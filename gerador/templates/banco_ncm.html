@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grande Tabela NCM - Banco de Dados Unificado (NFT Logistics)</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- NFT Logistics Theme (Light & Dark) -->
+    <link rel="stylesheet" href="/static/css/nft-theme.css">
+    <script src="/static/js/theme.js"></script>
+    <style>
+        .table-ncm { font-size: 13px; }
+        .badge-utrib { font-size: 0.85rem; padding: 4px 8px; font-family: monospace; }
+        .card-stat { border-left: 4px solid var(--primary); }
+    </style>
+</head>
+<body class="py-3">
+
+<div class="container-fluid px-4">
+    <!-- Top Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+        <div class="d-flex align-items-center gap-3">
+            <a href="/" class="d-flex align-items-center">
+                <img src="/static/img/brand/nft_logo_vetor_logo_black.svg" alt="NFT Logistics" class="logo-theme-black" style="height: 38px;">
+                <img src="/static/img/brand/nft_logo_vetor_logo_white.svg" alt="NFT Logistics" class="logo-theme-white" style="height: 38px;">
+            </a>
+            <div class="border-start ps-3 border-secondary-subtle">
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="mb-0 fw-bold">Grande Tabela NCM & Impostos</h4>
+                </div>
+                <small class="text-muted">15.156 registros unificados com Unidades Tributáveis (uTrib) e Alíquotas Oficiais (II, IPI, PIS, COFINS)</small>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro/Escuro" aria-label="Alternar Tema">
+                🌙
+            </button>
+            <a href="/download_ncm_excel" class="btn btn-success btn-sm fw-bold">
+                📗 Baixar Excel (.xlsx)
+            </a>
+            <a href="/download_ncm_json" class="btn btn-outline-secondary btn-sm fw-bold">
+                📥 Baixar JSON
+            </a>
+            <a href="/" class="btn btn-primary btn-sm fw-bold">
+                📋 Emissor NF-e
+            </a>
+        </div>
+    </div>
+
+    <!-- Cards de Estatisticas -->
+    <div class="row g-3 mb-3">
+        <div class="col-md-3">
+            <div class="card shadow-sm border card-stat py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted fw-bold">TOTAL DE REGISTROS NCM</small>
+                        <h4 class="mb-0 fw-bold" id="stat-total">15.156</h4>
+                    </div>
+                    <span class="fs-1">📚</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border card-stat py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted fw-bold">uTRIB EXPORTAÇÃO</small>
+                        <h4 class="mb-0 fw-bold">10.515</h4>
+                        <small class="text-muted">100% dos 8 dígitos</small>
+                    </div>
+                    <span class="fs-1">🏷️</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border card-stat py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted fw-bold">ALÍQUOTAS II & IPI</small>
+                        <h4 class="mb-0 fw-bold">100% Mapeadas</h4>
+                        <small class="text-muted">Camex TEC + Receita TIPI</small>
+                    </div>
+                    <span class="fs-1">⚖️</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border card-stat py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted fw-bold">PIS & COFINS PADRÃO</small>
+                        <h4 class="mb-0 fw-bold">1,65% / 7,60%</h4>
+                        <small class="text-muted">C/ Desonerações e Cesta Básica</small>
+                    </div>
+                    <span class="fs-1">💰</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Pesquisa -->
+    <div class="card shadow-sm border mb-3">
+        <div class="card-body py-3">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold mb-1">Buscar por Código NCM ou Descrição Oficial:</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">🔍</span>
+                        <input type="text" id="input-busca" class="form-control" placeholder="Ex: 90189099, 4202, bolsas, instrumentos, catalogo..." onkeydown="if(event.key==='Enter') pesquisarNcm(1)">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold mb-1">Filtrar por Unidade Tributável (uTrib):</label>
+                    <select id="select-utrib" class="form-select" onchange="pesquisarNcm(1)">
+                        <option value="">Todas as Unidades</option>
+                        <option value="UN">UN - Unidade</option>
+                        <option value="KG">KG - Quilograma</option>
+                        <option value="PC">PC - Peça</option>
+                        <option value="M">M - Metro</option>
+                        <option value="M2">M2 - Metro Quadrado</option>
+                        <option value="M3">M3 - Metro Cúbico</option>
+                        <option value="PAR">PAR - Par</option>
+                        <option value="L">L - Litro</option>
+                        <option value="MIL">MIL - Milheiro</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn btn-primary w-100 fw-bold" onclick="pesquisarNcm(1)">
+                        Filtrar
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="limparFiltros()">
+                        Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Resultados -->
+    <div class="card shadow-sm border mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+            <span class="fw-bold small text-secondary">
+                Mostrando <span id="lbl-contagem" class="text-dark fw-bold">0</span> registros
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <small class="text-muted">Por página:</small>
+                <select id="select-per-page" class="form-select form-select-sm" style="width: 80px;" onchange="pesquisarNcm(1)">
+                    <option value="25">25</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 560px;">
+                <table class="table table-hover table-striped table-bordered align-middle mb-0 table-ncm">
+                    <thead class="sticky-top">
+                        <tr>
+                            <th style="width: 120px;">Código NCM</th>
+                            <th style="width: 80px;" class="text-center">uTrib</th>
+                            <th>Descrição Oficial do NCM</th>
+                            <th style="width: 85px;" class="text-center">II (%)</th>
+                            <th style="width: 90px;" class="text-center">IPI (%)</th>
+                            <th style="width: 85px;" class="text-center">PIS (%)</th>
+                            <th style="width: 95px;" class="text-center">COFINS (%)</th>
+                            <th style="width: 95px;" class="text-center">Início</th>
+                            <th style="width: 130px;">Ato Legal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-ncm-corpo">
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">Carregando dados da tabela NCM...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2">
+            <small class="text-muted" id="lbl-paginacao-info">Página 1 de 1</small>
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="paginacao-botoes">
+                    <!-- Gerado dinamicamente -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script>
+    let paginaAtual = 1;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        pesquisarNcm(1);
+    });
+
+    function limparFiltros() {
+        document.getElementById('input-busca').value = '';
+        document.getElementById('select-utrib').value = '';
+        pesquisarNcm(1);
+    }
+
+    function pesquisarNcm(pagina = 1) {
+        paginaAtual = pagina;
+        const q = document.getElementById('input-busca').value.trim();
+        const utrib = document.getElementById('select-utrib').value;
+        const perPage = document.getElementById('select-per-page').value;
+
+        const tbody = document.getElementById('tabela-ncm-corpo');
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Buscando registros...</td></tr>`;
+
+        const url = `/api/ncm?q=${encodeURIComponent(q)}&utrib=${encodeURIComponent(utrib)}&page=${paginaAtual}&per_page=${perPage}`;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('lbl-contagem').innerText = data.total.toLocaleString('pt-BR');
+                document.getElementById('lbl-paginacao-info').innerText = `Página ${data.page} de ${data.total_pages} (${data.total.toLocaleString('pt-BR')} registros)`;
+
+                if (!data.items || data.items.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">Nenhum NCM encontrado para o termo pesquisado.</td></tr>`;
+                    renderPaginacao(data.page, data.total_pages);
+                    return;
+                }
+
+                let html = '';
+                data.items.forEach(it => {
+                    const utribBadge = it.utrib 
+                        ? `<span class="badge bg-success badge-utrib" title="${it.descricao_utrib || ''}">${it.utrib}</span>` 
+                        : `<span class="text-muted small">-</span>`;
+                    
+                    let iiBadge = '<span class="text-muted small">-</span>';
+                    if (it.aliquota_ii !== null && it.aliquota_ii !== undefined) {
+                        iiBadge = `<span class="badge bg-info-subtle text-info border border-info-subtle fw-bold">${Number(it.aliquota_ii).toFixed(2)}%</span>`;
+                    }
+
+                    let ipiBadge = '<span class="text-muted small">-</span>';
+                    if (it.aliquota_ipi !== null && it.aliquota_ipi !== undefined) {
+                        if (it.aliquota_ipi === 'NT') {
+                            ipiBadge = `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle" title="Não Tributado">NT (0%)</span>`;
+                        } else {
+                            ipiBadge = `<span class="badge bg-warning-subtle text-dark border border-warning-subtle fw-bold">${it.aliquota_ipi}%</span>`;
+                        }
+                    }
+
+                    let pisBadge = '<span class="text-muted small">-</span>';
+                    if (it.aliquota_pis !== null && it.aliquota_pis !== undefined) {
+                        const isZero = Number(it.aliquota_pis) === 0;
+                        pisBadge = `<span class="badge ${isZero ? 'bg-light text-muted border' : 'bg-success-subtle text-success border border-success-subtle fw-bold'}" title="${it.regime_pis_cofins || ''}">${Number(it.aliquota_pis).toFixed(2)}%</span>`;
+                    }
+
+                    let cofinsBadge = '<span class="text-muted small">-</span>';
+                    if (it.aliquota_cofins !== null && it.aliquota_cofins !== undefined) {
+                        const isZero = Number(it.aliquota_cofins) === 0;
+                        cofinsBadge = `<span class="badge ${isZero ? 'bg-light text-muted border' : 'border fw-bold'}" style="${isZero ? '' : 'background-color: #f3e8fd; color: #6f42c1; border-color: #d8b4fe !important;'}" title="${it.regime_pis_cofins || ''}">${Number(it.aliquota_cofins).toFixed(2)}%</span>`;
+                    }
+
+                    const ato = (it.tipo_ato && it.numero_ato) ? `${it.tipo_ato} ${it.numero_ato}/${it.ano_ato}` : '-';
+
+                    html += `<tr>
+                        <td class="fw-bold font-monospace">${it.codigo || it.codigo_limpo}</td>
+                        <td class="text-center">${utribBadge}</td>
+                        <td>
+                            <div>${it.descricao || '-'}</div>
+                            ${it.descricao_utrib ? `<div class="text-muted" style="font-size: 11px;">uTrib Oficial: <strong>${it.descricao_utrib}</strong></div>` : ''}
+                        </td>
+                        <td class="text-center">${iiBadge}</td>
+                        <td class="text-center">${ipiBadge}</td>
+                        <td class="text-center">${pisBadge}</td>
+                        <td class="text-center">${cofinsBadge}</td>
+                        <td class="text-center small">${it.data_inicio || '-'}</td>
+                        <td class="small text-muted">${ato}</td>
+                    </tr>`;
+                });
+
+                tbody.innerHTML = html;
+                renderPaginacao(data.page, data.total_pages);
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-danger">Erro ao carregar dados: ${err}</td></tr>`;
+            });
+    }
+
+    function renderPaginacao(page, totalPages) {
+        const pag = document.getElementById('paginacao-botoes');
+        pag.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${page === 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="#" onclick="pesquisarNcm(${page - 1}); return false;">&laquo;</a>`;
+        pag.appendChild(prevLi);
+
+        let startPage = Math.max(1, page - 2);
+        let endPage = Math.min(totalPages, page + 2);
+
+        for (let p = startPage; p <= endPage; p++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${p === page ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#" onclick="pesquisarNcm(${p}); return false;">${p}</a>`;
+            pag.appendChild(li);
+        }
+
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${page === totalPages ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="#" onclick="pesquisarNcm(${page + 1}); return false;">&raquo;</a>`;
+        pag.appendChild(nextLi);
+    }
+</script>
+</body>
+</html>

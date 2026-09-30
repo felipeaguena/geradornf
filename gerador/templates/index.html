@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador e Editor NF-e Sebrae - NFT Logistics</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- NFT Logistics Theme (Light & Dark) -->
+    <link rel="stylesheet" href="/static/css/nft-theme.css">
+    <script src="/static/js/theme.js"></script>
+    <!-- Tabulator CSS -->
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+</head>
+<body class="py-3">
+
+<div class="container-fluid px-4">
+    <!-- Top Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+        <div class="d-flex align-items-center gap-3">
+            <a href="/" class="d-flex align-items-center">
+                <img src="/static/img/brand/nft_logo_vetor_logo_black.svg" alt="NFT Logistics" class="logo-theme-black" style="height: 38px;">
+                <img src="/static/img/brand/nft_logo_vetor_logo_white.svg" alt="NFT Logistics" class="logo-theme-white" style="height: 38px;">
+            </a>
+            <div class="border-start ps-3 border-secondary-subtle">
+                <h4 class="mb-0 fw-bold">Editor & Gerador NF-e</h4>
+                <small class="text-muted">Importe o XML de modelo, selecione o Tipo de Nota para herdar impostos e gere o novo XML</small>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro/Escuro" aria-label="Alternar Tema">
+                🌙
+            </button>
+            <a href="/banco_ncm" target="_blank" class="btn btn-outline-primary btn-sm fw-bold">
+                📚 Grande Tabela NCM & Impostos
+            </a>
+            <button class="btn btn-success btn-sm fw-bold px-3" onclick="generateXML()">
+                💾 Gerar e Baixar Novo XML
+            </button>
+        </div>
+    </div>
+    
+    <!-- Upload Card -->
+    <div class="card mb-3 shadow-sm border">
+        <div class="card-body py-2 px-3">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <label class="form-label fw-bold mb-1 small text-muted">Arquivo XML de Modelo (Espelho de NF):</label>
+                    <input type="file" id="xmlFileInput" class="form-control" accept=".xml">
+                </div>
+                <div class="col-md-3 pt-md-3">
+                    <button class="btn btn-primary w-100 fw-bold" onclick="uploadXML()">
+                        📂 Carregar e Processar XML
+                    </button>
+                </div>
+                <div class="col-md-2 pt-md-3 text-end">
+                    <span id="status-badge" class="badge bg-secondary py-2 px-3 w-100">Aguardando XML</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegacao das Abas -->
+    <ul class="nav nav-tabs fw-bold" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="cabecalho-tab" data-bs-toggle="tab" data-bs-target="#cabecalho" type="button" role="tab">
+                📋 1. Cabeçalho & Operação
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="itens-tab" data-bs-toggle="tab" data-bs-target="#itens" type="button" role="tab">
+                📦 2. Itens da Nota (<span id="itens-badge" class="text-danger fw-bold">0</span>)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rodape-tab" data-bs-toggle="tab" data-bs-target="#rodape" type="button" role="tab">
+                📑 3. Rodapé & Totais
+            </button>
+        </li>
+        <li class="nav-item dropdown ms-auto" role="presentation">
+            <button class="nav-link dropdown-toggle" id="config-dropdown" data-bs-toggle="dropdown" type="button" role="button" aria-expanded="false">
+                ⚙️ Configurações
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="config-dropdown">
+                <li>
+                    <button class="dropdown-item py-2 d-flex align-items-center gap-2" id="tipo-nota-tab" data-bs-toggle="tab" data-bs-target="#tipo-nota" type="button" role="tab">
+                        <span>🏷️</span>
+                        <div>
+                            <span class="fw-bold">Tipo de Nota (Impostos)</span><br>
+                            <small class="text-muted">Tributos e regras padrão por operação</small>
+                        </div>
+                    </button>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    <!-- Conteudo das Abas -->
+    <div class="tab-content bg-white p-3 border border-top-0 rounded-bottom shadow-sm mb-4" id="myTabContent">
+        
+        <!-- ABA 1: CABECALHO -->
+        <div class="tab-pane fade show active" id="cabecalho" role="tabpanel">
+            <form id="form-cabecalho">
+                <div class="row g-3">
+                    <div class="col-12"><h6 class="border-bottom pb-1 fw-bold">Identificação e Seleção da Operação</h6></div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold">Número NF-e (nNF)</label>
+                        <input type="text" class="form-control" id="nNF" oninput="calcularChaveAcessoDinamica()">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label small fw-bold">Série</label>
+                        <input type="text" class="form-control" id="serie" oninput="calcularChaveAcessoDinamica()">
+                    </div>
+                    
+                    <!-- SELECT DO TIPO DE OPERACAO: HERDA TUDO NOS ITENS -->
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold">
+                            🎯 Tipo de Operação (Regras Padrão)
+                        </label>
+                        <select id="select_operacao" class="form-select fw-bold border-success" onchange="aoSelecionarOperacao(this.value)">
+                            <option value="">-- Carregando operações cadastradas... --</option>
+                        </select>
+                        <input type="hidden" id="natOp">
+                        <input type="hidden" id="cfop_padrao">
+                    </div>
+
+                    <!-- CHAVE DE ACESSO DA NF-E (44 DÍGITOS - DINÂMICA SEFAZ) -->
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small fw-bold mb-0">🔑 Chave de Acesso NF-e (44 dígitos)</label>
+                            <small class="text-muted font-monospace" style="font-size: 11px;">MOC SEFAZ (Dinâmica)</small>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace fw-bold text-primary" id="chaveAcessoDisplay" readonly placeholder="Aguardando dados da nota..." style="background-color: var(--surface-secondary); letter-spacing: 0.04em; font-size: 0.88rem;">
+                            <button class="btn btn-outline-secondary btn-sm px-3" type="button" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa">
+                                📋 Copiar
+                            </button>
+                        </div>
+                        <!-- Campos Ocultos de Apoio a Chave e Identificacao -->
+                        <input type="hidden" id="chaveAcesso">
+                        <input type="hidden" id="tpNF" value="0">
+                        <input type="hidden" id="idDest" value="3">
+                        <input type="hidden" id="cUF" value="35">
+                        <input type="hidden" id="cNF" value="">
+                        <input type="hidden" id="dhEmi" value="">
+                        <input type="hidden" id="mod" value="55">
+                        <input type="hidden" id="tpEmis" value="1">
+                        <input type="hidden" id="cDV" value="">
+                    </div>
+
+                    <!-- Caixa de Operação Ativa e Regras Herdadas -->
+                    <div class="col-12">
+                        <div id="card-resumo-heranca" class="card border p-2 px-3 mb-0 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <div><span class="text-muted">Operação:</span> <strong id="lbl-operacao-ativa">Nenhuma selecionada</strong></div>
+                                <div><span class="text-muted">Tipo NF:</span> <span id="lbl-tp-nf-ativo" class="fw-semibold">-</span></div>
+                                <div><span class="text-muted">Destino:</span> <span id="lbl-id-dest-ativo" class="fw-semibold">-</span></div>
+                                <div><span class="text-muted">CFOP:</span> <span id="lbl-cfop-ativo" class="fw-semibold">-</span></div>
+                                <div><span class="text-muted">CSOSN/ICMS:</span> <span id="lbl-icms-ativo" class="fw-semibold">-</span></div>
+                                <div><span class="text-muted">IPI CST:</span> <span id="lbl-ipi-ativo" class="fw-semibold">-</span></div>
+                                <div><span class="text-muted">PIS/COFINS:</span> <span id="lbl-pis-ativo" class="fw-semibold">-</span></div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="aplicarOperacaoSelecionadaAosItens()">
+                                    ⚡ Reaplicar Regras aos Itens
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EMITENTE -->
+                    <div class="col-md-6 mt-3">
+                        <div class="card h-100 border">
+                            <div class="card-header bg-light py-2">🏢 Dados do Emitente</div>
+                            <div class="card-body py-2">
+                                <div class="row g-2">
+                                    <div class="col-md-8">
+                                        <label class="form-label small mb-1">Razão Social (xNome)</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_xNome">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1">CNPJ</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_CNPJ" oninput="calcularChaveAcessoDinamica()">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <label class="form-label small mb-1">Logradouro (xLgr)</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_xLgr">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1">Número (nro)</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_nro">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small mb-1">Bairro</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_xBairro">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1">Cód. Mun. IBGE</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_cMun" oninput="calcularChaveAcessoDinamica()">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1">Município (xMun)</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_xMun">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1">UF</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_UF" oninput="calcularChaveAcessoDinamica()">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label small mb-1">CEP</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_CEP">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- DESTINATARIO -->
+                    <div class="col-md-6 mt-3">
+                        <div class="card h-100 border">
+                            <div class="card-header bg-light py-2">👤 Dados do Destinatário</div>
+                            <div class="card-body py-2">
+                                <div class="row g-2">
+                                    <div class="col-md-8">
+                                        <label class="form-label small mb-1">Nome / Razão Social (xNome)</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_xNome">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1">CNPJ / CPF / IdEstrangeiro</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_CNPJ_CPF">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <label class="form-label small mb-1">Logradouro (xLgr)</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_xLgr">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1">Número (nro)</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_nro">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small mb-1">Bairro</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_xBairro">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1">Cód. Mun. IBGE</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_cMun">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1">Município (xMun)</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_xMun">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small mb-1">UF</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_UF">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label small mb-1">CEP</label>
+                                        <input type="text" class="form-control form-control-sm" id="dest_CEP">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ABA: CONFIGURACOES > TIPO DE NOTA (CONFIGURACAO DE TRIBUTOS PADRAO POR OPERACAO) -->
+        <div class="tab-pane fade" id="tipo-nota" role="tabpanel">
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-secondary px-2 py-1">⚙️ Configurações</span>
+                    <span class="text-muted">/</span>
+                    <h6 class="mb-0 fw-bold">🏷️ Tipo de Nota (Impostos &amp; Regras Padrão por Operação)</h6>
+                </div>
+                <small class="text-muted">Gerencie e padronize regras tributárias herdadas automaticamente pelos itens da NF-e.</small>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="card h-100 border">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                            <span>Operações Cadastradas</span>
+                            <button class="btn btn-sm btn-outline-success" onclick="novaOperacao()">➕ Nova</button>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="list-group" id="lista-operacoes" style="max-height: 480px; overflow-y: auto;">
+                                <!-- Preenchido dinamicamente via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card border">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                            <span id="titulo-form-op">Configuração da Operação: <strong id="lbl-op-nome">Nova Operação</strong></span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-2" onclick="capturarImpostosDoXmlAtual()">
+                                    📥 Puxar Impostos do XML Atual
+                                </button>
+                                <button class="btn btn-sm btn-danger me-2" id="btn-excluir-op" style="display:none;" onclick="excluirOperacaoAtual()">
+                                    🗑️ Excluir
+                                </button>
+                                <button class="btn btn-sm btn-success fw-bold" onclick="salvarOperacao()">
+                                    💾 Salvar Configuração
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body py-3">
+                            <form id="form-tipo-nota">
+                                <input type="hidden" id="op_id">
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-bold">Nome da Operação (Natureza da Operação - natOp)</label>
+                                        <input type="text" class="form-control text-primary fw-bold" id="op_nome" placeholder="Ex: ADMISSAO TEMPORARIA, OUTRAS ENTRADAS...">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold">CFOP Padrão</label>
+                                        <input type="text" class="form-control fw-bold" id="op_cfop" placeholder="Ex: 3930, 7930, 5914">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label small fw-bold">Tipo da NF (tpNF)</label>
+                                        <select class="form-select fw-bold" id="op_tp_nf">
+                                            <option value="0">0 - Entrada</option>
+                                            <option value="1">1 - Saída</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Destino Operação (idDest)</label>
+                                        <select class="form-select fw-bold" id="op_id_dest">
+                                            <option value="1">1 - Interna (mesma UF)</option>
+                                            <option value="2">2 - Interestadual</option>
+                                            <option value="3" selected>3 - Com exterior</option>
+                                        </select>
+                                    </div>
+
+                                     <!-- ICMS -->
+                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">1. ICMS</h6></div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Origem da Mercadoria (orig)</label>
+                                        <select class="form-select form-select-sm" id="op_orig">
+                                            <option value="0">0 - Nacional</option>
+                                            <option value="1" selected>1 - Estrangeira - Importação direta</option>
+                                            <option value="2">2 - Estrangeira - Adquirida no mercado interno</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">CSOSN / CST ICMS</label>
+                                        <input type="text" class="form-control form-control-sm" id="op_csosn" placeholder="Ex: 102, 300, 400, 900">
+                                    </div>
+
+                                    <!-- IPI -->
+                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">2. IPI</h6></div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Código de Enquadramento (cEnq)</label>
+                                        <input type="text" class="form-control form-control-sm" id="op_c_enq" placeholder="Ex: 102, 999">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">CST IPI</label>
+                                        <input type="text" class="form-control form-control-sm" id="op_cst_ipi" placeholder="Ex: 05, 00, 49">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small">Alíquota IPI (%)</label>
+                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_p_ipi" value="0.00">
+                                    </div>
+
+                                    <!-- II -->
+                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">3. Imposto de Importação (II)</h6></div>
+                                    <div class="col-md-12">
+                                        <label class="form-label small">Alíquota II Padrão (%)</label>
+                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_aliquota_ii" value="0.00">
+                                    </div>
+
+                                    <!-- PIS & COFINS -->
+                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">4. PIS & COFINS</h6></div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">CST PIS</label>
+                                        <input type="text" class="form-control form-control-sm" id="op_cst_pis" placeholder="Ex: 07, 01">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Alíquota PIS (%)</label>
+                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_p_pis" value="0.00">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">CST COFINS</label>
+                                        <input type="text" class="form-control form-control-sm" id="op_cst_cofins" placeholder="Ex: 07, 01">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small">Alíquota COFINS (%)</label>
+                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_p_cofins" value="0.00">
+                                    </div>
+
+                                    <!-- INFORMACOES COMPLEMENTARES -->
+                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">5. Observações Padronizadas da Operação</h6></div>
+                                    <div class="col-12">
+                                        <label class="form-label small">Texto Sugerido para Informações Complementares (infCpl)</label>
+                                        <textarea class="form-control form-control-sm" id="op_inf_cpl" rows="3" placeholder="Texto que será sugerido no rodapé da nota para esta operação..."></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: ITENS DA NOTA (TABELA EM SEQUENCIA ESTILO GOOGLE SHEETS) -->
+        <div class="tab-pane fade" id="itens" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                <div>
+                    <h6 class="mb-0 fw-bold">Planilha de Itens da NF-e (det nItem)</h6>
+                    <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
+                </div>
+                <div>
+                    <button class="btn btn-outline-secondary btn-sm me-2" onclick="recarregarTabelaItens()">🔄 Redesenhar Grade</button>
+                    <button class="btn btn-success btn-sm me-2 fw-bold" onclick="exportarExcel()">⬇️ Exportar Excel (.xlsx)</button>
+                    <button class="btn btn-primary btn-sm fw-bold" onclick="document.getElementById('importExcelInput').click()">⬆️ Importar Excel (.xlsx)</button>
+                    <input type="file" id="importExcelInput" style="display:none" accept=".xlsx" onchange="importarExcel(this)">
+                </div>
+            </div>
+            
+            <div id="itens-table"></div>
+        </div>
+
+        <!-- ABA 3: RODAPE & TOTAIS -->
+        <div class="tab-pane fade" id="rodape" role="tabpanel">
+            <form id="form-rodape">
+                <!-- SEÇÃO 1: DADOS DO TRANSPORTE & CARGA -->
+                <div class="card border mb-3">
+                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">🚚 Dados do Transporte e Volumes</span>
+                        <small class="text-muted">Grupo &lt;transp&gt; SEFAZ</small>
+                    </div>
+                    <div class="card-body py-3">
+                        <div class="row g-2">
+                            <!-- Modalidade do Frete -->
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 fw-bold">Modalidade do Frete (modFrete)</label>
+                                <select class="form-select form-select-sm" id="transp_modFrete">
+                                    <option value="0">0 - CIF (Por conta do Remetente)</option>
+                                    <option value="1">1 - FOB (Por conta do Destinatário)</option>
+                                    <option value="2">2 - Terceiros</option>
+                                    <option value="3">3 - Próprio Remetente</option>
+                                    <option value="4">4 - Próprio Destinatário</option>
+                                    <option value="9">9 - Sem Ocorrência de Transporte</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 fw-bold">CNPJ / CPF Transportadora</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_CNPJ_CPF" placeholder="00.000.000/0000-00">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small mb-1 fw-bold">Razão Social / Nome (xNome)</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_xNome" placeholder="Nome da transportadora">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1 fw-bold">Inscrição Estadual (IE)</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_IE">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small mb-1">Endereço Completo (xEnder)</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_xEnder">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small mb-1">Município (xMun)</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_xMun">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1">UF</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_UF" maxlength="2">
+                            </div>
+                        </div>
+
+                        <hr class="my-3 text-muted">
+
+                        <!-- Dados dos Volumes e Pesos -->
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1 fw-bold text-primary">Qtd. Volumes (qVol)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_qVol" placeholder="Ex: 10">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 fw-bold text-primary">Espécie de Volumes (esp)</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_esp" placeholder="Ex: CAIXAS, PALETES, VOLUMES">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1">Marca (marca)</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_marca" placeholder="Marca volumes">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label small mb-1">Nº Vol.</label>
+                                <input type="text" class="form-control form-control-sm" id="transp_nVol" placeholder="Ex: 1">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1 fw-bold text-primary">Peso Líquido Total (kg)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_pesoL" placeholder="0,000" onchange="formatarInputVisualBR(this, 3, 3)">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1 fw-bold text-primary">Peso Bruto Total (kg)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_pesoB" placeholder="0,000" onchange="formatarInputVisualBR(this, 3, 3)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 2: OBSERVAÇÕES E INFORMAÇÕES COMPLEMENTARES -->
+                <div class="card border mb-3">
+                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">📝 Informações Complementares / Observações da Nota (infCpl)</span>
+                        <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2" onclick="aplicarObsDaOperacao()">
+                            📝 Puxar Observação Padrão do Tipo de Nota
+                        </button>
+                    </div>
+                    <div class="card-body py-2">
+                        <textarea class="form-control font-monospace form-control-sm" id="infCpl" rows="4" placeholder="Observações de interesse do contribuinte gravadas no XML..."></textarea>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 3: TOTAIS DA NOTA FISCAL (ICMSTOT) -->
+                <div class="card border">
+                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold">💰 Totais da Nota Fiscal (Grupo &lt;total&gt; / &lt;ICMSTot&gt;)</span>
+                            <small class="text-muted d-none d-md-inline">(Valores em R$)</small>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm py-1 px-3 fw-bold shadow-sm" onclick="recalcularTotaisDosItens()">
+                            ⚡ Recalcular Totais da Nota
+                        </button>
+                    </div>
+                    <div class="card-body py-3">
+                        <!-- Linha de Destaques Comerciais -->
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1 fw-bold">Total dos Produtos (vProd)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="tot_vProd" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1">Total do Frete (vFrete)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vFrete" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1">Total do Seguro (vSeg)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vSeg" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1">Outras Despesas (vOutro)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vOutro" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1">Total Desconto (vDesc)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end text-danger" id="tot_vDesc" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small mb-1 fw-bold text-success">Valor Total da NF (vNF)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold text-success border-success" id="tot_vNF" oninput="setVal('vNF', this.value)" onchange="formatarInputVisualBR(this, 2, 2); setVal('vNF', this.value);">
+                                <input type="hidden" id="vNF">
+                            </div>
+                        </div>
+
+                        <!-- Linha de Impostos e Tributos -->
+                        <div class="row g-2 pt-2 border-top">
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Base de Cálculo ICMS (vBC)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vBC" onchange="formatarInputVisualBR(this, 2, 2)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Total ICMS (vICMS)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vICMS" onchange="formatarInputVisualBR(this, 2, 2)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Base ICMS ST (vBCST)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vBCST" onchange="formatarInputVisualBR(this, 2, 2)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Total ICMS ST (vST)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vST" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Total Imposto Importação (vII)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vII" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Total IPI (vIPI)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vIPI" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Total PIS (vPIS)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vPIS" onchange="formatarInputVisualBR(this, 2, 2)">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 text-muted">Total COFINS (vCOFINS)</label>
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vCOFINS" onchange="formatarInputVisualBR(this, 2, 2)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let itensTable = null;
+    let xmlOriginalData = "";
+    let itensCache = [];
+    let operacoesCache = [];
+    let impostoModeloXml = null;
+
+    // Atalho para abrir a aba Tipo de Nota
+    function abrirAbaTipoNota(event) {
+        if (event) event.preventDefault();
+        const tabEl = document.getElementById('tipo-nota-tab');
+        if (tabEl) {
+            bootstrap.Tab.getOrCreateInstance(tabEl).show();
+        }
+    }
+
+    // Funcoes seguras para leitura e escrita de elementos do DOM (evitam crashes de null)
+    function setVal(id, val) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = (val !== undefined && val !== null) ? val : "";
+        }
+    }
+
+    function getVal(id) {
+        const el = document.getElementById(id);
+        return el ? el.value : "";
+    }
+
+    // === GERACAO DINAMICA DE CHAVE DE ACESSO DA NF-E (44 DIGITOS - SEFAZ MOC) ===
+    const UF_IBGE_MAP = {
+        'RO': '11', 'AC': '12', 'AM': '13', 'RR': '14', 'PA': '15', 'AP': '16', 'TO': '17',
+        'MA': '21', 'PI': '22', 'CE': '23', 'RN': '24', 'PB': '25', 'PE': '26', 'AL': '27',
+        'SE': '28', 'BA': '29', 'MG': '31', 'ES': '32', 'RJ': '33', 'SP': '35', 'PR': '41',
+        'SC': '42', 'RS': '43', 'MS': '50', 'MT': '51', 'GO': '52', 'DF': '53'
+    };
+
+    function calcularDVChave(chave43) {
+        if (!chave43 || chave43.length !== 43) return "";
+        let soma = 0;
+        let peso = 2;
+        for (let i = chave43.length - 1; i >= 0; i--) {
+            soma += parseInt(chave43.charAt(i), 10) * peso;
+            peso = (peso === 9) ? 2 : peso + 1;
+        }
+        const resto = soma % 11;
+        return (resto === 0 || resto === 1) ? 0 : (11 - resto);
+    }
+
+    function obterCodigoUF() {
+        const cMun = (getVal('emit_cMun') || '').trim();
+        if (cMun.length >= 2 && /^\d+$/.test(cMun.slice(0, 2))) {
+            return cMun.slice(0, 2);
+        }
+        const uf = (getVal('emit_UF') || '').trim().toUpperCase();
+        if (UF_IBGE_MAP[uf]) {
+            return UF_IBGE_MAP[uf];
+        }
+        return getVal('cUF') || '35';
+    }
+
+    function calcularChaveAcessoDinamica() {
+        const cUF = obterCodigoUF();
+        setVal('cUF', cUF);
+
+        let aamm = "";
+        const dh = getVal('dhEmi');
+        if (dh && dh.length >= 7) {
+            const parts = dh.split('-');
+            if (parts.length >= 2) {
+                aamm = parts[0].slice(-2) + parts[1].padStart(2, '0');
+            }
+        }
+        if (!aamm || aamm.length !== 4) {
+            const now = new Date();
+            aamm = String(now.getFullYear()).slice(-2) + String(now.getMonth() + 1).padStart(2, '0');
+        }
+
+        const cnpjRaw = (getVal('emit_CNPJ') || '').replace(/\D/g, '');
+        const cnpjPadded = cnpjRaw.padStart(14, '0').slice(-14);
+
+        const mod = (getVal('mod') || '55').padStart(2, '0').slice(-2);
+
+        let serieRaw = (getVal('serie') || '1').replace(/\D/g, '');
+        if (!serieRaw) serieRaw = '1';
+        const seriePadded = serieRaw.padStart(3, '0').slice(-3);
+
+        let nNFRaw = (getVal('nNF') || '1').replace(/\D/g, '');
+        if (!nNFRaw) nNFRaw = '1';
+        const nNFPadded = nNFRaw.padStart(9, '0').slice(-9);
+
+        const tpEmis = (getVal('tpEmis') || '1').slice(0, 1);
+
+        let cNF = (getVal('cNF') || '').replace(/\D/g, '');
+        if (!cNF || cNF.length !== 8) {
+            cNF = String(Math.floor(10000000 + Math.random() * 90000000));
+            setVal('cNF', cNF);
+        }
+
+        const chave43 = `${cUF}${aamm}${cnpjPadded}${mod}${seriePadded}${nNFPadded}${tpEmis}${cNF}`;
+        if (chave43.length === 43) {
+            const dv = calcularDVChave(chave43);
+            setVal('cDV', dv);
+            const chaveCompleta = `${chave43}${dv}`;
+            setVal('chaveAcesso', chaveCompleta);
+            const chaveFormatada = chaveCompleta.replace(/(\d{4})/g, '$1 ').trim();
+            setVal('chaveAcessoDisplay', chaveFormatada);
+        } else {
+            setVal('chaveAcessoDisplay', chave43);
+        }
+    }
+
+    function copiarChaveAcesso() {
+        const chave = getVal('chaveAcesso') || (getVal('chaveAcessoDisplay') || '').replace(/\s+/g, '');
+        if (!chave || chave.length < 44) {
+            alert("Chave de acesso incompleta ou ainda não gerada.");
+            return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(chave).then(() => {
+                const btn = document.getElementById('btnCopiarChave');
+                if (btn) {
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = "✅ Copiado!";
+                    btn.classList.remove('btn-outline-secondary');
+                    btn.classList.add('btn-success');
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-outline-secondary');
+                    }, 2000);
+                }
+            }).catch(() => {
+                prompt("Copie a chave de acesso abaixo:", chave);
+            });
+        } else {
+            prompt("Copie a chave de acesso abaixo:", chave);
+        }
+    }
+
+    // === FORMATADORES VISUAIS BR (APENAS PARA LEITURA NO FRONT-END) ===
+    function formatarNumeroVisualBR(valor, minDec = 2, maxDec = 2) {
+        if (valor === undefined || valor === null || valor === '') return '';
+        const strVal = String(valor).trim();
+        if (strVal === '') return '';
+        
+        let num;
+        if (strVal.includes(',') && strVal.includes('.')) {
+            num = parseFloat(strVal.replace(/\./g, '').replace(',', '.'));
+        } else if (strVal.includes(',')) {
+            num = parseFloat(strVal.replace(',', '.'));
+        } else {
+            num = parseFloat(strVal);
+        }
+        if (isNaN(num)) return valor;
+        return num.toLocaleString('pt-BR', {
+            minimumFractionDigits: minDec,
+            maximumFractionDigits: maxDec
+        });
+    }
+
+    function formatarMoedaVisualBR(cell) {
+        return formatarNumeroVisualBR(cell.getValue(), 2, 2);
+    }
+
+    function formatarAliquotaVisualBR(cell) {
+        const val = cell.getValue();
+        if (val === undefined || val === null || val === '') return '';
+        return formatarNumeroVisualBR(val, 2, 2);
+    }
+
+    function formatarQtdVisualBR(cell) {
+        const val = cell.getValue();
+        if (val === undefined || val === null || val === '') return '';
+        const strVal = String(val).trim();
+        let decs = 2;
+        if (strVal.includes('.')) {
+            const decPart = strVal.split('.')[1];
+            if (decPart && decPart.length > 2) {
+                decs = Math.min(decPart.length, 4);
+            }
+        } else if (strVal.includes(',')) {
+            const decPart = strVal.split(',')[1];
+            if (decPart && decPart.length > 2) {
+                decs = Math.min(decPart.length, 4);
+            }
+        }
+        return formatarNumeroVisualBR(val, decs, decs);
+    }
+
+    function formatarUnitarioVisualBR(cell) {
+        const val = cell.getValue();
+        if (val === undefined || val === null || val === '') return '';
+        const strVal = String(val).trim();
+        let decs = 2;
+        if (strVal.includes('.')) {
+            const decPart = strVal.split('.')[1];
+            if (decPart && decPart.length > 2) {
+                decs = Math.min(decPart.length, 4);
+            }
+        } else if (strVal.includes(',')) {
+            const decPart = strVal.split(',')[1];
+            if (decPart && decPart.length > 2) {
+                decs = Math.min(decPart.length, 4);
+            }
+        }
+        return formatarNumeroVisualBR(val, decs, decs);
+    }
+
+    // Mutador de edição: caso o usuário digite com vírgula ou pontos, limpa para formato decimal puro (SEFAZ)
+    function mutatorLimparNumero(value) {
+        if (value === undefined || value === null || value === '') return value;
+        const strVal = String(value).trim();
+        if (strVal === '') return '';
+        if (strVal.includes(',') && strVal.includes('.')) {
+            return strVal.replace(/\./g, '').replace(',', '.');
+        } else if (strVal.includes(',')) {
+            return strVal.replace(',', '.');
+        }
+        return strVal;
+    }
+
+    function formatarInputVisualBR(inputEl, minDec = 2, maxDec = 2) {
+        if (!inputEl) return;
+        const val = inputEl.value;
+        inputEl.value = formatarNumeroVisualBR(val, minDec, maxDec);
+    }
+
+    function parseNum(val) {
+        if (val === undefined || val === null || val === '') return 0;
+        const s = String(val).trim();
+        if (s === '') return 0;
+        if (s.includes(',') && s.includes('.')) {
+            return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0;
+        } else if (s.includes(',')) {
+            return parseFloat(s.replace(',', '.')) || 0;
+        }
+        return parseFloat(s) || 0;
+    }
+
+    // Recalcula o Valor Total da NF (vNF) somando os componentes da nota (Regra W16 SEFAZ)
+    function calcularVNFAutomatico() {
+        const vProd = parseNum(getVal('tot_vProd'));
+        const vFrete = parseNum(getVal('tot_vFrete'));
+        const vSeg = parseNum(getVal('tot_vSeg'));
+        const vOutro = parseNum(getVal('tot_vOutro'));
+        const vDesc = parseNum(getVal('tot_vDesc'));
+        const vII = parseNum(getVal('tot_vII'));
+        const vIPI = parseNum(getVal('tot_vIPI'));
+        const vST = parseNum(getVal('tot_vST'));
+
+        // Regra SEFAZ: vNF = vProd - vDesc + vST + vFrete + vSeg + vOutro + vII + vIPI
+        const vNF = (vProd - vDesc) + vST + vFrete + vSeg + vOutro + vII + vIPI;
+        
+        const formatado = formatarNumeroVisualBR(vNF.toFixed(2), 2, 2);
+        setVal('tot_vNF', formatado);
+        setVal('vNF', formatado);
+    }
+
+    // Varre os itens da grade e calcula os totais correspondentes
+    function recalcularTotaisDosItens(silencioso = false) {
+        const itens = (itensTable) ? itensTable.getData() : itensCache;
+        if (!itens || itens.length === 0) {
+            if (!silencioso) alert("Nenhum item carregado na grade para calcular os totais.");
+            return;
+        }
+
+        let somaProd = 0;
+        let somaFrete = 0;
+        let somaOutro = 0;
+        let somaIPI = 0;
+        let somaII = 0;
+        let somaPIS = 0;
+        let somaCOFINS = 0;
+
+        itens.forEach(item => {
+            somaProd += parseNum(item.vProd);
+            somaFrete += parseNum(item.vFrete);
+            somaOutro += parseNum(item.vOutro);
+            somaIPI += parseNum(item.vIPI);
+            somaII += parseNum(item.vII);
+            somaPIS += parseNum(item.vPIS);
+            somaCOFINS += parseNum(item.vCOFINS);
+        });
+
+        setVal('tot_vProd', formatarNumeroVisualBR(somaProd.toFixed(2), 2, 2));
+        setVal('tot_vFrete', formatarNumeroVisualBR(somaFrete.toFixed(2), 2, 2));
+        setVal('tot_vOutro', formatarNumeroVisualBR(somaOutro.toFixed(2), 2, 2));
+        setVal('tot_vIPI', formatarNumeroVisualBR(somaIPI.toFixed(2), 2, 2));
+        setVal('tot_vII', formatarNumeroVisualBR(somaII.toFixed(2), 2, 2));
+        setVal('tot_vPIS', formatarNumeroVisualBR(somaPIS.toFixed(2), 2, 2));
+        setVal('tot_vCOFINS', formatarNumeroVisualBR(somaCOFINS.toFixed(2), 2, 2));
+
+        // Recalcula vNF com base nos novos totais
+        calcularVNFAutomatico();
+
+        if (!silencioso) {
+            alert(`Totais e Valor Total da NF recalculados com sucesso com base nos ${itens.length} itens da nota!`);
+        }
+    }
+
+    // Definicao de todas as colunas de det nItem
+    const colunasItensDef = [
+        {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center"},
+        {title:"Cód. Prod.", field:"cProd", width:130, frozen:true, editor:"input"},
+        {title:"Descrição do Produto", field:"xProd", width:280, editor:"input"},
+        {title:"NCM", field:"NCM", width:100, editor:"input"},
+        {title:"CFOP", field:"CFOP", width:85, editor:"input"},
+        {title:"Un. Com.", field:"uCom", width:85, editor:"input"},
+        {title:"Qtd. Com.", field:"qCom", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. Unit. Com.", field:"vUnCom", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. Total Prod.", field:"vProd", width:125, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero, cssClass:"fw-bold text-primary"},
+        {title:"Un. Trib.", field:"uTrib", width:85, editor:"input"},
+        {title:"Qtd. Trib.", field:"qTrib", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. Unit. Trib.", field:"vUnTrib", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"Frete", field:"vFrete", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"Outras Desp.", field:"vOutro", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"Nº DI", field:"nDI", width:125, editor:"input"},
+        {title:"Data DI", field:"dDI", width:110, editor:"input"},
+        {title:"Local Desemb.", field:"xLocDesemb", width:170, editor:"input"},
+        {title:"UF Desemb.", field:"UFDesemb", width:95, editor:"input"},
+        {title:"Data Desemb.", field:"dDesemb", width:115, editor:"input"},
+        {title:"Via Transp.", field:"tpViaTransp", width:95, editor:"input"},
+        {title:"AFRMM", field:"vAFRMM", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"Exportador", field:"cExportador", width:130, editor:"input"},
+        {title:"Nº Adição", field:"nAdicao", width:95, editor:"input"},
+        {title:"Seq. Adição", field:"nSeqAdic", width:95, editor:"input"},
+        {title:"Fabricante", field:"cFabricante", width:130, editor:"input"},
+        {title:"Origem", field:"orig", width:80, editor:"input"},
+        {title:"CSOSN/CST ICMS", field:"CSOSN", width:120, editor:"input"},
+        {title:"cEnq IPI", field:"cEnq", width:90, editor:"input"},
+        {title:"CST IPI", field:"CST_IPI", width:90, editor:"input"},
+        {title:"BC IPI", field:"vBC_IPI", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"% IPI", field:"pIPI", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. IPI", field:"vIPI", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"BC II", field:"vBC_II", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"Desp. Aduan.", field:"vDespAdu", width:110, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. II", field:"vII", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. IOF", field:"vIOF", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"CST PIS", field:"CST_PIS", width:90, editor:"input"},
+        {title:"BC PIS", field:"vBC_PIS", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"% PIS", field:"pPIS", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. PIS", field:"vPIS", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"CST COFINS", field:"CST_COFINS", width:100, editor:"input"},
+        {title:"BC COFINS", field:"vBC_COFINS", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"% COFINS", field:"pCOFINS", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"V. COFINS", field:"vCOFINS", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero}
+    ];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Carregar Operações cadastradas do banco e inicializar identificação
+        carregarTiposOperacao();
+        atualizarCamposIdentificacao('0', '3');
+        calcularChaveAcessoDinamica();
+
+        // 2. Inicializar tabela de Itens
+        itensTable = new Tabulator("#itens-table", {
+            data: [],
+            layout: "fitDataFill",
+            height: "560px",
+            columns: colunasItensDef,
+            renderVertical: "basic",
+            renderHorizontal: "basic",
+            placeholder: "Nenhum item carregado. Selecione e carregue o XML acima."
+        });
+
+        itensTable.on("cellEdited", function(cell) {
+            const campo = cell.getField();
+            if (['vProd', 'vFrete', 'vOutro', 'vIPI', 'vII', 'vPIS', 'vCOFINS', 'vBC_IPI', 'vBC_II', 'vBC_PIS', 'vBC_COFINS'].includes(campo)) {
+                recalcularTotaisDosItens(true);
+            }
+        });
+
+        // 3. Listener para redimensionar tabela ao abrir a aba
+        const itensTabBtn = document.getElementById('itens-tab');
+        if (itensTabBtn) {
+            itensTabBtn.addEventListener('shown.bs.tab', function () {
+                setTimeout(() => {
+                    if (itensTable) {
+                        itensTable.redraw(true);
+                    }
+                }, 60);
+            });
+        }
+    });
+
+    function recarregarTabelaItens() {
+        if (itensTable) {
+            itensTable.redraw(true);
+        }
+    }
+
+    // === GERENCIAMENTO DE TIPOS DE OPERACAO ===
+    function carregarTiposOperacao(selecionarNome = null) {
+        fetch('/tipos_operacao')
+            .then(res => res.json())
+            .then(data => {
+                operacoesCache = data || [];
+                
+                // 1. Atualiza Select da Aba 1 (Cabecalho)
+                const sel = document.getElementById('select_operacao');
+                sel.innerHTML = '<option value="">-- Selecione uma Operação --</option>';
+                
+                operacoesCache.forEach(op => {
+                    const opt = document.createElement('option');
+                    opt.value = op.nome_operacao;
+                    opt.textContent = `(${op.cfop_padrao}) ${op.nome_operacao}`;
+                    sel.appendChild(opt);
+                });
+
+                // 2. Atualiza Lista da Aba de Configurações (Tipo de Nota)
+                const lista = document.getElementById('lista-operacoes');
+                lista.innerHTML = '';
+                
+                operacoesCache.forEach(op => {
+                    const item = document.createElement('a');
+                    item.href = "#";
+                    item.className = "list-group-item list-group-item-action py-2";
+                    const tipoTxt = (op.tp_nf == '1') ? '1 - Saída' : '0 - Entrada';
+                    const destTxt = (op.id_dest == '1') ? 'Interna' : (op.id_dest == '2' ? 'Interestadual' : 'Exterior');
+                    item.innerHTML = `<strong>(${op.cfop_padrao}) ${op.nome_operacao}</strong><br><small class='text-muted'>${tipoTxt} | Destino: ${destTxt} | ICMS: ${op.csosn_icms} | IPI: ${op.cst_ipi}</small>`;
+                    item.onclick = (e) => {
+                        e.preventDefault();
+                        selecionarOperacaoParaEdicao(op);
+                    };
+                    lista.appendChild(item);
+                });
+
+                // Se pediu para selecionar uma operacao especifica
+                if (selecionarNome) {
+                    sel.value = selecionarNome;
+                    aoSelecionarOperacao(selecionarNome);
+                } else if (sel.value) {
+                    aoSelecionarOperacao(sel.value);
+                }
+            });
+    }
+
+    function atualizarCamposIdentificacao(tpVal, idDestVal) {
+        if (tpVal !== undefined && tpVal !== null && tpVal !== '') {
+            setVal('tpNF', tpVal);
+        }
+        if (idDestVal !== undefined && idDestVal !== null && idDestVal !== '') {
+            setVal('idDest', idDestVal);
+        }
+
+        const rawTp = getVal('tpNF') || '0';
+        const rawDest = getVal('idDest') || '3';
+
+        const tpText = (rawTp === '1') ? '1 - Saída' : '0 - Entrada';
+        setVal('tpNF_desc', tpText);
+
+        let destText = '3 - Com exterior';
+        if (rawDest === '1') destText = '1 - Interna (mesma UF)';
+        else if (rawDest === '2') destText = '2 - Interestadual';
+        setVal('idDest_desc', destText);
+
+        const lblTp = document.getElementById('lbl-tp-nf-ativo');
+        if (lblTp) lblTp.innerText = tpText;
+
+        const lblDest = document.getElementById('lbl-id-dest-ativo');
+        if (lblDest) lblDest.innerText = destText;
+    }
+
+    function aoSelecionarOperacao(nomeOp) {
+        setVal('natOp', nomeOp);
+        const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (nomeOp || '').toUpperCase());
+        if (op) {
+            document.getElementById('lbl-operacao-ativa').innerText = `(${op.cfop_padrao}) ${op.nome_operacao}`;
+            document.getElementById('lbl-cfop-ativo').innerText = op.cfop_padrao || '-';
+            document.getElementById('lbl-icms-ativo').innerText = op.csosn_icms || '-';
+            document.getElementById('lbl-ipi-ativo').innerText = op.cst_ipi || '-';
+            document.getElementById('lbl-pis-ativo').innerText = (op.cst_pis || '-') + ' / ' + (op.cst_cofins || '-');
+            setVal('cfop_padrao', op.cfop_padrao);
+
+            // Herdar automaticamente tpNF (Entrada/Saída) e idDest (Destino da Operação)
+            atualizarCamposIdentificacao(op.tp_nf, op.id_dest);
+
+            // Herdar automaticamente nos itens carregados!
+            aplicarRegrasAosItens(op);
+        } else {
+            document.getElementById('lbl-operacao-ativa').innerText = nomeOp || 'Nenhuma selecionada';
+            document.getElementById('lbl-cfop-ativo').innerText = '-';
+            document.getElementById('lbl-icms-ativo').innerText = '-';
+            document.getElementById('lbl-ipi-ativo').innerText = '-';
+            document.getElementById('lbl-pis-ativo').innerText = '-';
+            atualizarCamposIdentificacao(getVal('tpNF'), getVal('idDest'));
+        }
+    }
+
+    function aplicarOperacaoSelecionadaAosItens() {
+        const nomeOp = getVal('select_operacao');
+        if (!nomeOp) {
+            alert("Selecione um Tipo de Operação primeiro!");
+            return;
+        }
+        const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === nomeOp.toUpperCase());
+        if (op) {
+            aplicarRegrasAosItens(op);
+            alert(`Regras da operação '${op.nome_operacao}' aplicadas com sucesso a todos os ${itensCache.length} itens!`);
+        }
+    }
+
+    function aplicarRegrasAosItens(op) {
+        if (!itensCache || itensCache.length === 0) return;
+        
+        itensCache.forEach(item => {
+            if (op.cfop_padrao) item.CFOP = op.cfop_padrao;
+            if (op.orig_padrao) item.orig = op.orig_padrao;
+            if (op.csosn_icms) item.CSOSN = op.csosn_icms;
+            if (op.c_enq_ipi) item.cEnq = op.c_enq_ipi;
+            if (op.cst_ipi) item.CST_IPI = op.cst_ipi;
+            if (op.p_ipi !== undefined) item.pIPI = op.p_ipi;
+            if (op.cst_pis) item.CST_PIS = op.cst_pis;
+            if (op.p_pis !== undefined) item.pPIS = op.p_pis;
+            if (op.cst_cofins) item.CST_COFINS = op.cst_cofins;
+            if (op.p_cofins !== undefined) item.pCOFINS = op.p_cofins;
+        });
+
+        if (itensTable) {
+            itensTable.setData(itensCache);
+        }
+        recalcularTotaisDosItens(true);
+    }
+
+    function aplicarObsDaOperacao() {
+        const nomeOp = getVal('select_operacao');
+        const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === nomeOp.toUpperCase());
+        if (op && op.inf_cpl_padrao) {
+            setVal('infCpl', op.inf_cpl_padrao);
+            alert("Observação padrão aplicada no rodapé!");
+        } else {
+            alert("Essa operação não possui texto padrão de observações cadastrado.");
+        }
+    }
+
+    // === ABA: FORMULARIO DE TIPO DE NOTA ===
+    function novaOperacao() {
+        setVal('op_id', '');
+        setVal('op_nome', '');
+        setVal('op_cfop', '3930');
+        setVal('op_tp_nf', '0');
+        setVal('op_id_dest', '3');
+        setVal('op_orig', '1');
+        setVal('op_csosn', '102');
+        setVal('op_c_enq', '102');
+        setVal('op_cst_ipi', '05');
+        setVal('op_p_ipi', '0.00');
+        setVal('op_aliquota_ii', '0.00');
+        setVal('op_cst_pis', '07');
+        setVal('op_p_pis', '0.00');
+        setVal('op_cst_cofins', '07');
+        setVal('op_p_cofins', '0.00');
+        setVal('op_inf_cpl', '');
+        
+        document.getElementById('lbl-op-nome').innerText = "Nova Operação";
+        document.getElementById('btn-excluir-op').style.display = "none";
+    }
+
+    function selecionarOperacaoParaEdicao(op) {
+        setVal('op_id', op.id);
+        setVal('op_nome', op.nome_operacao);
+        setVal('op_cfop', op.cfop_padrao);
+        setVal('op_tp_nf', (op.tp_nf !== undefined && op.tp_nf !== null) ? op.tp_nf : '0');
+        setVal('op_id_dest', (op.id_dest !== undefined && op.id_dest !== null) ? op.id_dest : '3');
+        setVal('op_orig', op.orig_padrao || '1');
+        setVal('op_csosn', op.csosn_icms);
+        setVal('op_c_enq', op.c_enq_ipi);
+        setVal('op_cst_ipi', op.cst_ipi);
+        setVal('op_p_ipi', op.p_ipi || '0.00');
+        setVal('op_aliquota_ii', op.aliquota_ii || '0.00');
+        setVal('op_cst_pis', op.cst_pis);
+        setVal('op_p_pis', op.p_pis || '0.00');
+        setVal('op_cst_cofins', op.cst_cofins);
+        setVal('op_p_cofins', op.p_cofins || '0.00');
+        setVal('op_inf_cpl', op.inf_cpl_padrao || '');
+
+        document.getElementById('lbl-op-nome').innerText = op.nome_operacao;
+        document.getElementById('btn-excluir-op').style.display = "inline-block";
+    }
+
+    function capturarImpostosDoXmlAtual() {
+        if (!impostoModeloXml) {
+            alert("Faça o upload de um arquivo XML primeiro para capturar os impostos!");
+            return;
+        }
+        setVal('op_cfop', impostoModeloXml.cfop_padrao || '3930');
+        if (impostoModeloXml.tp_nf !== undefined && impostoModeloXml.tp_nf !== null) {
+            setVal('op_tp_nf', impostoModeloXml.tp_nf);
+        }
+        if (impostoModeloXml.id_dest !== undefined && impostoModeloXml.id_dest !== null) {
+            setVal('op_id_dest', impostoModeloXml.id_dest);
+        }
+        setVal('op_orig', impostoModeloXml.orig_padrao || '1');
+        setVal('op_csosn', impostoModeloXml.csosn_icms || '102');
+        setVal('op_c_enq', impostoModeloXml.c_enq_ipi || '102');
+        setVal('op_cst_ipi', impostoModeloXml.cst_ipi || '05');
+        setVal('op_p_ipi', impostoModeloXml.p_ipi || '0.00');
+        setVal('op_cst_pis', impostoModeloXml.cst_pis || '07');
+        setVal('op_p_pis', impostoModeloXml.p_pis || '0.00');
+        setVal('op_cst_cofins', impostoModeloXml.cst_cofins || '07');
+        setVal('op_p_cofins', impostoModeloXml.p_cofins || '0.00');
+        if (!getVal('op_nome')) {
+            setVal('op_nome', getVal('natOp') || 'NOVA OPERACAO IMPORTADA');
+        }
+        alert("Parâmetros de impostos, tipo de nota (entrada/saída) e destino capturados do XML atual! Você pode revisar os dados e clicar em Salvar.");
+    }
+
+    function salvarOperacao() {
+        const nome = getVal('op_nome').trim();
+        if (!nome) {
+            alert("Informe o Nome da Operação!");
+            return;
+        }
+
+        const payload = {
+            id: getVal('op_id'),
+            nome_operacao: nome,
+            cfop_padrao: getVal('op_cfop'),
+            tp_nf: getVal('op_tp_nf'),
+            id_dest: getVal('op_id_dest'),
+            orig_padrao: getVal('op_orig'),
+            csosn_icms: getVal('op_csosn'),
+            c_enq_ipi: getVal('op_c_enq'),
+            cst_ipi: getVal('op_cst_ipi'),
+            p_ipi: parseFloat(getVal('op_p_ipi') || 0),
+            aliquota_ii: parseFloat(getVal('op_aliquota_ii') || 0),
+            cst_pis: getVal('op_cst_pis'),
+            p_pis: parseFloat(getVal('op_p_pis') || 0),
+            cst_cofins: getVal('op_cst_cofins'),
+            p_cofins: parseFloat(getVal('op_p_cofins') || 0),
+            inf_cpl_padrao: getVal('op_inf_cpl')
+        };
+
+        fetch('/tipos_operacao', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message || "Operação salva com sucesso!");
+            carregarTiposOperacao(nome);
+        });
+    }
+
+    function excluirOperacaoAtual() {
+        const id = getVal('op_id');
+        const nome = getVal('op_nome');
+        if (!id) return;
+        if (!confirm(`Deseja realmente excluir o tipo de nota '${nome}'?`)) return;
+
+        fetch(`/tipos_operacao/${id}`, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                alert("Operação excluída com sucesso!");
+                novaOperacao();
+                carregarTiposOperacao();
+            });
+    }
+
+    // === UPLOAD XML ===
+    function uploadXML() {
+        const fileInput = document.getElementById('xmlFileInput');
+        if(fileInput.files.length === 0) {
+            alert("Por favor, selecione um arquivo XML primeiro!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        const badge = document.getElementById('status-badge');
+        badge.className = "badge bg-warning py-2 px-3 w-100";
+        badge.innerText = "Processando XML...";
+
+        fetch('/upload_xml', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.error) {
+                alert("Erro ao processar XML: " + data.error);
+                badge.className = "badge bg-danger py-2 px-3 w-100";
+                badge.innerText = "Erro";
+                return;
+            }
+            
+            // 1. Preenchimento Seguro do Cabecalho
+            const c = data.cabecalho || {};
+            setVal('nNF', c.nNF);
+            setVal('serie', c.serie);
+            setVal('natOp', c.natOp);
+            setVal('cfop_padrao', c.cfop_padrao);
+            atualizarCamposIdentificacao(c.tpNF, c.idDest);
+            
+            // Chave de Acesso e Metadados SEFAZ
+            setVal('chaveAcesso', c.chaveAcesso || '');
+            setVal('cUF', c.cUF || '35');
+            setVal('cNF', c.cNF || '');
+            setVal('dhEmi', c.dhEmi || '');
+            setVal('mod', c.mod || '55');
+            setVal('tpEmis', c.tpEmis || '1');
+            setVal('cDV', c.cDV || '');
+            if (c.chaveAcesso && c.chaveAcesso.length === 44) {
+                const formatada = c.chaveAcesso.replace(/(\d{4})/g, '$1 ').trim();
+                setVal('chaveAcessoDisplay', formatada);
+            } else {
+                calcularChaveAcessoDinamica();
+            }
+            
+            // Guarda modelo tributario do XML para capturar se quiser
+            impostoModeloXml = data.imposto_modelo;
+
+            // Tenta selecionar operacao correspondente na lista
+            const selOp = document.getElementById('select_operacao');
+            const opEncontrada = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (c.natOp || '').toUpperCase());
+            if (opEncontrada) {
+                selOp.value = opEncontrada.nome_operacao;
+                aoSelecionarOperacao(opEncontrada.nome_operacao);
+            } else {
+                // Se nao achou pelo nome exato, seleciona o primeiro compativel com o CFOP
+                const opPorCfop = operacoesCache.find(o => o.cfop_padrao === c.cfop_padrao);
+                if (opPorCfop) {
+                    selOp.value = opPorCfop.nome_operacao;
+                    aoSelecionarOperacao(opPorCfop.nome_operacao);
+                } else {
+                    selOp.value = "";
+                    aoSelecionarOperacao(c.natOp);
+                }
+            }
+
+            // Emitente
+            setVal('emit_xNome', c.emit_xNome);
+            setVal('emit_CNPJ', c.emit_CNPJ);
+            setVal('emit_xLgr', c.emit_xLgr);
+            setVal('emit_nro', c.emit_nro);
+            setVal('emit_xBairro', c.emit_xBairro);
+            setVal('emit_cMun', c.emit_cMun);
+            setVal('emit_xMun', c.emit_xMun);
+            setVal('emit_UF', c.emit_UF);
+            setVal('emit_CEP', c.emit_CEP);
+            
+            // Destinatario
+            setVal('dest_xNome', c.dest_xNome);
+            setVal('dest_CNPJ_CPF', c.dest_CNPJ_CPF);
+            setVal('dest_xLgr', c.dest_xLgr);
+            setVal('dest_nro', c.dest_nro);
+            setVal('dest_xBairro', c.dest_xBairro);
+            setVal('dest_cMun', c.dest_cMun);
+            setVal('dest_xMun', c.dest_xMun);
+            setVal('dest_UF', c.dest_UF);
+            setVal('dest_CEP', c.dest_CEP);
+
+            // 2. Preenchimento Seguro do Rodape
+            const r = data.rodape || {};
+            setVal('infCpl', r.infCpl || '');
+
+            // Transporte e Volumes
+            const tr = r.transporte || {};
+            setVal('transp_modFrete', tr.modFrete || '0');
+            setVal('transp_CNPJ_CPF', tr.CNPJ_CPF || '');
+            setVal('transp_xNome', tr.xNome || '');
+            setVal('transp_IE', tr.IE || '');
+            setVal('transp_xEnder', tr.xEnder || '');
+            setVal('transp_xMun', tr.xMun || '');
+            setVal('transp_UF', tr.UF || '');
+            setVal('transp_qVol', tr.qVol || '');
+            setVal('transp_esp', tr.esp || '');
+            setVal('transp_marca', tr.marca || '');
+            setVal('transp_nVol', tr.nVol || '');
+            setVal('transp_pesoL', formatarNumeroVisualBR(tr.pesoL, 3, 3));
+            setVal('transp_pesoB', formatarNumeroVisualBR(tr.pesoB, 3, 3));
+
+            // Totais da Nota Fiscal (ICMSTot)
+            const tot = r.totais || {};
+            setVal('tot_vProd', formatarNumeroVisualBR(tot.vProd, 2, 2));
+            setVal('tot_vFrete', formatarNumeroVisualBR(tot.vFrete, 2, 2));
+            setVal('tot_vSeg', formatarNumeroVisualBR(tot.vSeg, 2, 2));
+            setVal('tot_vOutro', formatarNumeroVisualBR(tot.vOutro, 2, 2));
+            setVal('tot_vDesc', formatarNumeroVisualBR(tot.vDesc, 2, 2));
+            const vNFTotal = tot.vNF || r.vNF || '';
+            setVal('tot_vNF', formatarNumeroVisualBR(vNFTotal, 2, 2));
+            setVal('vNF', formatarNumeroVisualBR(vNFTotal, 2, 2));
+
+            setVal('tot_vBC', formatarNumeroVisualBR(tot.vBC, 2, 2));
+            setVal('tot_vICMS', formatarNumeroVisualBR(tot.vICMS, 2, 2));
+            setVal('tot_vBCST', formatarNumeroVisualBR(tot.vBCST, 2, 2));
+            setVal('tot_vST', formatarNumeroVisualBR(tot.vST, 2, 2));
+            setVal('tot_vII', formatarNumeroVisualBR(tot.vII, 2, 2));
+            setVal('tot_vIPI', formatarNumeroVisualBR(tot.vIPI, 2, 2));
+            setVal('tot_vPIS', formatarNumeroVisualBR(tot.vPIS, 2, 2));
+            setVal('tot_vCOFINS', formatarNumeroVisualBR(tot.vCOFINS, 2, 2));
+
+            // 3. Preenchimento da Tabela de Itens
+            itensCache = data.itens || [];
+            document.getElementById('itens-badge').innerText = itensCache.length;
+            
+            if (itensTable) {
+                itensTable.setData(itensCache);
+            }
+
+            // Guardar XML original
+            xmlOriginalData = data.xml_original;
+
+            badge.className = "badge bg-success py-2 px-3 w-100";
+            badge.innerText = itensCache.length + " item(ns) lido(s)";
+
+            // Muda automaticamente para a aba de Itens para exibir a tabela ao usuario
+            const tabBtn = document.getElementById('itens-tab');
+            if (tabBtn) {
+                const tabInstance = bootstrap.Tab.getOrCreateInstance(tabBtn);
+                tabInstance.show();
+            }
+            setTimeout(() => {
+                if (itensTable) {
+                    itensTable.redraw(true);
+                }
+            }, 100);
+        })
+        .catch(err => {
+            alert("Erro durante a execução: " + err);
+            badge.className = "badge bg-danger py-2 px-3 w-100";
+            badge.innerText = "Erro";
+        });
+    }
+
+    // === EXPORTAR / IMPORTAR EXCEL ===
+    function exportarExcel() {
+        const itens = (itensTable) ? itensTable.getData() : itensCache;
+        if(itens.length === 0) {
+            alert("Nenhum item disponível para exportar.");
+            return;
+        }
+        
+        fetch('/export_excel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itens: itens })
+        })
+        .then(res => res.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Itens_NFe_" + (getVal('nNF') || "modelo") + ".xlsx";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        });
+    }
+
+    function importarExcel(inputElement) {
+        if(inputElement.files.length === 0) return;
+        
+        const formData = new FormData();
+        formData.append("file", inputElement.files[0]);
+        
+        fetch('/import_excel', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.error) {
+                alert("Erro ao importar Excel: " + data.error);
+                return;
+            }
+            itensCache = data.itens || [];
+            document.getElementById('itens-badge').innerText = itensCache.length;
+            if (itensTable) {
+                itensTable.setData(itensCache);
+                recalcularTotaisDosItens(true);
+                setTimeout(() => { itensTable.redraw(true); }, 100);
+            }
+            alert("Excel importado com sucesso! " + itensCache.length + " itens carregados na tabela.");
+        });
+        
+        inputElement.value = "";
+    }
+
+    // === GERAR NOVO XML ===
+    function generateXML() {
+        if(!xmlOriginalData) {
+            alert("Por favor, faça o upload de um XML de modelo antes de gerar!");
+            return;
+        }
+
+        // Garante que a chave de acesso esteja recalculada com os dados atuais
+        calcularChaveAcessoDinamica();
+
+        const itensLimpos = (itensTable ? itensTable.getData() : itensCache).map(item => {
+            const novo = { ...item };
+            const camposNum = [
+                'qCom', 'vUnCom', 'vProd', 'qTrib', 'vUnTrib', 'vFrete', 'vSeg', 'vDesc', 'vOutro',
+                'vAFRMM', 'vBC_IPI', 'pIPI', 'vIPI', 'vBC_II', 'vDespAdu', 'vII', 'vIOF',
+                'vBC_PIS', 'pPIS', 'vPIS', 'vBC_COFINS', 'pCOFINS', 'vCOFINS'
+            ];
+            camposNum.forEach(k => {
+                if (novo[k] !== undefined && novo[k] !== null && novo[k] !== '') {
+                    let v = String(novo[k]).trim();
+                    if (v.includes(',') && v.includes('.')) {
+                        v = v.replace(/\./g, '').replace(',', '.');
+                    } else if (v.includes(',')) {
+                        v = v.replace(',', '.');
+                    }
+                    novo[k] = v;
+                }
+            });
+            return novo;
+        });
+
+        const payload = {
+            xml_original: xmlOriginalData,
+            cabecalho: {
+                nNF: getVal('nNF'),
+                serie: getVal('serie'),
+                natOp: getVal('natOp') || getVal('select_operacao'),
+                cfop_padrao: getVal('cfop_padrao'),
+                tpNF: getVal('tpNF'),
+                idDest: getVal('idDest'),
+                chaveAcesso: getVal('chaveAcesso'),
+                cNF: getVal('cNF'),
+                cUF: getVal('cUF'),
+                dhEmi: getVal('dhEmi'),
+                mod: getVal('mod'),
+                tpEmis: getVal('tpEmis'),
+                cDV: getVal('cDV'),
+                
+                emit_xNome: getVal('emit_xNome'),
+                emit_CNPJ: getVal('emit_CNPJ'),
+                emit_xLgr: getVal('emit_xLgr'),
+                emit_nro: getVal('emit_nro'),
+                emit_xBairro: getVal('emit_xBairro'),
+                emit_cMun: getVal('emit_cMun'),
+                emit_xMun: getVal('emit_xMun'),
+                emit_UF: getVal('emit_UF'),
+                emit_CEP: getVal('emit_CEP'),
+                
+                dest_xNome: getVal('dest_xNome'),
+                dest_CNPJ_CPF: getVal('dest_CNPJ_CPF'),
+                dest_xLgr: getVal('dest_xLgr'),
+                dest_nro: getVal('dest_nro'),
+                dest_xBairro: getVal('dest_xBairro'),
+                dest_cMun: getVal('dest_cMun'),
+                dest_xMun: getVal('dest_xMun'),
+                dest_UF: getVal('dest_UF'),
+                dest_CEP: getVal('dest_CEP')
+            },
+            itens: itensLimpos,
+            rodape: {
+                infCpl: getVal('infCpl'),
+                transporte: {
+                    modFrete: getVal('transp_modFrete'),
+                    CNPJ_CPF: getVal('transp_CNPJ_CPF'),
+                    xNome: getVal('transp_xNome'),
+                    IE: getVal('transp_IE'),
+                    xEnder: getVal('transp_xEnder'),
+                    xMun: getVal('transp_xMun'),
+                    UF: getVal('transp_UF'),
+                    qVol: getVal('transp_qVol'),
+                    esp: getVal('transp_esp'),
+                    marca: getVal('transp_marca'),
+                    nVol: getVal('transp_nVol'),
+                    pesoL: mutatorLimparNumero(getVal('transp_pesoL')),
+                    pesoB: mutatorLimparNumero(getVal('transp_pesoB'))
+                },
+                totais: {
+                    vProd: mutatorLimparNumero(getVal('tot_vProd')),
+                    vFrete: mutatorLimparNumero(getVal('tot_vFrete')),
+                    vSeg: mutatorLimparNumero(getVal('tot_vSeg')),
+                    vOutro: mutatorLimparNumero(getVal('tot_vOutro')),
+                    vDesc: mutatorLimparNumero(getVal('tot_vDesc')),
+                    vNF: mutatorLimparNumero(getVal('tot_vNF') || getVal('vNF')),
+                    vBC: mutatorLimparNumero(getVal('tot_vBC')),
+                    vICMS: mutatorLimparNumero(getVal('tot_vICMS')),
+                    vBCST: mutatorLimparNumero(getVal('tot_vBCST')),
+                    vST: mutatorLimparNumero(getVal('tot_vST')),
+                    vII: mutatorLimparNumero(getVal('tot_vII')),
+                    vIPI: mutatorLimparNumero(getVal('tot_vIPI')),
+                    vPIS: mutatorLimparNumero(getVal('tot_vPIS')),
+                    vCOFINS: mutatorLimparNumero(getVal('tot_vCOFINS'))
+                }
+            }
+        };
+
+        fetch('/generate_xml', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "NFe_" + (getVal('nNF') || "gerada") + ".xml";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        });
+    }
+</script>
+</body>
+</html>
