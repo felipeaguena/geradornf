@@ -2,7 +2,7 @@ import os
 import sqlite3
 import json
 import xml.etree.ElementTree as ET
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, redirect
 import tempfile
 import pandas as pd
 import io
@@ -267,8 +267,18 @@ def atualizar_det(det, item_data, cfop_padrao, ns):
             if 'vCOFINS' in item_data and item_data['vCOFINS'] is not None: s(c, 'nfe:vCOFINS', item_data['vCOFINS'], 'vCOFINS')
 
 @app.route('/')
+def portal():
+    return render_template('portal.html')
+
+@app.route('/rascunho')
+@app.route('/editor')
 def index():
     return render_template('index.html')
+
+@app.route('/di_duimp')
+@app.route('/duimp')
+def modulo_di_duimp():
+    return render_template('di_duimp.html')
 
 # === SERVIÇO & ROTAS: CÂMBIO PTAX BOLETIM (BANCO CENTRAL DO BRASIL - OLINDA) ===
 def consultar_moedas_ptax():
@@ -594,8 +604,8 @@ def upload_xml():
             "UF": get_text(transporta, 'UF') if transporta is not None else "",
             "qVol": get_text(vol, 'qVol') if vol is not None else "",
             "esp": get_text(vol, 'esp') if vol is not None else "",
-            "marca": get_text(vol, 'marca') if vol is not None else "",
-            "nVol": get_text(vol, 'nVol') if vol is not None else "",
+            "marca": "",
+            "nVol": "",
             "pesoL": get_text(vol, 'pesoL') if vol is not None else "",
             "pesoB": get_text(vol, 'pesoB') if vol is not None else ""
         }
@@ -803,20 +813,26 @@ def generate_xml():
                 if transporte_data.get('xMun') is not None: set_text(transporta, 'xMun', transporte_data.get('xMun'))
                 if transporte_data.get('UF') is not None: set_text(transporta, 'UF', transporte_data.get('UF'))
 
-            # vol
-            tem_dados_vol = any(transporte_data.get(k) for k in ['qVol', 'esp', 'marca', 'nVol', 'pesoL', 'pesoB'])
+            # vol (marca e nVol não devem ser preenchidos e não devem constar no XML)
+            tem_dados_vol = any(transporte_data.get(k) for k in ['qVol', 'esp', 'pesoL', 'pesoB'])
             vol = transp.find('.//{http://www.portalfiscal.inf.br/nfe}vol')
             if tem_dados_vol:
                 if vol is None:
                     vol = ET.SubElement(transp, '{http://www.portalfiscal.inf.br/nfe}vol')
-                if transporte_data.get('qVol') is not None: set_text(vol, 'qVol', transporte_data.get('qVol'))
-                if transporte_data.get('esp') is not None: set_text(vol, 'esp', transporte_data.get('esp'))
-                if transporte_data.get('marca') is not None: set_text(vol, 'marca', transporte_data.get('marca'))
-                if transporte_data.get('nVol') is not None: set_text(vol, 'nVol', transporte_data.get('nVol'))
+                if transporte_data.get('qVol') is not None and str(transporte_data.get('qVol')).strip() != '':
+                    set_text(vol, 'qVol', transporte_data.get('qVol'))
+                if transporte_data.get('esp') is not None and str(transporte_data.get('esp')).strip() != '':
+                    set_text(vol, 'esp', transporte_data.get('esp'))
                 if transporte_data.get('pesoL') is not None and str(transporte_data.get('pesoL')).strip() != '':
                     set_text(vol, 'pesoL', limpar_decimal_nfe(transporte_data.get('pesoL')))
                 if transporte_data.get('pesoB') is not None and str(transporte_data.get('pesoB')).strip() != '':
                     set_text(vol, 'pesoB', limpar_decimal_nfe(transporte_data.get('pesoB')))
+
+            # Remover expressamente 'marca' e 'nVol' se existirem no vol original do XML
+            if vol is not None:
+                for tag_remover in ['marca', 'nVol']:
+                    for el_rem in list(vol.findall(f'{{http://www.portalfiscal.inf.br/nfe}}{tag_remover}')):
+                        vol.remove(el_rem)
 
     # Totais da Nota Fiscal (ICMSTot)
     totais_data = rodape.get('totais', {})

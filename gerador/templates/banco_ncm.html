@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- NFT Logistics Theme (Light & Dark) -->
     <link rel="stylesheet" href="/static/css/nft-theme.css">
+    <link rel="stylesheet" href="/static/css/nft-sidebar.css">
     <script src="/static/js/theme.js"></script>
     <style>
         .table-ncm { font-size: 13px; }
@@ -15,38 +16,105 @@
         .card-stat { border-left: 4px solid var(--primary); }
     </style>
 </head>
-<body class="py-3">
+<body class="has-sidebar">
 
-<div class="container-fluid px-4">
-    <!-- Top Header -->
-    <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
-        <div class="d-flex align-items-center gap-3">
-            <a href="/" class="d-flex align-items-center">
-                <img src="/static/img/brand/nft_logo_vetor_logo_black.svg" alt="NFT Logistics" class="logo-theme-black" style="height: 38px;">
-                <img src="/static/img/brand/nft_logo_vetor_logo_white.svg" alt="NFT Logistics" class="logo-theme-white" style="height: 38px;">
-            </a>
-            <div class="border-start ps-3 border-secondary-subtle">
-                <div class="d-flex align-items-center gap-2">
-                    <h4 class="mb-0 fw-bold">Grande Tabela NCM & Impostos</h4>
+    <!-- MENU LATERAL FIXO (SIDEBAR) -->
+    <aside class="nft-sidebar" id="nftSidebar">
+        <!-- 1. Cabeçalho da Sidebar -->
+        <div class="nft-sidebar-header">
+            <a href="/" class="sidebar-brand-link" title="NFT Logistics - Retornar ao Início">
+                <div class="sidebar-brand-logo-wrap">
+                    <img src="/static/img/brand/nft_logo_vetor_icone_black.svg" alt="NFT" class="logo-theme-black">
+                    <img src="/static/img/brand/nft_logo_vetor_icone_white.svg" alt="NFT" class="logo-theme-white">
                 </div>
-                <small class="text-muted">15.156 registros unificados com Unidades Tributáveis (uTrib) e Alíquotas Oficiais de Importação (II, IPI, PIS, COFINS)</small>
+                <div class="sidebar-brand-info">
+                    <span class="sidebar-brand-title">NFT Logistics</span>
+                    <span class="sidebar-brand-badge">Tabela NCM</span>
+                </div>
+            </a>
+            <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
+                ◀
+            </button>
+        </div>
+
+        <!-- 2. Corpo com Menus e Itens -->
+        <div class="nft-sidebar-body">
+            
+            <!-- Grupo: Módulos -->
+            <div class="sidebar-section-title">Módulos</div>
+            <ul class="nft-sidebar-nav">
+                <li class="nft-sidebar-item">
+                    <a href="/" class="nft-sidebar-btn" title="Portal Inicial">
+                        <span class="sidebar-icon">🏠</span>
+                        <span class="sidebar-label">Início / Módulos</span>
+                    </a>
+                </li>
+                <li class="nft-sidebar-item">
+                    <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
+                        <span class="sidebar-icon">📄</span>
+                        <span class="sidebar-label">XML Rascunho</span>
+                    </a>
+                </li>
+                <li class="nft-sidebar-item">
+                    <a href="/di_duimp" class="nft-sidebar-btn" title="Módulo XML da DI ou DUIMP">
+                        <span class="sidebar-icon">🌐</span>
+                        <span class="sidebar-label">XML da DI ou DUIMP</span>
+                    </a>
+                </li>
+                <li class="nft-sidebar-item">
+                    <a href="/banco_ncm" class="nft-sidebar-btn active" title="Grande Tabela NCM & Impostos">
+                        <span class="sidebar-icon">📚</span>
+                        <span class="sidebar-label">Tabela NCM</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Grupo: Exportações da Tabela -->
+            <div class="sidebar-section-title">Exportações</div>
+            <ul class="nft-sidebar-nav">
+                <li class="nft-sidebar-item">
+                    <a href="/download_ncm_excel" class="nft-sidebar-btn" title="Baixar Planilha Excel Oficial">
+                        <span class="sidebar-icon">📗</span>
+                        <span class="sidebar-label">Baixar Excel (.xlsx)</span>
+                    </a>
+                </li>
+                <li class="nft-sidebar-item">
+                    <a href="/download_ncm_json" class="nft-sidebar-btn" title="Baixar Dados em JSON">
+                        <span class="sidebar-icon">📥</span>
+                        <span class="sidebar-label">Baixar JSON</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 3. Rodapé da Sidebar -->
+        <div class="nft-sidebar-footer">
+            <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
+                <span class="sidebar-icon theme-toggle-btn">🌙</span>
+                <span class="sidebar-footer-text">Alternar Tema</span>
+            </button>
+            <div class="sidebar-footer-info">
+                <span>NFT Logistics</span>
+                <span>v2.1</span>
             </div>
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <button type="button" class="theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro/Escuro" aria-label="Alternar Tema">
-                🌙
-            </button>
-            <a href="/download_ncm_excel" class="btn btn-success btn-sm fw-bold">
-                📗 Baixar Excel (.xlsx)
-            </a>
-            <a href="/download_ncm_json" class="btn btn-outline-secondary btn-sm fw-bold">
-                📥 Baixar JSON
-            </a>
-            <a href="/" class="btn btn-primary btn-sm fw-bold">
-                📋 Emissor NF-e
-            </a>
-        </div>
-    </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
+    <div class="nft-main-wrapper">
+        <div class="container-fluid px-4 py-3">
+            <!-- Top Header Limpo -->
+            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+                <div class="d-flex align-items-center gap-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
+                        ☰
+                    </button>
+                    <div>
+                        <h4 class="mb-0 fw-bold">Grande Tabela NCM &amp; Impostos</h4>
+                        <small class="text-muted">15.156 registros unificados com Unidades Tributáveis (uTrib) e Alíquotas Oficiais de Importação (II, IPI, PIS, COFINS)</small>
+                    </div>
+                </div>
+            </div>
 
     <!-- Cards de Estatisticas -->
     <div class="row g-3 mb-3">
@@ -308,5 +376,9 @@
         pag.appendChild(nextLi);
     }
 </script>
+        </div><!-- /container-fluid -->
+    </div><!-- /nft-main-wrapper -->
+
+    <script src="/static/js/nft-sidebar.js"></script>
 </body>
 </html>
