@@ -7,6 +7,9 @@ import tempfile
 import pandas as pd
 import io
 import re
+import urllib.request
+import urllib.parse
+from datetime import datetime, date, timedelta
 
 app = Flask(__name__)
 DB_PATH = os.path.join(os.path.dirname(__file__), 'database.db')
@@ -145,19 +148,54 @@ def atualizar_det(det, item_data, cfop_padrao, ns):
 
     prod = det.find('nfe:prod', ns)
     if prod is not None:
-        for k in ['cProd', 'cEAN', 'xProd', 'NCM', 'uCom', 'qCom', 'vUnCom', 'vProd', 'cEANTrib', 'uTrib', 'qTrib', 'vUnTrib', 'vFrete', 'vSeg', 'vDesc', 'vOutro', 'indTot', 'nItemPed']:
+        for k in ['cProd', 'cEAN', 'xProd', 'NCM', 'uCom', 'qCom', 'vUnCom', 'vProd', 'cEANTrib', 'uTrib', 'qTrib', 'vUnTrib', 'nItemPed']:
             if k in item_data and item_data[k] is not None:
                 s(prod, 'nfe:' + k, item_data[k], k)
+
+        # Campos de despesas em prod (vFrete, vSeg, vDesc, vOutro)
+        for k in ['vFrete', 'vSeg', 'vDesc', 'vOutro']:
+            if k in item_data and item_data[k] is not None and str(item_data[k]).strip() != '':
+                el_k = prod.find('nfe:' + k, ns)
+                if el_k is not None:
+                    el_k.text = limpar_decimal_nfe(item_data[k])
+                else:
+                    novo_el = ET.Element('{http://www.portalfiscal.inf.br/nfe}' + k)
+                    novo_el.text = limpar_decimal_nfe(item_data[k])
+                    ref = prod.find('nfe:indTot', ns) or prod.find('nfe:DI', ns)
+                    if ref is not None:
+                        idx_ref = list(prod).index(ref)
+                        prod.insert(idx_ref, novo_el)
+                    else:
+                        prod.append(novo_el)
         
+        if 'indTot' in item_data and item_data['indTot'] is not None:
+            s(prod, 'nfe:indTot', item_data['indTot'])
+
         cfop_val = cfop_padrao if (cfop_padrao and cfop_padrao.strip()) else item_data.get('CFOP', '')
         if cfop_val:
             s(prod, 'nfe:CFOP', cfop_val)
 
         di = prod.find('nfe:DI', ns)
         if di is not None:
-            for k in ['nDI', 'dDI', 'xLocDesemb', 'UFDesemb', 'dDesemb', 'tpViaTransp', 'vAFRMM', 'tpIntermedio', 'cExportador']:
+            for k in ['nDI', 'dDI', 'xLocDesemb', 'UFDesemb', 'dDesemb', 'tpViaTransp', 'tpIntermedio', 'cExportador']:
                 if k in item_data and item_data[k] is not None:
                     s(di, 'nfe:' + k, item_data[k], k)
+
+            # vAFRMM: Valor Adicional ao Frete para Renovação da Marinha Mercante
+            if 'vAFRMM' in item_data and item_data['vAFRMM'] is not None and str(item_data['vAFRMM']).strip() != '':
+                el_afrmm = di.find('nfe:vAFRMM', ns)
+                if el_afrmm is not None:
+                    el_afrmm.text = limpar_decimal_nfe(item_data['vAFRMM'])
+                else:
+                    novo_afrmm = ET.Element('{http://www.portalfiscal.inf.br/nfe}vAFRMM')
+                    novo_afrmm.text = limpar_decimal_nfe(item_data['vAFRMM'])
+                    ref = di.find('nfe:tpIntermedio', ns) or di.find('nfe:cExportador', ns) or di.find('nfe:adi', ns)
+                    if ref is not None:
+                        idx_ref = list(di).index(ref)
+                        di.insert(idx_ref, novo_afrmm)
+                    else:
+                        di.append(novo_afrmm)
+
             adi = di.find('nfe:adi', ns)
             if adi is not None:
                 for k in ['nAdicao', 'nSeqAdic', 'cFabricante']:
@@ -193,7 +231,22 @@ def atualizar_det(det, item_data, cfop_padrao, ns):
         ii = imposto.find('nfe:II', ns)
         if ii is not None:
             if 'vBC_II' in item_data and item_data['vBC_II'] is not None: s(ii, 'nfe:vBC', item_data['vBC_II'], 'vBC_II')
-            if 'vDespAdu' in item_data and item_data['vDespAdu'] is not None: s(ii, 'nfe:vDespAdu', item_data['vDespAdu'], 'vDespAdu')
+            
+            # vDespAdu: Despesas Aduaneiras / Taxa Siscomex
+            if 'vDespAdu' in item_data and item_data['vDespAdu'] is not None and str(item_data['vDespAdu']).strip() != '':
+                el_desp = ii.find('nfe:vDespAdu', ns)
+                if el_desp is not None:
+                    el_desp.text = limpar_decimal_nfe(item_data['vDespAdu'])
+                else:
+                    novo_desp = ET.Element('{http://www.portalfiscal.inf.br/nfe}vDespAdu')
+                    novo_desp.text = limpar_decimal_nfe(item_data['vDespAdu'])
+                    ref = ii.find('nfe:vII', ns) or ii.find('nfe:vIOF', ns)
+                    if ref is not None:
+                        idx_ref = list(ii).index(ref)
+                        ii.insert(idx_ref, novo_desp)
+                    else:
+                        ii.append(novo_desp)
+
             if 'vII' in item_data and item_data['vII'] is not None: s(ii, 'nfe:vII', item_data['vII'], 'vII')
             if 'vIOF' in item_data and item_data['vIOF'] is not None: s(ii, 'nfe:vIOF', item_data['vIOF'], 'vIOF')
 
@@ -216,6 +269,119 @@ def atualizar_det(det, item_data, cfop_padrao, ns):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# === SERVIÇO & ROTAS: CÂMBIO PTAX BOLETIM (BANCO CENTRAL DO BRASIL - OLINDA) ===
+def consultar_moedas_ptax():
+    url = "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/Moedas?$format=json"
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            return data.get('value', [])
+    except Exception:
+        # Fallback offline garantido com as moedas oficiais PTAX Bacen
+        return [
+            {"simbolo": "USD", "nomeFormatado": "Dólar dos Estados Unidos", "tipoMoeda": "A"},
+            {"simbolo": "EUR", "nomeFormatado": "Euro", "tipoMoeda": "B"},
+            {"simbolo": "GBP", "nomeFormatado": "Libra Esterlina", "tipoMoeda": "B"},
+            {"simbolo": "JPY", "nomeFormatado": "Iene", "tipoMoeda": "A"},
+            {"simbolo": "CAD", "nomeFormatado": "Dólar Canadense", "tipoMoeda": "A"},
+            {"simbolo": "CHF", "nomeFormatado": "Franco Suíço", "tipoMoeda": "A"},
+            {"simbolo": "AUD", "nomeFormatado": "Dólar Australiano", "tipoMoeda": "B"},
+            {"simbolo": "SEK", "nomeFormatado": "Coroa Sueca", "tipoMoeda": "A"},
+            {"simbolo": "NOK", "nomeFormatado": "Coroa Norueguesa", "tipoMoeda": "A"},
+            {"simbolo": "DKK", "nomeFormatado": "Coroa Dinamarquesa", "tipoMoeda": "A"}
+        ]
+
+def consultar_cotacao_ptax(moeda='USD', data_ref_str=None):
+    moeda = (moeda or 'USD').strip().upper()
+    if data_ref_str:
+        s = data_ref_str.strip()
+        try:
+            if '-' in s:
+                d_ref = datetime.strptime(s[:10], '%Y-%m-%d').date()
+            elif '/' in s:
+                d_ref = datetime.strptime(s[:10], '%d/%m/%Y').date()
+            else:
+                d_ref = date.today()
+        except Exception:
+            d_ref = date.today()
+    else:
+        d_ref = date.today()
+
+    # Janela de até 15 dias anteriores para cobrir feriados prolongados e fins de semana
+    d_fim = d_ref.strftime('%m-%d-%Y')
+    d_ini = (d_ref - timedelta(days=15)).strftime('%m-%d-%Y')
+
+    encoded_moeda = urllib.parse.quote(f"'{moeda}'")
+    encoded_d_ini = urllib.parse.quote(f"'{d_ini}'")
+    encoded_d_fim = urllib.parse.quote(f"'{d_fim}'")
+
+    url = (
+        f"https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/"
+        f"CotacaoMoedaPeriodo(moeda=@moeda,dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?"
+        f"@moeda={encoded_moeda}&@dataInicial={encoded_d_ini}&@dataFinalCotacao={encoded_d_fim}&"
+        f"$orderby=dataHoraCotacao%20desc&$top=15&$format=json"
+    )
+
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            vals = data.get('value', [])
+            if not vals:
+                return None
+            
+            latest = vals[0]
+            dt_raw = latest.get('dataHoraCotacao', '')
+            dt_formatada = ""
+            hora_formatada = ""
+            if dt_raw:
+                try:
+                    partes = dt_raw.split(' ')
+                    d_obj = datetime.strptime(partes[0], '%Y-%m-%d')
+                    dt_formatada = d_obj.strftime('%d/%m/%Y')
+                    hora_formatada = partes[1][:8] if len(partes) > 1 else ""
+                except Exception:
+                    dt_formatada = dt_raw
+            
+            return {
+                "moeda": moeda,
+                "cotacao_venda": latest.get('cotacaoVenda'),
+                "cotacao_compra": latest.get('cotacaoCompra'),
+                "tipo_boletim": latest.get('tipoBoletim', 'Boletim PTAX'),
+                "data_hora": dt_raw,
+                "data_cotacao": dt_formatada,
+                "hora_cotacao": hora_formatada,
+                "paridade_venda": latest.get('paridadeVenda'),
+                "paridade_compra": latest.get('paridadeCompra'),
+                "historico": vals[:6]
+            }
+    except Exception as e:
+        raise RuntimeError(f"Erro ao consultar API PTAX do Banco Central: {e}")
+
+@app.route('/api/ptax/moedas', methods=['GET'])
+def api_ptax_moedas():
+    try:
+        moedas = consultar_moedas_ptax()
+        return jsonify({"status": "success", "moedas": moedas})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/ptax/cotacao', methods=['GET'])
+def api_ptax_cotacao():
+    moeda = request.args.get('moeda', 'USD').strip().upper()
+    data_cotacao = request.args.get('data', '').strip()
+    try:
+        resultado = consultar_cotacao_ptax(moeda, data_cotacao)
+        if not resultado:
+            return jsonify({
+                "status": "not_found",
+                "error": f"Nenhuma cotação encontrada para a moeda '{moeda}' na data informada ou período recente."
+            }), 404
+        return jsonify({"status": "success", **resultado})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # === ROTAS: TIPOS DE NOTA / OPERAÇÃO ===
 @app.route('/tipos_operacao', methods=['GET'])
@@ -467,6 +633,42 @@ def upload_xml():
             "totais": totais
         }
 
+        # Totais de Rateio existentes no XML de modelo
+        soma_afrmm = 0.0
+        soma_desp_adu = 0.0
+        soma_outro_itens = 0.0
+        soma_frete_itens = 0.0
+        soma_seg_itens = 0.0
+        data_di_modelo = ""
+
+        for it in itens:
+            try:
+                if it.get('vAFRMM'): soma_afrmm += float(limpar_decimal_nfe(it['vAFRMM']))
+            except Exception: pass
+            try:
+                if it.get('vDespAdu'): soma_desp_adu += float(limpar_decimal_nfe(it['vDespAdu']))
+            except Exception: pass
+            try:
+                if it.get('vOutro'): soma_outro_itens += float(limpar_decimal_nfe(it['vOutro']))
+            except Exception: pass
+            try:
+                if it.get('vFrete'): soma_frete_itens += float(limpar_decimal_nfe(it['vFrete']))
+            except Exception: pass
+            try:
+                if it.get('vSeg'): soma_seg_itens += float(limpar_decimal_nfe(it['vSeg']))
+            except Exception: pass
+            if not data_di_modelo and it.get('dDI'):
+                data_di_modelo = it.get('dDI')
+
+        resumo_rateio = {
+            "vAFRMM": f"{soma_afrmm:.2f}",
+            "vDespAdu": f"{soma_desp_adu:.2f}",
+            "vOutro": f"{soma_outro_itens:.2f}",
+            "vFrete": f"{soma_frete_itens:.2f}",
+            "vSeg": f"{soma_seg_itens:.2f}",
+            "data_di": data_di_modelo
+        }
+
         xml_string = ET.tostring(root, encoding='utf-8').decode('utf-8')
 
         return jsonify({
@@ -474,6 +676,7 @@ def upload_xml():
             "itens": itens,
             "rodape": rodape,
             "imposto_modelo": imposto_modelo,
+            "resumo_rateio": resumo_rateio,
             "xml_original": xml_string
         })
     except Exception as e:
@@ -739,6 +942,56 @@ def download_ncm_excel():
         import exportar_ncm_excel
         exportar_ncm_excel.exportar_ncm_excel()
     return send_file(excel_path, as_attachment=True, download_name="Tabela_NCM_Completa_Backup.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+@app.route('/api/ncm/unidades_tributaveis', methods=['POST'])
+def api_ncm_unidades_tributaveis():
+    data = request.json or {}
+    ncms = data.get('ncms', [])
+    if not ncms:
+        return jsonify({})
+
+    map_input_to_clean = {}
+    for n in ncms:
+        if n:
+            clean = re.sub(r'\D', '', str(n))
+            if clean:
+                map_input_to_clean[clean] = str(n)
+
+    ncms_limpos = list(map_input_to_clean.keys())
+    if not ncms_limpos:
+        return jsonify({})
+
+    conn = get_db_connection()
+    c = conn.cursor()
+    placeholders = ','.join(['?'] * len(ncms_limpos))
+    rows = c.execute(
+        f"SELECT codigo_limpo, utrib, descricao_utrib FROM ncm WHERE codigo_limpo IN ({placeholders}) AND utrib > ''",
+        ncms_limpos
+    ).fetchall()
+
+    mapa = {}
+    for r in rows:
+        mapa[r['codigo_limpo']] = {
+            'utrib': (r['utrib'] or '').strip().upper(),
+            'descricao': (r['descricao_utrib'] or '').strip()
+        }
+
+    # Para NCMs sem match exato, tenta por prefixo de 6 ou 4 dígitos
+    faltantes = [n for n in ncms_limpos if n not in mapa]
+    for n in faltantes:
+        prefix = n[:6] if len(n) >= 6 else (n[:4] if len(n) >= 4 else n)
+        row = c.execute(
+            "SELECT utrib, descricao_utrib FROM ncm WHERE codigo_limpo LIKE ? AND utrib > '' LIMIT 1",
+            (f"{prefix}%",)
+        ).fetchone()
+        if row:
+            mapa[n] = {
+                'utrib': (row['utrib'] or '').strip().upper(),
+                'descricao': (row['descricao_utrib'] or '').strip()
+            }
+
+    conn.close()
+    return jsonify(mapa)
 
 if __name__ == '__main__':
     get_db_connection().close()

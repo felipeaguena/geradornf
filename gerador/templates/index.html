@@ -170,6 +170,236 @@
                         </div>
                     </div>
 
+                    <!-- NOVO CARD: PARÂMETROS PRINCIPAIS: CÂMBIO PTAX & RATEIO DE DESPESAS (MARINHA MERCANTE, SISCOMEX) -->
+                    <div class="col-12 mt-3" id="card-parametros-rateio-ptax">
+                        <div class="card border shadow-sm">
+                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary px-2 py-1">🌐 Parâmetros Principais</span>
+                                    <span class="fw-bold">Câmbio Oficial PTAX & Rateios Globais da NF-e</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-secondary" id="badge-itens-para-rateio">0 itens carregados</span>
+                                </div>
+                            </div>
+                            <div class="card-body p-3">
+                                <div class="row g-3">
+                                    <!-- PAINEL 1: MOEDA E CÂMBIO PTAX DO BANCO CENTRAL -->
+                                    <div class="col-lg-5 col-md-12 border-end-lg">
+                                        <div class="p-3 rounded bg-light border h-100">
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                                                    <span>💱</span> Moeda Estrangeira & Câmbio PTAX
+                                                </h6>
+                                                <span class="badge bg-info-subtle text-info fw-bold" id="badge-boletim-status">API Bacen Olinda</span>
+                                            </div>
+                                            <small class="text-muted d-block mb-3">
+                                                Selecione a moeda e puxe o boletim mais recente da taxa PTAX oficial do Banco Central para cotação aduaneira e registro na NF-e.
+                                            </small>
+
+                                            <div class="row g-2">
+                                                <!-- Campo Moeda -->
+                                                <div class="col-sm-7">
+                                                    <label class="form-label small fw-bold mb-1">Moeda da Operação</label>
+                                                    <select id="ptax_moeda" class="form-select form-select-sm fw-bold border-primary" onchange="aoMudarMoedaPtax()">
+                                                        <option value="USD" selected>USD - Dólar dos EUA</option>
+                                                        <option value="EUR">EUR - Euro</option>
+                                                        <option value="GBP">GBP - Libra Esterlina</option>
+                                                        <option value="JPY">JPY - Iene Japonês</option>
+                                                        <option value="CAD">CAD - Dólar Canadense</option>
+                                                        <option value="CHF">CHF - Franco Suíço</option>
+                                                        <option value="AUD">AUD - Dólar Australiano</option>
+                                                        <option value="NOK">NOK - Coroa Norueguesa</option>
+                                                        <option value="SEK">SEK - Coroa Sueca</option>
+                                                        <option value="DKK">DKK - Coroa Dinamarquesa</option>
+                                                        <option value="OUTRA">Outra Moeda / Digitar...</option>
+                                                    </select>
+                                                    <input type="text" class="form-control form-control-sm mt-1 text-uppercase fw-bold font-monospace" id="ptax_moeda_custom" placeholder="Código (Ex: CNY, EUR)" style="display: none;">
+                                                </div>
+
+                                                <!-- Data da Cotação -->
+                                                <div class="col-sm-5">
+                                                    <label class="form-label small fw-bold mb-1">Data Cotação</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <input type="date" class="form-control form-control-sm" id="ptax_data">
+                                                        <button class="btn btn-outline-secondary" type="button" onclick="definirDataPtaxHoje()" title="Definir data de hoje">Hoje</button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Botão de Consulta à API PTAX -->
+                                                <div class="col-12 mt-2">
+                                                    <button type="button" class="btn btn-primary btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()">
+                                                        <span id="spinner-ptax" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                                        <span>⚡ Puxar Taxa PTAX Atual (Boletim Bacen)</span>
+                                                    </button>
+                                                </div>
+
+                                                <!-- Valores de Câmbio Retornados -->
+                                                <div class="col-sm-6 mt-2">
+                                                    <label class="form-label small fw-bold mb-1 text-primary">Taxa PTAX Venda (R$)</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text font-monospace fw-bold">R$</span>
+                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold text-primary" id="ptax_cotacao_venda" placeholder="0,0000" onchange="formatarInputVisualBR(this, 4, 4)">
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 mt-2">
+                                                    <label class="form-label small mb-1 text-muted">Taxa PTAX Compra (R$)</label>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text font-monospace text-muted">R$</span>
+                                                        <input type="text" class="form-control form-control-sm font-monospace text-end text-muted" id="ptax_cotacao_compra" readonly placeholder="0,0000">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Box de Detalhes do Boletim -->
+                                                <div class="col-12">
+                                                    <div id="box-info-boletim" class="p-2 border rounded bg-white small font-monospace mt-1" style="font-size: 11px; display: none;">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span><strong id="lbl-boletim-tipo">Boletim:</strong> <span id="lbl-boletim-detalhe">-</span></span>
+                                                            <span class="badge bg-success-subtle text-success" id="badge-boletim-ok">Atualizado</span>
+                                                        </div>
+                                                        <div class="text-muted mt-1"><span id="lbl-boletim-datahora">-</span></div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Ações de Câmbio -->
+                                                <div class="col-12 mt-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="chk_ptax_infcpl" checked>
+                                                        <label class="form-check-label small" for="chk_ptax_infcpl">
+                                                            Gravar taxa de câmbio nas Informações Complementares (<code>infCpl</code>)
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 d-flex gap-2">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm flex-fill" onclick="aplicarCotacaoNasObservacoes()">
+                                                        📝 Registrar Câmbio em infCpl
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="converterItensComTaxaPtax()" title="Multiplica o valor unitário e total dos itens pela taxa PTAX">
+                                                        💱 Converter Itens
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PAINEL 2: RATEIO DE DESPESAS GLOBAIS ENTRE OS ITENS -->
+                                    <div class="col-lg-7 col-md-12">
+                                        <div class="p-3 rounded bg-light border h-100">
+                                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                                                    <span>⚖️</span> Rateio Global de Despesas entre os Itens
+                                                </h6>
+                                                <span class="badge bg-warning-subtle text-dark fw-bold">Divisão Centavo-Exata</span>
+                                            </div>
+                                            <small class="text-muted d-block mb-3">
+                                                Informe o total das despesas da DI. O sistema distribuirá matematicamente os centavos entre os itens da nota.
+                                            </small>
+
+                                            <div class="row g-2">
+                                                <!-- VALOR MARINHA MERCANTE (AFRMM) -->
+                                                <div class="col-sm-6">
+                                                    <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+                                                        <span>⚓ VALOR MARINHA MERCANTE</span>
+                                                        <span class="badge bg-primary-subtle text-primary font-monospace" style="font-size: 10px;">vAFRMM (DI)</span>
+                                                    </label>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text font-monospace fw-bold">R$</span>
+                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vAFRMM" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                    </div>
+                                                    <small class="text-muted" style="font-size: 10.5px;">Adicional Marinha Mercante lançado na Declaração de Importação</small>
+                                                </div>
+
+                                                <!-- TAXA SISCOMEX -->
+                                                <div class="col-sm-6">
+                                                    <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+                                                        <span>🏛️ TAXA SISCOMEX</span>
+                                                        <span class="badge bg-success-subtle text-success font-monospace" style="font-size: 10px;">vDespAdu (II) / vOutro</span>
+                                                    </label>
+                                                    <div class="input-group input-group-sm">
+                                                        <span class="input-group-text font-monospace fw-bold">R$</span>
+                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vSiscomex" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                    </div>
+                                                    <small class="text-muted" style="font-size: 10.5px;">Taxa Siscomex da DI lançada em Desp. Aduaneiras e Outras Desp.</small>
+                                                </div>
+
+                                                <!-- Opções de Lançamento da Taxa Siscomex -->
+                                                <div class="col-12 py-1">
+                                                    <div class="d-flex flex-wrap gap-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="chk_siscomex_despadu" checked>
+                                                            <label class="form-check-label small" for="chk_siscomex_despadu">
+                                                                Ratear em Despesas Aduaneiras (<code>vDespAdu</code> no grupo II)
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="chk_siscomex_outro" checked>
+                                                            <label class="form-check-label small" for="chk_siscomex_outro">
+                                                                Somar em Outras Despesas (<code>vOutro</code>) para compor o Total da NF (<code>vNF</code>)
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" id="chk_siscomex_infcpl" checked>
+                                                            <label class="form-check-label small" for="chk_siscomex_infcpl">
+                                                                Atualizar <code>TX SISCOMEX R$: ...</code> nas Observações (<code>infCpl</code>)
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Outras Despesas Acessórias de Rateio (Colapsável) -->
+                                                <div class="col-12 mt-1">
+                                                    <details class="border rounded p-2 bg-white">
+                                                        <summary class="small fw-bold text-muted" style="cursor: pointer;">
+                                                            ➕ Outros Rateios (Frete, Seguro e Outras Despesas Globais)
+                                                        </summary>
+                                                        <div class="row g-2 mt-2">
+                                                            <div class="col-sm-4">
+                                                                <label class="form-label small mb-1">Frete Total (vFrete)</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <span class="input-group-text font-monospace">R$</span>
+                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vFrete" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <label class="form-label small mb-1">Seguro Total (vSeg)</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <span class="input-group-text font-monospace">R$</span>
+                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vSeg" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <label class="form-label small mb-1">Outras Despesas (vOutro)</label>
+                                                                <div class="input-group input-group-sm">
+                                                                    <span class="input-group-text font-monospace">R$</span>
+                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vOutro" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </details>
+                                                </div>
+
+                                                <!-- Critério de Rateio e Botão de Aplicação -->
+                                                <div class="col-sm-6 mt-2">
+                                                    <label class="form-label small fw-bold mb-1">Critério de Proporcionalidade</label>
+                                                    <select class="form-select form-select-sm fw-bold border-secondary" id="rateio_criterio">
+                                                        <option value="vProd" selected>⚖️ Proporcional ao Valor dos Produtos (vProd)</option>
+                                                        <option value="qCom">📦 Proporcional à Quantidade (qCom)</option>
+                                                        <option value="igual">🔢 Dividir Igualmente entre os Itens</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-6 mt-2 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-warning fw-bold text-dark w-100 btn-sm shadow-sm py-2" onclick="executarRateioGlobal()">
+                                                        ⚡ Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- EMITENTE -->
                     <div class="col-md-6 mt-3">
                         <div class="card h-100 border">
@@ -407,18 +637,43 @@
             </div>
         </div>
 
-        <!-- ABA 3: ITENS DA NOTA (TABELA EM SEQUENCIA ESTILO GOOGLE SHEETS) -->
+        <!-- ABA 2: ITENS DA NOTA (TABELA EM SEQUENCIA ESTILO GOOGLE SHEETS) -->
         <div class="tab-pane fade" id="itens" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom flex-wrap gap-2">
                 <div>
                     <h6 class="mb-0 fw-bold">Planilha de Itens da NF-e (det nItem)</h6>
                     <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
                 </div>
-                <div>
-                    <button class="btn btn-outline-secondary btn-sm me-2" onclick="recarregarTabelaItens()">🔄 Redesenhar Grade</button>
-                    <button class="btn btn-success btn-sm me-2 fw-bold" onclick="exportarExcel()">⬇️ Exportar Excel (.xlsx)</button>
+                <div class="d-flex align-items-center flex-wrap gap-1">
+                    <button class="btn btn-warning btn-sm fw-bold text-dark me-1 shadow-sm" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
+                        ⚖️ Rateio &amp; PTAX
+                    </button>
+                    <button class="btn btn-outline-info btn-sm me-1 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
+                        🌐 Unidades Exportação (uTrib)
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm me-1" onclick="recarregarTabelaItens()">🔄 Redesenhar Grade</button>
+                    <button class="btn btn-success btn-sm me-1 fw-bold" onclick="exportarExcel()">⬇️ Exportar Excel (.xlsx)</button>
                     <button class="btn btn-primary btn-sm fw-bold" onclick="document.getElementById('importExcelInput').click()">⬆️ Importar Excel (.xlsx)</button>
                     <input type="file" id="importExcelInput" style="display:none" accept=".xlsx" onchange="importarExcel(this)">
+                </div>
+            </div>
+
+            <!-- Barra de Status Rápido de Câmbio PTAX & Despesas de Rateio Ativas -->
+            <div class="card border mb-2 p-2 px-3 bg-light d-flex flex-row justify-content-between align-items-center flex-wrap gap-2 shadow-sm" style="font-size: 12.5px;">
+                <div class="d-flex align-items-center flex-wrap gap-3">
+                    <div><span class="text-muted">Moeda:</span> <span id="lbl-bar-ptax-moeda" class="badge bg-secondary">USD</span></div>
+                    <div><span class="text-muted">Cotação PTAX:</span> <strong id="lbl-bar-ptax-taxa" class="text-primary font-monospace">R$ -</strong></div>
+                    <div class="border-start ps-3"><span class="text-muted">Marinha Mercante (AFRMM):</span> <span id="lbl-bar-rateio-afrmm" class="fw-bold font-monospace text-dark">R$ 0,00</span></div>
+                    <div><span class="text-muted">Taxa Siscomex:</span> <span id="lbl-bar-rateio-siscomex" class="fw-bold font-monospace text-dark">R$ 0,00</span></div>
+                    <div><span class="text-muted">Outras Desp. (vOutro):</span> <span id="lbl-bar-rateio-outro" class="fw-bold font-monospace text-dark">R$ 0,00</span></div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-info btn-sm py-0 px-2 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex">
+                        🌐 uTrib Exportação
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela">
+                        ⚡ Reaplicar Rateio
+                    </button>
                 </div>
             </div>
             
@@ -496,7 +751,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label small mb-1 fw-bold text-primary">Peso Líquido Total (kg)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_pesoL" placeholder="0,000" onchange="formatarInputVisualBR(this, 3, 3)">
+                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_pesoL" placeholder="0,000" onchange="formatarInputVisualBR(this, 3, 3); aoMudarPesoLiquidoTransporte();">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label small mb-1 fw-bold text-primary">Peso Bruto Total (kg)</label>
@@ -907,6 +1162,399 @@
         }
     }
 
+    // === CÂMBIO OFICIAL PTAX & PARÂMETROS DE RATEIO (BANCO CENTRAL & COMEX) ===
+    let cotacaoPtaxCache = null;
+
+    function carregarMoedasPtax() {
+        fetch('/api/ptax/moedas')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' && data.moedas && data.moedas.length > 0) {
+                    const sel = document.getElementById('ptax_moeda');
+                    const valAtual = sel.value || 'USD';
+                    sel.innerHTML = '';
+                    
+                    data.moedas.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.simbolo;
+                        opt.textContent = `${m.simbolo} - ${m.nomeFormatado}`;
+                        if (m.simbolo === valAtual) opt.selected = true;
+                        sel.appendChild(opt);
+                    });
+
+                    const optOutra = document.createElement('option');
+                    optOutra.value = 'OUTRA';
+                    optOutra.textContent = 'Outra Moeda / Digitar...';
+                    sel.appendChild(optOutra);
+                }
+            })
+            .catch(() => {
+                // Fallback silencioso mantendo as opções padrão do HTML
+            });
+    }
+
+    function aoMudarMoedaPtax() {
+        const sel = document.getElementById('ptax_moeda');
+        const customInput = document.getElementById('ptax_moeda_custom');
+        if (sel && sel.value === 'OUTRA') {
+            if (customInput) {
+                customInput.style.display = 'block';
+                customInput.focus();
+            }
+        } else {
+            if (customInput) customInput.style.display = 'none';
+        }
+        const moeda = obterMoedaSelecionada();
+        const lblMoedaBar = document.getElementById('lbl-bar-ptax-moeda');
+        if (lblMoedaBar) lblMoedaBar.innerText = moeda;
+    }
+
+    function obterMoedaSelecionada() {
+        const sel = document.getElementById('ptax_moeda');
+        if (sel && sel.value === 'OUTRA') {
+            const custom = (getVal('ptax_moeda_custom') || '').trim().toUpperCase();
+            return custom || 'USD';
+        }
+        return (sel ? sel.value : 'USD') || 'USD';
+    }
+
+    function definirDataPtaxHoje() {
+        const inputData = document.getElementById('ptax_data');
+        if (inputData) {
+            const hoje = new Date();
+            const yyyy = hoje.getFullYear();
+            const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoje.getDate()).padStart(2, '0');
+            inputData.value = `${yyyy}-${mm}-${dd}`;
+        }
+    }
+
+    function consultarCotacaoPtax(silencioso = false) {
+        const moeda = obterMoedaSelecionada();
+        const dataCotacao = getVal('ptax_data');
+        const btn = document.getElementById('btn-consultar-ptax');
+        const spinner = document.getElementById('spinner-ptax');
+
+        if (btn) btn.disabled = true;
+        if (spinner) spinner.classList.remove('d-none');
+
+        const url = `/api/ptax/cotacao?moeda=${encodeURIComponent(moeda)}&data=${encodeURIComponent(dataCotacao)}`;
+        
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('d-none');
+
+                if (data.error || data.status !== 'success') {
+                    if (!silencioso) {
+                        alert(data.error || "Não foi possível obter a cotação PTAX. Você pode informar o valor manualmente no campo.");
+                    }
+                    return;
+                }
+
+                cotacaoPtaxCache = data;
+                
+                // Atualiza campos de cotação
+                const vendaFmt = formatarNumeroVisualBR(data.cotacao_venda, 4, 4);
+                const compraFmt = formatarNumeroVisualBR(data.cotacao_compra, 4, 4);
+                setVal('ptax_cotacao_venda', vendaFmt);
+                setVal('ptax_cotacao_compra', compraFmt);
+
+                // Atualiza badge de boletim
+                const boxInfo = document.getElementById('box-info-boletim');
+                if (boxInfo) {
+                    boxInfo.style.display = 'block';
+                    document.getElementById('lbl-boletim-detalhe').innerText = `${data.tipo_boletim} - ${data.data_cotacao} ${data.hora_cotacao || ''}`;
+                    document.getElementById('lbl-boletim-datahora').innerText = `Venda: R$ ${vendaFmt} | Compra: R$ ${compraFmt} | Cotação Oficial Bacen Olinda`;
+                }
+
+                // Atualiza barra de status da aba 2
+                const lblTaxaBar = document.getElementById('lbl-bar-ptax-taxa');
+                if (lblTaxaBar) lblTaxaBar.innerText = `R$ ${vendaFmt}`;
+                const lblMoedaBar = document.getElementById('lbl-bar-ptax-moeda');
+                if (lblMoedaBar) lblMoedaBar.innerText = data.moeda;
+
+                // Se checkbox de infCpl estiver marcado
+                const chkInfCpl = document.getElementById('chk_ptax_infcpl');
+                if (chkInfCpl && chkInfCpl.checked) {
+                    gravarPtaxEmInfCpl(data.moeda, vendaFmt, data.tipo_boletim, data.data_cotacao, false);
+                }
+
+                if (!silencioso) {
+                    alert(`✅ Cotação PTAX obtida com sucesso!\nMoeda: ${data.moeda}\nTaxa Venda: R$ ${vendaFmt}\nBoletim: ${data.tipo_boletim} (${data.data_cotacao} ${data.hora_cotacao || ''})`);
+                }
+            })
+            .catch(err => {
+                if (btn) btn.disabled = false;
+                if (spinner) spinner.classList.add('d-none');
+                if (!silencioso) {
+                    alert("Erro ao conectar à API PTAX do Banco Central: " + err + "\nVocê pode digitar a taxa diretamente no campo.");
+                }
+            });
+    }
+
+    function gravarPtaxEmInfCpl(moeda, taxaVendaFmt, tipoBoletim, dataCotacao, alertar = true) {
+        let infCplAtual = getVal('infCpl') || '';
+        const textoPtax = `CAMBIO PTAX: 1 ${moeda} = R$ ${taxaVendaFmt} (${tipoBoletim} BACEN ${dataCotacao})`;
+
+        const regexPtax = /CAMBIO\s+PTAX\s*:\s*1\s+[A-Z]{3}\s*=\s*R\$\s*[\d.,]+[^\n\r]*/i;
+
+        if (regexPtax.test(infCplAtual)) {
+            infCplAtual = infCplAtual.replace(regexPtax, textoPtax);
+        } else {
+            infCplAtual = infCplAtual.trim() ? (infCplAtual.trim() + "  " + textoPtax) : textoPtax;
+        }
+
+        setVal('infCpl', infCplAtual);
+        if (alertar) {
+            alert(`Câmbio PTAX (${moeda} = R$ ${taxaVendaFmt}) registrado nas Informações Complementares da nota!`);
+        }
+    }
+
+    function aplicarCotacaoNasObservacoes() {
+        const taxa = getVal('ptax_cotacao_venda');
+        if (!taxa || parseNum(taxa) <= 0) {
+            alert("Puxe ou informe a Taxa PTAX antes de gravar nas observações.");
+            return;
+        }
+        const moeda = obterMoedaSelecionada();
+        const tipoBoletim = (cotacaoPtaxCache && cotacaoPtaxCache.tipo_boletim) ? cotacaoPtaxCache.tipo_boletim : 'PTAX';
+        const dataCotacao = (cotacaoPtaxCache && cotacaoPtaxCache.data_cotacao) ? cotacaoPtaxCache.data_cotacao : (getVal('ptax_data') || '');
+        gravarPtaxEmInfCpl(moeda, taxa, tipoBoletim, dataCotacao, true);
+    }
+
+    function converterItensComTaxaPtax() {
+        const taxa = parseNum(getVal('ptax_cotacao_venda'));
+        if (taxa <= 0) {
+            alert("Informe ou consulte uma Taxa PTAX válida antes de converter os itens.");
+            return;
+        }
+
+        const itens = (itensTable) ? itensTable.getData() : itensCache;
+        if (!itens || itens.length === 0) {
+            alert("Nenhum item carregado para converter.");
+            return;
+        }
+
+        const moeda = obterMoedaSelecionada();
+        if (!confirm(`Deseja converter os itens usando a Taxa PTAX de R$ ${formatarNumeroVisualBR(taxa, 4, 4)} por ${moeda}?\n\nOs campos Valor Unitário (vUnCom/vUnTrib) e Valor Total (vProd) dos ${itens.length} itens serão multiplicados pela taxa de câmbio.`)) {
+            return;
+        }
+
+        itens.forEach(it => {
+            const vUnComNum = parseNum(it.vUnCom);
+            const qComNum = parseNum(it.qCom) || 1;
+            
+            const novoUnit = vUnComNum * taxa;
+            const novoProd = novoUnit * qComNum;
+
+            it.vUnCom = novoUnit.toFixed(4);
+            it.vUnTrib = novoUnit.toFixed(4);
+            it.vProd = novoProd.toFixed(2);
+        });
+
+        itensCache = itens;
+        if (itensTable) {
+            itensTable.setData(itensCache);
+        }
+        recalcularTotaisDosItens(true);
+        alert(`Conversão com Taxa PTAX (R$ ${formatarNumeroVisualBR(taxa, 4, 4)}) concluída com sucesso para os ${itens.length} itens!`);
+    }
+
+    // === ALGORITMO DE RATEIO PROPORCIONAL CENTAVO-EXATO (HARE-NIEMEYER) ===
+    function calcularRateioProporcional(itens, valorTotal, criterio = 'vProd', casasDecimais = 2) {
+        if (!itens || itens.length === 0 || valorTotal <= 0) {
+            return Array(itens ? itens.length : 0).fill((0).toFixed(casasDecimais));
+        }
+
+        const fator = Math.pow(10, casasDecimais);
+        const n = itens.length;
+        const pesos = itens.map(it => {
+            let p = 0;
+            if (criterio === 'qCom') p = parseNum(it.qCom);
+            else if (criterio === 'igual') p = 1;
+            else p = parseNum(it.vProd); // Padrão Comex: vProd
+            return Math.max(0, p);
+        });
+
+        const somaPesos = pesos.reduce((a, b) => a + b, 0);
+
+        if (somaPesos <= 0) {
+            const valIndividual = Math.floor((valorTotal / n) * fator) / fator;
+            const dist = Array(n).fill(valIndividual);
+            let diffUnidades = Math.round((valorTotal - (valIndividual * n)) * fator);
+            for (let i = 0; i < diffUnidades; i++) {
+                dist[i % n] = Math.round((dist[i % n] + (1 / fator)) * fator) / fator;
+            }
+            return dist.map(v => v.toFixed(casasDecimais));
+        }
+
+        const exatos = pesos.map(p => (valorTotal * p) / somaPesos);
+        const unidadesPiso = exatos.map(v => Math.floor(Math.round(v * fator)));
+        const somaPiso = unidadesPiso.reduce((a, b) => a + b, 0);
+        const unidadesTotal = Math.round(valorTotal * fator);
+        let unidadesRestantes = unidadesTotal - somaPiso;
+
+        const restos = exatos.map((v, idx) => ({
+            idx: idx,
+            resto: (v * fator) - unidadesPiso[idx]
+        }));
+        restos.sort((a, b) => b.resto - a.resto);
+
+        for (let i = 0; i < unidadesRestantes; i++) {
+            const targetIdx = restos[i % n].idx;
+            unidadesPiso[targetIdx] += 1;
+        }
+
+        return unidadesPiso.map(c => (c / fator).toFixed(casasDecimais));
+    }
+
+    function executarRateioGlobal(silencioso = false) {
+        const itens = (itensTable) ? itensTable.getData() : itensCache;
+        if (!itens || itens.length === 0) {
+            alert("Nenhum item carregado para executar o rateio. Importe um XML de modelo primeiro.");
+            return;
+        }
+
+        const vAFRMM = parseNum(getVal('rateio_vAFRMM'));
+        const vSiscomex = parseNum(getVal('rateio_vSiscomex'));
+        const vFrete = parseNum(getVal('rateio_vFrete'));
+        const vSeg = parseNum(getVal('rateio_vSeg'));
+        const vOutro = parseNum(getVal('rateio_vOutro'));
+        const criterio = getVal('rateio_criterio') || 'vProd';
+
+        if (vAFRMM <= 0 && vSiscomex <= 0 && vFrete <= 0 && vSeg <= 0 && vOutro <= 0) {
+            alert("Informe ao menos um valor de parâmetro para ratear (Valor Marinha Mercante, Taxa Siscomex, Frete, Seguro ou Outras Despesas).");
+            return;
+        }
+
+        const chkSiscomexDespAdu = document.getElementById('chk_siscomex_despadu') ? document.getElementById('chk_siscomex_despadu').checked : true;
+        const chkSiscomexOutro = document.getElementById('chk_siscomex_outro') ? document.getElementById('chk_siscomex_outro').checked : true;
+        const chkSiscomexInfCpl = document.getElementById('chk_siscomex_infcpl') ? document.getElementById('chk_siscomex_infcpl').checked : true;
+
+        // 1. Distribuições proporcionais exatas
+        const distAFRMM = (vAFRMM > 0) ? calcularRateioProporcional(itens, vAFRMM, criterio) : null;
+        const distSiscomex = (vSiscomex > 0) ? calcularRateioProporcional(itens, vSiscomex, criterio) : null;
+        const distFrete = (vFrete > 0) ? calcularRateioProporcional(itens, vFrete, criterio) : null;
+        const distSeg = (vSeg > 0) ? calcularRateioProporcional(itens, vSeg, criterio) : null;
+        const distOutro = (vOutro > 0) ? calcularRateioProporcional(itens, vOutro, criterio) : null;
+
+        // 2. Aplicação direta aos itens
+        itens.forEach((it, idx) => {
+            if (distAFRMM) {
+                it.vAFRMM = distAFRMM[idx];
+            }
+            if (distSiscomex) {
+                const parcSiscomex = distSiscomex[idx];
+                if (chkSiscomexDespAdu) {
+                    it.vDespAdu = parcSiscomex;
+                }
+                if (chkSiscomexOutro) {
+                    const extraOutro = distOutro ? parseNum(distOutro[idx]) : 0;
+                    it.vOutro = (parseNum(parcSiscomex) + extraOutro).toFixed(2);
+                }
+            } else if (distOutro) {
+                it.vOutro = distOutro[idx];
+            }
+            if (distFrete) {
+                it.vFrete = distFrete[idx];
+            }
+            if (distSeg) {
+                it.vSeg = distSeg[idx];
+            }
+        });
+
+        itensCache = itens;
+        if (itensTable) {
+            itensTable.setData(itensCache);
+        }
+
+        // 3. Atualizar infCpl com a Taxa Siscomex se solicitado
+        if (chkSiscomexInfCpl && vSiscomex > 0) {
+            const siscomexFmt = formatarNumeroVisualBR(vSiscomex, 2, 2);
+            let infCplAtual = getVal('infCpl') || '';
+            const textoSiscomex = `TX SISCOMEX R$ : ${siscomexFmt}`;
+            const regexSiscomex = /TX\s+SISCOMEX\s+R\$\s*:\s*[\d.,]+/i;
+
+            if (regexSiscomex.test(infCplAtual)) {
+                infCplAtual = infCplAtual.replace(regexSiscomex, textoSiscomex);
+            } else {
+                infCplAtual = infCplAtual.trim() ? (infCplAtual.trim() + "  " + textoSiscomex) : textoSiscomex;
+            }
+            setVal('infCpl', infCplAtual);
+        }
+
+        // 4. Recalcular totais da nota
+        recalcularTotaisDosItens(true);
+        atualizarBadgesRateioEItens();
+
+        if (!silencioso) {
+            let msg = `✅ Rateio global executado com sucesso em todos os ${itens.length} itens!\n\n`;
+            if (vAFRMM > 0) msg += `⚓ Marinha Mercante (AFRMM): R$ ${formatarNumeroVisualBR(vAFRMM, 2, 2)} distribuídos no campo vAFRMM\n`;
+            if (vSiscomex > 0) msg += `🏛️ Taxa Siscomex: R$ ${formatarNumeroVisualBR(vSiscomex, 2, 2)} rateados em vDespAdu` + (chkSiscomexOutro ? ' e somados em vOutro\n' : '\n');
+            if (vFrete > 0) msg += `🚚 Frete Total: R$ ${formatarNumeroVisualBR(vFrete, 2, 2)} rateados em vFrete\n`;
+            if (vSeg > 0) msg += `🛡️ Seguro Total: R$ ${formatarNumeroVisualBR(vSeg, 2, 2)} rateados em vSeg\n`;
+            if (vOutro > 0 && !vSiscomex) msg += `📦 Outras Despesas: R$ ${formatarNumeroVisualBR(vOutro, 2, 2)} rateados em vOutro\n`;
+            msg += `\nOs totais da nota fiscal (ICMSTot e vNF) foram recalculados automaticamente.`;
+            alert(msg);
+        }
+    }
+
+    function reaplicarRateioItens() {
+        executarRateioGlobal(false);
+    }
+
+    function abrirPainelRateio() {
+        const tabEl = document.getElementById('cabecalho-tab');
+        if (tabEl) {
+            bootstrap.Tab.getOrCreateInstance(tabEl).show();
+            setTimeout(() => {
+                const card = document.getElementById('card-parametros-rateio-ptax');
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.classList.add('border-primary');
+                    card.classList.add('shadow');
+                    setTimeout(() => {
+                        card.classList.remove('border-primary');
+                        card.classList.remove('shadow');
+                    }, 2200);
+                }
+            }, 150);
+        }
+    }
+
+    function atualizarBadgesRateioEItens() {
+        const nItens = (itensTable ? itensTable.getData().length : itensCache.length) || 0;
+        
+        const b1 = document.getElementById('badge-itens-para-rateio');
+        if (b1) b1.innerText = `${nItens} item(ns) para rateio`;
+        
+        const b2 = document.getElementById('lbl-qtd-itens-rateio');
+        if (b2) b2.innerText = nItens;
+
+        const afrmmVal = formatarNumeroVisualBR(parseNum(getVal('rateio_vAFRMM')), 2, 2);
+        const siscomexVal = formatarNumeroVisualBR(parseNum(getVal('rateio_vSiscomex')), 2, 2);
+        const outroVal = formatarNumeroVisualBR(parseNum(getVal('rateio_vOutro')), 2, 2);
+
+        const lblAfrmm = document.getElementById('lbl-bar-rateio-afrmm');
+        if (lblAfrmm) lblAfrmm.innerText = `R$ ${afrmmVal}`;
+
+        const lblSis = document.getElementById('lbl-bar-rateio-siscomex');
+        if (lblSis) lblSis.innerText = `R$ ${siscomexVal}`;
+
+        const lblOutro = document.getElementById('lbl-bar-rateio-outro');
+        if (lblOutro) lblOutro.innerText = `R$ ${outroVal}`;
+        
+        const moeda = obterMoedaSelecionada();
+        const lblMoeda = document.getElementById('lbl-bar-ptax-moeda');
+        if (lblMoeda) lblMoeda.innerText = moeda;
+
+        const taxaVal = getVal('ptax_cotacao_venda');
+        const lblTaxa = document.getElementById('lbl-bar-ptax-taxa');
+        if (lblTaxa) lblTaxa.innerText = taxaVal ? `R$ ${taxaVal}` : 'R$ -';
+    }
+
     // Definicao de todas as colunas de det nItem
     const colunasItensDef = [
         {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center"},
@@ -961,7 +1609,21 @@
         atualizarCamposIdentificacao('0', '3');
         calcularChaveAcessoDinamica();
 
-        // 2. Inicializar tabela de Itens
+        // 2. Inicializar Câmbio PTAX e Parâmetros de Rateio
+        definirDataPtaxHoje();
+        carregarMoedasPtax();
+        atualizarBadgesRateioEItens();
+
+        // Listeners para atualizar badges quando valores forem alterados
+        ['rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vOutro', 'rateio_vFrete', 'ptax_cotacao_venda'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', atualizarBadgesRateioEItens);
+                el.addEventListener('change', atualizarBadgesRateioEItens);
+            }
+        });
+
+        // 3. Inicializar tabela de Itens
         itensTable = new Tabulator("#itens-table", {
             data: [],
             layout: "fitDataFill",
@@ -974,12 +1636,60 @@
 
         itensTable.on("cellEdited", function(cell) {
             const campo = cell.getField();
-            if (['vProd', 'vFrete', 'vOutro', 'vIPI', 'vII', 'vPIS', 'vCOFINS', 'vBC_IPI', 'vBC_II', 'vBC_PIS', 'vBC_COFINS'].includes(campo)) {
+            const row = cell.getRow();
+            const d = row.getData();
+
+            // Cálculo automático de Unidade e Quantidade Tributável (uTrib / qTrib / vUnTrib)
+            if (campo === 'qTrib') {
+                const qTribVal = parseNum(cell.getValue());
+                const vProdVal = parseNum(d.vProd);
+                if (qTribVal > 0 && vProdVal > 0) {
+                    const novoVUnTrib = (vProdVal / qTribVal).toFixed(4);
+                    row.update({ vUnTrib: novoVUnTrib });
+                } else if (!cell.getValue() || cell.getValue() === '' || qTribVal <= 0) {
+                    row.update({ vUnTrib: '' });
+                }
+            } else if (campo === 'vProd') {
+                const qTribVal = parseNum(d.qTrib);
+                const vProdVal = parseNum(cell.getValue());
+                if (qTribVal > 0 && vProdVal > 0) {
+                    const novoVUnTrib = (vProdVal / qTribVal).toFixed(4);
+                    row.update({ vUnTrib: novoVUnTrib });
+                }
+            } else if (campo === 'uTrib') {
+                const uTribVal = String(cell.getValue() || '').trim().toUpperCase();
+                row.update({ uTrib: uTribVal });
+                if (['UN', 'PARES', 'PAR', 'PC', 'PECAS', 'PECA'].includes(uTribVal)) {
+                    const vProdVal = parseNum(d.vProd);
+                    const qTribVal = parseNum(d.qCom);
+                    const novoVUnTrib = (vProdVal > 0 && qTribVal > 0) ? (vProdVal / qTribVal).toFixed(4) : (d.vUnCom || '');
+                    row.update({ qTrib: d.qCom, vUnTrib: novoVUnTrib });
+                } else if (['M3', 'M2', 'METRO', 'LT'].includes(uTribVal) && String(d.uCom || '').trim().toUpperCase() !== uTribVal) {
+                    if (d.qTrib === d.qCom) {
+                        row.update({ qTrib: '', vUnTrib: '' });
+                    }
+                }
+            } else if (campo === 'qCom' || campo === 'vUnCom') {
+                const qComNum = parseNum(d.qCom);
+                const vUnComNum = parseNum(d.vUnCom);
+                if (qComNum > 0 && vUnComNum > 0) {
+                    const novoVProd = (qComNum * vUnComNum).toFixed(2);
+                    const qTribVal = parseNum(d.qTrib);
+                    const updates = { vProd: novoVProd };
+                    if (qTribVal > 0) {
+                        updates.vUnTrib = (parseNum(novoVProd) / qTribVal).toFixed(4);
+                    }
+                    row.update(updates);
+                }
+            }
+
+            if (['vProd', 'vFrete', 'vOutro', 'vIPI', 'vII', 'vPIS', 'vCOFINS', 'vBC_IPI', 'vBC_II', 'vBC_PIS', 'vBC_COFINS', 'vAFRMM', 'vDespAdu', 'qCom', 'vUnCom'].includes(campo)) {
                 recalcularTotaisDosItens(true);
+                atualizarBadgesRateioEItens();
             }
         });
 
-        // 3. Listener para redimensionar tabela ao abrir a aba
+        // 4. Listener para redimensionar tabela ao abrir a aba
         const itensTabBtn = document.getElementById('itens-tab');
         if (itensTabBtn) {
             itensTabBtn.addEventListener('shown.bs.tab', function () {
@@ -1070,7 +1780,214 @@
         if (lblDest) lblDest.innerText = destText;
     }
 
-    function aoSelecionarOperacao(nomeOp) {
+    // Cache de unidades tributáveis NCM
+    let ncmUnidadesCache = {};
+
+    async function obterUnidadesTributaveisNCM(ncms) {
+        const faltantes = ncms.filter(n => {
+            const clean = String(n || '').replace(/\D/g, '');
+            return clean && !ncmUnidadesCache[clean];
+        });
+
+        if (faltantes.length > 0) {
+            try {
+                const res = await fetch('/api/ncm/unidades_tributaveis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ncms: faltantes })
+                });
+                const data = await res.json();
+                if (data && typeof data === 'object') {
+                    Object.assign(ncmUnidadesCache, data);
+                }
+            } catch (e) {
+                console.warn("Erro ao buscar unidades tributáveis NCM:", e);
+            }
+        }
+        return ncmUnidadesCache;
+    }
+
+    // Regras de Unidades Estatísticas de Exportação (uTrib / qTrib / vUnTrib)
+    async function aplicarRegrasExportacaoUnidades(itens, exibirAlerta = false) {
+        if (!itens || itens.length === 0) return { processados: 0, manuais: 0 };
+
+        const ncms = itens.map(it => it.NCM).filter(Boolean);
+        const ncmMap = await obterUnidadesTributaveisNCM(ncms);
+        const pesoLTotal = parseNum(getVal('transp_pesoL'));
+
+        const itensKGIndices = [];
+        const itensManuais = [];
+        let itensProcessados = 0;
+
+        itens.forEach((it, idx) => {
+            const cleanNcm = String(it.NCM || '').replace(/\D/g, '');
+            const info = ncmMap[cleanNcm] || {};
+            const uTribOficial = (info.utrib || it.uTrib || 'UN').trim().toUpperCase();
+
+            it.uTrib = uTribOficial;
+
+            const uComUpper = String(it.uCom || '').trim().toUpperCase();
+            const vProdNum = parseNum(it.vProd);
+
+            // Se a unidade comercial já for idêntica à tributável oficial
+            if (uComUpper && uComUpper === uTribOficial) {
+                it.qTrib = it.qCom;
+                it.vUnTrib = (vProdNum > 0 && parseNum(it.qTrib) > 0)
+                    ? (vProdNum / parseNum(it.qTrib)).toFixed(4)
+                    : (it.vUnCom || '');
+                itensProcessados++;
+                return;
+            }
+
+            // Casos específicos por unidade tributável:
+            if (uTribOficial === 'KG') {
+                itensKGIndices.push(idx);
+            } else if (uTribOficial === 'PARES' || uTribOficial === 'PAR') {
+                // "se for Pares, que puxe de quantidade comercializada e assim por diantes"
+                it.qTrib = it.qCom;
+                const qTribNum = parseNum(it.qTrib);
+                it.vUnTrib = (vProdNum > 0 && qTribNum > 0) ? (vProdNum / qTribNum).toFixed(4) : (it.vUnCom || '');
+                itensProcessados++;
+            } else if (['UN', 'PC', 'PECAS', 'PECA', 'CENTO'].includes(uTribOficial)) {
+                it.qTrib = it.qCom;
+                const qTribNum = parseNum(it.qTrib);
+                it.vUnTrib = (vProdNum > 0 && qTribNum > 0) ? (vProdNum / qTribNum).toFixed(4) : (it.vUnCom || '');
+                itensProcessados++;
+            } else if (uTribOficial === '1000UN') {
+                const qComNum = parseNum(it.qCom);
+                if (['1000UN', 'MIL'].includes(uComUpper)) {
+                    it.qTrib = it.qCom;
+                } else if (['UN', 'PC'].includes(uComUpper) && qComNum > 0) {
+                    it.qTrib = (qComNum / 1000).toFixed(4);
+                } else {
+                    it.qTrib = '';
+                }
+                const qTribNum = parseNum(it.qTrib);
+                it.vUnTrib = (vProdNum > 0 && qTribNum > 0) ? (vProdNum / qTribNum).toFixed(4) : '';
+                if (it.qTrib) itensProcessados++; else itensManuais.push(it);
+            } else if (uTribOficial === 'DUZIA') {
+                const qComNum = parseNum(it.qCom);
+                if (['DUZIA', 'DZ'].includes(uComUpper)) {
+                    it.qTrib = it.qCom;
+                } else if (['UN', 'PC'].includes(uComUpper) && qComNum > 0) {
+                    it.qTrib = (qComNum / 12).toFixed(4);
+                } else {
+                    it.qTrib = '';
+                }
+                const qTribNum = parseNum(it.qTrib);
+                it.vUnTrib = (vProdNum > 0 && qTribNum > 0) ? (vProdNum / qTribNum).toFixed(4) : '';
+                if (it.qTrib) itensProcessados++; else itensManuais.push(it);
+            } else {
+                // "se não der para calcular ou for muito complexo, deixe em branco para preenchimento manual como M3 que não tem como puxar de outro lugar nem calcular automaticamente sem uma origem de referencia"
+                it.qTrib = '';
+                it.vUnTrib = '';
+                itensManuais.push(it);
+            }
+        });
+
+        // Processamento dos itens em KG com base no Peso Líquido (transp_pesoL)
+        if (itensKGIndices.length > 0) {
+            if (pesoLTotal > 0) {
+                const subItensKG = itensKGIndices.map(idx => itens[idx]);
+                const pesosDist = calcularRateioProporcional(subItensKG, pesoLTotal, 'vProd', 4);
+                itensKGIndices.forEach((origIdx, kIdx) => {
+                    const it = itens[origIdx];
+                    it.qTrib = pesosDist[kIdx];
+                    const vProdNum = parseNum(it.vProd);
+                    const qTribNum = parseNum(it.qTrib);
+                    it.vUnTrib = (vProdNum > 0 && qTribNum > 0) ? (vProdNum / qTribNum).toFixed(4) : '';
+                    itensProcessados++;
+                });
+            } else {
+                // Peso Líquido não informado no cabeçalho
+                itensKGIndices.forEach(origIdx => {
+                    const it = itens[origIdx];
+                    const uComUpper = String(it.uCom || '').trim().toUpperCase();
+                    if (['KG', 'KILO', 'QUILOGRAMA'].includes(uComUpper)) {
+                        it.qTrib = it.qCom;
+                        const vProdNum = parseNum(it.vProd);
+                        const qTribNum = parseNum(it.qTrib);
+                        it.vUnTrib = (vProdNum > 0 && qTribNum > 0) ? (vProdNum / qTribNum).toFixed(4) : (it.vUnCom || '');
+                        itensProcessados++;
+                    } else {
+                        it.qTrib = '';
+                        it.vUnTrib = '';
+                        itensManuais.push(it);
+                    }
+                });
+            }
+        }
+
+        if (itensTable) {
+            itensTable.setData(itens);
+        }
+
+        if (exibirAlerta) {
+            let msg = `🌍 Regras de Unidades Estatísticas de Exportação aplicadas a ${itens.length} itens!\n\n`;
+            msg += `✅ Unidades Tributáveis (uTrib) atualizadas conforme Comex / Receita Federal.\n`;
+            if (itensKGIndices.length > 0) {
+                if (pesoLTotal > 0) {
+                    msg += `⚖️ Itens em KG (${itensKGIndices.length}): Peso Líquido (${formatarNumeroVisualBR(pesoLTotal, 3, 4)} kg) rateado proporcionalmente aos produtos em qTrib e vUnTrib calculados.\n`;
+                } else {
+                    msg += `⚠️ Itens em KG (${itensKGIndices.length}): Peso Líquido da nota está em branco/zerado. Preencha na aba de Transporte para ratear automaticamente ou digite qTrib no grid.\n`;
+                }
+            }
+            if (itensManuais.length > 0) {
+                msg += `\n📝 Itens para preenchimento manual de quantidade (${itensManuais.length}):\n`;
+                itensManuais.forEach(it => {
+                    msg += ` • Item ${it.nItem || '?'}: ${it.xProd ? it.xProd.slice(0, 32) + '...' : 'Produto'} (uTrib: ${it.uTrib})\n`;
+                });
+                msg += `Ao digitar o valor na coluna 'Qtd. Trib.', o valor unitário tributável (vUnTrib) será calculado automaticamente!`;
+            }
+            alert(msg);
+        }
+
+        return { processados: itensProcessados, manuais: itensManuais.length };
+    }
+
+    async function aplicarUnidadesExportacaoManual() {
+        const itens = (itensTable) ? itensTable.getData() : itensCache;
+        if (!itens || itens.length === 0) {
+            alert("Nenhum item carregado para atualizar unidades.");
+            return;
+        }
+        await aplicarRegrasExportacaoUnidades(itens, true);
+        itensCache = (itensTable) ? itensTable.getData() : itens;
+    }
+
+    function aoMudarPesoLiquidoTransporte() {
+        const itens = (itensTable) ? itensTable.getData() : itensCache;
+        if (!itens || itens.length === 0) return;
+
+        const cfopStr = String(getVal('cfop_padrao') || '').trim();
+        const tpNfStr = String(getVal('tpNF') || '').trim();
+        if (!cfopStr.startsWith('7') || tpNfStr !== '1') return;
+
+        const pesoLTotal = parseNum(getVal('transp_pesoL'));
+        const itensKGIndices = [];
+        itens.forEach((it, idx) => {
+            if ((it.uTrib || '').trim().toUpperCase() === 'KG') {
+                itensKGIndices.push(idx);
+            }
+        });
+
+        if (itensKGIndices.length > 0 && pesoLTotal > 0) {
+            const subItensKG = itensKGIndices.map(idx => itens[idx]);
+            const pesosDist = calcularRateioProporcional(subItensKG, pesoLTotal, 'vProd', 4);
+            itensKGIndices.forEach((origIdx, kIdx) => {
+                const it = itens[origIdx];
+                it.qTrib = pesosDist[kIdx];
+                const vProdNum = parseNum(it.vProd);
+                const qTribNum = parseNum(it.qTrib);
+                it.vUnTrib = (vProdNum > 0 && qTribNum > 0) ? (vProdNum / qTribNum).toFixed(4) : '';
+            });
+            if (itensTable) {
+                itensTable.setData(itens);
+            }
+        }
+    }
+
+    async function aoSelecionarOperacao(nomeOp) {
         setVal('natOp', nomeOp);
         const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (nomeOp || '').toUpperCase());
         if (op) {
@@ -1085,7 +2002,7 @@
             atualizarCamposIdentificacao(op.tp_nf, op.id_dest);
 
             // Herdar automaticamente nos itens carregados!
-            aplicarRegrasAosItens(op);
+            await aplicarRegrasAosItens(op, false);
         } else {
             document.getElementById('lbl-operacao-ativa').innerText = nomeOp || 'Nenhuma selecionada';
             document.getElementById('lbl-cfop-ativo').innerText = '-';
@@ -1096,7 +2013,7 @@
         }
     }
 
-    function aplicarOperacaoSelecionadaAosItens() {
+    async function aplicarOperacaoSelecionadaAosItens() {
         const nomeOp = getVal('select_operacao');
         if (!nomeOp) {
             alert("Selecione um Tipo de Operação primeiro!");
@@ -1104,12 +2021,11 @@
         }
         const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === nomeOp.toUpperCase());
         if (op) {
-            aplicarRegrasAosItens(op);
-            alert(`Regras da operação '${op.nome_operacao}' aplicadas com sucesso a todos os ${itensCache.length} itens!`);
+            await aplicarRegrasAosItens(op, true);
         }
     }
 
-    function aplicarRegrasAosItens(op) {
+    async function aplicarRegrasAosItens(op, exibirFeedback = false) {
         if (!itensCache || itensCache.length === 0) return;
         
         itensCache.forEach(item => {
@@ -1125,10 +2041,33 @@
             if (op.p_cofins !== undefined) item.pCOFINS = op.p_cofins;
         });
 
-        if (itensTable) {
-            itensTable.setData(itensCache);
+        // Verificar se é operação de Exportação (CFOP começa com 7 e tpNF é Saída = '1')
+        const cfopStr = String(op.cfop_padrao || getVal('cfop_padrao') || '').trim();
+        const tpNfStr = String(op.tp_nf !== undefined && op.tp_nf !== null ? op.tp_nf : getVal('tpNF') || '').trim();
+        const isExport = cfopStr.startsWith('7') && tpNfStr === '1';
+
+        let resExport = null;
+        if (isExport) {
+            resExport = await aplicarRegrasExportacaoUnidades(itensCache, false);
+        } else {
+            if (itensTable) {
+                itensTable.setData(itensCache);
+            }
         }
+
         recalcularTotaisDosItens(true);
+
+        if (exibirFeedback) {
+            let msg = `Regras da operação '${op.nome_operacao}' aplicadas com sucesso a todos os ${itensCache.length} itens!`;
+            if (isExport) {
+                msg += `\n\n🌍 Operação de Exportação identificada (CFOP ${cfopStr} / Saída):\n`;
+                msg += `• Unidades Tributáveis (uTrib) e Quantidades Tributáveis (qTrib/vUnTrib) configuradas conforme Comex/Receita Federal.\n`;
+                if (resExport && resExport.manuais > 0) {
+                    msg += `• Há ${resExport.manuais} item(ns) com unidade sem conversão direta (ex: M3) deixados em branco para preenchimento manual no grid. Ao digitar a 'Qtd. Trib.', o valor unitário será calculado automaticamente.`;
+                }
+            }
+            alert(msg);
+        }
     }
 
     function aplicarObsDaOperacao() {
@@ -1409,6 +2348,25 @@
                 itensTable.setData(itensCache);
             }
 
+            // 4. Preenchimento dos Parâmetros de Rateio e Câmbio PTAX do XML
+            const rateio = data.resumo_rateio || {};
+            setVal('rateio_vAFRMM', formatarNumeroVisualBR(rateio.vAFRMM, 2, 2));
+            setVal('rateio_vSiscomex', formatarNumeroVisualBR(rateio.vDespAdu, 2, 2));
+            setVal('rateio_vFrete', formatarNumeroVisualBR(rateio.vFrete, 2, 2));
+            setVal('rateio_vSeg', formatarNumeroVisualBR(rateio.vSeg, 2, 2));
+            setVal('rateio_vOutro', formatarNumeroVisualBR(rateio.vOutro, 2, 2));
+
+            if (rateio.data_di) {
+                setVal('ptax_data', rateio.data_di);
+            }
+
+            atualizarBadgesRateioEItens();
+
+            // Puxa cotação PTAX automaticamente caso ainda não tenha sido consultada
+            if (!getVal('ptax_cotacao_venda')) {
+                consultarCotacaoPtax(true);
+            }
+
             // Guardar XML original
             xmlOriginalData = data.xml_original;
 
@@ -1519,6 +2477,16 @@
             });
             return novo;
         });
+
+        // Verificação preventiva de itens com qTrib vazio (ex: M3 não preenchido ou pendente)
+        const itensComQTribVazio = itensLimpos.filter(it => !it.qTrib || String(it.qTrib).trim() === '' || parseNum(it.qTrib) <= 0);
+        if (itensComQTribVazio.length > 0) {
+            const listaFaltantes = itensComQTribVazio.slice(0, 5).map(it => `• Item ${it.nItem || '?'}: ${it.xProd ? it.xProd.slice(0, 32) : (it.cProd || 'Produto')} (uTrib: ${it.uTrib || '?'})`).join('\n');
+            const maisStr = itensComQTribVazio.length > 5 ? `\n...e mais ${itensComQTribVazio.length - 5} item(ns).` : '';
+            if (!confirm(`⚠️ ATENÇÃO: Quantidade Tributável (qTrib) em branco!\n\nOs seguintes ${itensComQTribVazio.length} item(ns) estão com o campo 'Qtd. Trib.' vazio ou zerado:\n${listaFaltantes}${maisStr}\n\nPara a SEFAZ (especialmente em exportações), este campo é de preenchimento obrigatório.\n\nDeseja gerar o XML mesmo assim?`)) {
+                return;
+            }
+        }
 
         const payload = {
             xml_original: xmlOriginalData,
