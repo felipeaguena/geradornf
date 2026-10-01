@@ -31,10 +31,37 @@ def get_db_connection():
         if 'id_dest' not in cols:
             conn.execute("ALTER TABLE tipos_operacao ADD COLUMN id_dest TEXT DEFAULT '3'")
             conn.commit()
+        
+        tables = [t[0] for t in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+        if 'tabela_csts' not in tables:
+            import init_db
+            init_db.init_db()
     except Exception:
         pass
 
     return conn
+
+def limpar_cst(val):
+    if val is None:
+        return ""
+    val_str = str(val).strip()
+    if ' - ' in val_str:
+        return val_str.split(' - ')[0].strip()
+    elif '-' in val_str:
+        return val_str.split('-')[0].strip()
+    return val_str
+
+def is_zero(val):
+    if val is None:
+        return True
+    s = str(val).strip()
+    if s == '' or s == '0' or s == '0.00' or s == '0,00' or s == '0.0' or s == '0,0':
+        return True
+    try:
+        f = float(s.replace(',', '.'))
+        return abs(f) < 0.000001
+    except (ValueError, TypeError):
+        return False
 
 def extrair_det(det, ns):
     def g(parent, path):
@@ -136,6 +163,259 @@ def limpar_decimal_nfe(v):
         s = s.replace(',', '.')
     return s
 
+def atualizar_icms_node(imposto, item_data, ns):
+    NFE_URI = '{http://www.portalfiscal.inf.br/nfe}'
+    icms = imposto.find('nfe:ICMS', ns)
+    if icms is None:
+        icms = ET.Element(NFE_URI + 'ICMS')
+        imposto.insert(0, icms)
+    
+    orig = str(item_data.get('orig') if item_data.get('orig') is not None else '1').strip()
+    if orig == '':
+        orig = '1'
+        
+    csosn_or_cst = limpar_cst(item_data.get('CSOSN') or '')
+    if not csosn_or_cst:
+        if len(list(icms)) > 0:
+            c = list(icms)[0]
+            el_orig = c.find('nfe:orig', ns)
+            if el_orig is not None:
+                el_orig.text = orig
+        return
+
+    # Limpa filhos anteriores de ICMS para recriar com a tag correta do Schema SEFAZ
+    for child in list(icms):
+        icms.remove(child)
+
+    if len(csosn_or_cst) == 3:
+        # Simples Nacional (CSOSN)
+        if csosn_or_cst in ['102', '103', '300', '400']:
+            node = ET.SubElement(icms, NFE_URI + 'ICMSSN102')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CSOSN').text = csosn_or_cst
+        elif csosn_or_cst == '101':
+            node = ET.SubElement(icms, NFE_URI + 'ICMSSN101')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CSOSN').text = '101'
+            ET.SubElement(node, NFE_URI + 'pCredSN').text = limpar_decimal_nfe(item_data.get('pCredSN') or '0.00')
+            ET.SubElement(node, NFE_URI + 'vCredICMSSN').text = limpar_decimal_nfe(item_data.get('vCredICMSSN') or '0.00')
+        elif csosn_or_cst == '201':
+            node = ET.SubElement(icms, NFE_URI + 'ICMSSN201')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CSOSN').text = '201'
+            ET.SubElement(node, NFE_URI + 'modBCST').text = '4'
+            ET.SubElement(node, NFE_URI + 'vBCST').text = limpar_decimal_nfe(item_data.get('vBCST') or '0.00')
+            ET.SubElement(node, NFE_URI + 'pICMSST').text = limpar_decimal_nfe(item_data.get('pICMSST') or '0.00')
+            ET.SubElement(node, NFE_URI + 'vICMSST').text = limpar_decimal_nfe(item_data.get('vICMSST') or '0.00')
+            ET.SubElement(node, NFE_URI + 'pCredSN').text = limpar_decimal_nfe(item_data.get('pCredSN') or '0.00')
+            ET.SubElement(node, NFE_URI + 'vCredICMSSN').text = limpar_decimal_nfe(item_data.get('vCredICMSSN') or '0.00')
+        elif csosn_or_cst in ['202', '203']:
+            node = ET.SubElement(icms, NFE_URI + 'ICMSSN202')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CSOSN').text = csosn_or_cst
+            ET.SubElement(node, NFE_URI + 'modBCST').text = '4'
+            ET.SubElement(node, NFE_URI + 'vBCST').text = limpar_decimal_nfe(item_data.get('vBCST') or '0.00')
+            ET.SubElement(node, NFE_URI + 'pICMSST').text = limpar_decimal_nfe(item_data.get('pICMSST') or '0.00')
+            ET.SubElement(node, NFE_URI + 'vICMSST').text = limpar_decimal_nfe(item_data.get('vICMSST') or '0.00')
+        elif csosn_or_cst == '500':
+            node = ET.SubElement(icms, NFE_URI + 'ICMSSN500')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CSOSN').text = '500'
+        elif csosn_or_cst == '900':
+            node = ET.SubElement(icms, NFE_URI + 'ICMSSN900')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CSOSN').text = '900'
+            p_icms = item_data.get('pICMS')
+            v_icms = item_data.get('vICMS')
+            if (p_icms and not is_zero(p_icms)) or (v_icms and not is_zero(v_icms)):
+                ET.SubElement(node, NFE_URI + 'modBC').text = '3'
+                ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_ICMS') or item_data.get('vProd') or '0.00')
+                ET.SubElement(node, NFE_URI + 'pICMS').text = limpar_decimal_nfe(p_icms or '0.00')
+                ET.SubElement(node, NFE_URI + 'vICMS').text = limpar_decimal_nfe(v_icms or '0.00')
+        else:
+            node = ET.SubElement(icms, NFE_URI + 'ICMSSN102')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CSOSN').text = csosn_or_cst
+    else:
+        # Regime Normal (CST 2 dígitos)
+        cst = csosn_or_cst.zfill(2)
+        if cst == '00':
+            node = ET.SubElement(icms, NFE_URI + 'ICMS00')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CST').text = '00'
+            ET.SubElement(node, NFE_URI + 'modBC').text = '3'
+            ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_ICMS') or item_data.get('vBC') or item_data.get('vProd') or '0.00')
+            ET.SubElement(node, NFE_URI + 'pICMS').text = limpar_decimal_nfe(item_data.get('pICMS') or '0.00')
+            ET.SubElement(node, NFE_URI + 'vICMS').text = limpar_decimal_nfe(item_data.get('vICMS') or '0.00')
+        elif cst in ['40', '41', '50']:
+            node = ET.SubElement(icms, NFE_URI + 'ICMS40')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CST').text = cst
+        elif cst == '90':
+            node = ET.SubElement(icms, NFE_URI + 'ICMS90')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CST').text = '90'
+            ET.SubElement(node, NFE_URI + 'modBC').text = '3'
+            ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_ICMS') or item_data.get('vProd') or '0.00')
+            ET.SubElement(node, NFE_URI + 'pICMS').text = limpar_decimal_nfe(item_data.get('pICMS') or '0.00')
+            ET.SubElement(node, NFE_URI + 'vICMS').text = limpar_decimal_nfe(item_data.get('vICMS') or '0.00')
+        elif cst in ['10', '20', '30', '51', '60', '70']:
+            node = ET.SubElement(icms, NFE_URI + 'ICMS' + cst)
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CST').text = cst
+            if cst in ['10', '20', '51', '70']:
+                ET.SubElement(node, NFE_URI + 'modBC').text = '3'
+                ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_ICMS') or item_data.get('vProd') or '0.00')
+                ET.SubElement(node, NFE_URI + 'pICMS').text = limpar_decimal_nfe(item_data.get('pICMS') or '0.00')
+                ET.SubElement(node, NFE_URI + 'vICMS').text = limpar_decimal_nfe(item_data.get('vICMS') or '0.00')
+        else:
+            node = ET.SubElement(icms, NFE_URI + 'ICMS00')
+            ET.SubElement(node, NFE_URI + 'orig').text = orig
+            ET.SubElement(node, NFE_URI + 'CST').text = cst
+
+def atualizar_ipi_node(imposto, item_data, ns):
+    NFE_URI = '{http://www.portalfiscal.inf.br/nfe}'
+    cst_ipi = limpar_cst(item_data.get('CST_IPI') or '')
+    c_enq = str(item_data.get('cEnq') or '999').strip()
+    if not c_enq:
+        c_enq = '999'
+
+    ipi = imposto.find('nfe:IPI', ns)
+    if not cst_ipi and ipi is None:
+        return
+
+    if ipi is None:
+        ipi = ET.Element(NFE_URI + 'IPI')
+        ref = imposto.find('nfe:II', ns) or imposto.find('nfe:ISSQN', ns) or imposto.find('nfe:PIS', ns) or imposto.find('nfe:COFINS', ns)
+        if ref is not None:
+            idx = list(imposto).index(ref)
+            imposto.insert(idx, ipi)
+        else:
+            imposto.append(ipi)
+
+    el_cenq = ipi.find('nfe:cEnq', ns)
+    if el_cenq is not None:
+        el_cenq.text = c_enq
+    else:
+        el_cenq = ET.Element(NFE_URI + 'cEnq')
+        el_cenq.text = c_enq
+        ipi.insert(0, el_cenq)
+
+    if not cst_ipi:
+        return
+
+    for el in list(ipi):
+        if el.tag.endswith('IPITrib') or el.tag.endswith('IPINT'):
+            ipi.remove(el)
+
+    cst_norm = cst_ipi.zfill(2)
+    # CSTs não tributados do IPI: 01, 02, 03, 04, 05, 51, 52, 53, 54, 55
+    if cst_norm in ['01', '02', '03', '04', '05', '51', '52', '53', '54', '55']:
+        ipint = ET.SubElement(ipi, NFE_URI + 'IPINT')
+        ET.SubElement(ipint, NFE_URI + 'CST').text = cst_norm
+    else:
+        # CSTs tributados do IPI: 00, 49, 50, 99
+        ipitrib = ET.SubElement(ipi, NFE_URI + 'IPITrib')
+        ET.SubElement(ipitrib, NFE_URI + 'CST').text = cst_norm
+        vbc = limpar_decimal_nfe(item_data.get('vBC_IPI') or item_data.get('vProd') or '0.00')
+        pipi = limpar_decimal_nfe(item_data.get('pIPI') or '0.00')
+        vipi = limpar_decimal_nfe(item_data.get('vIPI') or '0.00')
+        ET.SubElement(ipitrib, NFE_URI + 'vBC').text = vbc
+        ET.SubElement(ipitrib, NFE_URI + 'pIPI').text = pipi
+        ET.SubElement(ipitrib, NFE_URI + 'vIPI').text = vipi
+
+def atualizar_pis_node(imposto, item_data, ns):
+    NFE_URI = '{http://www.portalfiscal.inf.br/nfe}'
+    cst_pis = limpar_cst(item_data.get('CST_PIS') or '')
+    
+    pis = imposto.find('nfe:PIS', ns)
+    if not cst_pis and pis is None:
+        return
+
+    if pis is None:
+        pis = ET.Element(NFE_URI + 'PIS')
+        ref = imposto.find('nfe:PISST', ns) or imposto.find('nfe:COFINS', ns)
+        if ref is not None:
+            idx = list(imposto).index(ref)
+            imposto.insert(idx, pis)
+        else:
+            imposto.append(pis)
+
+    if not cst_pis:
+        return
+
+    for child in list(pis):
+        pis.remove(child)
+
+    cst_norm = cst_pis.zfill(2)
+    if cst_norm in ['01', '02']:
+        node = ET.SubElement(pis, NFE_URI + 'PISAliq')
+        ET.SubElement(node, NFE_URI + 'CST').text = cst_norm
+        ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_PIS') or item_data.get('vProd') or '0.00')
+        ET.SubElement(node, NFE_URI + 'pPIS').text = limpar_decimal_nfe(item_data.get('pPIS') or '0.00')
+        ET.SubElement(node, NFE_URI + 'vPIS').text = limpar_decimal_nfe(item_data.get('vPIS') or '0.00')
+    elif cst_norm in ['04', '05', '06', '07', '08', '09']:
+        node = ET.SubElement(pis, NFE_URI + 'PISNT')
+        ET.SubElement(node, NFE_URI + 'CST').text = cst_norm
+    elif cst_norm == '03':
+        node = ET.SubElement(pis, NFE_URI + 'PISQtde')
+        ET.SubElement(node, NFE_URI + 'CST').text = '03'
+        ET.SubElement(node, NFE_URI + 'qBCProd').text = limpar_decimal_nfe(item_data.get('qBCProd') or item_data.get('qCom') or '0.0000')
+        ET.SubElement(node, NFE_URI + 'vAliqProd').text = limpar_decimal_nfe(item_data.get('vAliqProd') or '0.0000')
+        ET.SubElement(node, NFE_URI + 'vPIS').text = limpar_decimal_nfe(item_data.get('vPIS') or '0.00')
+    else:
+        node = ET.SubElement(pis, NFE_URI + 'PISOutr')
+        ET.SubElement(node, NFE_URI + 'CST').text = cst_norm
+        ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_PIS') or item_data.get('vProd') or '0.00')
+        ET.SubElement(node, NFE_URI + 'pPIS').text = limpar_decimal_nfe(item_data.get('pPIS') or '0.00')
+        ET.SubElement(node, NFE_URI + 'vPIS').text = limpar_decimal_nfe(item_data.get('vPIS') or '0.00')
+
+def atualizar_cofins_node(imposto, item_data, ns):
+    NFE_URI = '{http://www.portalfiscal.inf.br/nfe}'
+    cst_cofins = limpar_cst(item_data.get('CST_COFINS') or '')
+    
+    cofins = imposto.find('nfe:COFINS', ns)
+    if not cst_cofins and cofins is None:
+        return
+
+    if cofins is None:
+        cofins = ET.Element(NFE_URI + 'COFINS')
+        ref = imposto.find('nfe:COFINSST', ns) or imposto.find('nfe:ICMSUFDest', ns)
+        if ref is not None:
+            idx = list(imposto).index(ref)
+            imposto.insert(idx, cofins)
+        else:
+            imposto.append(cofins)
+
+    if not cst_cofins:
+        return
+
+    for child in list(cofins):
+        cofins.remove(child)
+
+    cst_norm = cst_cofins.zfill(2)
+    if cst_norm in ['01', '02']:
+        node = ET.SubElement(cofins, NFE_URI + 'COFINSAliq')
+        ET.SubElement(node, NFE_URI + 'CST').text = cst_norm
+        ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_COFINS') or item_data.get('vProd') or '0.00')
+        ET.SubElement(node, NFE_URI + 'pCOFINS').text = limpar_decimal_nfe(item_data.get('pCOFINS') or '0.00')
+        ET.SubElement(node, NFE_URI + 'vCOFINS').text = limpar_decimal_nfe(item_data.get('vCOFINS') or '0.00')
+    elif cst_norm in ['04', '05', '06', '07', '08', '09']:
+        node = ET.SubElement(cofins, NFE_URI + 'COFINSNT')
+        ET.SubElement(node, NFE_URI + 'CST').text = cst_norm
+    elif cst_norm == '03':
+        node = ET.SubElement(cofins, NFE_URI + 'COFINSQtde')
+        ET.SubElement(node, NFE_URI + 'CST').text = '03'
+        ET.SubElement(node, NFE_URI + 'qBCProd').text = limpar_decimal_nfe(item_data.get('qBCProd') or item_data.get('qCom') or '0.0000')
+        ET.SubElement(node, NFE_URI + 'vAliqProd').text = limpar_decimal_nfe(item_data.get('vAliqProd') or '0.0000')
+        ET.SubElement(node, NFE_URI + 'vCOFINS').text = limpar_decimal_nfe(item_data.get('vCOFINS') or '0.00')
+    else:
+        node = ET.SubElement(cofins, NFE_URI + 'COFINSOutr')
+        ET.SubElement(node, NFE_URI + 'CST').text = cst_norm
+        ET.SubElement(node, NFE_URI + 'vBC').text = limpar_decimal_nfe(item_data.get('vBC_COFINS') or item_data.get('vProd') or '0.00')
+        ET.SubElement(node, NFE_URI + 'pCOFINS').text = limpar_decimal_nfe(item_data.get('pCOFINS') or '0.00')
+        ET.SubElement(node, NFE_URI + 'vCOFINS').text = limpar_decimal_nfe(item_data.get('vCOFINS') or '0.00')
+
 def atualizar_det(det, item_data, cfop_padrao, ns):
     def s(parent, path, val, tag_name=None):
         if parent is not None and val is not None:
@@ -154,13 +434,17 @@ def atualizar_det(det, item_data, cfop_padrao, ns):
 
         # Campos de despesas em prod (vFrete, vSeg, vDesc, vOutro)
         for k in ['vFrete', 'vSeg', 'vDesc', 'vOutro']:
-            if k in item_data and item_data[k] is not None and str(item_data[k]).strip() != '':
-                el_k = prod.find('nfe:' + k, ns)
+            val_k = item_data.get(k)
+            el_k = prod.find('nfe:' + k, ns)
+            if k in ['vFrete', 'vSeg', 'vOutro'] and is_zero(val_k):
                 if el_k is not None:
-                    el_k.text = limpar_decimal_nfe(item_data[k])
+                    prod.remove(el_k)
+            elif val_k is not None and str(val_k).strip() != '':
+                if el_k is not None:
+                    el_k.text = limpar_decimal_nfe(val_k)
                 else:
                     novo_el = ET.Element('{http://www.portalfiscal.inf.br/nfe}' + k)
-                    novo_el.text = limpar_decimal_nfe(item_data[k])
+                    novo_el.text = limpar_decimal_nfe(val_k)
                     ref = prod.find('nfe:indTot', ns) or prod.find('nfe:DI', ns)
                     if ref is not None:
                         idx_ref = list(prod).index(ref)
@@ -176,70 +460,84 @@ def atualizar_det(det, item_data, cfop_padrao, ns):
             s(prod, 'nfe:CFOP', cfop_val)
 
         di = prod.find('nfe:DI', ns)
-        if di is not None:
-            for k in ['nDI', 'dDI', 'xLocDesemb', 'UFDesemb', 'dDesemb', 'tpViaTransp', 'tpIntermedio', 'cExportador']:
-                if k in item_data and item_data[k] is not None:
-                    s(di, 'nfe:' + k, item_data[k], k)
-
-            # vAFRMM: Valor Adicional ao Frete para Renovação da Marinha Mercante
-            if 'vAFRMM' in item_data and item_data['vAFRMM'] is not None and str(item_data['vAFRMM']).strip() != '':
-                el_afrmm = di.find('nfe:vAFRMM', ns)
-                if el_afrmm is not None:
-                    el_afrmm.text = limpar_decimal_nfe(item_data['vAFRMM'])
-                else:
-                    novo_afrmm = ET.Element('{http://www.portalfiscal.inf.br/nfe}vAFRMM')
-                    novo_afrmm.text = limpar_decimal_nfe(item_data['vAFRMM'])
-                    ref = di.find('nfe:tpIntermedio', ns) or di.find('nfe:cExportador', ns) or di.find('nfe:adi', ns)
-                    if ref is not None:
-                        idx_ref = list(di).index(ref)
-                        di.insert(idx_ref, novo_afrmm)
-                    else:
-                        di.append(novo_afrmm)
-
-            adi = di.find('nfe:adi', ns)
-            if adi is not None:
-                for k in ['nAdicao', 'nSeqAdic', 'cFabricante']:
+        if str(cfop_val).startswith('7'):
+            # Reexportação / Exportação não permite grupo DI no schema da SEFAZ
+            if di is not None:
+                prod.remove(di)
+        else:
+            if di is not None:
+                for k in ['nDI', 'dDI', 'xLocDesemb', 'UFDesemb', 'dDesemb', 'tpViaTransp', 'tpIntermedio', 'cExportador']:
                     if k in item_data and item_data[k] is not None:
-                        s(adi, 'nfe:' + k, item_data[k], k)
+                        s(di, 'nfe:' + k, item_data[k], k)
+
+                # vAFRMM: Valor Adicional ao Frete para Renovação da Marinha Mercante
+                if 'vAFRMM' in item_data and item_data['vAFRMM'] is not None and str(item_data['vAFRMM']).strip() != '':
+                    el_afrmm = di.find('nfe:vAFRMM', ns)
+                    if el_afrmm is not None:
+                        el_afrmm.text = limpar_decimal_nfe(item_data['vAFRMM'])
+                    else:
+                        novo_afrmm = ET.Element('{http://www.portalfiscal.inf.br/nfe}vAFRMM')
+                        novo_afrmm.text = limpar_decimal_nfe(item_data['vAFRMM'])
+                        ref = di.find('nfe:tpIntermedio', ns) or di.find('nfe:cExportador', ns) or di.find('nfe:adi', ns)
+                        if ref is not None:
+                            idx_ref = list(di).index(ref)
+                            di.insert(idx_ref, novo_afrmm)
+                        else:
+                            di.append(novo_afrmm)
+
+                adi = di.find('nfe:adi', ns)
+                if adi is not None:
+                    for k in ['nAdicao', 'nSeqAdic', 'cFabricante']:
+                        if k in item_data and item_data[k] is not None:
+                            s(adi, 'nfe:' + k, item_data[k], k)
 
     imposto = det.find('nfe:imposto', ns)
-    if imposto is not None:
-        icms = imposto.find('nfe:ICMS', ns)
-        if icms is not None and len(list(icms)) > 0:
-            c = list(icms)[0]
-            if 'orig' in item_data and item_data['orig'] is not None:
-                s(c, 'nfe:orig', item_data['orig'])
-            if 'CSOSN' in item_data and item_data['CSOSN'] is not None:
-                s(c, 'nfe:CSOSN', item_data['CSOSN'])
-                s(c, 'nfe:CST', item_data['CSOSN'])
-        
-        ipi = imposto.find('nfe:IPI', ns)
-        if ipi is not None:
-            if 'cEnq' in item_data and item_data['cEnq'] is not None:
-                s(ipi, 'nfe:cEnq', item_data['cEnq'])
-            ipi_trib = ipi.find('nfe:IPITrib', ns)
-            ipi_nt = ipi.find('nfe:IPINT', ns)
-            cst_ipi = item_data.get('CST_IPI')
-            if ipi_trib is not None:
-                if cst_ipi is not None: s(ipi_trib, 'nfe:CST', cst_ipi)
-                if 'vBC_IPI' in item_data and item_data['vBC_IPI'] is not None: s(ipi_trib, 'nfe:vBC', item_data['vBC_IPI'], 'vBC_IPI')
-                if 'pIPI' in item_data and item_data['pIPI'] is not None: s(ipi_trib, 'nfe:pIPI', item_data['pIPI'], 'pIPI')
-                if 'vIPI' in item_data and item_data['vIPI'] is not None: s(ipi_trib, 'nfe:vIPI', item_data['vIPI'], 'vIPI')
-            elif ipi_nt is not None:
-                if cst_ipi is not None: s(ipi_nt, 'nfe:CST', cst_ipi)
+    if imposto is None:
+        imposto = ET.Element('{http://www.portalfiscal.inf.br/nfe}imposto')
+        det.append(imposto)
 
+    # 1. ICMS (Adequação da tag correta conforme CSOSN ou CST)
+    atualizar_icms_node(imposto, item_data, ns)
+
+    # 2. IPI (IPINT para CSTs não tributados como 55/05, IPITrib para tributados como 50/00)
+    atualizar_ipi_node(imposto, item_data, ns)
+
+    # 3. II (Imposto de Importação)
+    if str(cfop_val).startswith('7'):
+        # Reexportação / Exportação não possui II
+        ii_el = imposto.find('nfe:II', ns)
+        if ii_el is not None:
+            imposto.remove(ii_el)
+    else:
+        has_ii_data = any(
+            item_data.get(k) is not None and str(item_data.get(k)).strip() != '' and not (k == 'vDespAdu' and is_zero(item_data.get(k)))
+            for k in ['vBC_II', 'vDespAdu', 'vII', 'vIOF']
+        )
         ii = imposto.find('nfe:II', ns)
+        if ii is None and has_ii_data:
+            ii = ET.Element('{http://www.portalfiscal.inf.br/nfe}II')
+            ref_ii = imposto.find('nfe:ISSQN', ns) or imposto.find('nfe:PIS', ns) or imposto.find('nfe:COFINS', ns)
+            if ref_ii is not None:
+                idx_ref = list(imposto).index(ref_ii)
+                imposto.insert(idx_ref, ii)
+            else:
+                imposto.append(ii)
+
         if ii is not None:
             if 'vBC_II' in item_data and item_data['vBC_II'] is not None: s(ii, 'nfe:vBC', item_data['vBC_II'], 'vBC_II')
             
             # vDespAdu: Despesas Aduaneiras / Taxa Siscomex
-            if 'vDespAdu' in item_data and item_data['vDespAdu'] is not None and str(item_data['vDespAdu']).strip() != '':
-                el_desp = ii.find('nfe:vDespAdu', ns)
+            val_desp = item_data.get('vDespAdu')
+            el_desp = ii.find('nfe:vDespAdu', ns)
+            if is_zero(val_desp):
                 if el_desp is not None:
-                    el_desp.text = limpar_decimal_nfe(item_data['vDespAdu'])
+                    ii.remove(el_desp)
+            elif val_desp is not None and str(val_desp).strip() != '':
+                if el_desp is not None:
+                    el_desp.text = limpar_decimal_nfe(val_desp)
                 else:
                     novo_desp = ET.Element('{http://www.portalfiscal.inf.br/nfe}vDespAdu')
-                    novo_desp.text = limpar_decimal_nfe(item_data['vDespAdu'])
+                    novo_desp.text = limpar_decimal_nfe(val_desp)
                     ref = ii.find('nfe:vII', ns) or ii.find('nfe:vIOF', ns)
                     if ref is not None:
                         idx_ref = list(ii).index(ref)
@@ -250,21 +548,14 @@ def atualizar_det(det, item_data, cfop_padrao, ns):
             if 'vII' in item_data and item_data['vII'] is not None: s(ii, 'nfe:vII', item_data['vII'], 'vII')
             if 'vIOF' in item_data and item_data['vIOF'] is not None: s(ii, 'nfe:vIOF', item_data['vIOF'], 'vIOF')
 
-        pis = imposto.find('nfe:PIS', ns)
-        if pis is not None and len(list(pis)) > 0:
-            c = list(pis)[0]
-            if 'CST_PIS' in item_data and item_data['CST_PIS'] is not None: s(c, 'nfe:CST', item_data['CST_PIS'])
-            if 'vBC_PIS' in item_data and item_data['vBC_PIS'] is not None: s(c, 'nfe:vBC', item_data['vBC_PIS'], 'vBC_PIS')
-            if 'pPIS' in item_data and item_data['pPIS'] is not None: s(c, 'nfe:pPIS', item_data['pPIS'], 'pPIS')
-            if 'vPIS' in item_data and item_data['vPIS'] is not None: s(c, 'nfe:vPIS', item_data['vPIS'], 'vPIS')
+            if len(list(ii)) == 0:
+                imposto.remove(ii)
 
-        cofins = imposto.find('nfe:COFINS', ns)
-        if cofins is not None and len(list(cofins)) > 0:
-            c = list(cofins)[0]
-            if 'CST_COFINS' in item_data and item_data['CST_COFINS'] is not None: s(c, 'nfe:CST', item_data['CST_COFINS'])
-            if 'vBC_COFINS' in item_data and item_data['vBC_COFINS'] is not None: s(c, 'nfe:vBC', item_data['vBC_COFINS'], 'vBC_COFINS')
-            if 'pCOFINS' in item_data and item_data['pCOFINS'] is not None: s(c, 'nfe:pCOFINS', item_data['pCOFINS'], 'pCOFINS')
-            if 'vCOFINS' in item_data and item_data['vCOFINS'] is not None: s(c, 'nfe:vCOFINS', item_data['vCOFINS'], 'vCOFINS')
+    # 4. PIS (PISNT para 04..09, PISAliq para 01/02, PISOutr para 49..99)
+    atualizar_pis_node(imposto, item_data, ns)
+
+    # 5. COFINS (COFINSNT para 04..09, COFINSAliq para 01/02, COFINSOutr para 49..99)
+    atualizar_cofins_node(imposto, item_data, ns)
 
 @app.route('/')
 def portal():
@@ -393,6 +684,49 @@ def api_ptax_cotacao():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# === ROTAS: CSTS OFICIAIS (ICMS, CSOSN, IPI, PIS, COFINS) ===
+@app.route('/api/csts', methods=['GET'])
+def api_get_csts():
+    tipo = request.args.get('tipo', '').strip().upper()
+    conn = get_db_connection()
+    c = conn.cursor()
+    if tipo:
+        c.execute('SELECT tipo_imposto, codigo, descricao, codigo_descricao, aplicacao FROM tabela_csts WHERE tipo_imposto = ? ORDER BY codigo ASC', (tipo,))
+    else:
+        c.execute('SELECT tipo_imposto, codigo, descricao, codigo_descricao, aplicacao FROM tabela_csts ORDER BY tipo_imposto, codigo ASC')
+    rows = c.fetchall()
+    conn.close()
+
+    res = {
+        'icms_csosn': [],
+        'icms': [],
+        'csosn': [],
+        'ipi': [],
+        'pis_cofins': [],
+        'all': []
+    }
+    for r in rows:
+        item = {
+            'tipo_imposto': r['tipo_imposto'],
+            'codigo': r['codigo'],
+            'descricao': r['descricao'],
+            'codigo_descricao': r['codigo_descricao'] or f"{r['codigo']} - {r['descricao']}",
+            'aplicacao': r['aplicacao']
+        }
+        res['all'].append(item)
+        if r['tipo_imposto'] == 'ICMS':
+            res['icms'].append(item)
+            res['icms_csosn'].append(item)
+        elif r['tipo_imposto'] == 'CSOSN':
+            res['csosn'].append(item)
+            res['icms_csosn'].append(item)
+        elif r['tipo_imposto'] == 'IPI':
+            res['ipi'].append(item)
+        elif r['tipo_imposto'] == 'PIS_COFINS':
+            res['pis_cofins'].append(item)
+
+    return jsonify({"status": "success", "csts": res})
+
 # === ROTAS: TIPOS DE NOTA / OPERAÇÃO ===
 @app.route('/tipos_operacao', methods=['GET'])
 def get_tipos_operacao():
@@ -416,6 +750,11 @@ def save_tipo_operacao():
     
     tp_nf = str(data.get('tp_nf', '0'))
     id_dest = str(data.get('id_dest', '3'))
+    csosn_icms = limpar_cst(data.get('csosn_icms', '102'))
+    c_enq_ipi = str(data.get('c_enq_ipi', '102')).strip()
+    cst_ipi = limpar_cst(data.get('cst_ipi', '05'))
+    cst_pis = limpar_cst(data.get('cst_pis', '07'))
+    cst_cofins = limpar_cst(data.get('cst_cofins', '07'))
 
     if existente:
         c.execute('''
@@ -429,14 +768,14 @@ def save_tipo_operacao():
             tp_nf,
             id_dest,
             data.get('orig_padrao', '1'),
-            data.get('csosn_icms', '102'),
-            data.get('c_enq_ipi', '102'),
-            data.get('cst_ipi', '05'),
+            csosn_icms,
+            c_enq_ipi,
+            cst_ipi,
             float(data.get('p_ipi', 0) or 0),
             float(data.get('aliquota_ii', 0) or 0),
-            data.get('cst_pis', '07'),
+            cst_pis,
             float(data.get('p_pis', 0) or 0),
-            data.get('cst_cofins', '07'),
+            cst_cofins,
             float(data.get('p_cofins', 0) or 0),
             data.get('inf_cpl_padrao', ''),
             nome
@@ -453,14 +792,14 @@ def save_tipo_operacao():
             tp_nf,
             id_dest,
             data.get('orig_padrao', '1'),
-            data.get('csosn_icms', '102'),
-            data.get('c_enq_ipi', '102'),
-            data.get('cst_ipi', '05'),
+            csosn_icms,
+            c_enq_ipi,
+            cst_ipi,
             float(data.get('p_ipi', 0) or 0),
             float(data.get('aliquota_ii', 0) or 0),
-            data.get('cst_pis', '07'),
+            cst_pis,
             float(data.get('p_pis', 0) or 0),
-            data.get('cst_cofins', '07'),
+            cst_cofins,
             float(data.get('p_cofins', 0) or 0),
             data.get('inf_cpl_padrao', '')
         ))
@@ -552,6 +891,8 @@ def upload_xml():
             # Destinatario
             "dest_xNome": get_text(dest, 'xNome'),
             "dest_CNPJ_CPF": get_text(dest, 'CNPJ') or get_text(dest, 'CPF') or get_text(dest, 'idEstrangeiro'),
+            "dest_indIEDest": get_text(dest, 'indIEDest') or "9",
+            "dest_IE": get_text(dest, 'IE') or "",
             "dest_xLgr": get_text(dest, 'xLgr'),
             "dest_nro": get_text(dest, 'nro'),
             "dest_xBairro": get_text(dest, 'xBairro'),
@@ -768,6 +1109,28 @@ def generate_xml():
     set_text(dest, 'UF', cabecalho.get('dest_UF'))
     set_text(dest, 'CEP', cabecalho.get('dest_CEP'))
 
+    # indIEDest e IE
+    ind_ie = str(cabecalho.get('dest_indIEDest') or '').strip()
+    if ind_ie:
+        set_text(dest, 'indIEDest', ind_ie)
+    
+    ie_val = str(cabecalho.get('dest_IE') or '').strip()
+    if ind_ie == '1' and ie_val:
+        set_text(dest, 'IE', ie_val)
+    elif ind_ie in ['2', '9']:
+        el_ie = dest.find('.//{http://www.portalfiscal.inf.br/nfe}IE') if dest is not None else None
+        if el_ie is not None:
+            if not ie_val or ie_val.upper() in ['ISENTO', '']:
+                try:
+                    for p in dest.iter():
+                        if el_ie in list(p):
+                            p.remove(el_ie)
+                            break
+                except Exception:
+                    el_ie.text = ''
+            else:
+                el_ie.text = ie_val
+
     # Atualiza cada det correspondente em sequencia
     dets = inf_nfe.findall('.//{http://www.portalfiscal.inf.br/nfe}det')
     cfop_padrao = cabecalho.get('cfop_padrao')
@@ -779,6 +1142,23 @@ def generate_xml():
         
         if item_data:
             atualizar_det(det, item_data, cfop_padrao, ns)
+
+        # Remove tags de despesas zeradas do prod e imposto/II caso tenham restado do XML original
+        p = det.find('nfe:prod', ns)
+        if p is not None:
+            for k in ['vFrete', 'vSeg', 'vOutro']:
+                el_k = p.find('nfe:' + k, ns)
+                if el_k is not None and is_zero(el_k.text):
+                    p.remove(el_k)
+        imposto_el = det.find('nfe:imposto', ns)
+        if imposto_el is not None:
+            ii_el = imposto_el.find('nfe:II', ns)
+            if ii_el is not None:
+                el_desp = ii_el.find('nfe:vDespAdu', ns)
+                if el_desp is not None and is_zero(el_desp.text):
+                    ii_el.remove(el_desp)
+                if len(list(ii_el)) == 0:
+                    imposto_el.remove(ii_el)
 
     # Transporte e Volumes
     transporte_data = rodape.get('transporte', {})

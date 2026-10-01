@@ -402,7 +402,7 @@
                                                     </label>
                                                     <div class="input-group input-group-sm">
                                                         <span class="input-group-text font-monospace fw-bold">R$</span>
-                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vAFRMM" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vAFRMM" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
                                                     </div>
                                                     <small class="text-muted" style="font-size: 10.5px;">Adicional Marinha Mercante lançado na Declaração de Importação</small>
                                                 </div>
@@ -415,7 +415,7 @@
                                                     </label>
                                                     <div class="input-group input-group-sm">
                                                         <span class="input-group-text font-monospace fw-bold">R$</span>
-                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vSiscomex" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vSiscomex" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
                                                     </div>
                                                     <small class="text-muted" style="font-size: 10.5px;">Taxa Siscomex da DI lançada em Desp. Aduaneiras e Outras Desp.</small>
                                                 </div>
@@ -455,21 +455,21 @@
                                                                 <label class="form-label small mb-1">Frete Total (vFrete)</label>
                                                                 <div class="input-group input-group-sm">
                                                                     <span class="input-group-text font-monospace">R$</span>
-                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vFrete" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vFrete" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-4">
                                                                 <label class="form-label small mb-1">Seguro Total (vSeg)</label>
                                                                 <div class="input-group input-group-sm">
                                                                     <span class="input-group-text font-monospace">R$</span>
-                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vSeg" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vSeg" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-4">
                                                                 <label class="form-label small mb-1">Outras Despesas (vOutro)</label>
                                                                 <div class="input-group input-group-sm">
                                                                     <span class="input-group-text font-monospace">R$</span>
-                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vOutro" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2)">
+                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vOutro" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -558,6 +558,18 @@
                                     <div class="col-md-4">
                                         <label class="form-label small mb-1">CNPJ / CPF / IdEstrangeiro</label>
                                         <input type="text" class="form-control form-control-sm" id="dest_CNPJ_CPF">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1">Tipo de Contribuinte (ICMS)</label>
+                                        <select class="form-select form-select-sm" id="dest_indIEDest" onchange="atualizarEstadoInscricaoEstadual()">
+                                            <option value="1">1 - Contribuinte ICMS</option>
+                                            <option value="2">2 - Contribuinte ISENTO</option>
+                                            <option value="9" selected>9 - Não Contribuinte</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1">Inscrição Estadual (IE)</label>
+                                        <input type="text" class="form-control form-control-sm bg-light" id="dest_IE" placeholder="Apenas p/ Contribuinte ICMS" disabled>
                                     </div>
                                     <div class="col-md-9">
                                         <label class="form-label small mb-1">Logradouro (xLgr)</label>
@@ -677,7 +689,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label small">CSOSN / CST ICMS</label>
-                                        <input type="text" class="form-control form-control-sm" id="op_csosn" placeholder="Ex: 102, 300, 400, 900">
+                                        <select class="form-select form-select-sm" id="op_csosn"></select>
                                     </div>
 
                                     <!-- IPI -->
@@ -688,7 +700,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small">CST IPI</label>
-                                        <input type="text" class="form-control form-control-sm" id="op_cst_ipi" placeholder="Ex: 05, 00, 49">
+                                        <select class="form-select form-select-sm" id="op_cst_ipi"></select>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small">Alíquota IPI (%)</label>
@@ -706,7 +718,7 @@
                                     <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">4. PIS & COFINS</h6></div>
                                     <div class="col-md-3">
                                         <label class="form-label small">CST PIS</label>
-                                        <input type="text" class="form-control form-control-sm" id="op_cst_pis" placeholder="Ex: 07, 01">
+                                        <select class="form-select form-select-sm" id="op_cst_pis"></select>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small">Alíquota PIS (%)</label>
@@ -714,7 +726,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small">CST COFINS</label>
-                                        <input type="text" class="form-control form-control-sm" id="op_cst_cofins" placeholder="Ex: 07, 01">
+                                        <select class="form-select form-select-sm" id="op_cst_cofins"></select>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small">Alíquota COFINS (%)</label>
@@ -971,7 +983,16 @@
     function setVal(id, val) {
         const el = document.getElementById(id);
         if (el) {
-            el.value = (val !== undefined && val !== null) ? val : "";
+            if (el.tagName === 'SELECT') {
+                const sVal = (val !== undefined && val !== null) ? String(val) : "";
+                const clean = sVal.split(' - ')[0].trim();
+                el.value = sVal;
+                if (!el.value && clean) {
+                    el.value = clean;
+                }
+            } else {
+                el.value = (val !== undefined && val !== null) ? val : "";
+            }
         }
     }
 
@@ -1514,14 +1535,51 @@
         const vOutro = parseNum(getVal('rateio_vOutro'));
         const criterio = getVal('rateio_criterio') || 'vProd';
 
-        if (vAFRMM <= 0 && vSiscomex <= 0 && vFrete <= 0 && vSeg <= 0 && vOutro <= 0) {
-            alert("Informe ao menos um valor de parâmetro para ratear (Valor Marinha Mercante, Taxa Siscomex, Frete, Seguro ou Outras Despesas).");
-            return;
-        }
-
         const chkSiscomexDespAdu = document.getElementById('chk_siscomex_despadu') ? document.getElementById('chk_siscomex_despadu').checked : true;
         const chkSiscomexOutro = document.getElementById('chk_siscomex_outro') ? document.getElementById('chk_siscomex_outro').checked : true;
         const chkSiscomexInfCpl = document.getElementById('chk_siscomex_infcpl') ? document.getElementById('chk_siscomex_infcpl').checked : true;
+
+        // Se todos os campos estiverem zerados (0,00)
+        if (vAFRMM <= 0 && vSiscomex <= 0 && vFrete <= 0 && vSeg <= 0 && vOutro <= 0) {
+            const confirmaZerado = confirm(
+                "Atenção: Os campos de Rateio Global de Despesas estão preenchidos com 0,00 (zerados).\n\n" +
+                "Confirma que os dados estão zerados e que os itens serão repassados SEM valores adicionais de despesas?\n\n" +
+                "(Desta forma, será transmitido somente o valor da mercadoria (vProd) e eventuais custos já informados diretamente nos itens)"
+            );
+            if (!confirmaZerado) {
+                return;
+            }
+
+            // Zera as despesas rateadas em todos os itens
+            itens.forEach(it => {
+                it.vAFRMM = '0.00';
+                if (chkSiscomexDespAdu) it.vDespAdu = '0.00';
+                it.vFrete = '0.00';
+                it.vSeg = '0.00';
+                it.vOutro = '0.00';
+            });
+
+            itensCache = itens;
+            if (itensTable) {
+                itensTable.setData(itensCache);
+            }
+
+            recalcularTotaisDosItens(true);
+            atualizarBadgesRateioEItens();
+
+            if (!silencioso) {
+                alert("✅ Confirmado: Despesas rateadas zeradas com sucesso em todos os itens!\nSerá repassado somente o valor da mercadoria e custos próprios.");
+            }
+            return;
+        }
+
+        // Identifica campos que foram preenchidos com 0,00
+        const camposZerados = [];
+        if (vAFRMM <= 0) camposZerados.push("Marinha Mercante (AFRMM)");
+        if (vSiscomex <= 0) camposZerados.push("Taxa Siscomex");
+        if (vFrete <= 0) camposZerados.push("Frete");
+        if (vSeg <= 0) camposZerados.push("Seguro");
+        if (vOutro <= 0) camposZerados.push("Outras Despesas");
 
         // 1. Distribuições proporcionais exatas
         const distAFRMM = (vAFRMM > 0) ? calcularRateioProporcional(itens, vAFRMM, criterio) : null;
@@ -1530,11 +1588,14 @@
         const distSeg = (vSeg > 0) ? calcularRateioProporcional(itens, vSeg, criterio) : null;
         const distOutro = (vOutro > 0) ? calcularRateioProporcional(itens, vOutro, criterio) : null;
 
-        // 2. Aplicação direta aos itens
+        // 2. Aplicação direta aos itens (garantindo que campos zerados recebam 0.00)
         itens.forEach((it, idx) => {
             if (distAFRMM) {
                 it.vAFRMM = distAFRMM[idx];
+            } else {
+                it.vAFRMM = '0.00';
             }
+
             if (distSiscomex) {
                 const parcSiscomex = distSiscomex[idx];
                 if (chkSiscomexDespAdu) {
@@ -1544,14 +1605,25 @@
                     const extraOutro = distOutro ? parseNum(distOutro[idx]) : 0;
                     it.vOutro = (parseNum(parcSiscomex) + extraOutro).toFixed(2);
                 }
-            } else if (distOutro) {
-                it.vOutro = distOutro[idx];
+            } else {
+                if (chkSiscomexDespAdu) it.vDespAdu = '0.00';
+                if (distOutro) {
+                    it.vOutro = distOutro[idx];
+                } else {
+                    it.vOutro = '0.00';
+                }
             }
+
             if (distFrete) {
                 it.vFrete = distFrete[idx];
+            } else {
+                it.vFrete = '0.00';
             }
+
             if (distSeg) {
                 it.vSeg = distSeg[idx];
+            } else {
+                it.vSeg = '0.00';
             }
         });
 
@@ -1561,16 +1633,21 @@
         }
 
         // 3. Atualizar infCpl com a Taxa Siscomex se solicitado
-        if (chkSiscomexInfCpl && vSiscomex > 0) {
-            const siscomexFmt = formatarNumeroVisualBR(vSiscomex, 2, 2);
+        if (chkSiscomexInfCpl) {
             let infCplAtual = getVal('infCpl') || '';
-            const textoSiscomex = `TX SISCOMEX R$ : ${siscomexFmt}`;
             const regexSiscomex = /TX\s+SISCOMEX\s+R\$\s*:\s*[\d.,]+/i;
-
-            if (regexSiscomex.test(infCplAtual)) {
-                infCplAtual = infCplAtual.replace(regexSiscomex, textoSiscomex);
+            if (vSiscomex > 0) {
+                const siscomexFmt = formatarNumeroVisualBR(vSiscomex, 2, 2);
+                const textoSiscomex = `TX SISCOMEX R$ : ${siscomexFmt}`;
+                if (regexSiscomex.test(infCplAtual)) {
+                    infCplAtual = infCplAtual.replace(regexSiscomex, textoSiscomex);
+                } else {
+                    infCplAtual = infCplAtual.trim() ? (infCplAtual.trim() + "  " + textoSiscomex) : textoSiscomex;
+                }
             } else {
-                infCplAtual = infCplAtual.trim() ? (infCplAtual.trim() + "  " + textoSiscomex) : textoSiscomex;
+                if (regexSiscomex.test(infCplAtual)) {
+                    infCplAtual = infCplAtual.replace(regexSiscomex, '').trim();
+                }
             }
             setVal('infCpl', infCplAtual);
         }
@@ -1586,6 +1663,9 @@
             if (vFrete > 0) msg += `🚚 Frete Total: R$ ${formatarNumeroVisualBR(vFrete, 2, 2)} rateados em vFrete\n`;
             if (vSeg > 0) msg += `🛡️ Seguro Total: R$ ${formatarNumeroVisualBR(vSeg, 2, 2)} rateados em vSeg\n`;
             if (vOutro > 0 && !vSiscomex) msg += `📦 Outras Despesas: R$ ${formatarNumeroVisualBR(vOutro, 2, 2)} rateados em vOutro\n`;
+            if (camposZerados.length > 0) {
+                msg += `\nℹ️ Campos zerados (0,00) repassados sem valores: ${camposZerados.join(', ')}.\n`;
+            }
             msg += `\nOs totais da nota fiscal (ICMSTot e vNF) foram recalculados automaticamente.`;
             alert(msg);
         }
@@ -1645,6 +1725,160 @@
         if (lblTaxa) lblTaxa.innerText = taxaVal ? `R$ ${taxaVal}` : 'R$ -';
     }
 
+    // CSTs Oficiais e Estruturas de Seleção
+    let cstMapDescricao = {};
+    let cstOptionsICMS = [];
+    let cstOptionsIPI = [];
+    let cstOptionsPIS = [];
+
+    function formatarCstCell(cell) {
+        const val = cell.getValue();
+        if (!val) return '';
+        const clean = String(val).split(' - ')[0].trim();
+        const desc = cstMapDescricao[clean] || val;
+        return `<span title="${desc}" class="fw-semibold text-truncate d-inline-block" style="max-width: 100%; cursor: pointer;">${desc}</span>`;
+    }
+
+    function mutatorLimparCst(value) {
+        if (!value) return '';
+        const str = String(value).trim();
+        if (str.includes(' - ')) {
+            return str.split(' - ')[0].trim();
+        }
+        return str;
+    }
+
+    function atualizarEstadoInscricaoEstadual() {
+        const sel = document.getElementById('dest_indIEDest');
+        const ie = document.getElementById('dest_IE');
+        if (!sel || !ie) return;
+        if (sel.value === '1') {
+            ie.disabled = false;
+            ie.classList.remove('bg-light');
+            ie.placeholder = 'Inscrição Estadual';
+        } else {
+            ie.disabled = true;
+            ie.classList.add('bg-light');
+            ie.placeholder = (sel.value === '2') ? 'ISENTO (Desabilitado)' : 'Não Contribuinte (Desabilitado)';
+            if (sel.value === '9') ie.value = '';
+        }
+    }
+
+    function verificarAvisoZeradoRateio(inputEl) {
+        if (!inputEl) return;
+        const val = parseNum(inputEl.value);
+        const feedbackId = 'fb-' + inputEl.id;
+        let fb = document.getElementById(feedbackId);
+        if (!fb) {
+            fb = document.createElement('div');
+            fb.id = feedbackId;
+            fb.className = 'small mt-1';
+            if (inputEl.parentNode && inputEl.parentNode.parentNode) {
+                inputEl.parentNode.parentNode.appendChild(fb);
+            }
+        }
+        if (val === 0) {
+            fb.innerHTML = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle" style="font-size: 10px;">ℹ️ Zerado (0,00): Sem rateio</span>';
+        } else {
+            fb.innerHTML = '';
+        }
+    }
+
+    async function carregarCSTsOficiais() {
+        try {
+            const resp = await fetch('/api/csts');
+            const data = await resp.json();
+            if (data.status === 'success' && data.csts) {
+                cstMapDescricao = {};
+                data.csts.all.forEach(c => {
+                    cstMapDescricao[c.codigo] = c.codigo_descricao;
+                });
+
+                cstOptionsICMS = data.csts.icms_csosn.map(c => ({ label: c.codigo_descricao, value: c.codigo }));
+                cstOptionsIPI = data.csts.ipi.map(c => ({ label: c.codigo_descricao, value: c.codigo }));
+                cstOptionsPIS = data.csts.pis_cofins.map(c => ({ label: c.codigo_descricao, value: c.codigo }));
+
+                const selCsosn = document.getElementById('op_csosn');
+                if (selCsosn) {
+                    const cur = selCsosn.value;
+                    selCsosn.innerHTML = '';
+                    const grpCsosn = document.createElement('optgroup');
+                    grpCsosn.label = 'Simples Nacional (CSOSN)';
+                    const grpIcms = document.createElement('optgroup');
+                    grpIcms.label = 'Regime Normal (CST ICMS)';
+                    data.csts.csosn.forEach(c => grpCsosn.appendChild(new Option(c.codigo_descricao, c.codigo)));
+                    data.csts.icms.forEach(c => grpIcms.appendChild(new Option(c.codigo_descricao, c.codigo)));
+                    selCsosn.appendChild(grpCsosn);
+                    selCsosn.appendChild(grpIcms);
+                    if (cur) selCsosn.value = cur;
+                    else selCsosn.value = '102';
+                }
+
+                const selIpi = document.getElementById('op_cst_ipi');
+                if (selIpi) {
+                    const cur = selIpi.value;
+                    selIpi.innerHTML = '';
+                    const grpEnt = document.createElement('optgroup');
+                    grpEnt.label = 'Entradas / Importação';
+                    const grpSai = document.createElement('optgroup');
+                    grpSai.label = 'Saídas / Exportação';
+                    data.csts.ipi.forEach(c => {
+                        const opt = new Option(c.codigo_descricao, c.codigo);
+                        if (c.aplicacao === 'ENTRADA' || c.aplicacao === 'IMPORTACAO') grpEnt.appendChild(opt);
+                        else grpSai.appendChild(opt);
+                    });
+                    selIpi.appendChild(grpEnt);
+                    selIpi.appendChild(grpSai);
+                    if (cur) selIpi.value = cur;
+                    else selIpi.value = '05';
+                }
+
+                ['op_cst_pis', 'op_cst_cofins'].forEach(id => {
+                    const sel = document.getElementById(id);
+                    if (sel) {
+                        const cur = sel.value;
+                        sel.innerHTML = '';
+                        const grpSai = document.createElement('optgroup');
+                        grpSai.label = 'Saídas / Exportação';
+                        const grpEnt = document.createElement('optgroup');
+                        grpEnt.label = 'Entradas / Importação';
+                        data.csts.pis_cofins.forEach(c => {
+                            const opt = new Option(c.codigo_descricao, c.codigo);
+                            if (c.aplicacao === 'SAIDA' || c.aplicacao === 'EXPORTACAO') grpSai.appendChild(opt);
+                            else grpEnt.appendChild(opt);
+                        });
+                        sel.appendChild(grpSai);
+                        sel.appendChild(grpEnt);
+                        if (cur) sel.value = cur;
+                        else sel.value = '07';
+                    }
+                });
+
+                if (itensTable) {
+                    itensTable.updateColumnDefinition("CSOSN", {
+                        editor: "list",
+                        editorParams: { values: cstOptionsICMS, autocomplete: true, listOnEmpty: true, freetext: false, clearable: true }
+                    });
+                    itensTable.updateColumnDefinition("CST_IPI", {
+                        editor: "list",
+                        editorParams: { values: cstOptionsIPI, autocomplete: true, listOnEmpty: true, freetext: false, clearable: true }
+                    });
+                    itensTable.updateColumnDefinition("CST_PIS", {
+                        editor: "list",
+                        editorParams: { values: cstOptionsPIS, autocomplete: true, listOnEmpty: true, freetext: false, clearable: true }
+                    });
+                    itensTable.updateColumnDefinition("CST_COFINS", {
+                        editor: "list",
+                        editorParams: { values: cstOptionsPIS, autocomplete: true, listOnEmpty: true, freetext: false, clearable: true }
+                    });
+                    itensTable.redraw(true);
+                }
+            }
+        } catch(err) {
+            console.error("Erro ao carregar CSTs oficiais:", err);
+        }
+    }
+
     // Definicao de todas as colunas de det nItem
     const colunasItensDef = [
         {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center"},
@@ -1673,9 +1907,9 @@
         {title:"Seq. Adição", field:"nSeqAdic", width:95, editor:"input"},
         {title:"Fabricante", field:"cFabricante", width:130, editor:"input"},
         {title:"Origem", field:"orig", width:80, editor:"input"},
-        {title:"CSOSN/CST ICMS", field:"CSOSN", width:120, editor:"input"},
+        {title:"CSOSN/CST ICMS", field:"CSOSN", width:210, editor:"list", editorParams:{values:[], autocomplete:true, listOnEmpty:true, freetext:false, clearable:true}, formatter:formatarCstCell, mutatorEdit:mutatorLimparCst},
         {title:"cEnq IPI", field:"cEnq", width:90, editor:"input"},
-        {title:"CST IPI", field:"CST_IPI", width:90, editor:"input"},
+        {title:"CST IPI", field:"CST_IPI", width:190, editor:"list", editorParams:{values:[], autocomplete:true, listOnEmpty:true, freetext:false, clearable:true}, formatter:formatarCstCell, mutatorEdit:mutatorLimparCst},
         {title:"BC IPI", field:"vBC_IPI", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"% IPI", field:"pIPI", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. IPI", field:"vIPI", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
@@ -1683,20 +1917,22 @@
         {title:"Desp. Aduan.", field:"vDespAdu", width:110, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. II", field:"vII", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. IOF", field:"vIOF", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
-        {title:"CST PIS", field:"CST_PIS", width:90, editor:"input"},
+        {title:"CST PIS", field:"CST_PIS", width:190, editor:"list", editorParams:{values:[], autocomplete:true, listOnEmpty:true, freetext:false, clearable:true}, formatter:formatarCstCell, mutatorEdit:mutatorLimparCst},
         {title:"BC PIS", field:"vBC_PIS", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"% PIS", field:"pPIS", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. PIS", field:"vPIS", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
-        {title:"CST COFINS", field:"CST_COFINS", width:100, editor:"input"},
+        {title:"CST COFINS", field:"CST_COFINS", width:190, editor:"list", editorParams:{values:[], autocomplete:true, listOnEmpty:true, freetext:false, clearable:true}, formatter:formatarCstCell, mutatorEdit:mutatorLimparCst},
         {title:"BC COFINS", field:"vBC_COFINS", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"% COFINS", field:"pCOFINS", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. COFINS", field:"vCOFINS", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero}
     ];
 
     document.addEventListener('DOMContentLoaded', function() {
-        // 1. Carregar Operações cadastradas do banco e inicializar identificação
+        // 1. Carregar Operações cadastradas do banco e CSTs oficiais
+        carregarCSTsOficiais();
         carregarTiposOperacao();
         atualizarCamposIdentificacao('0', '3');
+        atualizarEstadoInscricaoEstadual();
         calcularChaveAcessoDinamica();
 
         // 2. Inicializar Câmbio PTAX e Parâmetros de Rateio
@@ -2082,10 +2318,16 @@
         const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (nomeOp || '').toUpperCase());
         if (op) {
             document.getElementById('lbl-operacao-ativa').innerText = `(${op.cfop_padrao}) ${op.nome_operacao}`;
-            document.getElementById('lbl-cfop-ativo').innerText = op.cfop_padrao || '-';
+            const descIcms = cstMapDescricao[op.csosn_icms] || op.csosn_icms || '-';
+            const descIpi = cstMapDescricao[op.cst_ipi] || op.cst_ipi || '-';
+            const descPis = cstMapDescricao[op.cst_pis] || op.cst_pis || '-';
+            const descCofins = cstMapDescricao[op.cst_cofins] || op.cst_cofins || '-';
             document.getElementById('lbl-icms-ativo').innerText = op.csosn_icms || '-';
+            document.getElementById('lbl-icms-ativo').title = descIcms;
             document.getElementById('lbl-ipi-ativo').innerText = op.cst_ipi || '-';
+            document.getElementById('lbl-ipi-ativo').title = descIpi;
             document.getElementById('lbl-pis-ativo').innerText = (op.cst_pis || '-') + ' / ' + (op.cst_cofins || '-');
+            document.getElementById('lbl-pis-ativo').title = `PIS: ${descPis} | COFINS: ${descCofins}`;
             setVal('cfop_padrao', op.cfop_padrao);
 
             // Herdar automaticamente tpNF (Entrada/Saída) e idDest (Destino da Operação)
@@ -2382,6 +2624,9 @@
             // Destinatario
             setVal('dest_xNome', c.dest_xNome);
             setVal('dest_CNPJ_CPF', c.dest_CNPJ_CPF);
+            setVal('dest_indIEDest', c.dest_indIEDest || '9');
+            setVal('dest_IE', c.dest_IE || '');
+            atualizarEstadoInscricaoEstadual();
             setVal('dest_xLgr', c.dest_xLgr);
             setVal('dest_nro', c.dest_nro);
             setVal('dest_xBairro', c.dest_xBairro);
@@ -2605,6 +2850,8 @@
                 
                 dest_xNome: getVal('dest_xNome'),
                 dest_CNPJ_CPF: getVal('dest_CNPJ_CPF'),
+                dest_indIEDest: getVal('dest_indIEDest') || '9',
+                dest_IE: getVal('dest_IE') || '',
                 dest_xLgr: getVal('dest_xLgr'),
                 dest_nro: getVal('dest_nro'),
                 dest_xBairro: getVal('dest_xBairro'),

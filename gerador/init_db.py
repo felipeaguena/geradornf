@@ -117,6 +117,106 @@ def init_db():
         except sqlite3.IntegrityError:
             pass
 
+    # 3. Tabela de CSTs Oficiais (ICMS/CSOSN, IPI, PIS, COFINS)
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS tabela_csts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo_imposto TEXT,
+            codigo TEXT,
+            descricao TEXT,
+            codigo_descricao TEXT,
+            aplicacao TEXT
+        )
+    ''')
+    c.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_cst_tipo_cod ON tabela_csts(tipo_imposto, codigo)')
+
+    csts_oficiais = [
+        # ICMS Normal
+        ('ICMS', '00', 'Tributada integralmente', '00 - Tributada integralmente', 'GERAL'),
+        ('ICMS', '10', 'Tributada e com cobrança do ICMS por substituição tributária', '10 - Tributada e com cobrança do ICMS por substituição tributária', 'GERAL'),
+        ('ICMS', '20', 'Com redução de base de cálculo', '20 - Com redução de base de cálculo', 'GERAL'),
+        ('ICMS', '30', 'Isenta ou não tributada e com cobrança do ICMS por substituição tributária', '30 - Isenta ou não tributada e com cobrança do ICMS por substituição tributária', 'GERAL'),
+        ('ICMS', '40', 'Isenta', '40 - Isenta', 'GERAL'),
+        ('ICMS', '41', 'Não tributada (Exportação / Imunidade)', '41 - Não tributada (Exportação / Imunidade)', 'EXPORTACAO'),
+        ('ICMS', '50', 'Suspensão', '50 - Suspensão', 'IMPORTACAO'),
+        ('ICMS', '51', 'Diferimento', '51 - Diferimento', 'IMPORTACAO'),
+        ('ICMS', '60', 'ICMS cobrado anteriormente por substituição tributária', '60 - ICMS cobrado anteriormente por substituição tributária', 'GERAL'),
+        ('ICMS', '70', 'Com redução de base de cálculo e cobrança do ICMS por substituição tributária', '70 - Com redução de base de cálculo e cobrança do ICMS por substituição tributária', 'GERAL'),
+        ('ICMS', '90', 'Outras', '90 - Outras', 'GERAL'),
+
+        # CSOSN - Simples Nacional
+        ('CSOSN', '101', 'Tributada pelo Simples Nacional com permissão de crédito', '101 - Tributada pelo Simples Nacional com permissão de crédito', 'GERAL'),
+        ('CSOSN', '102', 'Tributada pelo Simples Nacional sem permissão de crédito', '102 - Tributada pelo Simples Nacional sem permissão de crédito', 'GERAL'),
+        ('CSOSN', '103', 'Isenção do ICMS no Simples Nacional para faixa de receita bruta', '103 - Isenção do ICMS no Simples Nacional para faixa de receita bruta', 'GERAL'),
+        ('CSOSN', '201', 'Tributada pelo Simples Nacional com permissão de crédito e cobrança do ICMS por ST', '201 - Tributada pelo Simples Nacional com permissão de crédito e cobrança do ICMS por ST', 'GERAL'),
+        ('CSOSN', '202', 'Tributada pelo Simples Nacional sem permissão de crédito e cobrança do ICMS por ST', '202 - Tributada pelo Simples Nacional sem permissão de crédito e cobrança do ICMS por ST', 'GERAL'),
+        ('CSOSN', '203', 'Isenção do ICMS no Simples Nacional para faixa de receita bruta e cobrança do ICMS por ST', '203 - Isenção do ICMS no Simples Nacional para faixa de receita bruta e cobrança do ICMS por ST', 'GERAL'),
+        ('CSOSN', '300', 'Imune (Exportação)', '300 - Imune (Exportação)', 'EXPORTACAO'),
+        ('CSOSN', '400', 'Não tributada pelo Simples Nacional', '400 - Não tributada pelo Simples Nacional', 'GERAL'),
+        ('CSOSN', '500', 'ICMS cobrado anteriormente por substituição tributária (substituído) ou por antecipação', '500 - ICMS cobrado anteriormente por substituição tributária (substituído) ou por antecipação', 'GERAL'),
+        ('CSOSN', '900', 'Outros (Importação / Exportação / Outros)', '900 - Outros (Importação / Exportação / Outros)', 'IMPORTACAO'),
+
+        # IPI
+        ('IPI', '00', 'Entrada com recuperação de crédito', '00 - Entrada com recuperação de crédito', 'ENTRADA'),
+        ('IPI', '01', 'Entrada tributada com alíquota zero', '01 - Entrada tributada com alíquota zero', 'ENTRADA'),
+        ('IPI', '02', 'Entrada isenta', '02 - Entrada isenta', 'ENTRADA'),
+        ('IPI', '03', 'Entrada não-tributada', '03 - Entrada não-tributada', 'ENTRADA'),
+        ('IPI', '04', 'Entrada imune', '04 - Entrada imune', 'ENTRADA'),
+        ('IPI', '05', 'Entrada com suspensão (Admissão Temporária)', '05 - Entrada com suspensão (Admissão Temporária)', 'IMPORTACAO'),
+        ('IPI', '49', 'Outras entradas', '49 - Outras entradas', 'ENTRADA'),
+        ('IPI', '50', 'Saída tributada', '50 - Saída tributada', 'SAIDA'),
+        ('IPI', '51', 'Saída tributável com alíquota zero', '51 - Saída tributável com alíquota zero', 'SAIDA'),
+        ('IPI', '52', 'Saída isenta', '52 - Saída isenta', 'SAIDA'),
+        ('IPI', '53', 'Saída não-tributada', '53 - Saída não-tributada', 'SAIDA'),
+        ('IPI', '54', 'Saída imune (Exportação)', '54 - Saída imune (Exportação)', 'EXPORTACAO'),
+        ('IPI', '55', 'Saída com suspensão', '55 - Saída com suspensão', 'SAIDA'),
+        ('IPI', '99', 'Outras saídas', '99 - Outras saídas', 'SAIDA'),
+
+        # PIS e COFINS (Saídas e Entradas)
+        ('PIS_COFINS', '01', 'Operação tributável com alíquota básica', '01 - Operação tributável com alíquota básica', 'SAIDA'),
+        ('PIS_COFINS', '02', 'Operação tributável com alíquota diferenciada', '02 - Operação tributável com alíquota diferenciada', 'SAIDA'),
+        ('PIS_COFINS', '03', 'Operação tributável com alíquota por unidade de medida de produto', '03 - Operação tributável com alíquota por unidade de medida de produto', 'SAIDA'),
+        ('PIS_COFINS', '04', 'Operação tributável monofásica - Revenda a alíquota zero', '04 - Operação tributável monofásica - Revenda a alíquota zero', 'SAIDA'),
+        ('PIS_COFINS', '05', 'Operação tributável por substituição tributária', '05 - Operação tributável por substituição tributária', 'SAIDA'),
+        ('PIS_COFINS', '06', 'Operação tributável a alíquota zero', '06 - Operação tributável a alíquota zero', 'SAIDA'),
+        ('PIS_COFINS', '07', 'Operação isenta da contribuição', '07 - Operação isenta da contribuição', 'SAIDA'),
+        ('PIS_COFINS', '08', 'Operação sem incidência da contribuição (Exportação)', '08 - Operação sem incidência da contribuição (Exportação)', 'EXPORTACAO'),
+        ('PIS_COFINS', '09', 'Operação com suspensão da contribuição', '09 - Operação com suspensão da contribuição', 'SAIDA'),
+        ('PIS_COFINS', '49', 'Outras operações de saída', '49 - Outras operações de saída', 'SAIDA'),
+        ('PIS_COFINS', '50', 'Operação com direito a crédito - Vinculada a receita tributada no mercado interno', '50 - Operação com direito a crédito - Vinculada a receita tributada no mercado interno', 'ENTRADA'),
+        ('PIS_COFINS', '51', 'Operação com direito a crédito - Vinculada a receita não-tributada no mercado interno', '51 - Operação com direito a crédito - Vinculada a receita não-tributada no mercado interno', 'ENTRADA'),
+        ('PIS_COFINS', '52', 'Operação com direito a crédito - Vinculada a receita de exportação', '52 - Operação com direito a crédito - Vinculada a receita de exportação', 'ENTRADA'),
+        ('PIS_COFINS', '53', 'Operação com direito a crédito - Vinculada a receitas tributadas e não-tributadas no mercado interno', '53 - Operação com direito a crédito - Vinculada a receitas tributadas e não-tributadas no mercado interno', 'ENTRADA'),
+        ('PIS_COFINS', '54', 'Operação com direito a crédito - Vinculada a receitas tributadas e de exportação', '54 - Operação com direito a crédito - Vinculada a receitas tributadas e de exportação', 'ENTRADA'),
+        ('PIS_COFINS', '55', 'Operação com direito a crédito - Vinculada a receitas não-tributadas e de exportação', '55 - Operação com direito a crédito - Vinculada a receitas não-tributadas e de exportação', 'ENTRADA'),
+        ('PIS_COFINS', '56', 'Operação com direito a crédito - Vinculada a múltiplos tipos de receita', '56 - Operação com direito a crédito - Vinculada a múltiplos tipos de receita', 'ENTRADA'),
+        ('PIS_COFINS', '60', 'Crédito presumido - Vinculada a receita tributada no mercado interno', '60 - Crédito presumido - Vinculada a receita tributada no mercado interno', 'ENTRADA'),
+        ('PIS_COFINS', '61', 'Crédito presumido - Vinculada a receita não-tributada no mercado interno', '61 - Crédito presumido - Vinculada a receita não-tributada no mercado interno', 'ENTRADA'),
+        ('PIS_COFINS', '62', 'Crédito presumido - Vinculada a receita de exportação', '62 - Crédito presumido - Vinculada a receita de exportação', 'ENTRADA'),
+        ('PIS_COFINS', '63', 'Crédito presumido - Vinculada a receitas tributadas e não-tributadas no mercado interno', '63 - Crédito presumido - Vinculada a receitas tributadas e não-tributadas no mercado interno', 'ENTRADA'),
+        ('PIS_COFINS', '64', 'Crédito presumido - Vinculada a receitas tributadas e de exportação', '64 - Crédito presumido - Vinculada a receitas tributadas e de exportação', 'ENTRADA'),
+        ('PIS_COFINS', '65', 'Crédito presumido - Vinculada a receitas não-tributadas e de exportação', '65 - Crédito presumido - Vinculada a receitas não-tributadas e de exportação', 'ENTRADA'),
+        ('PIS_COFINS', '66', 'Crédito presumido - Vinculada a receitas tributadas, não-tributadas e de exportação', '66 - Crédito presumido - Vinculada a receitas tributadas, não-tributadas e de exportação', 'ENTRADA'),
+        ('PIS_COFINS', '67', 'Crédito presumido - Outras operações', '67 - Crédito presumido - Outras operações', 'ENTRADA'),
+        ('PIS_COFINS', '70', 'Operação de aquisição sem direito a crédito', '70 - Operação de aquisição sem direito a crédito', 'ENTRADA'),
+        ('PIS_COFINS', '71', 'Operação de aquisição com isenção', '71 - Operação de aquisição com isenção', 'ENTRADA'),
+        ('PIS_COFINS', '72', 'Operação de aquisição com suspensão (Admissão Temporária / Drawback)', '72 - Operação de aquisição com suspensão (Admissão Temporária / Drawback)', 'IMPORTACAO'),
+        ('PIS_COFINS', '73', 'Operação de aquisição a alíquota zero', '73 - Operação de aquisição a alíquota zero', 'ENTRADA'),
+        ('PIS_COFINS', '74', 'Operação de aquisição sem incidência da contribuição', '74 - Operação de aquisição sem incidência da contribuição', 'ENTRADA'),
+        ('PIS_COFINS', '75', 'Operação de aquisição por substituição tributária', '75 - Operação de aquisição por substituição tributária', 'ENTRADA'),
+        ('PIS_COFINS', '98', 'Outras operações de entrada', '98 - Outras operações de entrada', 'ENTRADA'),
+        ('PIS_COFINS', '99', 'Outras operações', '99 - Outras operações', 'AMBOS')
+    ]
+
+    for cst in csts_oficiais:
+        try:
+            c.execute('''
+                INSERT INTO tabela_csts (tipo_imposto, codigo, descricao, codigo_descricao, aplicacao)
+                VALUES (?, ?, ?, ?, ?)
+            ''', cst)
+        except sqlite3.IntegrityError:
+            pass
+
     conn.commit()
     conn.close()
     print("Banco de dados inicializado com sucesso!")
