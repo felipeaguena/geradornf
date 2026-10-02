@@ -109,71 +109,76 @@
     <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
     <div class="nft-main-wrapper">
         <div class="container-fluid px-4 py-3">
-            <!-- Top Header Limpo -->
+            <!-- Top Header Limpo Padronizado -->
             <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
                 <div class="d-flex align-items-center gap-3">
                     <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                        <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
+                        <i data-lucide="menu"></i>
                     </button>
                     <div>
                         <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                            <span>Gerador NF-e</span>
-                            <span class="badge bg-primary text-white font-monospace" style="font-size: 11px; padding: 4px 8px;">XML da DI / DUIMP</span>
+                            <span>Editor &amp; Gerador NF-e</span>
+                            <span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 11px; padding: 4px 8px;">XML da DI ou DUIMP</span>
                         </h4>
-                        <small class="text-muted">Geração e parametrização a partir de Declarações de Importação (DI) ou DUIMP Aduaneira</small>
+                        <small class="text-muted">Importe a Declaração de Importação (DI) ou DUIMP, selecione o Tipo de Nota e salve rascunhos para continuar a edição</small>
                     </div>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1" onclick="abrirModalListaRascunhos()">
-                        <i data-lucide="folder-clock" style="width: 14px; height: 14px;"></i>
-                        <span>Rascunhos</span>
-                        <span class="badge bg-secondary-subtle text-muted ms-1 badge-counter-rascunhos">0</span>
-                    </button>
                 </div>
             </div>
             
-            <!-- Upload Card: Tarefa 1 (Referência Interna ao lado do Escolher Ficheiro) & Tarefa 2 (Salvar e Rascunhos) -->
+            <!-- Upload & Rascunhos Card Padronizado (Idêntico ao XML Rascunho) -->
             <div class="card mb-3 shadow-sm border">
                 <div class="card-body py-2 px-3">
-                    <div class="row g-2 align-items-end">
-                        <div class="col-lg-5 col-md-6">
+                    <div class="row align-items-end g-2">
+                        <!-- 1. Campo de Referência Interna -->
+                        <div class="col-xl-3 col-md-4">
                             <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
-                                <i data-lucide="file-up" style="width: 14px; height: 14px;"></i>
-                                <span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
-                            </label>
-                            <input type="file" id="xmlFileInput" class="form-control form-control-sm" accept=".xml">
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
-                                <i data-lucide="tag" style="width: 14px; height: 14px;"></i>
+                                <i data-lucide="tag"></i>
                                 <span>Referência Interna:</span>
                             </label>
-                            <div class="input-group input-group-sm">
-                                <input type="text" id="referencia_interna" class="form-control" placeholder="Ex: REF-2026-001..." title="Referência interna do processo / DI / pedido">
-                            </div>
+                            <input type="text" id="referenciaInterna" class="form-control font-monospace" placeholder="Ex: REF-2026/001, PO-998" oninput="atualizarReferenciaRascunho(this.value)">
                         </div>
-                        <div class="col-lg-4 col-md-12 d-flex gap-2">
-                            <button class="btn btn-sm btn-primary flex-fill fw-bold d-inline-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
-                                <i data-lucide="upload" style="width: 15px; height: 15px;"></i>
+
+                        <!-- 2. Arquivo XML ("Escolher ficheiro") -->
+                        <div class="col-xl-4 col-md-4">
+                            <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
+                                <i data-lucide="file-up"></i>
+                                <span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
+                            </label>
+                            <input type="file" id="xmlFileInput" class="form-control" accept=".xml">
+                        </div>
+
+                        <!-- 3. Botão Carregar e Processar XML -->
+                        <div class="col-xl-2 col-md-4">
+                            <button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
+                                <i data-lucide="upload"></i>
                                 <span>Processar XML</span>
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center gap-1 px-3" onclick="abrirModalSalvarRascunho()" title="Salvar rascunho do trabalho atual para continuar depois">
-                                <i data-lucide="save" style="width: 15px; height: 15px;"></i>
+                        </div>
+
+                        <!-- 4. Botões de Ação de Rascunho -->
+                        <div class="col-xl-3 col-md-12 d-flex align-items-center gap-2">
+                            <button class="btn btn-outline-success fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
+                                <i data-lucide="save"></i>
                                 <span>Salvar</span>
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center gap-1 px-3 position-relative" onclick="abrirModalListaRascunhos()" title="Ver e gerenciar rascunhos salvos">
-                                <i data-lucide="folder-clock" style="width: 15px; height: 15px;"></i>
+                            <button class="btn btn-outline-secondary fw-bold d-flex align-items-center justify-content-center gap-2" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
+                                <i data-lucide="folder-clock"></i>
                                 <span>Rascunhos</span>
-                                <span class="badge bg-secondary-subtle text-muted ms-1 badge-counter-rascunhos">0</span>
+                                <span class="badge bg-secondary text-white badge-counter-rascunhos" id="badge-total-rascunhos">0</span>
                             </button>
                         </div>
                     </div>
+
+                    <!-- Linha Inferior com Indicadores de Status e Origem -->
                     <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                        <small class="text-muted d-flex align-items-center gap-1 font-monospace" style="font-size: 11px;">
-                            <i data-lucide="info" style="width: 12px; height: 12px;"></i>
-                            <span>Módulo exclusivo para importação direta de DI (Declaração de Importação) e DUIMP Aduaneira.</span>
-                        </small>
-                        <span id="status-badge" class="badge bg-secondary py-1 px-3">Aguardando XML</span>
+                        <div class="d-flex align-items-center gap-2 small">
+                            <span class="text-muted">Status do Documento:</span>
+                            <span id="status-badge" class="badge bg-secondary py-1 px-2">Aguardando XML</span>
+                            <span id="rascunho-info-tag" class="badge bg-light text-dark border d-none"></span>
+                        </div>
+                        <div id="rascunho-origem-indicator" class="text-muted small font-monospace">
+                            Módulo Ativo: <span class="badge badge-origem-di">XML da DI ou DUIMP</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -182,36 +187,22 @@
             <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="cabecalho-tab" data-bs-toggle="tab" data-bs-target="#cabecalho" type="button" role="tab">
-                        <i data-lucide="file-text" style="width: 14px; height: 14px; vertical-align: -2px;"></i> 1. Cabeçalho &amp; Operação
+                        <i data-lucide="clipboard-list"></i> 1. Cabeçalho &amp; Operação
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="itens-tab" data-bs-toggle="tab" data-bs-target="#itens" type="button" role="tab">
-                        <i data-lucide="package" style="width: 14px; height: 14px; vertical-align: -2px;"></i> 2. Itens da Nota (<span id="itens-badge" class="text-danger fw-bold">0</span>)
+                        <i data-lucide="package"></i> 2. Itens da Nota (<span id="itens-badge" class="text-danger fw-bold">0</span>)
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="rodape-tab" data-bs-toggle="tab" data-bs-target="#rodape" type="button" role="tab">
-                        <i data-lucide="calculator" style="width: 14px; height: 14px; vertical-align: -2px;"></i> 3. Rodapé &amp; Totais
+                        <i data-lucide="receipt"></i> 3. Rodapé &amp; Totais
                     </button>
-                </li>
-                <li class="nav-item dropdown ms-auto" role="presentation">
-                    <button class="nav-link dropdown-toggle" id="config-dropdown" data-bs-toggle="dropdown" type="button" role="button" aria-expanded="false">
-                        <i data-lucide="settings" style="width: 14px; height: 14px; vertical-align: -2px;"></i> Configurações
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="config-dropdown">
-                        <li>
-                            <button class="dropdown-item py-2 d-flex align-items-center gap-2" id="tipo-nota-tab" data-bs-toggle="tab" data-bs-target="#tipo-nota" type="button" role="tab">
-                                <i data-lucide="settings" style="width: 15px; height: 15px;"></i>
-                                <div>
-                                    <span class="fw-bold">Tipo de Nota (Impostos)</span><br>
-                                    <small class="text-muted">Tributos e regras padrão por operação</small>
-                                </div>
-                            </button>
-                        </li>
-                    </ul>
                 </li>
             </ul>
+            <!-- Botão oculto para ativação de Tipo de Nota via Menu Lateral -->
+            <button class="d-none" id="tipo-nota-tab" data-bs-toggle="tab" data-bs-target="#tipo-nota" type="button" role="tab" aria-hidden="true"></button>
 
             <!-- Conteudo das Abas -->
             <div class="tab-content bg-white p-3 border rounded shadow-sm mb-4" id="myTabContent">
@@ -789,15 +780,34 @@
                     <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
                 </div>
                 <div class="d-flex align-items-center flex-wrap gap-1">
-                    <button class="btn btn-warning btn-sm fw-bold text-dark me-1 shadow-sm" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
-                        <i data-lucide="scale" style="width: 14px; height: 14px;"></i> Rateio &amp; PTAX
+                    <button type="button" class="btn btn-outline-danger btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade">
+                        <i data-lucide="trash-2"></i>
+                        <span>Excluir Item</span>
                     </button>
-                    <button class="btn btn-outline-info btn-sm me-1 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
-                        <i data-lucide="globe" style="width: 14px; height: 14px;"></i> Unidades Exportação (uTrib)
+                    <button type="button" class="btn btn-outline-primary btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="duplicarItensSelecionados()" title="Duplicar item(ns) selecionado(s) na grade">
+                        <i data-lucide="copy"></i>
+                        <span>Duplicar Item</span>
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm me-1" onclick="recarregarTabelaItens()"><i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Redesenhar Grade</button>
-                    <button class="btn btn-success btn-sm me-1 fw-bold" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Exportar Excel (.xlsx)</button>
-                    <button class="btn btn-primary btn-sm fw-bold" onclick="document.getElementById('importExcelInput').click()"><i data-lucide="file-up" style="width: 14px; height: 14px;"></i> Importar Excel (.xlsx)</button>
+                    <button class="btn btn-warning btn-sm fw-bold text-dark me-1 shadow-sm d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
+                        <i data-lucide="scale"></i>
+                        <span>Rateio &amp; PTAX</span>
+                    </button>
+                    <button class="btn btn-outline-info btn-sm me-1 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
+                        <i data-lucide="globe"></i>
+                        <span>Unidades Exportação (uTrib)</span>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm me-1 d-flex align-items-center gap-1" onclick="recarregarTabelaItens()">
+                        <i data-lucide="refresh-cw"></i>
+                        <span>Redesenhar Grade</span>
+                    </button>
+                    <button class="btn btn-success btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="exportarExcel()">
+                        <i data-lucide="file-spreadsheet"></i>
+                        <span>Exportar Excel (.xlsx)</span>
+                    </button>
+                    <button class="btn btn-primary btn-sm fw-bold d-flex align-items-center gap-1" onclick="document.getElementById('importExcelInput').click()">
+                        <i data-lucide="upload"></i>
+                        <span>Importar Excel (.xlsx)</span>
+                    </button>
                     <input type="file" id="importExcelInput" style="display:none" accept=".xlsx" onchange="importarExcel(this)">
                 </div>
             </div>
@@ -1591,6 +1601,7 @@
                 it.vFrete = '0.00';
                 it.vSeg = '0.00';
                 it.vOutro = '0.00';
+                it.vBC_II = parseNum(it.vProd).toFixed(2);
             });
 
             itensCache = itens;
@@ -1659,6 +1670,9 @@
             } else {
                 it.vSeg = '0.00';
             }
+
+            // Recalcula Base de Cálculo do II (vBC_II = vProd + vFrete + vSeg)
+            it.vBC_II = (parseNum(it.vProd) + parseNum(it.vFrete) + parseNum(it.vSeg)).toFixed(2);
         });
 
         itensCache = itens;
@@ -1913,17 +1927,173 @@
         }
     }
 
+    // Função para obter o CFOP do Tipo de Operação ativo
+    function obterCfopOperacaoAtiva() {
+        const cfopHidden = getVal('cfop_padrao');
+        if (cfopHidden) return cfopHidden;
+        const sel = document.getElementById('select_operacao');
+        const nomeOp = sel ? sel.value : '';
+        if (nomeOp && typeof operacoesCache !== 'undefined' && Array.isArray(operacoesCache)) {
+            const op = operacoesCache.find(o => o.nome_operacao && o.nome_operacao.toUpperCase() === nomeOp.toUpperCase());
+            if (op && op.cfop_padrao) return op.cfop_padrao;
+        }
+        return '';
+    }
+
+    // Excluir Itens Selecionados com Modal Moderno (nftConfirm)
+    async function excluirItensSelecionados() {
+        if (!itensTable) return;
+        const selectedRows = itensTable.getSelectedRows();
+        if (!selectedRows || selectedRows.length === 0) {
+            if (window.nftAlert) {
+                await window.nftAlert("Selecione pelo menos um item da grade usando a caixa de seleção para excluir.", {
+                    type: "warning",
+                    title: "Nenhum Item Selecionado"
+                });
+            } else {
+                alert("Selecione pelo menos um item da grade usando a caixa de seleção para excluir.");
+            }
+            return;
+        }
+
+        const qtd = selectedRows.length;
+        const confirmMsg = `Deseja realmente excluir ${qtd === 1 ? 'o item selecionado' : `os ${qtd} itens selecionados`} da nota fiscal?\n\nEsta operação removerá os itens da grade e os totais serão recalculados automaticamente.`;
+        
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(confirmMsg, {
+                title: qtd === 1 ? 'Confirmar Exclusão de Item' : 'Confirmar Exclusão de Itens',
+                type: 'danger',
+                confirmText: 'Sim, Excluir',
+                cancelText: 'Cancelar',
+                icon: 'trash-2'
+            });
+        } else {
+            confirmado = confirm(confirmMsg);
+        }
+
+        if (!confirmado) return;
+
+        const selectedData = selectedRows.map(r => r.getData());
+        itensCache = itensCache.filter(it => !selectedData.includes(it));
+        // Reindexar nItem sequencialmente
+        itensCache.forEach((it, idx) => {
+            it.nItem = String(idx + 1);
+        });
+
+        itensTable.setData(itensCache);
+        const badgeItens = document.getElementById('itens-badge');
+        if (badgeItens) badgeItens.innerText = itensCache.length;
+
+        recalcularTotaisDosItens(true);
+        atualizarBadgesRateioEItens();
+
+        if (window.nftAlert) {
+            await window.nftAlert(`${qtd === 1 ? 'Item excluído' : `${qtd} itens excluídos`} com sucesso!`, {
+                type: 'success',
+                title: 'Exclusão Concluída'
+            });
+        }
+    }
+
+    // Duplicar Itens Selecionados com Modal Moderno (nftConfirm)
+    async function duplicarItensSelecionados() {
+        if (!itensTable) return;
+        const selectedRows = itensTable.getSelectedRows();
+        if (!selectedRows || selectedRows.length === 0) {
+            if (window.nftAlert) {
+                await window.nftAlert("Selecione pelo menos um item da grade usando a caixa de seleção para duplicar.", {
+                    type: "warning",
+                    title: "Nenhum Item Selecionado"
+                });
+            } else {
+                alert("Selecione pelo menos um item da grade usando a caixa de seleção para duplicar.");
+            }
+            return;
+        }
+
+        const qtd = selectedRows.length;
+        const confirmMsg = `Deseja duplicar ${qtd === 1 ? 'o item selecionado' : `os ${qtd} itens selecionados`}?\n\nNovas cópias dos itens serão inseridas na grade com cálculos e regras atualizados.`;
+
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(confirmMsg, {
+                title: qtd === 1 ? 'Confirmar Duplicação de Item' : 'Confirmar Duplicação de Itens',
+                type: 'info',
+                confirmText: 'Sim, Duplicar',
+                cancelText: 'Cancelar',
+                icon: 'copy'
+            });
+        } else {
+            confirmado = confirm(confirmMsg);
+        }
+
+        if (!confirmado) return;
+
+        const cfopOp = obterCfopOperacaoAtiva();
+        const novosItens = [];
+
+        selectedRows.forEach(r => {
+            const itemOrig = r.getData();
+            const clone = JSON.parse(JSON.stringify(itemOrig));
+            if (cfopOp) {
+                clone.CFOP = cfopOp;
+            }
+            const qCom = parseNum(clone.qCom);
+            const vUnCom = parseNum(clone.vUnCom);
+            if (qCom > 0 && vUnCom > 0) {
+                clone.vProd = (qCom * vUnCom).toFixed(2);
+            }
+            const vFrete = parseNum(clone.vFrete);
+            const vSeg = parseNum(clone.vSeg);
+            clone.vBC_II = (parseNum(clone.vProd) + vFrete + vSeg).toFixed(2);
+
+            novosItens.push(clone);
+        });
+
+        itensCache = itensCache.concat(novosItens);
+        itensCache.forEach((it, idx) => {
+            it.nItem = String(idx + 1);
+        });
+
+        itensTable.setData(itensCache);
+        const badgeItens = document.getElementById('itens-badge');
+        if (badgeItens) badgeItens.innerText = itensCache.length;
+
+        recalcularTotaisDosItens(true);
+        atualizarBadgesRateioEItens();
+
+        if (window.nftAlert) {
+            await window.nftAlert(`${qtd === 1 ? 'Item duplicado' : `${qtd} itens duplicados`} com sucesso!`, {
+                type: 'success',
+                title: 'Duplicação Concluída'
+            });
+        }
+    }
+
     // Definicao de todas as colunas de det nItem
     const colunasItensDef = [
+        {
+            formatter: "rowSelection",
+            titleFormatter: "rowSelection",
+            hozAlign: "center",
+            headerHozAlign: "center",
+            headerSort: false,
+            width: 42,
+            frozen: true,
+            cellClick: function(e, cell) {
+                cell.getRow().toggleSelect();
+            }
+        },
         {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center"},
         {title:"Cód. Prod.", field:"cProd", width:130, frozen:true, editor:"input"},
         {title:"Descrição do Produto", field:"xProd", width:280, editor:"input"},
         {title:"NCM", field:"NCM", width:100, editor:"input"},
-        {title:"CFOP", field:"CFOP", width:85, editor:"input"},
+        {title:"CFOP", field:"CFOP", width:85, hozAlign:"center", headerHozAlign:"center", cssClass:"font-monospace bg-light-subtle"},
         {title:"Un. Com.", field:"uCom", width:85, editor:"input"},
         {title:"Qtd. Com.", field:"qCom", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Com.", field:"vUnCom", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
-        {title:"V. Total Prod.", field:"vProd", width:125, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero, cssClass:"fw-bold text-primary"},
+        {title:"V. Total Prod.", field:"vProd", width:125, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:"fw-bold text-primary bg-light-subtle"},
         {title:"Un. Trib.", field:"uTrib", width:85, editor:"input"},
         {title:"Qtd. Trib.", field:"qTrib", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Trib.", field:"vUnTrib", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
@@ -1947,7 +2117,7 @@
         {title:"BC IPI", field:"vBC_IPI", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"% IPI", field:"pIPI", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. IPI", field:"vIPI", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
-        {title:"BC II", field:"vBC_II", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"BC II", field:"vBC_II", width:100, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:"bg-light-subtle"},
         {title:"Desp. Aduan.", field:"vDespAdu", width:110, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. II", field:"vII", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. IOF", field:"vIOF", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
@@ -1989,6 +2159,7 @@
             layout: "fitDataFill",
             height: "560px",
             columns: colunasItensDef,
+            selectable: true,
             renderVertical: "basic",
             renderHorizontal: "basic",
             placeholder: "Nenhum item carregado. Selecione e carregue o XML acima."
@@ -2030,17 +2201,28 @@
                     }
                 }
             } else if (campo === 'qCom' || campo === 'vUnCom') {
+                // Cálculo automático obrigatório de V. Total Prod. (vProd = qCom * vUnCom) e BC II (vBC_II = vProd + vFrete + vSeg)
                 const qComNum = parseNum(d.qCom);
                 const vUnComNum = parseNum(d.vUnCom);
                 if (qComNum > 0 && vUnComNum > 0) {
                     const novoVProd = (qComNum * vUnComNum).toFixed(2);
                     const qTribVal = parseNum(d.qTrib);
-                    const updates = { vProd: novoVProd };
+                    const vFreteNum = parseNum(d.vFrete);
+                    const vSegNum = parseNum(d.vSeg);
+                    const novoBCII = (parseNum(novoVProd) + vFreteNum + vSegNum).toFixed(2);
+                    const updates = { vProd: novoVProd, vBC_II: novoBCII };
                     if (qTribVal > 0) {
                         updates.vUnTrib = (parseNum(novoVProd) / qTribVal).toFixed(4);
                     }
                     row.update(updates);
                 }
+            } else if (campo === 'vFrete' || campo === 'vSeg') {
+                // Atualização automática de BC II ao alterar componentes aduaneiros do frete ou seguro
+                const vProdNum = parseNum(d.vProd);
+                const vFreteNum = parseNum(d.vFrete);
+                const vSegNum = parseNum(d.vSeg);
+                const novoBCII = (vProdNum + vFreteNum + vSegNum).toFixed(2);
+                row.update({ vBC_II: novoBCII });
             }
 
             if (['vProd', 'vFrete', 'vOutro', 'vIPI', 'vII', 'vPIS', 'vCOFINS', 'vBC_IPI', 'vBC_II', 'vBC_PIS', 'vBC_COFINS', 'vAFRMM', 'vDespAdu', 'qCom', 'vUnCom'].includes(campo)) {
@@ -2737,6 +2919,16 @@
 
             // 3. Preenchimento da Tabela de Itens
             itensCache = data.itens || [];
+            const cfopAtivoUpload = obterCfopOperacaoAtiva();
+            if (cfopAtivoUpload) {
+                itensCache.forEach(it => { it.CFOP = cfopAtivoUpload; });
+            }
+            itensCache.forEach(it => {
+                const q = parseNum(it.qCom);
+                const vu = parseNum(it.vUnCom);
+                if (q > 0 && vu > 0) it.vProd = (q * vu).toFixed(2);
+                it.vBC_II = (parseNum(it.vProd) + parseNum(it.vFrete) + parseNum(it.vSeg)).toFixed(2);
+            });
             document.getElementById('itens-badge').innerText = itensCache.length;
             
             if (itensTable) {
@@ -2830,6 +3022,16 @@
                 return;
             }
             itensCache = data.itens || [];
+            const cfopAtivoExcel = obterCfopOperacaoAtiva();
+            if (cfopAtivoExcel) {
+                itensCache.forEach(it => { it.CFOP = cfopAtivoExcel; });
+            }
+            itensCache.forEach(it => {
+                const q = parseNum(it.qCom);
+                const vu = parseNum(it.vUnCom);
+                if (q > 0 && vu > 0) it.vProd = (q * vu).toFixed(2);
+                it.vBC_II = (parseNum(it.vProd) + parseNum(it.vFrete) + parseNum(it.vSeg)).toFixed(2);
+            });
             document.getElementById('itens-badge').innerText = itensCache.length;
             if (itensTable) {
                 itensTable.setData(itensCache);
