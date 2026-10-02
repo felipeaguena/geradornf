@@ -36,6 +36,40 @@ def get_db_connection():
         if 'tabela_csts' not in tables:
             import init_db
             init_db.init_db()
+
+        if 'sistema_config' not in tables:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS sistema_config (
+                    chave TEXT PRIMARY KEY,
+                    valor TEXT,
+                    data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            # Se ja existem tipos_operacao cadastrados, marca que as operacoes ja foram carregadas
+            qtd_ops = conn.execute("SELECT COUNT(*) FROM tipos_operacao").fetchone()[0]
+            if qtd_ops > 0:
+                conn.execute("INSERT OR REPLACE INTO sistema_config (chave, valor) VALUES ('operacoes_iniciais_carregadas', '1')")
+            conn.commit()
+
+        if 'rascunhos' not in tables:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS rascunhos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    referencia_interna TEXT,
+                    categoria TEXT DEFAULT 'Geral',
+                    origem TEXT NOT NULL,
+                    tipo_operacao TEXT,
+                    operacao_id TEXT,
+                    nome_arquivo_original TEXT,
+                    caminho_arquivo_isolado TEXT,
+                    qtd_itens INTEGER DEFAULT 0,
+                    valor_total REAL DEFAULT 0.0,
+                    chave_acesso TEXT,
+                    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            conn.commit()
     except Exception:
         pass
 
@@ -812,10 +846,343 @@ def save_tipo_operacao():
 def delete_tipo_operacao(op_id):
     conn = get_db_connection()
     c = conn.cursor()
+    # Obter nome da operação antes da exclusão
+    op = c.execute('SELECT nome_operacao FROM tipos_operacao WHERE id = ?', (op_id,)).fetchone()
+    nome_op = op['nome_operacao'] if op else None
+
     c.execute('DELETE FROM tipos_operacao WHERE id = ?', (op_id,))
+
+    # Se a operação deletada era a última ativa em algum módulo, desassocia da configuração persistente
+    if nome_op:
+        c.execute("DELETE FROM sistema_config WHERE valor = ? AND chave LIKE 'ultima_operacao_%'", (nome_op,))
+
     conn.commit()
     conn.close()
-    return jsonify({"status": "success"})
+    return jsonify({"status": "success", "message": "Operação excluída definitivamente."})
+
+# === ROTAS: CONFIGURAÇÕES E DECISÕES PERSISTENTES DO SISTEMA ===
+@app.route('/api/config/ultima_operacao', methods=['GET'])
+def get_ultima_operacao():
+    modulo = request.args.get('modulo', 'rascunho')
+    chave = f"ultima_operacao_{modulo}"
+    conn = get_db_connection()
+    row = conn.execute("SELECT valor FROM sistema_config WHERE chave = ?", (chave,)).fetchone()
+    if not row or not row['valor']:
+        conn.close()
+        return jsonify({"status": "success", "ultima_operacao": None})
+    
+    nome_op = row['valor']
+    # Confirma se a operação ainda existe na tabela tipos_operacao
+    op = conn.execute("SELECT * FROM tipos_operacao WHERE nome_operacao = ?", (nome_op,)).fetchone()
+    if not op:
+        # Se foi excluída, limpa a referência da configuração
+        conn.execute("DELETE FROM sistema_config WHERE chave = ?", (chave,))
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "success", "ultima_operacao": None})
+    
+    op_dict = dict(op)
+    conn.close()
+    return jsonify({"status": "success", "ultima_operacao": nome_op, "dados_operacao": op_dict})
+
+@app.route('/api/config/ultima_operacao', methods=['POST'])
+def set_ultima_operacao():
+    data = request.json or {}
+    modulo = data.get('modulo', 'rascunho')
+    nome_operacao = (data.get('nome_operacao') or '').strip()
+    chave = f"ultima_operacao_{modulo}"
+    conn = get_db_connection()
+    if nome_operacao:
+        conn.execute(
+            "INSERT OR REPLACE INTO sistema_config (chave, valor, data_atualizacao) VALUES (?, ?, CURRENT_TIMESTAMP)",
+            (chave, nome_operacao)
+        )
+    else:
+        conn.execute("DELETE FROM sistema_config WHERE chave = ?", (chave,))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success", "modulo": modulo, "ultima_operacao": nome_operacao})
+
+@app.route('/api/config/salvar', methods=['POST'])
+def salvar_config_geral():
+    data = request.json or {}
+    chave = data.get('chave')
+    valor = data.get('valor')
+    if not chave:
+        return jsonify({"error": "Chave é obrigatória"}), 400
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT OR REPLACE INTO sistema_config (chave, valor, data_atualizacao) VALUES (?, ?, CURRENT_TIMESTAMP)",
+        (str(chave), str(valor) if valor is not None else "")
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success", "chave": chave, "valor": valor})
+
+@app.route('/api/config/obter', methods=['GET'])
+def obter_config_geral():
+    chave = request.args.get('chave')
+    if not chave:
+        return jsonify({"error": "Chave é obrigatória"}), 400
+    conn = get_db_connection()
+    row = conn.execute("SELECT valor FROM sistema_config WHERE chave = ?", (chave,)).fetchone()
+    conn.close()
+    valor = row['valor'] if row else None
+    return jsonify({"status": "success", "chave": chave, "valor": valor})
+
+# === ROTAS: GESTÃO DE RASCUNHOS SALVOS (ISOLADOS EM ARQUIVO & INDEXADOS NO BD) ===
+RASCUNHOS_DIR = os.path.join(os.path.dirname(__file__), 'rascunhos')
+os.makedirs(RASCUNHOS_DIR, exist_ok=True)
+
+@app.route('/api/rascunhos/salvar', methods=['POST'])
+def salvar_rascunho():
+    try:
+        data = request.get_json(force=True)
+        if not data:
+            return jsonify({"error": "Dados inválidos para o rascunho"}), 400
+
+        rascunho_id = data.get('id')
+        referencia_interna = str(data.get('referencia_interna') or '').strip()
+        categoria = str(data.get('categoria') or 'Geral').strip() or 'Geral'
+        origem = str(data.get('origem') or 'XML Rascunho').strip()
+        tipo_operacao = str(data.get('tipo_operacao') or '').strip()
+        operacao_id = str(data.get('operacao_id') or '').strip()
+        nome_arquivo_original = str(data.get('nome_arquivo_original') or '').strip()
+        chave_acesso = str(data.get('chave_acesso') or '').strip()
+        
+        # Itens e Quantidade de Itens
+        itens = data.get('itens') or (data.get('dados_completos') or {}).get('itens') or []
+        qtd_itens_input = data.get('qtd_itens')
+        if qtd_itens_input is not None and str(qtd_itens_input).strip() != '':
+            try:
+                qtd_itens = int(qtd_itens_input)
+            except Exception:
+                qtd_itens = len(itens)
+        else:
+            qtd_itens = len(itens)
+        
+        # Calcular valor total da nota
+        valor_total = 0.0
+        val_direto = data.get('valor_total')
+        if val_direto is not None and str(val_direto).strip() != '':
+            try:
+                s_val = str(val_direto).strip()
+                if ',' in s_val and '.' in s_val:
+                    s_val = s_val.replace('.', '').replace(',', '.')
+                elif ',' in s_val:
+                    s_val = s_val.replace(',', '.')
+                valor_total = float(s_val)
+            except Exception:
+                valor_total = 0.0
+
+        if valor_total <= 0.0:
+            totais = data.get('totais') or {}
+            v_nf = totais.get('vNF') or (data.get('dados_completos') or {}).get('cabecalho', {}).get('tot_vNF') or (data.get('dados_completos') or {}).get('cabecalho', {}).get('vNF')
+            if v_nf is not None and str(v_nf).strip() != '':
+                try:
+                    s_vnf = str(v_nf).strip()
+                    if ',' in s_vnf and '.' in s_vnf:
+                        s_vnf = s_vnf.replace('.', '').replace(',', '.')
+                    elif ',' in s_vnf:
+                        s_vnf = s_vnf.replace(',', '.')
+                    valor_total = float(s_vnf)
+                except Exception:
+                    valor_total = 0.0
+                
+        if valor_total <= 0.0:
+            for it in itens:
+                try:
+                    vp = it.get('vProd', 0)
+                    s_vp = str(vp).strip()
+                    if ',' in s_vp and '.' in s_vp:
+                        s_vp = s_vp.replace('.', '').replace(',', '.')
+                    elif ',' in s_vp:
+                        s_vp = s_vp.replace(',', '.')
+                    valor_total += float(s_vp)
+                except Exception:
+                    pass
+
+        conn = get_db_connection()
+        c = conn.cursor()
+
+        is_update = False
+        if rascunho_id:
+            try:
+                rascunho_id = int(rascunho_id)
+                row_check = c.execute("SELECT id FROM rascunhos WHERE id = ?", (rascunho_id,)).fetchone()
+                if row_check:
+                    is_update = True
+            except (ValueError, TypeError):
+                is_update = False
+
+        if is_update:
+            c.execute('''
+                UPDATE rascunhos SET
+                    referencia_interna = ?,
+                    categoria = ?,
+                    origem = ?,
+                    tipo_operacao = ?,
+                    operacao_id = ?,
+                    nome_arquivo_original = CASE WHEN ? != '' THEN ? ELSE nome_arquivo_original END,
+                    qtd_itens = ?,
+                    valor_total = ?,
+                    chave_acesso = ?,
+                    data_atualizacao = datetime('now', 'localtime')
+                WHERE id = ?
+            ''', (
+                referencia_interna, categoria, origem, tipo_operacao, operacao_id,
+                nome_arquivo_original, nome_arquivo_original, qtd_itens, round(valor_total, 2),
+                chave_acesso, rascunho_id
+            ))
+            conn.commit()
+            arquivo_nome = f'rascunho_{rascunho_id}.json'
+        else:
+            c.execute('''
+                INSERT INTO rascunhos (
+                    referencia_interna, categoria, origem, tipo_operacao, operacao_id,
+                    nome_arquivo_original, caminho_arquivo_isolado, qtd_itens, valor_total,
+                    chave_acesso, data_criacao, data_atualizacao
+                ) VALUES (?, ?, ?, ?, ?, ?, '', ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))
+            ''', (
+                referencia_interna, categoria, origem, tipo_operacao, operacao_id,
+                nome_arquivo_original, qtd_itens, round(valor_total, 2), chave_acesso
+            ))
+            rascunho_id = c.lastrowid
+            arquivo_nome = f'rascunho_{rascunho_id}.json'
+            c.execute('UPDATE rascunhos SET caminho_arquivo_isolado = ? WHERE id = ?', (arquivo_nome, rascunho_id))
+            conn.commit()
+
+        conn.close()
+
+        # Salvar o payload completo no arquivo isolado em disco
+        caminho_arquivo = os.path.join(RASCUNHOS_DIR, arquivo_nome)
+        data['id'] = rascunho_id
+        data['referencia_interna'] = referencia_interna
+        data['categoria'] = categoria
+        data['origem'] = origem
+        data['tipo_operacao'] = tipo_operacao
+        data['operacao_id'] = operacao_id
+        data['nome_arquivo_original'] = nome_arquivo_original
+        data['qtd_itens'] = qtd_itens
+        data['valor_total'] = round(valor_total, 2)
+        data['data_salvo'] = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+
+        with open(caminho_arquivo, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        return jsonify({
+            "success": True,
+            "id": rascunho_id,
+            "referencia_interna": referencia_interna,
+            "categoria": categoria,
+            "origem": origem,
+            "tipo_operacao": tipo_operacao,
+            "qtd_itens": qtd_itens,
+            "valor_total": round(valor_total, 2),
+            "message": f"Rascunho '{referencia_interna or 'ID #' + str(rascunho_id)}' salvo com sucesso em arquivo isolado e banco de dados!"
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"Falha ao salvar rascunho: {str(e)}"}), 500
+
+@app.route('/api/rascunhos', methods=['GET'])
+def listar_rascunhos():
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        
+        categoria = request.args.get('categoria', '').strip()
+        origem = request.args.get('origem', '').strip()
+        busca = request.args.get('busca', '').strip()
+        
+        query = """
+            SELECT id, referencia_interna, categoria, origem, tipo_operacao, operacao_id, 
+                   nome_arquivo_original, caminho_arquivo_isolado, qtd_itens, valor_total, 
+                   chave_acesso, data_criacao, data_atualizacao,
+                   COALESCE(strftime('%d/%m/%Y %H:%M', data_atualizacao), strftime('%d/%m/%Y %H:%M', data_criacao), strftime('%d/%m/%Y %H:%M', 'now', 'localtime')) as data_atualizacao_formatada,
+                   COALESCE(strftime('%d/%m/%Y %H:%M', data_criacao), strftime('%d/%m/%Y %H:%M', 'now', 'localtime')) as data_criacao_formatada
+            FROM rascunhos 
+            WHERE 1=1
+        """
+        params = []
+        if categoria:
+            query += " AND categoria = ?"
+            params.append(categoria)
+        if origem:
+            query += " AND origem = ?"
+            params.append(origem)
+        if busca:
+            query += " AND (referencia_interna LIKE ? OR tipo_operacao LIKE ? OR nome_arquivo_original LIKE ? OR categoria LIKE ?)"
+            lk = f"%{busca}%"
+            params.extend([lk, lk, lk, lk])
+            
+        query += " ORDER BY data_atualizacao DESC, id DESC"
+        rows = c.execute(query, params).fetchall()
+        rascunhos = [dict(r) for r in rows]
+        conn.close()
+        return jsonify({"rascunhos": rascunhos, "total": len(rascunhos)})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/rascunhos/<int:rascunho_id>', methods=['GET'])
+def obter_rascunho(rascunho_id):
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        row = c.execute("SELECT * FROM rascunhos WHERE id = ?", (rascunho_id,)).fetchone()
+        conn.close()
+        
+        if not row:
+            return jsonify({"error": "Rascunho não encontrado"}), 404
+            
+        caminho_arquivo = os.path.join(RASCUNHOS_DIR, f'rascunho_{rascunho_id}.json')
+        if os.path.exists(caminho_arquivo):
+            with open(caminho_arquivo, 'r', encoding='utf-8') as f:
+                payload = json.load(f)
+            payload['id'] = row['id']
+            payload['referencia_interna'] = row['referencia_interna']
+            payload['categoria'] = row['categoria']
+            payload['origem'] = row['origem']
+            payload['tipo_operacao'] = row['tipo_operacao']
+            payload['operacao_id'] = row['operacao_id']
+            return jsonify(payload)
+        else:
+            return jsonify(dict(row))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/rascunhos/<int:rascunho_id>', methods=['DELETE'])
+def excluir_rascunho(rascunho_id):
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("DELETE FROM rascunhos WHERE id = ?", (rascunho_id,))
+        conn.commit()
+        conn.close()
+        
+        caminho_arquivo = os.path.join(RASCUNHOS_DIR, f'rascunho_{rascunho_id}.json')
+        if os.path.exists(caminho_arquivo):
+            try:
+                os.remove(caminho_arquivo)
+            except Exception:
+                pass
+                
+        return jsonify({"success": True, "message": "Rascunho excluído com sucesso!"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/rascunhos/categorias', methods=['GET'])
+def listar_categorias_rascunhos():
+    try:
+        conn = get_db_connection()
+        rows = conn.execute("SELECT DISTINCT categoria FROM rascunhos WHERE categoria IS NOT NULL AND categoria != ''").fetchall()
+        conn.close()
+        base_cats = ['Geral', 'Importação', 'Exportação', 'Remessa', 'Devolução', 'Vendas']
+        db_cats = [r['categoria'] for r in rows if r['categoria']]
+        all_cats = list(dict.fromkeys(base_cats + db_cats))
+        return jsonify(all_cats)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # === ROTA: UPLOAD XML ===
 @app.route('/upload_xml', methods=['POST'])

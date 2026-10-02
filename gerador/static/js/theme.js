@@ -22,15 +22,18 @@
         const btns = document.querySelectorAll('.theme-toggle-btn');
         btns.forEach(btn => {
             if (theme === 'dark') {
-                btn.innerHTML = '☀️';
+                btn.innerHTML = '<i data-lucide="sun"></i>';
                 btn.title = 'Alternar para Modo Claro';
                 btn.setAttribute('aria-label', 'Modo Claro');
             } else {
-                btn.innerHTML = '🌙';
+                btn.innerHTML = '<i data-lucide="moon"></i>';
                 btn.title = 'Alternar para Modo Escuro';
                 btn.setAttribute('aria-label', 'Modo Escuro');
             }
         });
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
     }
 
     // Apply immediately to prevent flash

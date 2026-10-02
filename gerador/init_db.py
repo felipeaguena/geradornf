@@ -83,6 +83,19 @@ def init_db():
         )
     ''')
 
+    # 2.1 Tabela de Configurações e Preferências do Sistema
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS sistema_config (
+            chave TEXT PRIMARY KEY,
+            valor TEXT,
+            data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Verifica se as operacoes iniciais ja foram populadas alguma vez no sistema
+    op_init_row = c.execute("SELECT valor FROM sistema_config WHERE chave = 'operacoes_iniciais_carregadas'").fetchone()
+    qtd_ops_existentes = c.execute("SELECT COUNT(*) FROM tipos_operacao").fetchone()[0]
+
     operacoes_iniciais = [
         (
             'ADMISSAO TEMPORARIA',
@@ -106,16 +119,21 @@ def init_db():
         )
     ]
 
-    for op in operacoes_iniciais:
-        try:
-            c.execute('''
-                INSERT INTO tipos_operacao (
-                    nome_operacao, cfop_padrao, tp_nf, id_dest, orig_padrao, csosn_icms, c_enq_ipi,
-                    cst_ipi, p_ipi, aliquota_ii, cst_pis, p_pis, cst_cofins, p_cofins, inf_cpl_padrao
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', op)
-        except sqlite3.IntegrityError:
-            pass
+    # Só insere as operações padrão se o sistema for totalmente virgem (sem operações e flag não gravada)
+    # Se o usuário já utiliza o banco ou já deletou operações, respeita a decisão e não re-insere!
+    if not op_init_row:
+        if qtd_ops_existentes == 0:
+            for op in operacoes_iniciais:
+                try:
+                    c.execute('''
+                        INSERT INTO tipos_operacao (
+                            nome_operacao, cfop_padrao, tp_nf, id_dest, orig_padrao, csosn_icms, c_enq_ipi,
+                            cst_ipi, p_ipi, aliquota_ii, cst_pis, p_pis, cst_cofins, p_cofins, inf_cpl_padrao
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', op)
+                except sqlite3.IntegrityError:
+                    pass
+        c.execute("INSERT OR REPLACE INTO sistema_config (chave, valor) VALUES ('operacoes_iniciais_carregadas', '1')")
 
     # 3. Tabela de CSTs Oficiais (ICMS/CSOSN, IPI, PIS, COFINS)
     c.execute('''
@@ -216,6 +234,27 @@ def init_db():
             ''', cst)
         except sqlite3.IntegrityError:
             pass
+
+    # 4. Tabela de Rascunhos Salvos
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS rascunhos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            referencia_interna TEXT,
+            categoria TEXT DEFAULT 'Geral',
+            origem TEXT NOT NULL,
+            tipo_operacao TEXT,
+            operacao_id TEXT,
+            nome_arquivo_original TEXT,
+            caminho_arquivo_isolado TEXT,
+            qtd_itens INTEGER DEFAULT 0,
+            valor_total REAL DEFAULT 0.0,
+            chave_acesso TEXT,
+            data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+            data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    rascunhos_dir = os.path.join(os.path.dirname(__file__), 'rascunhos')
+    os.makedirs(rascunhos_dir, exist_ok=True)
 
     conn.commit()
     conn.close()

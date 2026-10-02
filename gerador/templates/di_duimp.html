@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="/static/css/nft-theme.css">
     <link rel="stylesheet" href="/static/css/nft-sidebar.css">
     <script src="/static/js/theme.js"></script>
+    <!-- Lucide Icons (Minimalist Line SVGs) -->
+    <script src="/static/js/lucide.min.js"></script>
     <!-- Tabulator CSS -->
     <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
     <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
@@ -31,7 +33,7 @@
                 </div>
             </a>
             <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
-                ◀
+                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
             </button>
         </div>
 
@@ -43,25 +45,25 @@
             <ul class="nft-sidebar-nav">
                 <li class="nft-sidebar-item">
                     <a href="/" class="nft-sidebar-btn" title="Portal Inicial">
-                        <span class="sidebar-icon">🏠</span>
+                        <span class="sidebar-icon"><i data-lucide="home"></i></span>
                         <span class="sidebar-label">Início / Módulos</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon">📄</span>
+                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
                         <span class="sidebar-label">XML Rascunho</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/di_duimp" class="nft-sidebar-btn active" title="Módulo XML da DI ou DUIMP">
-                        <span class="sidebar-icon">🌐</span>
+                        <span class="sidebar-icon"><i data-lucide="globe"></i></span>
                         <span class="sidebar-label">XML da DI ou DUIMP</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM & Impostos">
-                        <span class="sidebar-icon">📚</span>
+                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
                         <span class="sidebar-label">Tabela NCM</span>
                     </a>
                 </li>
@@ -72,31 +74,38 @@
             <ul class="nft-sidebar-nav">
                 <li class="nft-sidebar-item">
                     <button type="button" class="nft-sidebar-btn active" data-tab="cabecalho" onclick="sidebarSwitchTab('cabecalho')" title="Cabeçalho e Operação">
-                        <span class="sidebar-icon">📋</span>
+                        <span class="sidebar-icon"><i data-lucide="file-text"></i></span>
                         <span class="sidebar-label">Cabeçalho &amp; Operação</span>
                     </button>
                 </li>
                 <li class="nft-sidebar-item">
                     <button type="button" class="nft-sidebar-btn" data-tab="itens" onclick="sidebarSwitchTab('itens')" title="Itens da Nota">
-                        <span class="sidebar-icon">📦</span>
+                        <span class="sidebar-icon"><i data-lucide="package"></i></span>
                         <span class="sidebar-label">Itens da Nota</span>
                         <span class="badge bg-secondary-subtle text-muted sidebar-badge" id="sidebar-itens-badge">0</span>
                     </button>
                 </li>
                 <li class="nft-sidebar-item">
                     <button type="button" class="nft-sidebar-btn" data-tab="rodape" onclick="sidebarSwitchTab('rodape')" title="Rodapé e Totais">
-                        <span class="sidebar-icon">📑</span>
+                        <span class="sidebar-icon"><i data-lucide="calculator"></i></span>
                         <span class="sidebar-label">Rodapé &amp; Totais</span>
                     </button>
                 </li>
             </ul>
 
-            <!-- Grupo: Configurações -->
-            <div class="sidebar-section-title">Configurações</div>
+            <!-- Grupo: Rascunhos & Configurações -->
+            <div class="sidebar-section-title">Gerenciamento</div>
             <ul class="nft-sidebar-nav">
                 <li class="nft-sidebar-item">
+                    <button type="button" class="nft-sidebar-btn" onclick="abrirModalListaRascunhos()" title="Ver e gerenciar rascunhos salvos de DI / DUIMP e XML">
+                        <span class="sidebar-icon"><i data-lucide="bookmarks"></i></span>
+                        <span class="sidebar-label">Rascunhos Salvos</span>
+                        <span class="badge bg-secondary-subtle text-muted sidebar-badge badge-counter-rascunhos" id="sidebar-rascunhos-badge">0</span>
+                    </button>
+                </li>
+                <li class="nft-sidebar-item">
                     <button type="button" class="nft-sidebar-btn" data-tab="tipo-nota" onclick="sidebarSwitchTab('tipo-nota')" title="Configuração de Impostos &amp; Regras por Operação">
-                        <span class="sidebar-icon">⚙️</span>
+                        <span class="sidebar-icon"><i data-lucide="settings"></i></span>
                         <span class="sidebar-label">Tipo de Nota (Impostos)</span>
                     </button>
                 </li>
@@ -106,11 +115,11 @@
         <!-- 3. Rodapé da Sidebar -->
         <div class="nft-sidebar-footer">
             <button type="button" class="sidebar-footer-btn sidebar-footer-btn-primary" onclick="generateXML()" title="Gerar e Baixar Novo XML">
-                <span class="sidebar-icon">💾</span>
+                <span class="sidebar-icon"><i data-lucide="download"></i></span>
                 <span class="sidebar-footer-text">Gerar Novo XML</span>
             </button>
             <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
-                <span class="sidebar-icon theme-toggle-btn">🌙</span>
+                <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
                 <span class="sidebar-footer-text">Alternar Tema</span>
             </button>
             <div class="sidebar-footer-info">
@@ -127,7 +136,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
                 <div class="d-flex align-items-center gap-3">
                     <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                        ☰
+                        <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
                     </button>
                     <div>
                         <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
@@ -137,24 +146,57 @@
                         <small class="text-muted">Geração e parametrização a partir de Declarações de Importação (DI) ou DUIMP Aduaneira</small>
                     </div>
                 </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1" onclick="abrirModalListaRascunhos()">
+                        <i data-lucide="bookmarks" style="width: 14px; height: 14px;"></i>
+                        <span>Rascunhos</span>
+                        <span class="badge bg-secondary-subtle text-muted ms-1 badge-counter-rascunhos">0</span>
+                    </button>
+                </div>
             </div>
             
-            <!-- Upload Card -->
+            <!-- Upload Card: Tarefa 1 (Referência Interna ao lado do Escolher Ficheiro) & Tarefa 2 (Salvar e Rascunhos) -->
             <div class="card mb-3 shadow-sm border">
                 <div class="card-body py-2 px-3">
-                    <div class="row align-items-center">
-                        <div class="col-md-7">
-                            <label class="form-label fw-bold mb-1 small text-muted">Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</label>
-                            <input type="file" id="xmlFileInput" class="form-control" accept=".xml">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-lg-5 col-md-6">
+                            <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
+                                <i data-lucide="file-up" style="width: 14px; height: 14px;"></i>
+                                <span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
+                            </label>
+                            <input type="file" id="xmlFileInput" class="form-control form-control-sm" accept=".xml">
                         </div>
-                        <div class="col-md-3 pt-md-3">
-                            <button class="btn btn-primary w-100 fw-bold" onclick="uploadXML()">
-                                📂 Carregar e Processar XML
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
+                                <i data-lucide="tag" style="width: 14px; height: 14px;"></i>
+                                <span>Referência Interna:</span>
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="referencia_interna" class="form-control" placeholder="Ex: REF-2026-001..." title="Referência interna do processo / DI / pedido">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-12 d-flex gap-2">
+                            <button class="btn btn-sm btn-primary flex-fill fw-bold d-inline-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
+                                <i data-lucide="upload" style="width: 15px; height: 15px;"></i>
+                                <span>Processar XML</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center gap-1 px-3" onclick="abrirModalSalvarRascunho()" title="Salvar rascunho do trabalho atual para continuar depois">
+                                <i data-lucide="save" style="width: 15px; height: 15px;"></i>
+                                <span>Salvar</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center justify-content-center gap-1 px-3 position-relative" onclick="abrirModalListaRascunhos()" title="Ver e gerenciar rascunhos salvos">
+                                <i data-lucide="bookmarks" style="width: 15px; height: 15px;"></i>
+                                <span>Rascunhos</span>
+                                <span class="badge bg-secondary-subtle text-muted ms-1 badge-counter-rascunhos">0</span>
                             </button>
                         </div>
-                        <div class="col-md-2 pt-md-3 text-end">
-                            <span id="status-badge" class="badge bg-secondary py-2 px-3 w-100">Aguardando XML</span>
-                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                        <small class="text-muted d-flex align-items-center gap-1 font-monospace" style="font-size: 11px;">
+                            <i data-lucide="info" style="width: 12px; height: 12px;"></i>
+                            <span>Módulo exclusivo para importação direta de DI (Declaração de Importação) e DUIMP Aduaneira.</span>
+                        </small>
+                        <span id="status-badge" class="badge bg-secondary py-1 px-3">Aguardando XML</span>
                     </div>
                 </div>
             </div>
@@ -163,27 +205,27 @@
             <ul class="nav nav-tabs d-none" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="cabecalho-tab" data-bs-toggle="tab" data-bs-target="#cabecalho" type="button" role="tab">
-                        📋 1. Cabeçalho &amp; Operação
+                        <i data-lucide="file-text" style="width: 14px; height: 14px; vertical-align: -2px;"></i> 1. Cabeçalho &amp; Operação
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="itens-tab" data-bs-toggle="tab" data-bs-target="#itens" type="button" role="tab">
-                        📦 2. Itens da Nota (<span id="itens-badge" class="text-danger fw-bold">0</span>)
+                        <i data-lucide="package" style="width: 14px; height: 14px; vertical-align: -2px;"></i> 2. Itens da Nota (<span id="itens-badge" class="text-danger fw-bold">0</span>)
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="rodape-tab" data-bs-toggle="tab" data-bs-target="#rodape" type="button" role="tab">
-                        📑 3. Rodapé &amp; Totais
+                        <i data-lucide="calculator" style="width: 14px; height: 14px; vertical-align: -2px;"></i> 3. Rodapé &amp; Totais
                     </button>
                 </li>
                 <li class="nav-item dropdown ms-auto" role="presentation">
                     <button class="nav-link dropdown-toggle" id="config-dropdown" data-bs-toggle="dropdown" type="button" role="button" aria-expanded="false">
-                        ⚙️ Configurações
+                        <i data-lucide="settings" style="width: 14px; height: 14px; vertical-align: -2px;"></i> Configurações
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="config-dropdown">
                         <li>
                             <button class="dropdown-item py-2 d-flex align-items-center gap-2" id="tipo-nota-tab" data-bs-toggle="tab" data-bs-target="#tipo-nota" type="button" role="tab">
-                                <span>🏷️</span>
+                                <i data-lucide="settings" style="width: 15px; height: 15px;"></i>
                                 <div>
                                     <span class="fw-bold">Tipo de Nota (Impostos)</span><br>
                                     <small class="text-muted">Tributos e regras padrão por operação</small>
@@ -214,8 +256,9 @@
                     
                     <!-- SELECT DO TIPO DE OPERACAO: HERDA TUDO NOS ITENS -->
                     <div class="col-md-3">
-                        <label class="form-label small fw-bold">
-                            🎯 Tipo de Operação (Regras Padrão)
+                        <label class="form-label small fw-bold d-flex align-items-center gap-1">
+                            <i data-lucide="target" style="width: 14px; height: 14px;"></i>
+                            <span>Tipo de Operação (Regras Padrão)</span>
                         </label>
                         <select id="select_operacao" class="form-select fw-bold border-success" onchange="aoSelecionarOperacao(this.value)">
                             <option value="">-- Carregando operações cadastradas... --</option>
@@ -227,13 +270,17 @@
                     <!-- CHAVE DE ACESSO DA NF-E (44 DÍGITOS - DINÂMICA SEFAZ) -->
                     <div class="col-md-6">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label small fw-bold mb-0">🔑 Chave de Acesso NF-e (44 dígitos)</label>
+                            <label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1">
+                                <i data-lucide="key" style="width: 14px; height: 14px;"></i>
+                                <span>Chave de Acesso NF-e (44 dígitos)</span>
+                            </label>
                             <small class="text-muted font-monospace" style="font-size: 11px;">MOC SEFAZ (Dinâmica)</small>
                         </div>
                         <div class="input-group">
                             <input type="text" class="form-control font-monospace fw-bold text-primary" id="chaveAcessoDisplay" readonly placeholder="Aguardando dados da nota..." style="background-color: var(--surface-secondary); letter-spacing: 0.04em; font-size: 0.88rem;">
-                            <button class="btn btn-outline-secondary btn-sm px-3" type="button" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa">
-                                📋 Copiar
+                            <button class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-1" type="button" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa">
+                                <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+                                <span>Copiar</span>
                             </button>
                         </div>
                         <!-- Campos Ocultos de Apoio a Chave e Identificacao -->
@@ -261,8 +308,9 @@
                                 <div><span class="text-muted">PIS/COFINS:</span> <span id="lbl-pis-ativo" class="fw-semibold">-</span></div>
                             </div>
                             <div>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="aplicarOperacaoSelecionadaAosItens()">
-                                    ⚡ Reaplicar Regras aos Itens
+                                <button type="button" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" onclick="aplicarOperacaoSelecionadaAosItens()">
+                                    <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+                                    <span>Reaplicar Regras aos Itens</span>
                                 </button>
                             </div>
                         </div>
@@ -273,7 +321,10 @@
                         <div class="card border shadow-sm">
                             <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-primary px-2 py-1">🌐 Parâmetros Principais</span>
+                                    <span class="badge bg-primary px-2 py-1 d-inline-flex align-items-center gap-1">
+                                        <i data-lucide="globe" style="width: 12px; height: 12px;"></i>
+                                        <span>Parâmetros Principais</span>
+                                    </span>
                                     <span class="fw-bold">Câmbio Oficial PTAX & Rateios Globais da NF-e</span>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
@@ -287,7 +338,8 @@
                                         <div class="p-3 rounded bg-light border h-100">
                                             <div class="d-flex align-items-center justify-content-between mb-2">
                                                 <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                                                    <span>💱</span> Moeda Estrangeira & Câmbio PTAX
+                                                    <i data-lucide="coins" style="width: 16px; height: 16px;"></i>
+                                                    <span>Moeda Estrangeira &amp; Câmbio PTAX</span>
                                                 </h6>
                                                 <span class="badge bg-info-subtle text-info fw-bold" id="badge-boletim-status">API Bacen Olinda</span>
                                             </div>
@@ -328,7 +380,8 @@
                                                 <div class="col-12 mt-2">
                                                     <button type="button" class="btn btn-primary btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()">
                                                         <span id="spinner-ptax" class="spinner-border spinner-border-sm d-none" role="status"></span>
-                                                        <span>⚡ Puxar Taxa PTAX Atual (Boletim Bacen)</span>
+                                                        <i data-lucide="zap" style="width: 15px; height: 15px;"></i>
+                                                        <span>Puxar Taxa PTAX Atual (Boletim Bacen)</span>
                                                     </button>
                                                 </div>
 
@@ -369,11 +422,13 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-12 d-flex gap-2">
-                                                    <button type="button" class="btn btn-outline-primary btn-sm flex-fill" onclick="aplicarCotacaoNasObservacoes()">
-                                                        📝 Registrar Câmbio em infCpl
+                                                    <button type="button" class="btn btn-outline-primary btn-sm flex-fill d-inline-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()">
+                                                        <i data-lucide="file-edit" style="width: 14px; height: 14px;"></i>
+                                                        <span>Registrar Câmbio em infCpl</span>
                                                     </button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="converterItensComTaxaPtax()" title="Multiplica o valor unitário e total dos itens pela taxa PTAX">
-                                                        💱 Converter Itens
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" onclick="converterItensComTaxaPtax()" title="Multiplica o valor unitário e total dos itens pela taxa PTAX">
+                                                        <i data-lucide="arrow-left-right" style="width: 14px; height: 14px;"></i>
+                                                        <span>Converter Itens</span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -385,7 +440,8 @@
                                         <div class="p-3 rounded bg-light border h-100">
                                             <div class="d-flex align-items-center justify-content-between mb-2">
                                                 <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                                                    <span>⚖️</span> Rateio Global de Despesas entre os Itens
+                                                    <i data-lucide="scale" style="width: 16px; height: 16px;"></i>
+                                                    <span>Rateio Global de Despesas entre os Itens</span>
                                                 </h6>
                                                 <span class="badge bg-warning-subtle text-dark fw-bold">Divisão Centavo-Exata</span>
                                             </div>
@@ -397,7 +453,7 @@
                                                 <!-- VALOR MARINHA MERCANTE (AFRMM) -->
                                                 <div class="col-sm-6">
                                                     <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
-                                                        <span>⚓ VALOR MARINHA MERCANTE</span>
+                                                        <span class="d-inline-flex align-items-center gap-1"><i data-lucide="anchor" style="width: 13px; height: 13px;"></i> VALOR MARINHA MERCANTE</span>
                                                         <span class="badge bg-primary-subtle text-primary font-monospace" style="font-size: 10px;">vAFRMM (DI)</span>
                                                     </label>
                                                     <div class="input-group input-group-sm">
@@ -410,7 +466,7 @@
                                                 <!-- TAXA SISCOMEX -->
                                                 <div class="col-sm-6">
                                                     <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
-                                                        <span>🏛️ TAXA SISCOMEX</span>
+                                                        <span class="d-inline-flex align-items-center gap-1"><i data-lucide="landmark" style="width: 13px; height: 13px;"></i> TAXA SISCOMEX</span>
                                                         <span class="badge bg-success-subtle text-success font-monospace" style="font-size: 10px;">vDespAdu (II) / vOutro</span>
                                                     </label>
                                                     <div class="input-group input-group-sm">
@@ -447,8 +503,9 @@
                                                 <!-- Outras Despesas Acessórias de Rateio (Colapsável) -->
                                                 <div class="col-12 mt-1">
                                                     <details class="border rounded p-2 bg-white">
-                                                        <summary class="small fw-bold text-muted" style="cursor: pointer;">
-                                                            ➕ Outros Rateios (Frete, Seguro e Outras Despesas Globais)
+                                                        <summary class="small fw-bold text-muted d-flex align-items-center gap-1" style="cursor: pointer;">
+                                                            <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i>
+                                                            <span>Outros Rateios (Frete, Seguro e Outras Despesas Globais)</span>
                                                         </summary>
                                                         <div class="row g-2 mt-2">
                                                             <div class="col-sm-4">
@@ -480,14 +537,14 @@
                                                 <div class="col-sm-6 mt-2">
                                                     <label class="form-label small fw-bold mb-1">Critério de Proporcionalidade</label>
                                                     <select class="form-select form-select-sm fw-bold border-secondary" id="rateio_criterio">
-                                                        <option value="vProd" selected>⚖️ Proporcional ao Valor dos Produtos (vProd)</option>
-                                                        <option value="qCom">📦 Proporcional à Quantidade (qCom)</option>
-                                                        <option value="igual">🔢 Dividir Igualmente entre os Itens</option>
+                                                        <option value="vProd" selected>Proporcional ao Valor dos Produtos (vProd)</option>
+                                                        <option value="qCom">Proporcional à Quantidade (qCom)</option>
+                                                        <option value="igual">Dividir Igualmente entre os Itens</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-sm-6 mt-2 d-flex align-items-end">
                                                     <button type="button" class="btn btn-warning fw-bold text-dark w-100 btn-sm shadow-sm py-2" onclick="executarRateioGlobal()">
-                                                        ⚡ Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)
+                                                        <i data-lucide="zap" style="width: 14px; height: 14px;"></i> Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)
                                                     </button>
                                                 </div>
                                             </div>
@@ -501,7 +558,7 @@
                     <!-- EMITENTE -->
                     <div class="col-md-6 mt-3">
                         <div class="card h-100 border">
-                            <div class="card-header bg-light py-2">🏢 Dados do Emitente</div>
+                            <div class="card-header bg-light py-2 d-flex align-items-center gap-2 fw-bold"><i data-lucide="building-2" style="width: 15px; height: 15px;"></i> Dados do Emitente</div>
                             <div class="card-body py-2">
                                 <div class="row g-2">
                                     <div class="col-md-8">
@@ -548,7 +605,7 @@
                     <!-- DESTINATARIO -->
                     <div class="col-md-6 mt-3">
                         <div class="card h-100 border">
-                            <div class="card-header bg-light py-2">👤 Dados do Destinatário</div>
+                            <div class="card-header bg-light py-2 d-flex align-items-center gap-2 fw-bold"><i data-lucide="user" style="width: 15px; height: 15px;"></i> Dados do Destinatário</div>
                             <div class="card-body py-2">
                                 <div class="row g-2">
                                     <div class="col-md-8">
@@ -611,9 +668,9 @@
         <div class="tab-pane fade" id="tipo-nota" role="tabpanel">
             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-secondary px-2 py-1">⚙️ Configurações</span>
+                    <span class="badge bg-secondary px-2 py-1 d-inline-flex align-items-center gap-1"><i data-lucide="settings" style="width: 12px; height: 12px;"></i> Configurações</span>
                     <span class="text-muted">/</span>
-                    <h6 class="mb-0 fw-bold">🏷️ Tipo de Nota (Impostos &amp; Regras Padrão por Operação)</h6>
+                    <h6 class="mb-0 fw-bold d-inline-flex align-items-center gap-1"><i data-lucide="tag" style="width: 15px; height: 15px;"></i> Tipo de Nota (Impostos &amp; Regras Padrão por Operação)</h6>
                 </div>
                 <small class="text-muted">Gerencie e padronize regras tributárias herdadas automaticamente pelos itens da NF-e.</small>
             </div>
@@ -622,7 +679,7 @@
                     <div class="card h-100 border">
                         <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
                             <span>Operações Cadastradas</span>
-                            <button class="btn btn-sm btn-outline-success" onclick="novaOperacao()">➕ Nova</button>
+                            <button class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1" onclick="novaOperacao()"><i data-lucide="plus" style="width: 13px; height: 13px;"></i> Nova</button>
                         </div>
                         <div class="card-body p-2">
                             <div class="list-group" id="lista-operacoes" style="max-height: 480px; overflow-y: auto;">
@@ -638,13 +695,13 @@
                             <span id="titulo-form-op">Configuração da Operação: <strong id="lbl-op-nome">Nova Operação</strong></span>
                             <div>
                                 <button class="btn btn-sm btn-outline-primary me-2" onclick="capturarImpostosDoXmlAtual()">
-                                    📥 Puxar Impostos do XML Atual
+                                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> Puxar Impostos do XML Atual
                                 </button>
                                 <button class="btn btn-sm btn-danger me-2" id="btn-excluir-op" style="display:none;" onclick="excluirOperacaoAtual()">
-                                    🗑️ Excluir
+                                    <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Excluir
                                 </button>
                                 <button class="btn btn-sm btn-success fw-bold" onclick="salvarOperacao()">
-                                    💾 Salvar Configuração
+                                    <i data-lucide="save" style="width: 13px; height: 13px;"></i> Salvar Configuração
                                 </button>
                             </div>
                         </div>
@@ -756,14 +813,14 @@
                 </div>
                 <div class="d-flex align-items-center flex-wrap gap-1">
                     <button class="btn btn-warning btn-sm fw-bold text-dark me-1 shadow-sm" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
-                        ⚖️ Rateio &amp; PTAX
+                        <i data-lucide="scale" style="width: 14px; height: 14px;"></i> Rateio &amp; PTAX
                     </button>
                     <button class="btn btn-outline-info btn-sm me-1 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
-                        🌐 Unidades Exportação (uTrib)
+                        <i data-lucide="globe" style="width: 14px; height: 14px;"></i> Unidades Exportação (uTrib)
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm me-1" onclick="recarregarTabelaItens()">🔄 Redesenhar Grade</button>
-                    <button class="btn btn-success btn-sm me-1 fw-bold" onclick="exportarExcel()">⬇️ Exportar Excel (.xlsx)</button>
-                    <button class="btn btn-primary btn-sm fw-bold" onclick="document.getElementById('importExcelInput').click()">⬆️ Importar Excel (.xlsx)</button>
+                    <button class="btn btn-outline-secondary btn-sm me-1" onclick="recarregarTabelaItens()"><i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Redesenhar Grade</button>
+                    <button class="btn btn-success btn-sm me-1 fw-bold" onclick="exportarExcel()"><i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i> Exportar Excel (.xlsx)</button>
+                    <button class="btn btn-primary btn-sm fw-bold" onclick="document.getElementById('importExcelInput').click()"><i data-lucide="file-up" style="width: 14px; height: 14px;"></i> Importar Excel (.xlsx)</button>
                     <input type="file" id="importExcelInput" style="display:none" accept=".xlsx" onchange="importarExcel(this)">
                 </div>
             </div>
@@ -779,10 +836,10 @@
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-outline-info btn-sm py-0 px-2 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex">
-                        🌐 uTrib Exportação
+                        <i data-lucide="globe" style="width: 12px; height: 12px;"></i> uTrib Exportação
                     </button>
                     <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela">
-                        ⚡ Reaplicar Rateio
+                        <i data-lucide="zap" style="width: 12px; height: 12px;"></i> Reaplicar Rateio
                     </button>
                 </div>
             </div>
@@ -796,7 +853,7 @@
                 <!-- SEÇÃO 1: DADOS DO TRANSPORTE & CARGA -->
                 <div class="card border mb-3">
                     <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">🚚 Dados do Transporte e Volumes</span>
+                        <span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="truck" style="width: 16px; height: 16px;"></i> Dados do Transporte e Volumes</span>
                         <small class="text-muted">Grupo &lt;transp&gt; SEFAZ</small>
                     </div>
                     <div class="card-body py-3">
@@ -866,9 +923,9 @@
                 <!-- SEÇÃO 2: OBSERVAÇÕES E INFORMAÇÕES COMPLEMENTARES -->
                 <div class="card border mb-3">
                     <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">📝 Informações Complementares / Observações da Nota (infCpl)</span>
+                        <span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Informações Complementares / Observações da Nota (infCpl)</span>
                         <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2" onclick="aplicarObsDaOperacao()">
-                            📝 Puxar Observação Padrão do Tipo de Nota
+                            <i data-lucide="file-edit" style="width: 13px; height: 13px;"></i> Puxar Observação Padrão do Tipo de Nota
                         </button>
                     </div>
                     <div class="card-body py-2">
@@ -880,11 +937,11 @@
                 <div class="card border">
                     <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="fw-bold">💰 Totais da Nota Fiscal (Grupo &lt;total&gt; / &lt;ICMSTot&gt;)</span>
+                            <span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="calculator" style="width: 16px; height: 16px;"></i> Totais da Nota Fiscal (Grupo &lt;total&gt; / &lt;ICMSTot&gt;)</span>
                             <small class="text-muted d-none d-md-inline">(Valores em R$)</small>
                         </div>
                         <button type="button" class="btn btn-primary btn-sm py-1 px-3 fw-bold shadow-sm" onclick="recalcularTotaisDosItens()">
-                            ⚡ Recalcular Totais da Nota
+                            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Recalcular Totais da Nota
                         </button>
                     </div>
                     <div class="card-body py-3">
@@ -1659,10 +1716,10 @@
         if (!silencioso) {
             let msg = `✅ Rateio global executado com sucesso em todos os ${itens.length} itens!\n\n`;
             if (vAFRMM > 0) msg += `⚓ Marinha Mercante (AFRMM): R$ ${formatarNumeroVisualBR(vAFRMM, 2, 2)} distribuídos no campo vAFRMM\n`;
-            if (vSiscomex > 0) msg += `🏛️ Taxa Siscomex: R$ ${formatarNumeroVisualBR(vSiscomex, 2, 2)} rateados em vDespAdu` + (chkSiscomexOutro ? ' e somados em vOutro\n' : '\n');
-            if (vFrete > 0) msg += `🚚 Frete Total: R$ ${formatarNumeroVisualBR(vFrete, 2, 2)} rateados em vFrete\n`;
-            if (vSeg > 0) msg += `🛡️ Seguro Total: R$ ${formatarNumeroVisualBR(vSeg, 2, 2)} rateados em vSeg\n`;
-            if (vOutro > 0 && !vSiscomex) msg += `📦 Outras Despesas: R$ ${formatarNumeroVisualBR(vOutro, 2, 2)} rateados em vOutro\n`;
+            if (vSiscomex > 0) msg += `• Taxa Siscomex: R$ ${formatarNumeroVisualBR(vSiscomex, 2, 2)} rateados em vDespAdu` + (chkSiscomexOutro ? ' e somados em vOutro\n' : '\n');
+            if (vFrete > 0) msg += `• Frete Total: R$ ${formatarNumeroVisualBR(vFrete, 2, 2)} rateados em vFrete\n`;
+            if (vSeg > 0) msg += `• Seguro Total: R$ ${formatarNumeroVisualBR(vSeg, 2, 2)} rateados em vSeg\n`;
+            if (vOutro > 0 && !vSiscomex) msg += `• Outras Despesas: R$ ${formatarNumeroVisualBR(vOutro, 2, 2)} rateados em vOutro\n`;
             if (camposZerados.length > 0) {
                 msg += `\nℹ️ Campos zerados (0,00) repassados sem valores: ${camposZerados.join(', ')}.\n`;
             }
@@ -2038,7 +2095,7 @@
     function carregarTiposOperacao(selecionarNome = null) {
         fetch('/tipos_operacao')
             .then(res => res.json())
-            .then(data => {
+            .then(async data => {
                 operacoesCache = data || [];
                 
                 // 1. Atualiza Select da Aba 1 (Cabecalho)
@@ -2054,28 +2111,47 @@
 
                 // 2. Atualiza Lista da Aba de Configurações (Tipo de Nota)
                 const lista = document.getElementById('lista-operacoes');
-                lista.innerHTML = '';
-                
-                operacoesCache.forEach(op => {
-                    const item = document.createElement('a');
-                    item.href = "#";
-                    item.className = "list-group-item list-group-item-action py-2";
-                    const tipoTxt = (op.tp_nf == '1') ? '1 - Saída' : '0 - Entrada';
-                    const destTxt = (op.id_dest == '1') ? 'Interna' : (op.id_dest == '2' ? 'Interestadual' : 'Exterior');
-                    item.innerHTML = `<strong>(${op.cfop_padrao}) ${op.nome_operacao}</strong><br><small class='text-muted'>${tipoTxt} | Destino: ${destTxt} | ICMS: ${op.csosn_icms} | IPI: ${op.cst_ipi}</small>`;
-                    item.onclick = (e) => {
-                        e.preventDefault();
-                        selecionarOperacaoParaEdicao(op);
-                    };
-                    lista.appendChild(item);
-                });
+                if (lista) {
+                    lista.innerHTML = '';
+                    operacoesCache.forEach(op => {
+                        const item = document.createElement('a');
+                        item.href = "#";
+                        item.className = "list-group-item list-group-item-action py-2";
+                        const tipoTxt = (op.tp_nf == '1') ? '1 - Saída' : '0 - Entrada';
+                        const destTxt = (op.id_dest == '1') ? 'Interna' : (op.id_dest == '2' ? 'Interestadual' : 'Exterior');
+                        item.innerHTML = `<strong>(${op.cfop_padrao}) ${op.nome_operacao}</strong><br><small class='text-muted'>${tipoTxt} | Destino: ${destTxt} | ICMS: ${op.csosn_icms} | IPI: ${op.cst_ipi}</small>`;
+                        item.onclick = (e) => {
+                            e.preventDefault();
+                            selecionarOperacaoParaEdicao(op);
+                        };
+                        lista.appendChild(item);
+                    });
+                }
 
-                // Se pediu para selecionar uma operacao especifica
-                if (selecionarNome) {
-                    sel.value = selecionarNome;
-                    aoSelecionarOperacao(selecionarNome);
+                // 3. Determina qual operação selecionar e aplicar
+                let opParaSelecionar = selecionarNome;
+
+                // Se não foi passada explicitamente, busca a última escolha persistida no banco de dados
+                if (!opParaSelecionar) {
+                    try {
+                        const resUltima = await fetch('/api/config/ultima_operacao?modulo=di_duimp');
+                        const dataUltima = await resUltima.json();
+                        if (dataUltima && dataUltima.status === 'success' && dataUltima.ultima_operacao) {
+                            const existe = operacoesCache.some(o => o.nome_operacao.toUpperCase() === dataUltima.ultima_operacao.toUpperCase());
+                            if (existe) {
+                                opParaSelecionar = dataUltima.ultima_operacao;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn("Erro ao buscar ultima operacao:", e);
+                    }
+                }
+
+                if (opParaSelecionar) {
+                    sel.value = opParaSelecionar;
+                    aoSelecionarOperacao(opParaSelecionar, false);
                 } else if (sel.value) {
-                    aoSelecionarOperacao(sel.value);
+                    aoSelecionarOperacao(sel.value, false);
                 }
             });
     }
@@ -2249,7 +2325,7 @@
         }
 
         if (exibirAlerta) {
-            let msg = `🌍 Regras de Unidades Estatísticas de Exportação aplicadas a ${itens.length} itens!\n\n`;
+            let msg = `Regras de Unidades Estatísticas de Exportação aplicadas a ${itens.length} itens!\n\n`;
             msg += `✅ Unidades Tributáveis (uTrib) atualizadas conforme Comex / Receita Federal.\n`;
             if (itensKGIndices.length > 0) {
                 if (pesoLTotal > 0) {
@@ -2259,7 +2335,7 @@
                 }
             }
             if (itensManuais.length > 0) {
-                msg += `\n📝 Itens para preenchimento manual de quantidade (${itensManuais.length}):\n`;
+                msg += `\n• Itens para preenchimento manual de quantidade (${itensManuais.length}):\n`;
                 itensManuais.forEach(it => {
                     msg += ` • Item ${it.nItem || '?'}: ${it.xProd ? it.xProd.slice(0, 32) + '...' : 'Produto'} (uTrib: ${it.uTrib})\n`;
                 });
@@ -2313,7 +2389,7 @@
         }
     }
 
-    async function aoSelecionarOperacao(nomeOp) {
+    async function aoSelecionarOperacao(nomeOp, persistir = true) {
         setVal('natOp', nomeOp);
         const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (nomeOp || '').toUpperCase());
         if (op) {
@@ -2342,6 +2418,15 @@
             document.getElementById('lbl-ipi-ativo').innerText = '-';
             document.getElementById('lbl-pis-ativo').innerText = '-';
             atualizarCamposIdentificacao(getVal('tpNF'), getVal('idDest'));
+        }
+
+        // Salva a decisão definitiva do usuário no banco de dados para continuar na próxima vez que abrir
+        if (persistir) {
+            fetch('/api/config/ultima_operacao', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ modulo: 'di_duimp', nome_operacao: nomeOp || '' })
+            }).catch(e => console.warn("Erro ao salvar ultima operacao:", e));
         }
     }
 
@@ -2392,7 +2477,7 @@
         if (exibirFeedback) {
             let msg = `Regras da operação '${op.nome_operacao}' aplicadas com sucesso a todos os ${itensCache.length} itens!`;
             if (isExport) {
-                msg += `\n\n🌍 Operação de Exportação identificada (CFOP ${cfopStr} / Saída):\n`;
+                msg += `\n\n• Operação de Exportação identificada (CFOP ${cfopStr} / Saída):\n`;
                 msg += `• Unidades Tributáveis (uTrib) e Quantidades Tributáveis (qTrib/vUnTrib) configuradas conforme Comex/Receita Federal.\n`;
                 if (resExport && resExport.manuais > 0) {
                     msg += `• Há ${resExport.manuais} item(ns) com unidade sem conversão direta (ex: M3) deixados em branco para preenchimento manual no grid. Ao digitar a 'Qtd. Trib.', o valor unitário será calculado automaticamente.`;
@@ -2911,7 +2996,734 @@
             a.remove();
         });
     }
+
+    // =========================================================================
+    // SISTEMA DE RASCUNHOS SALVOS (ARQUIVOS ISOLADOS + BANCO DE DADOS UNIFICADO)
+    // =========================================================================
+    window.NOME_MODULO_ORIGEM = "XML da DI ou DUIMP";
+    window.idRascunhoAtual = null;
+    window.nomeArquivoOriginal = "";
+
+    // Armazena nome do arquivo quando o usuário seleciona um XML
+    const xmlInputEl = document.getElementById('xmlFileInput');
+    if (xmlInputEl) {
+        xmlInputEl.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                window.nomeArquivoOriginal = e.target.files[0].name;
+            }
+        });
+    }
+
+    // Monitora campo de Referência Interna principal para manter sincronizado
+    function obterReferenciaInterna() {
+        return (getVal('referencia_interna') || getVal('referenciaInterna') || '').trim();
+    }
+
+    function definirReferenciaInterna(val) {
+        const v = val || '';
+        setVal('referencia_interna', v);
+        setVal('referenciaInterna', v);
+        const modalRefEl = document.getElementById('rascunho_ref_input');
+        if (modalRefEl && modalRefEl.value !== v) {
+            modalRefEl.value = v;
+        }
+    }
+
+    function atualizarReferenciaRascunho(val) {
+        definirReferenciaInterna(val);
+    }
+
+    // Vincula inputs de referencia interna
+    document.addEventListener('DOMContentLoaded', function() {
+        ['referencia_interna', 'referenciaInterna'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', function() {
+                    definirReferenciaInterna(this.value);
+                });
+            }
+        });
+        const modalRefEl = document.getElementById('rascunho_ref_input');
+        if (modalRefEl) {
+            modalRefEl.addEventListener('input', function() {
+                setVal('referencia_interna', this.value);
+                setVal('referenciaInterna', this.value);
+            });
+        }
+    });
+
+    function abrirModalSalvarRascunho() {
+        const refAtual = obterReferenciaInterna();
+        const refInputModal = document.getElementById('rascunho_ref_input');
+        if (refInputModal) {
+            refInputModal.value = refAtual;
+        }
+
+        // 1. Obtém e formata o Tipo de Operação ativo
+        let opAtivaTexto = '';
+        const selOpVal = getVal('select_operacao');
+        const natOpVal = getVal('natOp');
+        const opNomeBusca = selOpVal || natOpVal;
+
+        if (opNomeBusca && operacoesCache && operacoesCache.length > 0) {
+            const opObj = operacoesCache.find(o => 
+                o.nome_operacao.toUpperCase() === opNomeBusca.toUpperCase() ||
+                `(${o.cfop_padrao}) ${o.nome_operacao}`.toUpperCase() === opNomeBusca.toUpperCase()
+            );
+            if (opObj) {
+                opAtivaTexto = `(${opObj.cfop_padrao}) ${opObj.nome_operacao}`;
+            }
+        }
+        if (!opAtivaTexto && opNomeBusca) {
+            opAtivaTexto = opNomeBusca;
+        }
+        if (!opAtivaTexto) {
+            const lblOpEl = document.getElementById('lbl-operacao-ativa');
+            if (lblOpEl && lblOpEl.innerText && !lblOpEl.innerText.includes('Nenhuma') && !lblOpEl.innerText.includes('-')) {
+                opAtivaTexto = lblOpEl.innerText.trim();
+            }
+        }
+        if (!opAtivaTexto) {
+            opAtivaTexto = 'Nenhuma selecionada';
+        }
+
+        // 2. Obtém a Qtd de Itens
+        const itensAtuais = (itensTable ? itensTable.getData() : (itensCache || []));
+        const qtdItens = (itensAtuais && Array.isArray(itensAtuais)) ? itensAtuais.length : 0;
+
+        // 3. Obtém ou calcula o Valor Total Estimado
+        let vTotalNum = parseNum(getVal('tot_vNF') || getVal('vNF'));
+        if (vTotalNum <= 0 && itensAtuais && itensAtuais.length > 0) {
+            itensAtuais.forEach(it => {
+                const vp = parseNum(it.vProd || 0);
+                const vf = parseNum(it.vFrete || 0);
+                const vo = parseNum(it.vOutro || 0);
+                const vi = parseNum(it.vIPI || 0);
+                const vii = parseNum(it.vII || 0);
+                vTotalNum += (vp + vf + vo + vi + vii);
+            });
+        }
+
+        // Preenche resumo dos dados no modal
+        const lblOp = document.getElementById('rascunho_modal_op_preview');
+        const lblItens = document.getElementById('rascunho_modal_itens_preview');
+        const lblVal = document.getElementById('rascunho_modal_valor_preview');
+
+        if (lblOp) lblOp.innerText = opAtivaTexto;
+        if (lblItens) lblItens.innerText = `${qtdItens}`;
+        if (lblVal) lblVal.innerText = `R$ ${formatarNumeroVisualBR(vTotalNum, 2, 2)}`;
+
+        // Guarda valores em memória para inclusão no payload ao salvar
+        window._rascunhoQtdItensCalc = qtdItens;
+        window._rascunhoValorTotalCalc = vTotalNum;
+        window._rascunhoTipoOperacaoCalc = (opAtivaTexto !== 'Nenhuma selecionada') ? opAtivaTexto : (getVal('natOp') || getVal('select_operacao') || '');
+
+        // Carrega categorias disponíveis dinamicamente no select
+        fetch('/api/rascunhos/categorias')
+            .then(res => res.json())
+            .then(cats => {
+                const sel = document.getElementById('rascunho_cat_select');
+                if (sel) {
+                    const valorAtual = sel.value || 'Importação';
+                    sel.innerHTML = '';
+                    (cats || ['Importação', 'Geral', 'Exportação', 'Remessa', 'Devolução', 'Venda']).forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c;
+                        opt.textContent = c;
+                        if (c === valorAtual) opt.selected = true;
+                        sel.appendChild(opt);
+                    });
+                    const optNova = document.createElement('option');
+                    optNova.value = '__nova__';
+                    optNova.textContent = '+ Nova Categoria...';
+                    sel.appendChild(optNova);
+                }
+            })
+            .catch(() => {});
+
+        const modalEl = document.getElementById('modalSalvarRascunho');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+            setTimeout(() => {
+                if (window.lucide) lucide.createIcons();
+                if (refInputModal) refInputModal.focus();
+            }, 150);
+        }
+    }
+
+    function verificarCategoriaOutra(sel) {
+        const inputNova = document.getElementById('rascunho_cat_custom');
+        if (!inputNova) return;
+        if (sel && sel.value === '__nova__') {
+            inputNova.classList.remove('d-none');
+            inputNova.focus();
+        } else {
+            inputNova.classList.add('d-none');
+            inputNova.value = '';
+        }
+    }
+
+    async function confirmarSalvarRascunho() {
+        const refInput = document.getElementById('rascunho_ref_input');
+        const refVal = (refInput ? refInput.value : '').trim();
+
+        const catSelect = document.getElementById('rascunho_cat_select');
+        let catVal = catSelect ? catSelect.value : 'Importação';
+        if (catVal === '__nova__') {
+            const catCustom = document.getElementById('rascunho_cat_custom');
+            catVal = (catCustom ? catCustom.value : '').trim() || 'Importação';
+        }
+
+        // Sincroniza de volta com os campos de referência principal
+        definirReferenciaInterna(refVal);
+
+        // Coleta todos os campos do formulário
+        const idsCabecalho = [
+            'nNF', 'serie', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
+            'emit_xNome', 'emit_CNPJ', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
+            'dest_xNome', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
+            'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
+            'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
+            'rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vFrete', 'rateio_vSeg', 'rateio_vOutro', 'ptax_data', 'ptax_moeda', 'ptax_moeda_custom', 'ptax_cotacao_venda', 'criterio_rateio',
+            'infCpl', 'select_operacao', 'referencia_interna', 'referenciaInterna'
+        ];
+
+        const cabecalhoDados = {};
+        idsCabecalho.forEach(id => {
+            cabecalhoDados[id] = getVal(id);
+        });
+
+        const itensDados = (itensTable ? itensTable.getData() : (itensCache || []));
+        const qtdFinal = (window._rascunhoQtdItensCalc !== undefined) ? window._rascunhoQtdItensCalc : itensDados.length;
+        const vNFTotalNum = (window._rascunhoValorTotalCalc !== undefined && window._rascunhoValorTotalCalc > 0)
+            ? window._rascunhoValorTotalCalc
+            : parseNum(getVal('tot_vNF') || getVal('vNF'));
+        const opFinal = window._rascunhoTipoOperacaoCalc || getVal('natOp') || getVal('select_operacao') || '';
+
+        const payloadRascunho = {
+            id: window.idRascunhoAtual,
+            referencia_interna: refVal,
+            categoria: catVal,
+            origem: window.NOME_MODULO_ORIGEM,
+            tipo_operacao: opFinal,
+            operacao_id: getVal('cfop_padrao') || '',
+            nome_arquivo_original: window.nomeArquivoOriginal || (xmlInputEl && xmlInputEl.files[0] ? xmlInputEl.files[0].name : "DI_DUIMP.xml"),
+            chave_acesso: getVal('chaveAcesso') || '',
+            qtd_itens: qtdFinal,
+            valor_total: vNFTotalNum,
+            dados_completos: {
+                cabecalho: cabecalhoDados,
+                itens: itensDados,
+                xml_original: xmlOriginalData || '',
+                nome_arquivo_original: window.nomeArquivoOriginal || '',
+                referencia_interna: refVal,
+                categoria: catVal,
+                origem: window.NOME_MODULO_ORIGEM,
+                tipo_operacao: opFinal
+            }
+        };
+
+        try {
+            const resp = await fetch('/api/rascunhos/salvar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payloadRascunho)
+            });
+            const result = await resp.json();
+
+            if (!resp.ok) {
+                alert("Erro ao salvar rascunho: " + (result.erro || "Falha na comunicação."));
+                return;
+            }
+
+            window.idRascunhoAtual = result.id;
+
+            // Fecha modal
+            const modalEl = document.getElementById('modalSalvarRascunho');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+
+            atualizarContadorRascunhos();
+
+            alert(`✅ Rascunho salvo com sucesso!\n\nID: #${result.id}\nReferência: ${refVal || "(Não informada)"}\nCategoria: ${catVal}\nOrigem: ${window.NOME_MODULO_ORIGEM}\nArquivo isolado gerado e gravado no servidor.`);
+        } catch (err) {
+            console.error("Erro ao salvar rascunho:", err);
+            alert("Erro inesperado ao salvar rascunho: " + err);
+        }
+    }
+
+    async function abrirModalListaRascunhos() {
+        // Carrega categorias disponíveis no filtro
+        try {
+            const respCats = await fetch('/api/rascunhos/categorias');
+            const cats = await respCats.json();
+            const selCat = document.getElementById('filtro_cat_rascunho');
+            if (selCat) {
+                const valAtual = selCat.value;
+                selCat.innerHTML = '<option value="">Todas as Categorias</option>';
+                cats.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    if (c === valAtual) opt.selected = true;
+                    selCat.appendChild(opt);
+                });
+            }
+        } catch(e) {}
+
+        const modalEl = document.getElementById('modalListaRascunhos');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+            carregarListaRascunhos();
+            setTimeout(() => {
+                if (window.lucide) lucide.createIcons();
+            }, 150);
+        }
+    }
+
+    let rascunhosCacheLista = [];
+
+    async function carregarListaRascunhos() {
+        const tbody = document.getElementById('tbody-lista-rascunhos');
+        if (!tbody) return;
+
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Carregando rascunhos salvos...</td></tr>`;
+
+        const cat = getVal('filtro_cat_rascunho') || '';
+        const origem = getVal('filtro_origem_rascunho') || '';
+        const busca = (getVal('filtro_busca_rascunho') || '').trim();
+
+        const params = new URLSearchParams();
+        if (cat) params.append('categoria', cat);
+        if (origem) params.append('origem', origem);
+        if (busca) params.append('busca', busca);
+
+        try {
+            const resp = await fetch('/api/rascunhos?' + params.toString());
+            const data = await resp.json();
+            rascunhosCacheLista = data.rascunhos || [];
+
+            renderizarTabelaRascunhos(rascunhosCacheLista);
+
+            const badgeTotalModal = document.getElementById('badge-total-rascunhos-modal');
+            if (badgeTotalModal) badgeTotalModal.innerText = rascunhosCacheLista.length;
+
+            const infoRodape = document.getElementById('info-rodape-rascunhos');
+            if (infoRodape) infoRodape.innerText = `Total de ${rascunhosCacheLista.length} rascunho(s) encontrado(s).`;
+        } catch (err) {
+            console.error("Erro ao carregar rascunhos:", err);
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-4">Erro ao carregar lista de rascunhos: ${err}</td></tr>`;
+        }
+    }
+
+    function renderizarTabelaRascunhos(lista) {
+        const tbody = document.getElementById('tbody-lista-rascunhos');
+        if (!tbody) return;
+
+        if (!lista || lista.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-5">
+                <i data-lucide="inbox" style="width: 32px; height: 32px; display: block; margin: 0 auto 8px auto; opacity: 0.5;"></i>
+                Nenhum rascunho encontrado para os filtros selecionados.
+            </td></tr>`;
+            if (window.lucide) lucide.createIcons();
+            return;
+        }
+
+        let html = '';
+        lista.forEach(r => {
+            const isOrigemDI = (r.origem || '').includes('DI');
+            const badgeOrigemClass = isOrigemDI ? 'badge-origem-di' : 'badge-origem-rasc';
+            const iconeOrigem = isOrigemDI ? 'globe' : 'file-code';
+            const dataFmt = r.data_atualizacao_formatada || (r.data_atualizacao ? r.data_atualizacao.slice(0, 16).replace('T', ' ') : (r.data_criacao_formatada || '-'));
+            const valTotalFmt = formatarNumeroVisualBR(r.valor_total || 0, 2, 2);
+
+            html += `
+            <tr id="tr-rascunho-${r.id}">
+                <td>
+                    <div class="d-flex align-items-center gap-1">
+                        <i data-lucide="tag" style="width: 13px; height: 13px; color: var(--text-muted); flex-shrink: 0;"></i>
+                        <strong class="text-truncate" style="max-width: 170px;" title="${r.referencia_interna || 'Sem referência'}">
+                            ${r.referencia_interna || '<span class="text-muted fst-italic">Sem referência</span>'}
+                        </strong>
+                    </div>
+                    <small class="text-muted font-monospace d-block text-truncate" style="font-size: 10.5px; max-width: 180px;">#${r.id} ${r.nome_arquivo_original ? '• ' + r.nome_arquivo_original : ''}</small>
+                </td>
+                <td class="small text-muted font-monospace text-truncate" style="max-width: 95px;" title="${r.categoria || 'Geral'}">
+                    ${r.categoria || 'Geral'}
+                </td>
+                <td>
+                    <span class="badge ${badgeOrigemClass} d-inline-flex align-items-center gap-1" style="font-size: 11px; padding: 3px 6px;">
+                        <i data-lucide="${iconeOrigem}" style="width: 11px; height: 11px;"></i>
+                        <span>${r.origem || 'XML da DI ou DUIMP'}</span>
+                    </span>
+                </td>
+                <td>
+                    <span class="text-truncate d-inline-block text-secondary" style="max-width: 165px; font-size: 11.5px; vertical-align: middle;" title="${r.tipo_operacao || '-'}">
+                        ${r.tipo_operacao || '<span class="text-muted">-</span>'}
+                    </span>
+                </td>
+                <td class="text-center small text-muted font-monospace">
+                    ${r.qtd_itens !== undefined && r.qtd_itens !== null ? r.qtd_itens : 0}
+                </td>
+                <td class="text-end fw-bold text-success font-monospace" style="font-size: 12px; white-space: nowrap;">
+                    R$ ${valTotalFmt}
+                </td>
+                <td class="small text-muted font-monospace" style="white-space: nowrap; font-size: 11.5px;">
+                    <span class="d-inline-flex align-items-center gap-1">
+                        <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
+                        <span>${dataFmt}</span>
+                    </span>
+                </td>
+                <td class="text-center">
+                    <div class="d-flex justify-content-center gap-1">
+                        <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 px-2 py-0" style="font-size: 11.5px; height: 26px;" onclick="carregarRascunho(${r.id}, '${r.origem}')" title="Carregar e continuar edição deste rascunho">
+                            <i data-lucide="folder-open" style="width: 12px; height: 12px;"></i>
+                            <span>Abrir</span>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center px-1 py-0" style="height: 26px;" onclick="excluirRascunho(${r.id}, '${(r.referencia_interna || '').replace(/'/g, "\\'")}')" title="Excluir este rascunho">
+                            <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html;
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function filtrarTabelaRascunhos() {
+        const termo = (document.getElementById('filtro_busca_rascunho')?.value || '').toLowerCase().trim();
+        if (!termo) {
+            renderizarTabelaRascunhos(rascunhosCacheLista);
+            return;
+        }
+        const filtrados = rascunhosCacheLista.filter(r => {
+            return (
+                (r.referencia_interna || '').toLowerCase().includes(termo) ||
+                (r.nome_arquivo_original || '').toLowerCase().includes(termo) ||
+                (r.categoria || '').toLowerCase().includes(termo) ||
+                (r.tipo_operacao || '').toLowerCase().includes(termo) ||
+                (r.chave_acesso || '').toLowerCase().includes(termo)
+            );
+        });
+        renderizarTabelaRascunhos(filtrados);
+    }
+
+    async function carregarRascunho(id, origemRascunho) {
+        // Verifica se pertence ao outro módulo
+        if (origemRascunho && origemRascunho !== window.NOME_MODULO_ORIGEM) {
+            const confirmaMudanca = confirm(
+                `Este rascunho (#${id}) foi salvo originalmente no módulo:\n"${origemRascunho}".\n\n` +
+                `Você está atualmente no módulo "${window.NOME_MODULO_ORIGEM}".\n\n` +
+                `Deseja abrir a página correspondente e continuar a edição por lá?`
+            );
+            if (confirmaMudanca) {
+                if (origemRascunho.includes('DI')) {
+                    window.location.href = `/di_duimp?carregar_rascunho=${id}`;
+                } else {
+                    window.location.href = `/rascunho?carregar_rascunho=${id}`;
+                }
+            }
+            return;
+        }
+
+        try {
+            const resp = await fetch(`/api/rascunhos/${id}`);
+            if (!resp.ok) {
+                alert("Não foi possível carregar o rascunho. Arquivo ou registro não encontrado.");
+                return;
+            }
+            const rascunho = await resp.json();
+            const dados = rascunho.dados_completos || {};
+
+            // 1. Restaura campos do cabeçalho
+            if (dados.cabecalho) {
+                Object.keys(dados.cabecalho).forEach(k => {
+                    setVal(k, dados.cabecalho[k]);
+                });
+            }
+
+            // 2. Restaura Referência Interna
+            definirReferenciaInterna(rascunho.referencia_interna || '');
+
+            // 3. Restaura Tipo de Operação
+            const tipoOpSalvo = rascunho.tipo_operacao || (dados.cabecalho ? (dados.cabecalho.select_operacao || dados.cabecalho.natOp) : '');
+            if (tipoOpSalvo) {
+                let opNome = tipoOpSalvo;
+                if (opNome.includes(') ')) {
+                    opNome = opNome.split(') ')[1].trim();
+                }
+                const opEncontrada = operacoesCache.find(o => 
+                    o.nome_operacao.toUpperCase() === opNome.toUpperCase() ||
+                    `(${o.cfop_padrao}) ${o.nome_operacao}`.toUpperCase() === tipoOpSalvo.toUpperCase()
+                );
+                if (opEncontrada) {
+                    setVal('select_operacao', opEncontrada.nome_operacao);
+                    aoSelecionarOperacao(opEncontrada.nome_operacao, true);
+                } else {
+                    setVal('select_operacao', opNome);
+                    aoSelecionarOperacao(opNome, true);
+                }
+            }
+
+            // 3. Restaura Tabela de Itens
+            if (dados.itens && Array.isArray(dados.itens)) {
+                itensCache = dados.itens;
+                if (itensTable) {
+                    itensTable.setData(itensCache);
+                }
+                const badgeItens = document.getElementById('itens-badge');
+                if (badgeItens) badgeItens.innerText = itensCache.length;
+                recalcularTotaisDosItens(true);
+            }
+
+            // 4. Restaura XML original se houver
+            if (dados.xml_original) {
+                xmlOriginalData = dados.xml_original;
+            }
+            if (rascunho.nome_arquivo_original) {
+                window.nomeArquivoOriginal = rascunho.nome_arquivo_original;
+            }
+
+            // 5. Restaura status de identificação e chave de acesso
+            window.idRascunhoAtual = rascunho.id;
+            atualizarCamposIdentificacao(getVal('tpNF'), getVal('idDest'));
+            atualizarEstadoInscricaoEstadual();
+            calcularChaveAcessoDinamica();
+            atualizarBadgesRateioEItens();
+
+            // 6. Atualiza badge da área de upload
+            const badgeUpload = document.getElementById('status-badge');
+            if (badgeUpload) {
+                badgeUpload.className = "badge bg-success py-2 px-3 w-100";
+                badgeUpload.innerText = `Rascunho #${rascunho.id} ativo (${itensCache.length} itens)`;
+            }
+
+            // Fecha modal
+            const modalEl = document.getElementById('modalListaRascunhos');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+
+            alert(`✅ Rascunho #${rascunho.id} carregado com sucesso!\n\nReferência: ${rascunho.referencia_interna || '(Sem referência)'}\nCategoria: ${rascunho.categoria}\nItens: ${rascunho.qtd_itens}`);
+        } catch (err) {
+            console.error("Erro ao carregar rascunho:", err);
+            alert("Erro ao carregar rascunho: " + err);
+        }
+    }
+
+    async function excluirRascunho(id, ref) {
+        const conf = confirm(`Tem certeza que deseja excluir o rascunho #${id}${ref ? ' (' + ref + ')' : ''}?\n\nO arquivo isolado e o registro no banco serão excluídos permanentemente.`);
+        if (!conf) return;
+
+        try {
+            const resp = await fetch(`/api/rascunhos/${id}`, { method: 'DELETE' });
+            if (!resp.ok) {
+                alert("Erro ao excluir rascunho.");
+                return;
+            }
+            if (window.idRascunhoAtual === id) {
+                window.idRascunhoAtual = null;
+            }
+            carregarListaRascunhos();
+            atualizarContadorRascunhos();
+        } catch (err) {
+            console.error("Erro ao excluir rascunho:", err);
+            alert("Erro inesperado ao excluir rascunho: " + err);
+        }
+    }
+
+    async function atualizarContadorRascunhos() {
+        try {
+            const resp = await fetch('/api/rascunhos');
+            const data = await resp.json();
+            const total = (data.rascunhos || []).length;
+            document.querySelectorAll('.badge-counter-rascunhos').forEach(el => {
+                el.innerText = total;
+            });
+            const badgeSidebar = document.getElementById('sidebar-rascunhos-badge');
+            if (badgeSidebar) badgeSidebar.innerText = total;
+        } catch(e) {}
+    }
+
+    // Inicialização ao carregar página: ícones lucide, contador de rascunhos e verificação de URL
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+        atualizarContadorRascunhos();
+
+        // Verifica se foi passado parâmetro para carregar rascunho via URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const rascunhoParam = urlParams.get('carregar_rascunho');
+        if (rascunhoParam) {
+            setTimeout(() => {
+                carregarRascunho(rascunhoParam, window.NOME_MODULO_ORIGEM);
+            }, 300);
+        }
+    });
 </script>
+
+<!-- MODAL: Salvar Rascunho -->
+<div class="modal fade" id="modalSalvarRascunho" tabindex="-1" aria-labelledby="modalSalvarRascunhoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title d-flex align-items-center gap-2" id="modalSalvarRascunhoLabel">
+                    <i data-lucide="bookmark-plus" style="width: 20px; height: 20px;"></i>
+                    <span>Salvar Rascunho da NF-e (DI / DUIMP)</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Referência Interna</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i data-lucide="tag" style="width: 16px; height: 16px;"></i></span>
+                        <input type="text" id="rascunho_ref_input" class="form-control" placeholder="Ex: REF-2026-001, DI 26/1234567-8...">
+                    </div>
+                    <div class="form-text">Esta referência permite identificar rapidamente seu trabalho em andamento.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted small text-uppercase">Categoria do Rascunho</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 16px; height: 16px;"></i></span>
+                        <select id="rascunho_cat_select" class="form-select" onchange="verificarCategoriaOutra(this)">
+                            <option value="Importação" selected>Importação</option>
+                            <option value="Geral">Geral</option>
+                            <option value="Exportação">Exportação</option>
+                            <option value="Remessa">Remessa</option>
+                            <option value="Devolução">Devolução</option>
+                            <option value="Venda">Venda</option>
+                            <option value="__nova__">+ Nova Categoria...</option>
+                        </select>
+                    </div>
+                    <input type="text" id="rascunho_cat_custom" class="form-control mt-2 d-none" placeholder="Digite o nome da nova categoria...">
+                </div>
+
+                <div class="card bg-body-tertiary border-0 p-3 mb-2 rounded-3">
+                    <div class="row g-2 small">
+                        <div class="col-6">
+                            <span class="text-muted d-block">Origem:</span>
+                            <span class="badge badge-origem-di"><i data-lucide="globe" style="width: 12px; height: 12px; vertical-align: -1px;"></i> XML da DI ou DUIMP</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block">Tipo de Operação:</span>
+                            <span class="fw-semibold text-truncate d-block" id="rascunho_modal_op_preview">-</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">Qtd. Itens:</span>
+                            <span class="fw-bold fs-6 font-monospace" id="rascunho_modal_itens_preview">0</span>
+                        </div>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block">Valor Total Estimado:</span>
+                            <span class="fw-bold fs-6 text-success" id="rascunho_modal_valor_preview">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="small text-muted text-center mt-2">
+                    <i data-lucide="shield-check" style="width: 14px; height: 14px; vertical-align: -2px;"></i> O rascunho é gravado em arquivo isolado seguro e indexado no banco de dados.
+                </div>
+            </div>
+            <div class="modal-footer border-top bg-body-tertiary">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2" onclick="confirmarSalvarRascunho()">
+                    <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                    <span>Gravar Rascunho</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Listagem de Rascunhos Salvos -->
+<div class="modal fade" id="modalListaRascunhos" tabindex="-1" aria-labelledby="modalListaRascunhosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-bottom">
+                <div>
+                    <h5 class="modal-title d-flex align-items-center gap-2 mb-0" id="modalListaRascunhosLabel">
+                        <i data-lucide="bookmarks" style="width: 20px; height: 20px;"></i>
+                        <span>Rascunhos Salvos</span>
+                        <span class="badge bg-secondary-subtle text-muted" id="badge-total-rascunhos-modal">0</span>
+                    </h5>
+                    <p class="text-muted small mb-0 mt-1">Gerencie seus rascunhos de notas fiscais gerados no XML Rascunho e no XML DI/DUIMP.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-3">
+                <!-- Filtros e Barra de Pesquisa -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-5">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-body-tertiary"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+                            <input type="text" id="filtro_busca_rascunho" class="form-control" placeholder="Buscar por referência, arquivo ou chave..." oninput="filtrarTabelaRascunhos()">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-body-tertiary"><i data-lucide="layers" style="width: 14px; height: 14px;"></i></span>
+                            <select id="filtro_origem_rascunho" class="form-select" onchange="carregarListaRascunhos()">
+                                <option value="">Todas as Origens</option>
+                                <option value="XML da DI ou DUIMP">XML da DI ou DUIMP</option>
+                                <option value="XML Rascunho">XML Rascunho</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 14px; height: 14px;"></i></span>
+                            <select id="filtro_cat_rascunho" class="form-select" onchange="carregarListaRascunhos()">
+                                <option value="">Todas as Categorias</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 d-flex">
+                        <button type="button" class="btn btn-sm btn-outline-secondary w-100" onclick="carregarListaRascunhos()" title="Atualizar Lista">
+                            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabela de Rascunhos -->
+                <div class="table-responsive border rounded-3" style="max-height: 480px;">
+                    <table class="table table-sm table-hover align-middle mb-0 small">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 20%;">Referência Interna</th>
+                                <th style="width: 10%;">Categoria</th>
+                                <th style="width: 12%;">Origem</th>
+                                <th style="width: 17%;">Tipo de Operação</th>
+                                <th style="width: 6%;" class="text-center" title="Quantidade de Itens">Qtd.</th>
+                                <th style="width: 12%;" class="text-end">Valor Total</th>
+                                <th style="width: 14%;">Última Atualização</th>
+                                <th style="width: 9%;" class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-lista-rascunhos">
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">Carregando rascunhos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-top bg-body-tertiary d-flex justify-content-between">
+                <div class="small text-muted" id="info-rodape-rascunhos">
+                    Carregando registros...
+                </div>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
         </div><!-- /container-fluid -->
     </div><!-- /nft-main-wrapper -->
 

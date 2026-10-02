@@ -567,3 +567,81 @@ small.text-muted {
   color: var(--muted-foreground) !important;
   border-color: var(--border) !important;
 }
+
+/* --- 14. ÍCONES EM LINHA MINIMALISTAS (LUCIDE / LINE-ICONS) --- */
+.lucide, svg.lucide {
+  width: 1.15em;
+  height: 1.15em;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: -0.16em;
+  display: inline-block;
+  fill: none;
+  flex-shrink: 0;
+  transition: stroke 0.2s ease, transform 0.2s ease;
+}
+
+.lucide-sm, svg.lucide.lucide-sm {
+  width: 0.95em;
+  height: 0.95em;
+  stroke-width: 1.6;
+}
+
+.lucide-lg, svg.lucide.lucide-lg {
+  width: 1.35em;
+  height: 1.35em;
+  stroke-width: 1.8;
+}
+
+.sidebar-icon .lucide,
+.sidebar-icon svg.lucide {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  vertical-align: middle;
+}
+
+/* --- 15. COMPONENTES DE RASCUNHOS SALVOS --- */
+.badge-origem-rascunho {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+}
+
+.badge-origem-di {
+  background-color: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.3);
+  color: #0284c7;
+}
+
+[data-theme="dark"] .badge-origem-di {
+  background-color: rgba(14, 165, 233, 0.2);
+  border-color: rgba(14, 165, 233, 0.4);
+  color: #38bdf8;
+}
+
+.badge-origem-rasc {
+  background-color: rgba(237, 90, 36, 0.12);
+  border-color: rgba(237, 90, 36, 0.3);
+  color: var(--primary);
+}
+
+.badge-categoria-rascunho {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background-color: var(--surface-secondary);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+

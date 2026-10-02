@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="/static/css/nft-theme.css">
     <link rel="stylesheet" href="/static/css/nft-sidebar.css">
     <script src="/static/js/theme.js"></script>
+    <!-- Lucide Icons (Minimalist Line SVGs) -->
+    <script src="/static/js/lucide.min.js"></script>
     <style>
         .table-ncm { font-size: 13px; }
         .badge-utrib { font-size: 0.85rem; padding: 4px 8px; font-family: monospace; }
@@ -33,7 +35,7 @@
                 </div>
             </a>
             <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
-                ◀
+                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
             </button>
         </div>
 
@@ -45,25 +47,25 @@
             <ul class="nft-sidebar-nav">
                 <li class="nft-sidebar-item">
                     <a href="/" class="nft-sidebar-btn" title="Portal Inicial">
-                        <span class="sidebar-icon">🏠</span>
+                        <span class="sidebar-icon"><i data-lucide="home"></i></span>
                         <span class="sidebar-label">Início / Módulos</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon">📄</span>
+                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
                         <span class="sidebar-label">XML Rascunho</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/di_duimp" class="nft-sidebar-btn" title="Módulo XML da DI ou DUIMP">
-                        <span class="sidebar-icon">🌐</span>
+                        <span class="sidebar-icon"><i data-lucide="globe"></i></span>
                         <span class="sidebar-label">XML da DI ou DUIMP</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/banco_ncm" class="nft-sidebar-btn active" title="Grande Tabela NCM & Impostos">
-                        <span class="sidebar-icon">📚</span>
+                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
                         <span class="sidebar-label">Tabela NCM</span>
                     </a>
                 </li>
@@ -74,13 +76,13 @@
             <ul class="nft-sidebar-nav">
                 <li class="nft-sidebar-item">
                     <a href="/download_ncm_excel" class="nft-sidebar-btn" title="Baixar Planilha Excel Oficial">
-                        <span class="sidebar-icon">📗</span>
+                        <span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
                         <span class="sidebar-label">Baixar Excel (.xlsx)</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/download_ncm_json" class="nft-sidebar-btn" title="Baixar Dados em JSON">
-                        <span class="sidebar-icon">📥</span>
+                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
                         <span class="sidebar-label">Baixar JSON</span>
                     </a>
                 </li>
@@ -90,7 +92,7 @@
         <!-- 3. Rodapé da Sidebar -->
         <div class="nft-sidebar-footer">
             <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
-                <span class="sidebar-icon theme-toggle-btn">🌙</span>
+                <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
                 <span class="sidebar-footer-text">Alternar Tema</span>
             </button>
             <div class="sidebar-footer-info">
@@ -107,7 +109,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
                 <div class="d-flex align-items-center gap-3">
                     <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                        ☰
+                        <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
                     </button>
                     <div>
                         <h4 class="mb-0 fw-bold">Grande Tabela NCM &amp; Impostos</h4>
@@ -125,7 +127,7 @@
                         <small class="text-muted fw-bold">TOTAL DE REGISTROS NCM</small>
                         <h4 class="mb-0 fw-bold" id="stat-total">15.156</h4>
                     </div>
-                    <span class="fs-1">📚</span>
+                    <i data-lucide="book-open" class="text-muted" style="width: 32px; height: 32px;"></i>
                 </div>
             </div>
         </div>
@@ -137,7 +139,7 @@
                         <h4 class="mb-0 fw-bold">10.515</h4>
                         <small class="text-muted">100% dos 8 dígitos</small>
                     </div>
-                    <span class="fs-1">🏷️</span>
+                    <i data-lucide="tag" class="text-muted" style="width: 32px; height: 32px;"></i>
                 </div>
             </div>
         </div>
@@ -149,7 +151,7 @@
                         <h4 class="mb-0 fw-bold">100% Mapeadas</h4>
                         <small class="text-muted">Camex TEC + Receita TIPI</small>
                     </div>
-                    <span class="fs-1">⚖️</span>
+                    <i data-lucide="scale" class="text-muted" style="width: 32px; height: 32px;"></i>
                 </div>
             </div>
         </div>
@@ -161,7 +163,7 @@
                         <h4 class="mb-0 fw-bold">2,10% / 9,65%</h4>
                         <small class="text-muted">Lei 10.865/04 (Bens) c/ Desonerações</small>
                     </div>
-                    <span class="fs-1">💰</span>
+                    <i data-lucide="calculator" class="text-muted" style="width: 32px; height: 32px;"></i>
                 </div>
             </div>
         </div>
@@ -174,7 +176,7 @@
                 <div class="col-md-6">
                     <label class="form-label small fw-bold mb-1">Buscar por Código NCM ou Descrição Oficial:</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light">🔍</span>
+                        <span class="input-group-text bg-light"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
                         <input type="text" id="input-busca" class="form-control" placeholder="Ex: 90189099, 4202, bolsas, instrumentos, catalogo..." onkeydown="if(event.key==='Enter') pesquisarNcm(1)">
                     </div>
                 </div>
@@ -380,5 +382,10 @@
     </div><!-- /nft-main-wrapper -->
 
     <script src="/static/js/nft-sidebar.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
 </body>
 </html>

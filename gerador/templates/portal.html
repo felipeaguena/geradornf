@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="/static/css/nft-theme.css">
     <link rel="stylesheet" href="/static/css/nft-sidebar.css">
     <script src="/static/js/theme.js"></script>
+    <!-- Lucide Icons (Minimalist Line SVGs) -->
+    <script src="/static/js/lucide.min.js"></script>
 
     <style>
         :root {
@@ -342,7 +344,7 @@
                 </div>
             </a>
             <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
-                ◀
+                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
             </button>
         </div>
 
@@ -354,25 +356,25 @@
             <ul class="nft-sidebar-nav">
                 <li class="nft-sidebar-item">
                     <a href="/" class="nft-sidebar-btn active" title="Portal Inicial">
-                        <span class="sidebar-icon">🏠</span>
+                        <span class="sidebar-icon"><i data-lucide="home"></i></span>
                         <span class="sidebar-label">Início / Módulos</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon">📄</span>
+                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
                         <span class="sidebar-label">XML Rascunho</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/di_duimp" class="nft-sidebar-btn" title="Módulo XML da DI ou DUIMP">
-                        <span class="sidebar-icon">🌐</span>
+                        <span class="sidebar-icon"><i data-lucide="globe"></i></span>
                         <span class="sidebar-label">XML da DI ou DUIMP</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM & Impostos">
-                        <span class="sidebar-icon">📚</span>
+                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
                         <span class="sidebar-label">Tabela NCM</span>
                     </a>
                 </li>
@@ -382,7 +384,7 @@
         <!-- 3. Rodapé da Sidebar -->
         <div class="nft-sidebar-footer">
             <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
-                <span class="sidebar-icon theme-toggle-btn">🌙</span>
+                <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
                 <span class="sidebar-footer-text">Alternar Tema</span>
             </button>
             <div class="sidebar-footer-info">
@@ -399,7 +401,7 @@
         <header class="portal-navbar">
             <div class="d-flex align-items-center gap-3">
                 <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                    ☰
+                    <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
                 </button>
                 <a href="/" class="portal-brand" title="NFT Logistics — Portal de Emissão NF-e">
                     <img src="/static/img/brand/nft_logo_vetor_logo_black.svg" alt="NFT Logistics" class="logo-theme-black" style="height: 38px;">
@@ -413,7 +415,7 @@
     <main class="portal-hero">
         <div class="portal-hero-header">
             <div class="portal-tagline">
-                <span>⚡</span>
+                <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
                 <span>Módulos de Faturamento</span>
             </div>
             <h1 class="portal-title">Selecione o Tipo de Emissão</h1>
@@ -432,8 +434,8 @@
                 <div class="portal-card-content">
                     <div>
                         <h2 class="portal-card-title">
-                            <span>📄</span>
-                            <span>XML rascunho</span>
+                            <i data-lucide="file-code" style="width: 22px; height: 22px;"></i>
+                            <span>XML Rascunho</span>
                         </h2>
                         <p class="portal-card-desc">
                             Importação e edição com base em espelho de NF-e, rascunhos gerados pelo Sebrae, notas de entrada de importação ou reexportações complementares.
@@ -443,7 +445,7 @@
                         <span class="text-muted small">Base de Modelo NF-e</span>
                         <div class="portal-card-cta-btn">
                             <span>Acessar Módulo</span>
-                            <span class="portal-card-arrow">➔</span>
+                            <span class="portal-card-arrow"><i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i></span>
                         </div>
                     </div>
                 </div>
@@ -458,7 +460,7 @@
                 <div class="portal-card-content">
                     <div>
                         <h2 class="portal-card-title">
-                            <span>🌐</span>
+                            <i data-lucide="globe" style="width: 22px; height: 22px;"></i>
                             <span>XML da DI ou DUIMP</span>
                         </h2>
                         <p class="portal-card-desc">
@@ -469,7 +471,7 @@
                         <span class="text-muted small">Base Aduaneira DI / DUIMP</span>
                         <div class="portal-card-cta-btn">
                             <span>Acessar Módulo</span>
-                            <span class="portal-card-arrow">➔</span>
+                            <span class="portal-card-arrow"><i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i></span>
                         </div>
                     </div>
                 </div>
@@ -492,5 +494,10 @@
     </div><!-- /nft-main-wrapper -->
 
     <script src="/static/js/nft-sidebar.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
 </body>
 </html>
