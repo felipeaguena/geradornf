@@ -32,9 +32,9 @@ body.has-sidebar {
 }
 
 [data-theme="dark"] .nft-sidebar {
-  background-color: #111317;
-  border-right-color: #282c35;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
+  background-color: #141720;
+  border-right-color: #313a4b;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
 }
 
 /* Área Principal Deslocada */
@@ -253,7 +253,8 @@ body.sidebar-collapsed .nft-sidebar:hover {
 }
 
 [data-theme="dark"] .nft-sidebar-footer {
-  background: #111317;
+  background: #141720;
+  border-top-color: #313a4b;
 }
 
 .sidebar-footer-btn {

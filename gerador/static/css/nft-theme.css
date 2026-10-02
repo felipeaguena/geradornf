@@ -56,32 +56,33 @@
   color-scheme: light;
 }
 
-/* --- 2. DARK THEME --- */
+/* --- 2. DARK THEME (Mais Leve & Alto Contraste) --- */
 .dark,
 [data-theme="dark"] {
   /* Marca NFT */
   --primary: #ed5a24;
   --primary-hover: #fa6c38;
   --primary-active: #d84b16;
-  --primary-subtle: rgba(237, 90, 36, 0.18);
-  --primary-border: rgba(237, 90, 36, 0.4);
+  --primary-subtle: rgba(237, 90, 36, 0.16);
+  --primary-border: rgba(237, 90, 36, 0.45);
   
-  --secondary: #818cab;
-  --secondary-hover: #98a3c2;
+  --secondary: #94a3b8;
+  --secondary-hover: #cbd5e1;
   
-  /* Superfícies & Fundo - Dark */
-  --background: #181b20;
-  --surface: #111317;
-  --surface-secondary: #1e2229;
-  --foreground: #cbd5e1;
-  --heading: #f8fafc;
-  --muted-foreground: #94a3b8;
-  --border: #282c35;
-  --border-subtle: #20242c;
+  /* Superfícies & Fundo - Dark (Leve e Elegante com Alto Contraste) */
+  --background: #11141a;
+  --surface: #1a1e27;
+  --surface-secondary: #222834;
+  --surface-tertiary: #2b3242;
+  --foreground: #e6ecf5;
+  --heading: #ffffff;
+  --muted-foreground: #9db0c6;
+  --border: #353e50;
+  --border-subtle: #293140;
   
   /* Sombras */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 4px 6px -1px rgba(0, 0, 0, 0.25);
-  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 8px 16px -2px rgba(0, 0, 0, 0.25);
+  --card-shadow-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.45);
   
   /* Feedback */
   --success: #10b981;
@@ -90,8 +91,8 @@
   --warning-subtle: rgba(245, 158, 11, 0.18);
   --danger: #ef4444;
   --danger-subtle: rgba(239, 68, 68, 0.18);
-  --info: #0ea5e9;
-  --info-subtle: rgba(14, 165, 233, 0.18);
+  --info: #38bdf8;
+  --info-subtle: rgba(56, 189, 248, 0.18);
   --purple: #a78bfa;
   --purple-subtle: rgba(167, 139, 250, 0.18);
 
@@ -418,6 +419,37 @@ small.text-muted {
   background-color: var(--primary-subtle) !important;
 }
 
+/* Dark Theme - Seção de Itens da Nota e Tabelas: Fonte escura no hover para contraste nítido */
+.dark .tabulator .tabulator-row:hover,
+.dark .tabulator .tabulator-row:hover .tabulator-cell,
+.dark #itens .tabulator .tabulator-row:hover,
+.dark #itens .tabulator .tabulator-row:hover .tabulator-cell,
+.dark #itens-table .tabulator-row:hover,
+.dark #itens-table .tabulator-row:hover .tabulator-cell,
+[data-theme="dark"] .tabulator .tabulator-row:hover,
+[data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell,
+[data-theme="dark"] #itens .tabulator .tabulator-row:hover,
+[data-theme="dark"] #itens .tabulator .tabulator-row:hover .tabulator-cell,
+[data-theme="dark"] #itens-table .tabulator-row:hover,
+[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell {
+  color: #11141a !important;
+}
+
+.dark .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
+.dark #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen {
+  background-color: var(--primary-subtle) !important;
+  color: #11141a !important;
+}
+
+.dark .tabulator .tabulator-row:hover .text-primary,
+.dark #itens-table .tabulator-row:hover .text-primary,
+[data-theme="dark"] .tabulator .tabulator-row:hover .text-primary,
+[data-theme="dark"] #itens-table .tabulator-row:hover .text-primary {
+  color: #9a3412 !important;
+}
+
 .tabulator .tabulator-cell {
   border-right: 1px solid var(--border) !important;
   padding: 6px 8px !important;
@@ -450,26 +482,26 @@ small.text-muted {
 
 .dark .handsontable th,
 [data-theme="dark"] .handsontable th {
-  background-color: #1e2229 !important;
-  color: #f8fafc !important;
-  border-color: #282c35 !important;
+  background-color: #222834 !important;
+  color: #ffffff !important;
+  border-color: #353e50 !important;
 }
 
 .dark .handsontable td,
 [data-theme="dark"] .handsontable td {
-  background-color: #111317 !important;
-  color: #cbd5e1 !important;
-  border-color: #282c35 !important;
+  background-color: #1a1e27 !important;
+  color: #e6ecf5 !important;
+  border-color: #2c3444 !important;
 }
 
 .dark .handsontable .htDimmed,
 [data-theme="dark"] .handsontable .htDimmed {
-  color: #94a3b8 !important;
+  color: #9db0c6 !important;
 }
 
 .dark .handsontable td.current,
 [data-theme="dark"] .handsontable td.current {
-  background-color: rgba(237, 90, 36, 0.2) !important;
+  background-color: rgba(237, 90, 36, 0.22) !important;
 }
 
 /* --- 10. BADGES & PILLS --- */
@@ -644,4 +676,292 @@ small.text-muted {
   border: 1px solid var(--border);
   color: var(--foreground);
 }
+
+/* --- 16. MODAIS, POPUPS & BACKDROP BLUR --- */
+.modal-backdrop {
+  --bs-backdrop-bg: #090c12 !important;
+  --bs-backdrop-opacity: 0.75 !important;
+  background-color: rgba(9, 12, 18, 0.75) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.modal-backdrop.show {
+  opacity: 1 !important;
+}
+
+.modal {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.modal-dialog {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 3.5rem);
+}
+
+.modal-content {
+  background-color: var(--surface) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--border) !important;
+  overflow: hidden;
+  animation: nftModalZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes nftModalZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  background-color: var(--surface) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 1.15rem 1.4rem !important;
+}
+
+.modal-footer {
+  background-color: var(--surface-secondary) !important;
+  border-top: 1px solid var(--border) !important;
+  padding: 0.9rem 1.4rem !important;
+}
+
+.modal-body {
+  padding: 1.4rem !important;
+}
+
+.btn-close {
+  filter: var(--btn-close-filter, none);
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-close:hover {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+/* --- 17. SISTEMA DE POPUPS MODERNOS (ALERT & CONFIRM) --- */
+.nft-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(9, 12, 18, 0.75);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  padding: 1.25rem;
+  opacity: 0;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nft-dialog-overlay.active {
+  opacity: 1;
+}
+
+.nft-dialog-box {
+  background-color: var(--surface);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
+  max-width: 460px;
+  width: 100%;
+  padding: 1.6rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transform: scale(0.94);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.nft-dialog-overlay.active .nft-dialog-box {
+  transform: scale(1);
+}
+
+.nft-dialog-icon-wrap {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.1rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.nft-dialog-icon-wrap.type-info {
+  background-color: var(--primary-subtle);
+  border: 1px solid var(--primary-border);
+  color: var(--primary);
+}
+
+.nft-dialog-icon-wrap.type-success {
+  background-color: var(--success-subtle);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--success);
+}
+
+.nft-dialog-icon-wrap.type-warning {
+  background-color: var(--warning-subtle);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+
+.nft-dialog-icon-wrap.type-danger {
+  background-color: var(--danger-subtle);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+}
+
+.nft-dialog-icon-wrap .lucide,
+.nft-dialog-icon-wrap svg {
+  width: 28px;
+  height: 28px;
+  stroke-width: 2;
+}
+
+.nft-dialog-title {
+  color: var(--heading) !important;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.65rem;
+  letter-spacing: -0.015em;
+}
+
+.nft-dialog-message {
+  color: var(--foreground);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin-bottom: 1.4rem;
+  word-break: break-word;
+  max-height: 60vh;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.nft-dialog-message p {
+  margin-bottom: 0.5rem;
+}
+
+.nft-dialog-message p:last-child {
+  margin-bottom: 0;
+}
+
+.nft-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.nft-dialog-actions .btn {
+  flex: 1;
+  min-height: 38px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+/* --- 18. REGRAS EXTRAS DE ALTO CONTRASTE PARA O MODO ESCURO --- */
+.dark .text-dark,
+[data-theme="dark"] .text-dark {
+  color: var(--heading) !important;
+}
+
+.dark .text-muted,
+[data-theme="dark"] .text-muted {
+  color: var(--muted-foreground) !important;
+}
+
+.dark .text-secondary,
+[data-theme="dark"] .text-secondary {
+  color: #9db0c6 !important;
+}
+
+.dark .bg-light,
+[data-theme="dark"] .bg-light {
+  background-color: var(--surface-secondary) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .bg-body-tertiary,
+[data-theme="dark"] .bg-body-tertiary {
+  background-color: var(--surface-secondary) !important;
+  color: var(--foreground) !important;
+}
+
+.dark .table-light,
+[data-theme="dark"] .table-light {
+  background-color: var(--surface-secondary) !important;
+  color: var(--heading) !important;
+  border-color: var(--border) !important;
+}
+
+.dark .table-light th,
+[data-theme="dark"] .table-light th {
+  background-color: var(--surface-secondary) !important;
+  color: var(--heading) !important;
+  border-color: var(--border) !important;
+}
+
+.dark .form-control,
+[data-theme="dark"] .form-control,
+.dark .form-select,
+[data-theme="dark"] .form-select {
+  background-color: #151821 !important;
+  border-color: var(--border) !important;
+  color: #f1f5f9 !important;
+}
+
+.dark .form-control:focus,
+[data-theme="dark"] .form-control:focus,
+.dark .form-select:focus,
+[data-theme="dark"] .form-select:focus {
+  background-color: #171b26 !important;
+  border-color: var(--primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(237, 90, 36, 0.25) !important;
+}
+
+.dark .input-group-text,
+[data-theme="dark"] .input-group-text {
+  background-color: var(--surface-secondary) !important;
+  border-color: var(--border) !important;
+  color: var(--muted-foreground) !important;
+}
+
+.dark .btn-close,
+[data-theme="dark"] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
+}
+
+.dark .badge.bg-warning-subtle,
+[data-theme="dark"] .badge.bg-warning-subtle {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+.dark .badge.bg-secondary-subtle,
+[data-theme="dark"] .badge.bg-secondary-subtle {
+  background-color: var(--surface-tertiary) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+}
+
 

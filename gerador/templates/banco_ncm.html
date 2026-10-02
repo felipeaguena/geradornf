@@ -12,6 +12,7 @@
     <script src="/static/js/theme.js"></script>
     <!-- Lucide Icons (Minimalist Line SVGs) -->
     <script src="/static/js/lucide.min.js"></script>
+    <script src="/static/js/nft-dialogs.js"></script>
     <style>
         .table-ncm { font-size: 13px; }
         .badge-utrib { font-size: 0.85rem; padding: 4px 8px; font-family: monospace; }
@@ -64,7 +65,18 @@
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
-                    <a href="/banco_ncm" class="nft-sidebar-btn active" title="Grande Tabela NCM & Impostos">
+                    <a href="/rascunho?abrir_rascunhos=1" class="nft-sidebar-btn" title="Ver e gerenciar Rascunhos Salvos">
+                        <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+                        <span class="sidebar-label">Rascunhos Salvos</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Grupo: Configurações -->
+            <div class="sidebar-section-title">Configurações</div>
+            <ul class="nft-sidebar-nav">
+                <li class="nft-sidebar-item">
+                    <a href="/banco_ncm" class="nft-sidebar-btn active" title="Grande Tabela NCM &amp; Impostos">
                         <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
                         <span class="sidebar-label">Tabela NCM</span>
                     </a>

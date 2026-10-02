@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/static/css/nft-sidebar.css">
     <script src="/static/js/theme.js"></script>
     <script src="/static/js/lucide.min.js"></script>
+    <script src="/static/js/nft-dialogs.js"></script>
     <!-- Tabulator CSS -->
     <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
     <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
@@ -50,7 +51,7 @@
                 </li>
                 <li class="nft-sidebar-item">
                     <a href="/rascunho" class="nft-sidebar-btn active" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon"><i data-lucide="file-text"></i></span>
+                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
                         <span class="sidebar-label">XML Rascunho</span>
                     </a>
                 </li>
@@ -61,40 +62,10 @@
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
-                    <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM & Impostos">
-                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
-                        <span class="sidebar-label">Tabela NCM</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <button type="button" class="nft-sidebar-btn" onclick="abrirModalListaRascunhos()" title="Consultar e carregar Rascunhos Salvos">
+                    <button type="button" class="nft-sidebar-btn" onclick="abrirModalListaRascunhos()" title="Ver e gerenciar Rascunhos Salvos">
                         <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
                         <span class="sidebar-label">Rascunhos Salvos</span>
-                        <span class="badge bg-secondary-subtle text-muted sidebar-badge" id="sidebar-rascunhos-badge">0</span>
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Grupo: Etapas da NF-e -->
-            <div class="sidebar-section-title">Etapas da NF-e</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <button type="button" class="nft-sidebar-btn active" data-tab="cabecalho" onclick="sidebarSwitchTab('cabecalho')" title="Cabeçalho e Operação">
-                        <span class="sidebar-icon"><i data-lucide="clipboard-list"></i></span>
-                        <span class="sidebar-label">Cabeçalho &amp; Operação</span>
-                    </button>
-                </li>
-                <li class="nft-sidebar-item">
-                    <button type="button" class="nft-sidebar-btn" data-tab="itens" onclick="sidebarSwitchTab('itens')" title="Itens da Nota">
-                        <span class="sidebar-icon"><i data-lucide="package"></i></span>
-                        <span class="sidebar-label">Itens da Nota</span>
-                        <span class="badge bg-secondary-subtle text-muted sidebar-badge" id="sidebar-itens-badge">0</span>
-                    </button>
-                </li>
-                <li class="nft-sidebar-item">
-                    <button type="button" class="nft-sidebar-btn" data-tab="rodape" onclick="sidebarSwitchTab('rodape')" title="Rodapé e Totais">
-                        <span class="sidebar-icon"><i data-lucide="receipt"></i></span>
-                        <span class="sidebar-label">Rodapé &amp; Totais</span>
+                        <span class="badge bg-secondary-subtle text-muted sidebar-badge badge-counter-rascunhos" id="sidebar-rascunhos-badge">0</span>
                     </button>
                 </li>
             </ul>
@@ -102,6 +73,12 @@
             <!-- Grupo: Configurações -->
             <div class="sidebar-section-title">Configurações</div>
             <ul class="nft-sidebar-nav">
+                <li class="nft-sidebar-item">
+                    <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM &amp; Impostos">
+                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
+                        <span class="sidebar-label">Tabela NCM</span>
+                    </a>
+                </li>
                 <li class="nft-sidebar-item">
                     <button type="button" class="nft-sidebar-btn" data-tab="tipo-nota" onclick="sidebarSwitchTab('tipo-nota')" title="Configuração de Impostos &amp; Regras por Operação">
                         <span class="sidebar-icon"><i data-lucide="settings"></i></span>
@@ -205,8 +182,8 @@
                 </div>
             </div>
 
-            <!-- Navegação de Abas Oculta no Meio (Controlada 100% pelo Menu Lateral) -->
-            <ul class="nav nav-tabs d-none" id="myTab" role="tablist">
+            <!-- Navegação de Abas (Etapas da NF-e) Embaixo da Referência Interna -->
+            <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="cabecalho-tab" data-bs-toggle="tab" data-bs-target="#cabecalho" type="button" role="tab">
                         <i data-lucide="clipboard-list"></i> 1. Cabeçalho &amp; Operação
@@ -981,7 +958,7 @@
                     </div>
                     <div class="card-body py-3">
                         <!-- Linha de Destaques Comerciais -->
-                        <div class="row g-2 mb-2">
+                        <div class="row g-2 pb-3 mb-3 border-bottom">
                             <div class="col-md-2">
                                 <label class="form-label small mb-1 fw-bold">Total dos Produtos (vProd)</label>
                                 <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="tot_vProd" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
@@ -1010,7 +987,7 @@
                         </div>
 
                         <!-- Linha de Impostos e Tributos -->
-                        <div class="row g-2 pt-2 border-top">
+                        <div class="row g-2">
                             <div class="col-md-3">
                                 <label class="form-label small mb-1 text-muted">Base de Cálculo ICMS (vBC)</label>
                                 <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vBC" onchange="formatarInputVisualBR(this, 2, 2)">
@@ -1527,7 +1504,7 @@
         gravarPtaxEmInfCpl(moeda, taxa, tipoBoletim, dataCotacao, true);
     }
 
-    function converterItensComTaxaPtax() {
+    async function converterItensComTaxaPtax() {
         const taxa = parseNum(getVal('ptax_cotacao_venda'));
         if (taxa <= 0) {
             alert("Informe ou consulte uma Taxa PTAX válida antes de converter os itens.");
@@ -1541,7 +1518,12 @@
         }
 
         const moeda = obterMoedaSelecionada();
-        if (!confirm(`Deseja converter os itens usando a Taxa PTAX de R$ ${formatarNumeroVisualBR(taxa, 4, 4)} por ${moeda}?\n\nOs campos Valor Unitário (vUnCom/vUnTrib) e Valor Total (vProd) dos ${itens.length} itens serão multiplicados pela taxa de câmbio.`)) {
+        const conf = await nftConfirm(`Deseja converter os itens usando a Taxa PTAX de R$ ${formatarNumeroVisualBR(taxa, 4, 4)} por ${moeda}?\n\nOs campos Valor Unitário (vUnCom/vUnTrib) e Valor Total (vProd) dos ${itens.length} itens serão multiplicados pela taxa de câmbio.`, {
+            title: 'Converter Valores com PTAX',
+            type: 'info',
+            confirmText: 'Converter Itens'
+        });
+        if (!conf) {
             return;
         }
 
@@ -1613,7 +1595,7 @@
         return unidadesPiso.map(c => (c / fator).toFixed(casasDecimais));
     }
 
-    function executarRateioGlobal(silencioso = false) {
+    async function executarRateioGlobal(silencioso = false) {
         const itens = (itensTable) ? itensTable.getData() : itensCache;
         if (!itens || itens.length === 0) {
             alert("Nenhum item carregado para executar o rateio. Importe um XML de modelo primeiro.");
@@ -1633,10 +1615,15 @@
 
         // Se todos os campos estiverem zerados (0,00)
         if (vAFRMM <= 0 && vSiscomex <= 0 && vFrete <= 0 && vSeg <= 0 && vOutro <= 0) {
-            const confirmaZerado = confirm(
-                "Atenção: Os campos de Rateio Global de Despesas estão preenchidos com 0,00 (zerados).\n\n" +
+            const confirmaZerado = await nftConfirm(
+                "Os campos de Rateio Global de Despesas estão preenchidos com 0,00 (zerados).\n\n" +
                 "Confirma que os dados estão zerados e que os itens serão repassados SEM valores adicionais de despesas?\n\n" +
-                "(Desta forma, será transmitido somente o valor da mercadoria (vProd) e eventuais custos já informados diretamente nos itens)"
+                "(Desta forma, será transmitido somente o valor da mercadoria e eventuais custos já informados diretamente nos itens)", {
+                    title: "Zerar Despesas Rateadas",
+                    type: "warning",
+                    confirmText: "Sim, Manter Zerado",
+                    cancelText: "Voltar e Informar"
+                }
             );
             if (!confirmaZerado) {
                 return;
@@ -2643,11 +2630,16 @@
         });
     }
 
-    function excluirOperacaoAtual() {
+    async function excluirOperacaoAtual() {
         const id = getVal('op_id');
         const nome = getVal('op_nome');
         if (!id) return;
-        if (!confirm(`Deseja realmente excluir o tipo de nota '${nome}'?`)) return;
+        const conf = await nftConfirm(`Deseja realmente excluir a operação '${nome}'?\n\nEsta ação removerá permanentemente a operação cadastrada do banco de dados.`, {
+            title: 'Excluir Operação',
+            type: 'danger',
+            confirmText: 'Sim, Excluir'
+        });
+        if (!conf) return;
 
         fetch(`/tipos_operacao/${id}`, { method: 'DELETE' })
             .then(res => res.json())
@@ -2901,7 +2893,7 @@
     }
 
     // === GERAR NOVO XML ===
-    function generateXML() {
+    async function generateXML() {
         if(!xmlOriginalData) {
             alert("Por favor, faça o upload de um XML de modelo antes de gerar!");
             return;
@@ -2936,7 +2928,13 @@
         if (itensComQTribVazio.length > 0) {
             const listaFaltantes = itensComQTribVazio.slice(0, 5).map(it => `• Item ${it.nItem || '?'}: ${it.xProd ? it.xProd.slice(0, 32) : (it.cProd || 'Produto')} (uTrib: ${it.uTrib || '?'})`).join('\n');
             const maisStr = itensComQTribVazio.length > 5 ? `\n...e mais ${itensComQTribVazio.length - 5} item(ns).` : '';
-            if (!confirm(`⚠️ ATENÇÃO: Quantidade Tributável (qTrib) em branco!\n\nOs seguintes ${itensComQTribVazio.length} item(ns) estão com o campo 'Qtd. Trib.' vazio ou zerado:\n${listaFaltantes}${maisStr}\n\nPara a SEFAZ (especialmente em exportações), este campo é de preenchimento obrigatório.\n\nDeseja gerar o XML mesmo assim?`)) {
+            const conf = await nftConfirm(`Os seguintes ${itensComQTribVazio.length} item(ns) estão com o campo 'Qtd. Trib.' vazio ou zerado:\n${listaFaltantes}${maisStr}\n\nPara a SEFAZ (especialmente em exportações), este campo é de preenchimento obrigatório.\n\nDeseja gerar o XML mesmo assim?`, {
+                title: 'Quantidade Tributável em Branco',
+                type: 'warning',
+                confirmText: 'Gerar Mesmo Assim',
+                cancelText: 'Voltar e Revisar'
+            });
+            if (!conf) {
                 return;
             }
         }
@@ -3452,10 +3450,15 @@
     async function carregarRascunho(id, origemRascunho) {
         // Verifica se pertence ao outro módulo
         if (origemRascunho && origemRascunho !== window.NOME_MODULO_ORIGEM) {
-            const confirmaMudanca = confirm(
+            const confirmaMudanca = await nftConfirm(
                 `Este rascunho (#${id}) foi salvo originalmente no módulo:\n"${origemRascunho}".\n\n` +
                 `Você está atualmente no módulo "${window.NOME_MODULO_ORIGEM}".\n\n` +
-                `Deseja abrir a página correspondente e continuar a edição por lá?`
+                `Deseja abrir a página correspondente e continuar a edição por lá?`, {
+                    title: 'Mudar de Módulo',
+                    type: 'info',
+                    confirmText: 'Abrir Módulo',
+                    cancelText: 'Permanecer Aqui'
+                }
             );
             if (confirmaMudanca) {
                 if (origemRascunho.includes('DI')) {
@@ -3554,7 +3557,11 @@
     }
 
     async function excluirRascunho(id, ref) {
-        const conf = confirm(`Tem certeza que deseja excluir o rascunho #${id}${ref ? ' (' + ref + ')' : ''}?\n\nO arquivo isolado e o registro no banco serão excluídos permanentemente.`);
+        const conf = await nftConfirm(`Tem certeza que deseja excluir o rascunho #${id}${ref ? ' (' + ref + ')' : ''}?\n\nO arquivo isolado e o registro no banco de dados serão excluídos permanentemente.`, {
+            title: 'Excluir Rascunho',
+            type: 'danger',
+            confirmText: 'Sim, Excluir'
+        });
         if (!conf) return;
 
         try {
@@ -3600,6 +3607,11 @@
         if (rascunhoParam) {
             setTimeout(() => {
                 carregarRascunho(rascunhoParam, window.NOME_MODULO_ORIGEM);
+            }, 300);
+        }
+        if (urlParams.get('abrir_rascunhos')) {
+            setTimeout(() => {
+                abrirModalListaRascunhos();
             }, 300);
         }
     });
@@ -3685,7 +3697,7 @@
             <div class="modal-header border-bottom">
                 <div>
                     <h5 class="modal-title d-flex align-items-center gap-2 mb-0" id="modalListaRascunhosLabel">
-                        <i data-lucide="bookmarks" style="width: 20px; height: 20px;"></i>
+                        <i data-lucide="folder-clock" style="width: 20px; height: 20px;"></i>
                         <span>Rascunhos Salvos</span>
                         <span class="badge bg-secondary-subtle text-muted" id="badge-total-rascunhos-modal">0</span>
                     </h5>
