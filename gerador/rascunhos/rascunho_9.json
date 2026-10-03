@@ -6,24 +6,24 @@
   "tipo_operacao": "(7930) REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA",
   "operacao_id": "7930",
   "nome_arquivo_original": "Rascunho.xml",
-  "chave_acesso": "35260547998441000198550010000000011020508014",
+  "chave_acesso": "35260547998441000198550010000000041020508016",
   "qtd_itens": 1,
   "valor_total": 1581004.39,
   "dados_completos": {
     "cabecalho": {
-      "nNF": "1",
+      "nNF": "4",
       "serie": "1",
       "natOp": "REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA",
       "cfop_padrao": "7930",
       "tpNF": "1",
       "idDest": "3",
-      "chaveAcesso": "35260547998441000198550010000000011020508014",
+      "chaveAcesso": "35260547998441000198550010000000041020508016",
       "cNF": "02050801",
       "cUF": "35",
       "dhEmi": "2026-05-06T10:05:20-03:00",
       "mod": "55",
       "tpEmis": "1",
-      "cDV": "4",
+      "cDV": "6",
       "emit_xNome": "NFT LOGISTICS LTDA",
       "emit_CNPJ": "47998441000198",
       "emit_xLgr": "AVENIDA DR GASTAO VIDIGAL",
@@ -43,7 +43,7 @@
       "dest_cMun": "9999999",
       "dest_xMun": "EXTERIOR",
       "dest_UF": "EX",
-      "dest_CEP": "00000000",
+      "dest_CEP": "99999-999",
       "modFrete": "",
       "transp_CNPJ_CPF": "04601873000100",
       "transp_xNome": "TRANSFERRARI TRANSPORTADORA LTDA_",
@@ -147,5 +147,5 @@
     "origem": "XML Rascunho",
     "tipo_operacao": "(7930) REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA"
   },
-  "data_salvo": "02/10/2026 11:24:40"
+  "data_salvo": "03/10/2026 10:53:16"
 }

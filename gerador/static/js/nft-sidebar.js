@@ -67,12 +67,40 @@
         const targetTabBtn = document.getElementById(tabKey + '-tab');
         if (targetTabBtn) {
             if (window.bootstrap && bootstrap.Tab) {
-                const tabInstance = bootstrap.Tab.getOrCreateInstance(targetTabBtn);
-                tabInstance.show();
+                try {
+                    const tabInstance = bootstrap.Tab.getOrCreateInstance(targetTabBtn);
+                    tabInstance.show();
+                } catch(e) {
+                    targetTabBtn.click();
+                }
             } else {
                 targetTabBtn.click();
             }
         }
+
+        // Força a transição segura dos tab-panes
+        const targetPane = document.getElementById(tabKey);
+        if (targetPane) {
+            const tabContent = targetPane.closest('.tab-content') || document.getElementById('myTabContent');
+            if (tabContent) {
+                tabContent.querySelectorAll('.tab-pane').forEach(p => {
+                    p.classList.remove('show', 'active');
+                });
+                targetPane.classList.add('show', 'active');
+            }
+        }
+
+        // Sincroniza abas superiores nav-tabs
+        const myTab = document.getElementById('myTab');
+        if (myTab) {
+            myTab.querySelectorAll('.nav-link').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (targetTabBtn) {
+                targetTabBtn.classList.add('active');
+            }
+        }
+
         setActiveSidebarItem(tabKey);
     };
 

@@ -256,6 +256,61 @@ def init_db():
     rascunhos_dir = os.path.join(os.path.dirname(__file__), 'rascunhos')
     os.makedirs(rascunhos_dir, exist_ok=True)
 
+    # 5. Tabelas de Localidades (Paises BACEN, Municipios IBGE e Cache de CEPs)
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS tabela_paises (
+            codigo TEXT PRIMARY KEY,
+            nome TEXT
+        )
+    ''')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_paises_nome ON tabela_paises(nome)')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS tabela_municipios (
+            codigo_ibge TEXT PRIMARY KEY,
+            nome TEXT,
+            uf TEXT,
+            c_uf TEXT
+        )
+    ''')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_mun_uf ON tabela_municipios(uf)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_mun_nome ON tabela_municipios(nome)')
+
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS tabela_ceps (
+            cep TEXT PRIMARY KEY,
+            logradouro TEXT,
+            bairro TEXT,
+            municipio TEXT,
+            codigo_ibge TEXT,
+            uf TEXT,
+            data_consulta DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Seed de dados_localidades.json se as tabelas estiverem vazias
+    count_p = c.execute("SELECT COUNT(*) FROM tabela_paises").fetchone()[0]
+    count_m = c.execute("SELECT COUNT(*) FROM tabela_municipios").fetchone()[0]
+    if count_p == 0 or count_m == 0:
+        json_loc_path = os.path.join(os.path.dirname(__file__), 'dados_localidades.json')
+        if os.path.exists(json_loc_path):
+            import json, unicodedata, re
+            def clean_loc(txt):
+                if not txt: return ''
+                s = unicodedata.normalize('NFKD', str(txt))
+                s = ''.join(c for c in s if not unicodedata.combining(c))
+                s = re.sub(r'[^a-zA-Z0-9\s\-]', ' ', s)
+                return re.sub(r'\s+', ' ', s).strip()
+
+            with open(json_loc_path, 'r', encoding='utf-8') as f_loc:
+                dados_loc = json.load(f_loc)
+                if count_p == 0 and 'paises' in dados_loc:
+                    p_rows = [(p['codigo'], clean_loc(p['nome'])) for p in dados_loc['paises']]
+                    c.executemany('INSERT OR REPLACE INTO tabela_paises (codigo, nome) VALUES (?, ?)', p_rows)
+                if count_m == 0 and 'municipios' in dados_loc:
+                    m_rows = [(m['codigo_ibge'], clean_loc(m['nome']), m['uf'], m['c_uf']) for m in dados_loc['municipios']]
+                    c.executemany('INSERT OR REPLACE INTO tabela_municipios (codigo_ibge, nome, uf, c_uf) VALUES (?, ?, ?, ?)', m_rows)
+
     conn.commit()
     conn.close()
     print("Banco de dados inicializado com sucesso!")

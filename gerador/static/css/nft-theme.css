@@ -1311,8 +1311,46 @@ small.text-muted {
   background-color: rgba(237, 90, 36, 0.12) !important;
 }
 
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected {
-  background-color: rgba(237, 90, 36, 0.22) !important;
+/* Dark Theme - Seleção com fundo Laranja --primary sólido e texto em alto contraste */
+.dark .tabulator .tabulator-row.tabulator-selected,
+.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
+.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+.dark #itens .tabulator .tabulator-row.tabulator-selected,
+.dark #itens .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
+.dark #itens-table .tabulator-row.tabulator-selected,
+.dark #itens-table .tabulator-row.tabulator-selected .tabulator-cell,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] #itens .tabulator .tabulator-row.tabulator-selected,
+[data-theme="dark"] #itens .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
+[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected,
+[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+/* Garante texto branco com contraste nítido em todas as células, spans e números na linha selecionada */
+.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell *,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell * {
+  color: #ffffff !important;
+}
+
+/* Linhas divisórias sutis na linha selecionada */
+.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell {
+  border-right-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Hover em linha selecionada */
+.dark .tabulator .tabulator-row.tabulator-selected:hover,
+.dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
+.dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen {
+  background-color: var(--primary-hover) !important;
+  color: #ffffff !important;
 }
 
 .tabulator input[type="checkbox"] {

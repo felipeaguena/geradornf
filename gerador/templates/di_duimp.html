@@ -75,9 +75,21 @@
             <div class="sidebar-section-title">Configurações</div>
             <ul class="nft-sidebar-nav">
                 <li class="nft-sidebar-item">
+                    <a href="/empresas" class="nft-sidebar-btn" title="Gestão de Empresas e Cadastros">
+                        <span class="sidebar-icon"><i data-lucide="building-2"></i></span>
+                        <span class="sidebar-label">Empresas</span>
+                    </a>
+                </li>
+                <li class="nft-sidebar-item">
                     <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM &amp; Impostos">
                         <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
                         <span class="sidebar-label">Tabela NCM</span>
+                    </a>
+                </li>
+                <li class="nft-sidebar-item">
+                    <a href="/localidades" class="nft-sidebar-btn" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
+                        <span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
+                        <span class="sidebar-label">Localidades</span>
                     </a>
                 </li>
                 <li class="nft-sidebar-item">
@@ -130,7 +142,7 @@
                 <div class="card-body py-2 px-3">
                     <div class="row align-items-end g-2">
                         <!-- 1. Campo de Referência Interna -->
-                        <div class="col-xl-3 col-md-4">
+                        <div class="col-xl-2 col-lg-2 col-md-3">
                             <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
                                 <i data-lucide="tag"></i>
                                 <span>Referência Interna:</span>
@@ -139,7 +151,7 @@
                         </div>
 
                         <!-- 2. Arquivo XML ("Escolher ficheiro") -->
-                        <div class="col-xl-4 col-md-4">
+                        <div class="col-xl-3 col-lg-3 col-md-4">
                             <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
                                 <i data-lucide="file-up"></i>
                                 <span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
@@ -148,7 +160,7 @@
                         </div>
 
                         <!-- 3. Botão Carregar e Processar XML -->
-                        <div class="col-xl-2 col-md-4">
+                        <div class="col-xl-2 col-lg-2 col-md-2">
                             <button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
                                 <i data-lucide="upload"></i>
                                 <span>Processar XML</span>
@@ -156,7 +168,7 @@
                         </div>
 
                         <!-- 4. Botões de Ação de Rascunho -->
-                        <div class="col-xl-3 col-md-12 d-flex align-items-center gap-2">
+                        <div class="col-xl-5 col-lg-5 col-md-12 d-flex align-items-center gap-2">
                             <button class="btn btn-outline-success fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
                                 <i data-lucide="save"></i>
                                 <span>Salvar</span>
@@ -165,6 +177,10 @@
                                 <i data-lucide="folder-clock"></i>
                                 <span>Rascunhos</span>
                                 <span class="badge bg-secondary text-white badge-counter-rascunhos" id="badge-total-rascunhos">0</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco">
+                                <i data-lucide="rotate-ccw"></i>
+                                <span>Nova Nota</span>
                             </button>
                         </div>
                     </div>
@@ -184,6 +200,21 @@
             </div>
 
             <!-- Navegação de Abas (Etapas da NF-e) Embaixo da Referência Interna -->
+                        <!-- BANNER INFORMATIVO: SESSÃO TEMPORÁRIA RESTAURADA -->
+            <div id="nft-autosave-alert" class="alert alert-info py-2 px-3 mb-3 d-none align-items-center justify-content-between flex-wrap gap-2 shadow-sm border" style="font-size: 12.5px;">
+                <div class="d-flex align-items-center gap-2">
+                    <i data-lucide="history" style="width: 16px; height: 16px;"></i>
+                    <span><strong>Sessão restaurada automaticamente:</strong> Os dados e itens em edição foram preservados com segurança nesta página.</span>
+                    <span class="badge bg-secondary-subtle text-secondary font-monospace" id="nft-autosave-time"></span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar formulário e começar nota em branco">
+                        <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i>
+                        <span>Limpar (Nova Nota)</span>
+                    </button>
+                    <button type="button" class="btn-close" style="font-size: 10px;" onclick="fecharBannerSessaoRestaurada()" aria-label="Fechar"></button>
+                </div>
+            </div>
             <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="cabecalho-tab" data-bs-toggle="tab" data-bs-target="#cabecalho" type="button" role="tab">
@@ -200,9 +231,12 @@
                         <i data-lucide="receipt"></i> 3. Rodapé &amp; Totais
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tipo-nota-tab" data-bs-toggle="tab" data-bs-target="#tipo-nota" type="button" role="tab">
+                        <i data-lucide="settings"></i> 4. Tipo de Nota (Impostos)
+                    </button>
+                </li>
             </ul>
-            <!-- Botão oculto para ativação de Tipo de Nota via Menu Lateral -->
-            <button class="d-none" id="tipo-nota-tab" data-bs-toggle="tab" data-bs-target="#tipo-nota" type="button" role="tab" aria-hidden="true"></button>
 
             <!-- Conteudo das Abas -->
             <div class="tab-content bg-white p-3 border rounded shadow-sm mb-4" id="myTabContent">
@@ -261,6 +295,7 @@
                         <input type="hidden" id="mod" value="55">
                         <input type="hidden" id="tpEmis" value="1">
                         <input type="hidden" id="cDV" value="">
+                        <input type="hidden" id="verProc" value="4.01_sebrae_b057">
                     </div>
 
                     <!-- Caixa de Operação Ativa e Regras Herdadas -->
@@ -529,13 +564,30 @@
                             <div class="card-header bg-light py-2 d-flex align-items-center gap-2 fw-bold"><i data-lucide="building-2" style="width: 15px; height: 15px;"></i> Dados do Emitente</div>
                             <div class="card-body py-2">
                                 <div class="row g-2">
+                                    <!-- PAÍS DO EMITENTE -->
+                                    <div class="col-md-7">
+                                        <label class="form-label small mb-1 fw-bold">País do Emitente (Nome)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control form-control-sm fw-bold" id="emit_xPais" list="datalist-paises" placeholder="Selecione ou digite o País" value="Brasil" oninput="aoDigitarPaisEmitente()" onchange="aoMudarPaisEmitente()">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="resetarPaisParaBrasil('emit')" title="Redefinir para Brasil"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small mb-1 fw-bold">Cód. BACEN (&lt;cPais&gt;)</label>
+                                        <input type="text" class="form-control form-control-sm font-monospace fw-bold bg-light" id="emit_cPais" value="1058" readonly>
+                                    </div>
+
                                     <div class="col-md-8">
                                         <label class="form-label small mb-1">Razão Social (xNome)</label>
                                         <input type="text" class="form-control form-control-sm" id="emit_xNome">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small mb-1">CNPJ</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_CNPJ" oninput="calcularChaveAcessoDinamica()">
+                                        <input type="text" class="form-control form-control-sm" id="emit_CNPJ" class="form-control form-control-sm mask-cnpj-cpf" placeholder="00.000.000/0000-00" oninput="calcularChaveAcessoDinamica()">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small mb-1">Inscrição Estadual (IE)</label>
+                                        <input type="text" class="form-control form-control-sm" id="emit_IE">
                                     </div>
                                     <div class="col-md-9">
                                         <label class="form-label small mb-1">Logradouro (xLgr)</label>
@@ -562,8 +614,11 @@
                                         <input type="text" class="form-control form-control-sm" id="emit_UF" oninput="calcularChaveAcessoDinamica()">
                                     </div>
                                     <div class="col-md-8">
-                                        <label class="form-label small mb-1">CEP</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_CEP">
+                                        <label class="form-label small mb-1 fw-bold">CEP (Busca Automática)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control form-control-sm font-monospace" id="emit_CEP" placeholder="00000-000" onblur="buscarCepAuto(this.value, 'emit')">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="buscarCepAuto(document.getElementById('emit_CEP').value, 'emit')" title="Consultar CEP e preencher endereço"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -573,23 +628,43 @@
                     <!-- DESTINATARIO -->
                     <div class="col-md-6 mt-3">
                         <div class="card h-100 border">
-                            <div class="card-header bg-light py-2 d-flex align-items-center gap-2 fw-bold"><i data-lucide="user" style="width: 15px; height: 15px;"></i> Dados do Destinatário</div>
+                            <div class="card-header bg-light py-2 d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2 fw-bold">
+                                    <i data-lucide="user" style="width: 15px; height: 15px;"></i>
+                                    <span>Dados do Destinatário</span>
+                                </div>
+                                <span class="badge bg-secondary font-monospace" id="lbl-status-pais-dest">Nacional (Brasil)</span>
+                            </div>
                             <div class="card-body py-2">
                                 <div class="row g-2">
+                                    <!-- PAÍS DO DESTINATÁRIO -->
+                                    <div class="col-md-7">
+                                        <label class="form-label small mb-1 fw-bold">País do Destinatário (Nome)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control form-control-sm fw-bold" id="dest_xPais" list="datalist-paises" placeholder="Selecione ou digite o País" value="Brasil" oninput="aoDigitarPaisDestinatario()" onchange="aoMudarPaisDestinatario()">
+                                            <datalist id="datalist-paises"></datalist>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="resetarPaisParaBrasil()" title="Redefinir para Brasil"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small mb-1 fw-bold">Cód. BACEN (&lt;cPais&gt;)</label>
+                                        <input type="text" class="form-control form-control-sm font-monospace fw-bold bg-light" id="dest_cPais" value="1058" readonly>
+                                    </div>
+
                                     <div class="col-md-8">
                                         <label class="form-label small mb-1">Nome / Razão Social (xNome)</label>
                                         <input type="text" class="form-control form-control-sm" id="dest_xNome">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small mb-1">CNPJ / CPF / IdEstrangeiro</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_CNPJ_CPF">
+                                        <input type="text" class="form-control form-control-sm mask-cnpj-cpf" id="dest_CNPJ_CPF" placeholder="00.000.000/0000-00">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label small mb-1">Tipo de Contribuinte (ICMS)</label>
                                         <select class="form-select form-select-sm" id="dest_indIEDest" onchange="atualizarEstadoInscricaoEstadual()">
-                                            <option value="1">1 - Contribuinte ICMS</option>
-                                            <option value="2">2 - Contribuinte ISENTO</option>
-                                            <option value="9" selected>9 - Não Contribuinte</option>
+                                            <option value="1">Contribuinte</option>
+                                            <option value="2">Isento de Contribuição</option>
+                                            <option value="9" selected>Não Contribuinte</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
@@ -610,7 +685,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small mb-1">Cód. Mun. IBGE</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_cMun">
+                                        <input type="text" class="form-control form-control-sm font-monospace" id="dest_cMun">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small mb-1">Município (xMun)</label>
@@ -618,11 +693,14 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label small mb-1">UF</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_UF">
+                                        <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="dest_UF" maxlength="2">
                                     </div>
                                     <div class="col-md-8">
-                                        <label class="form-label small mb-1">CEP</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_CEP">
+                                        <label class="form-label small mb-1 fw-bold">CEP (Busca Automática / 99999-999)</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control form-control-sm font-monospace" id="dest_CEP" placeholder="00000-000 ou 99999-999" onblur="buscarCepAuto(this.value, 'dest')">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="buscarCepAuto(document.getElementById('dest_CEP').value, 'dest')" title="Consultar CEP e preencher endereço"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -660,7 +738,7 @@
                 <div class="col-md-8">
                     <div class="card border">
                         <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                            <span id="titulo-form-op">Configuração da Operação: <strong id="lbl-op-nome">Nova Operação</strong></span>
+                            <span id="titulo-form-op">Configuração da Operação:<br> <strong id="lbl-op-nome">Nova Operação</strong></span>
                             <div>
                                 <button class="btn btn-sm btn-outline-primary me-2" onclick="capturarImpostosDoXmlAtual()">
                                     <i data-lucide="download" style="width: 13px; height: 13px;"></i> Puxar Impostos do XML Atual
@@ -859,7 +937,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label small mb-1 fw-bold">CNPJ / CPF Transportadora</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_CNPJ_CPF" placeholder="00.000.000/0000-00">
+                                <input type="text" class="form-control form-control-sm" id="transp_CNPJ_CPF" class="form-control form-control-sm mask-cnpj-cpf" placeholder="00.000.000/0000-00" placeholder="00.000.000/0000-00">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small mb-1 fw-bold">Razão Social / Nome (xNome)</label>
@@ -869,17 +947,24 @@
                                 <label class="form-label small mb-1 fw-bold">Inscrição Estadual (IE)</label>
                                 <input type="text" class="form-control form-control-sm" id="transp_IE">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 fw-bold">CEP Transportadora</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control form-control-sm font-monospace" id="transp_CEP" placeholder="00000-000" onblur="buscarCepAuto(this.value, 'transp')">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="buscarCepAuto(document.getElementById('transp_CEP').value, 'transp')" title="Buscar CEP da transportadora"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
                                 <label class="form-label small mb-1">Endereço Completo (xEnder)</label>
                                 <input type="text" class="form-control form-control-sm" id="transp_xEnder">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label small mb-1">Município (xMun)</label>
+                            <div class="col-md-3">
+                                <label class="form-label small mb-1 fw-bold">Município (xMun)</label>
                                 <input type="text" class="form-control form-control-sm" id="transp_xMun">
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1">UF</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_UF" maxlength="2">
+                            <div class="col-md-1">
+                                <label class="form-label small mb-1 fw-bold">UF</label>
+                                <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="transp_UF" maxlength="2">
                             </div>
                         </div>
 
@@ -1017,9 +1102,11 @@
     // Atalho para abrir a aba Tipo de Nota
     function abrirAbaTipoNota(event) {
         if (event) event.preventDefault();
-        const tabEl = document.getElementById('tipo-nota-tab');
-        if (tabEl) {
-            bootstrap.Tab.getOrCreateInstance(tabEl).show();
+        if (typeof sidebarSwitchTab === "function") {
+            sidebarSwitchTab("tipo-nota");
+        } else {
+            const tabEl = document.getElementById("tipo-nota-tab");
+            if (tabEl) bootstrap.Tab.getOrCreateInstance(tabEl).show();
         }
     }
 
@@ -2085,15 +2172,15 @@
                 cell.getRow().toggleSelect();
             }
         },
-        {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center"},
+        {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center", editor:"input"},
         {title:"Cód. Prod.", field:"cProd", width:130, frozen:true, editor:"input"},
         {title:"Descrição do Produto", field:"xProd", width:280, editor:"input"},
         {title:"NCM", field:"NCM", width:100, editor:"input"},
-        {title:"CFOP", field:"CFOP", width:85, hozAlign:"center", headerHozAlign:"center", cssClass:"font-monospace bg-light-subtle"},
+        {title:"CFOP", field:"CFOP", width:85, hozAlign:"center", headerHozAlign:"center", cssClass:"font-monospace"},
         {title:"Un. Com.", field:"uCom", width:85, editor:"input"},
         {title:"Qtd. Com.", field:"qCom", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Com.", field:"vUnCom", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
-        {title:"V. Total Prod.", field:"vProd", width:125, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:"fw-bold text-primary bg-light-subtle"},
+        {title:"V. Total Prod.", field:"vProd", width:125, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:"fw-bold text-primary"},
         {title:"Un. Trib.", field:"uTrib", width:85, editor:"input"},
         {title:"Qtd. Trib.", field:"qTrib", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Trib.", field:"vUnTrib", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
@@ -2117,7 +2204,7 @@
         {title:"BC IPI", field:"vBC_IPI", width:100, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"% IPI", field:"pIPI", width:90, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarAliquotaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. IPI", field:"vIPI", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
-        {title:"BC II", field:"vBC_II", width:100, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:"bg-light-subtle"},
+        {title:"BC II", field:"vBC_II", width:100, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:""},
         {title:"Desp. Aduan.", field:"vDespAdu", width:110, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. II", field:"vII", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. IOF", field:"vIOF", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
@@ -2163,6 +2250,16 @@
             renderVertical: "basic",
             renderHorizontal: "basic",
             placeholder: "Nenhum item carregado. Selecione e carregue o XML acima."
+        });
+
+        itensTable.on("dataChanged", function() {
+            if (window.triggerAutoSave) window.triggerAutoSave();
+        });
+        itensTable.on("rowDeleted", function() {
+            if (window.triggerAutoSave) window.triggerAutoSave();
+        });
+        itensTable.on("rowAdded", function() {
+            if (window.triggerAutoSave) window.triggerAutoSave();
         });
 
         itensTable.on("cellEdited", function(cell) {
@@ -2797,7 +2894,7 @@
         badge.className = "badge bg-warning py-2 px-3 w-100";
         badge.innerText = "Processando XML...";
 
-        fetch('/upload_xml', {
+        fetch('/upload_di_duimp', {
             method: 'POST',
             body: formData
         })
@@ -2878,6 +2975,10 @@
             setVal('dest_xMun', c.dest_xMun);
             setVal('dest_UF', c.dest_UF);
             setVal('dest_CEP', c.dest_CEP);
+            if (c.dest_cPais) setVal('dest_cPais', c.dest_cPais);
+            if (c.dest_xPais) setVal('dest_xPais', c.dest_xPais);
+            if (c.verProc) setVal('verProc', c.verProc);
+            if (typeof aoMudarPaisDestinatario === 'function') aoMudarPaisDestinatario();
 
             // 2. Preenchimento Seguro do Rodape
             const r = data.rodape || {};
@@ -2892,6 +2993,7 @@
             setVal('transp_xEnder', tr.xEnder || '');
             setVal('transp_xMun', tr.xMun || '');
             setVal('transp_UF', tr.UF || '');
+            if (tr.CEP) setVal('transp_CEP', tr.CEP);
             setVal('transp_qVol', tr.qVol || '');
             setVal('transp_esp', tr.esp || '');
             setVal('transp_pesoL', formatarNumeroVisualBR(tr.pesoL, 3, 3));
@@ -2923,7 +3025,8 @@
             if (cfopAtivoUpload) {
                 itensCache.forEach(it => { it.CFOP = cfopAtivoUpload; });
             }
-            itensCache.forEach(it => {
+            itensCache.forEach((it, idx) => {
+                if (!it.nItem) it.nItem = String(idx + 1);
                 const q = parseNum(it.qCom);
                 const vu = parseNum(it.vUnCom);
                 if (q > 0 && vu > 0) it.vProd = (q * vu).toFixed(2);
@@ -3117,9 +3220,12 @@
                 emit_xMun: getVal('emit_xMun'),
                 emit_UF: getVal('emit_UF'),
                 emit_CEP: getVal('emit_CEP'),
+                emit_IE: getVal('emit_IE') || (window.currentCabecalho && window.currentCabecalho.emit_IE) || '138843326117',
+                emit_CRT: (window.currentCabecalho && window.currentCabecalho.emit_CRT) || '1',
                 
                 dest_xNome: getVal('dest_xNome'),
                 dest_CNPJ_CPF: getVal('dest_CNPJ_CPF'),
+                dest_idEstrangeiro: getVal('dest_idEstrangeiro') || getVal('dest_CNPJ_CPF') || (window.currentCabecalho && window.currentCabecalho.dest_idEstrangeiro) || '',
                 dest_indIEDest: getVal('dest_indIEDest') || '9',
                 dest_IE: getVal('dest_IE') || '',
                 dest_xLgr: getVal('dest_xLgr'),
@@ -3128,7 +3234,10 @@
                 dest_cMun: getVal('dest_cMun'),
                 dest_xMun: getVal('dest_xMun'),
                 dest_UF: getVal('dest_UF'),
-                dest_CEP: getVal('dest_CEP')
+                dest_CEP: getVal('dest_CEP'),
+                dest_cPais: getVal('dest_cPais') || (window.currentCabecalho && window.currentCabecalho.dest_cPais) || '1058',
+                dest_xPais: getVal('dest_xPais') || (window.currentCabecalho && window.currentCabecalho.dest_xPais) || 'Brasil',
+                verProc: getVal('verProc') || '4.01_sebrae_b057'
             },
             itens: itensLimpos,
             rodape: {
@@ -3141,6 +3250,7 @@
                     xEnder: getVal('transp_xEnder'),
                     xMun: getVal('transp_xMun'),
                     UF: getVal('transp_UF'),
+                    CEP: getVal('transp_CEP'),
                     qVol: getVal('transp_qVol'),
                     esp: getVal('transp_esp'),
                     pesoL: mutatorLimparNumero(getVal('transp_pesoL')),
@@ -3170,7 +3280,13 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-        .then(res => res.blob())
+        .then(async res => {
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.error || `Erro HTTP ${res.status}`);
+            }
+            return res.blob();
+        })
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -3179,6 +3295,13 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
+            if (typeof nftToast === 'function') {
+                nftToast('XML gerado com sucesso!', 'success');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao gerar XML: " + err.message);
         });
     }
 
@@ -3746,12 +3869,208 @@
         } catch(e) {}
     }
 
+    // =========================================================================
+    // LOCALIDADES: PAÍSES (BACEN), MUNICÍPIOS (IBGE) E BUSCA INTELIGENTE DE CEP
+    // =========================================================================
+    let paisesBacenCache = [];
+
+    function carregarDatalistPaises() {
+        fetch('/api/localidades/paises')
+            .then(r => r.json())
+            .then(data => {
+                paisesBacenCache = data || [];
+                const datalist = document.getElementById('datalist-paises');
+                if (datalist) {
+                    datalist.innerHTML = paisesBacenCache.map(p => 
+                        `<option value="${p.nome}" data-codigo="${p.codigo}">${p.codigo} - ${p.nome}</option>`
+                    ).join('');
+                }
+            })
+            .catch(err => console.warn("Erro ao carregar lista de países:", err));
+    }
+
+    function aoDigitarPaisDestinatario() {
+        const val = (getVal('dest_xPais') || '').trim().toUpperCase();
+        if (!val) return;
+        const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
+        if (encontrado) {
+            setVal('dest_cPais', encontrado.codigo);
+            setVal('dest_xPais', encontrado.nome);
+            ajustarRegrasPaisDestinatario(encontrado.codigo);
+        }
+    }
+
+    function aoMudarPaisDestinatario() {
+        const val = (getVal('dest_xPais') || '').trim().toUpperCase();
+        let codigo = getVal('dest_cPais');
+        
+        if (paisesBacenCache.length > 0) {
+            const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
+            if (encontrado) {
+                codigo = encontrado.codigo;
+                setVal('dest_cPais', codigo);
+                setVal('dest_xPais', encontrado.nome);
+            }
+        }
+        ajustarRegrasPaisDestinatario(codigo);
+    }
+
+    function ajustarRegrasPaisDestinatario(codigo) {
+        const lbl = document.getElementById('lbl-status-pais-dest');
+        const isBrasil = (!codigo || codigo === '1058');
+
+        if (isBrasil) {
+            setVal('dest_cPais', '1058');
+            if (lbl) {
+                lbl.className = 'badge bg-success font-monospace';
+                lbl.innerText = 'Nacional (Brasil)';
+            }
+            if (getVal('dest_CEP') === '99999-999' || getVal('dest_CEP') === '99999999') {
+                setVal('dest_CEP', '');
+            }
+            if (getVal('dest_UF') === 'EX') setVal('dest_UF', '');
+            if (getVal('dest_xMun') === 'EXTERIOR') setVal('dest_xMun', '');
+            if (getVal('dest_cMun') === '9999999') setVal('dest_cMun', '');
+            if (getVal('idDest') === '3') setVal('idDest', '1');
+        } else {
+            if (lbl) {
+                lbl.className = 'badge bg-warning text-dark font-monospace';
+                lbl.innerText = `Exterior (${codigo})`;
+            }
+            setVal('dest_CEP', '99999-999');
+            setVal('dest_UF', 'EX');
+            setVal('dest_cMun', '9999999');
+            setVal('dest_xMun', 'EXTERIOR');
+            setVal('dest_indIEDest', '9');
+            setVal('dest_IE', '');
+            const elIE = document.getElementById('dest_IE');
+            if (elIE) elIE.disabled = true;
+            setVal('idDest', '3');
+        }
+    }
+
+    function resetarPaisParaBrasil(tipo = 'dest') {
+        setVal(`${tipo}_xPais`, 'Brasil');
+        setVal(`${tipo}_cPais`, '1058');
+        if (tipo === 'dest') {
+            ajustarRegrasPaisDestinatario('1058');
+        } else if (tipo === 'emit') {
+            ajustarRegrasPaisEmitente('1058');
+        }
+    }
+
+    function aoDigitarPaisEmitente() {
+        const val = getVal('emit_xPais').trim().toUpperCase();
+        const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
+        if (encontrado) {
+            setVal('emit_cPais', encontrado.codigo);
+            ajustarRegrasPaisEmitente(encontrado.codigo);
+        } else {
+            setVal('emit_cPais', '');
+        }
+    }
+
+    function aoMudarPaisEmitente() {
+        const val = getVal('emit_xPais').trim().toUpperCase();
+        let codigo = getVal('emit_cPais');
+        if (!codigo) {
+            const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
+            if (encontrado) {
+                codigo = encontrado.codigo;
+                setVal('emit_cPais', codigo);
+                setVal('emit_xPais', encontrado.nome);
+            }
+        }
+        ajustarRegrasPaisEmitente(codigo);
+    }
+
+    function ajustarRegrasPaisEmitente(codigo) {
+        const isBrasil = (!codigo || codigo === '1058');
+
+        if (isBrasil) {
+            setVal('emit_cPais', '1058');
+            if (getVal('emit_CEP') === '99999-999' || getVal('emit_CEP') === '99999999') {
+                setVal('emit_CEP', '');
+            }
+            if (getVal('emit_UF') === 'EX') setVal('emit_UF', '');
+            if (getVal('emit_xMun') === 'EXTERIOR') setVal('emit_xMun', '');
+            if (getVal('emit_cMun') === '9999999') setVal('emit_cMun', '');
+        } else {
+            setVal('emit_CEP', '99999-999');
+            setVal('emit_UF', 'EX');
+            setVal('emit_cMun', '9999999');
+            setVal('emit_xMun', 'EXTERIOR');
+        }
+    }
+
+    function buscarCepAuto(cepValor, destino) {
+        if (!cepValor) return;
+        const limpo = String(cepValor).replace(/\D/g, '');
+
+        if (destino === 'dest' && (limpo === '99999999' || cepValor.toUpperCase().includes('EX') || (getVal('dest_cPais') && getVal('dest_cPais') !== '1058'))) {
+            setVal('dest_CEP', '99999-999');
+            setVal('dest_UF', 'EX');
+            setVal('dest_cMun', '9999999');
+            setVal('dest_xMun', 'EXTERIOR');
+            return;
+        }
+
+        if (destino === 'emit' && (limpo === '99999999' || cepValor.toUpperCase().includes('EX') || (getVal('emit_cPais') && getVal('emit_cPais') !== '1058'))) {
+            setVal('emit_CEP', '99999-999');
+            setVal('emit_UF', 'EX');
+            setVal('emit_cMun', '9999999');
+            setVal('emit_xMun', 'EXTERIOR');
+            return;
+        }
+
+        if (limpo.length !== 8) {
+            return;
+        }
+
+        fetch(`/api/localidades/cep/${limpo}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    console.warn("CEP não localizado:", data.error);
+                    return;
+                }
+                if (destino === 'emit') {
+                    setVal('emit_CEP', data.cep || limpo);
+                    if (data.logradouro) setVal('emit_xLgr', data.logradouro);
+                    if (data.bairro) setVal('emit_xBairro', data.bairro);
+                    if (data.localidade) setVal('emit_xMun', data.localidade);
+                    if (data.ibge) setVal('emit_cMun', data.ibge);
+                    if (data.uf) setVal('emit_UF', data.uf);
+                    calcularChaveAcessoDinamica();
+                } else if (destino === 'dest') {
+                    setVal('dest_CEP', data.cep || limpo);
+                    if (data.logradouro) setVal('dest_xLgr', data.logradouro);
+                    if (data.bairro) setVal('dest_xBairro', data.bairro);
+                    if (data.localidade) setVal('dest_xMun', data.localidade);
+                    if (data.ibge) setVal('dest_cMun', data.ibge);
+                    if (data.uf) setVal('dest_UF', data.uf);
+                    setVal('dest_cPais', '1058');
+                    setVal('dest_xPais', 'Brasil');
+                    ajustarRegrasPaisDestinatario('1058');
+                } else if (destino === 'transp') {
+                    setVal('transp_CEP', data.cep || limpo);
+                    if (data.localidade) setVal('transp_xMun', data.localidade);
+                    if (data.uf) setVal('transp_UF', data.uf);
+                    if (!getVal('transp_xEnder') && data.logradouro) {
+                        setVal('transp_xEnder', `${data.logradouro}${data.bairro ? ' - ' + data.bairro : ''}`);
+                    }
+                }
+            })
+            .catch(err => console.warn("Erro ao buscar CEP:", err));
+    }
+
     // Inicialização ao carregar página: ícones lucide, contador de rascunhos e verificação de URL
     document.addEventListener('DOMContentLoaded', function() {
         if (window.lucide) {
             lucide.createIcons();
         }
         atualizarContadorRascunhos();
+        carregarDatalistPaises();
 
         // Verifica se foi passado parâmetro para carregar rascunho via URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -3927,5 +4246,37 @@
     </div><!-- /nft-main-wrapper -->
 
     <script src="/static/js/nft-sidebar.js"></script>
+    <script src="/static/js/nft-autosave.js"></script>
+    <script>
+        document.addEventListener('input', function (e) {
+            if (e.target.classList.contains('mask-cnpj-cpf')) {
+                let v = e.target.value.replace(/\D/g, '');
+                if (v.length <= 11) {
+                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                } else {
+                    v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+                    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+                    v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+                    v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+                    if (v.length > 18) v = v.substring(0, 18);
+                }
+                e.target.value = v;
+            }
+            if (e.target.classList.contains('mask-telefone')) {
+                let v = e.target.value.replace(/\D/g, '');
+                if (v.length > 11) v = v.substring(0, 11);
+                if (v.length > 10) {
+                    v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                } else if (v.length > 5) {
+                    v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                } else if (v.length > 2) {
+                    v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                }
+                e.target.value = v;
+            }
+        });
+    </script>
 </body>
 </html>
