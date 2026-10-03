@@ -3,27 +3,27 @@
   "referencia_interna": "NFT2600234-I REEXP",
   "categoria": "Geral",
   "origem": "XML Rascunho",
-  "tipo_operacao": "(7930) REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA",
-  "operacao_id": "7930",
+  "tipo_operacao": "(5914) REMESSA PARA FEIRA",
+  "operacao_id": "5914",
   "nome_arquivo_original": "Rascunho.xml",
-  "chave_acesso": "35260547998441000198550010000000041020508016",
+  "chave_acesso": "35260547998441000198550010000000081020508015",
   "qtd_itens": 1,
   "valor_total": 1581004.39,
   "dados_completos": {
     "cabecalho": {
-      "nNF": "4",
+      "nNF": "8",
       "serie": "1",
-      "natOp": "REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA",
-      "cfop_padrao": "7930",
+      "natOp": "REMESSA PARA FEIRA",
+      "cfop_padrao": "5914",
       "tpNF": "1",
-      "idDest": "3",
-      "chaveAcesso": "35260547998441000198550010000000041020508016",
+      "idDest": "1",
+      "chaveAcesso": "35260547998441000198550010000000081020508015",
       "cNF": "02050801",
       "cUF": "35",
       "dhEmi": "2026-05-06T10:05:20-03:00",
       "mod": "55",
       "tpEmis": "1",
-      "cDV": "6",
+      "cDV": "5",
       "emit_xNome": "NFT LOGISTICS LTDA",
       "emit_CNPJ": "47998441000198",
       "emit_xLgr": "AVENIDA DR GASTAO VIDIGAL",
@@ -81,16 +81,16 @@
       "ptax_cotacao_venda": "4,9274",
       "criterio_rateio": "",
       "infCpl": "CARGA DESTINADA A HOSPITALAR 2026 A SER REALIZADA ENTRE 19 A 22 DE MAIO DE 2026 NO SÃO PAULO EXPO - BRASIL E RETORNARÁ À ORIGEM APÓS O EVENTO. N/REF: MFMDIM26040027  S/REF: NFT2600234-I \"HOSPITALAR 2026\"  DI: 2606330730 - 06/05/2026 00:00:00  LOCAL DE DESEMBARACO: MULTILOG BARUERI    CAMBIO PTAX: 1 USD = R$ 4,9274 (Fechamento BACEN 06/05/2026)",
-      "select_operacao": "REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA",
+      "select_operacao": "REMESSA PARA FEIRA",
       "referencia_interna": "",
       "referenciaInterna": "NFT2600234-I REEXP"
     },
     "itens": [
       {
-        "CFOP": "7930",
-        "CSOSN": "300",
+        "CFOP": "5914",
+        "CSOSN": "102",
         "CST_COFINS": "07",
-        "CST_IPI": "55",
+        "CST_IPI": "05",
         "CST_PIS": "07",
         "NCM": "90189099",
         "UFDesemb": "SP",
@@ -145,7 +145,7 @@
     "referencia_interna": "NFT2600234-I REEXP",
     "categoria": "Geral",
     "origem": "XML Rascunho",
-    "tipo_operacao": "(7930) REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA"
+    "tipo_operacao": "(5914) REMESSA PARA FEIRA"
   },
-  "data_salvo": "03/10/2026 10:53:16"
+  "data_salvo": "03/10/2026 15:52:42"
 }

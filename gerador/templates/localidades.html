@@ -1,436 +1,413 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Localidades Oficiais - Países (BACEN), Municípios (IBGE) e CEPs - NFT Logistics</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- NFT Logistics Theme (Light & Dark) -->
-    <link rel="stylesheet" href="/static/css/nft-theme.css">
-    <link rel="stylesheet" href="/static/css/nft-sidebar.css">
-    <script src="/static/js/theme.js"></script>
-    <!-- Lucide Icons -->
-    <script src="/static/js/lucide.min.js"></script>
-    <script src="/static/js/nft-dialogs.js"></script>
+    <!-- Favicon -->
+    <link href="/static/img/brand/nftlogo.webp" rel="icon" type="image/webp"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Localidades Oficiais - Países (BACEN), Municípios (IBGE) e CEPs - NFT Logistics</title>
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- NFT Logistics Theme (Light & Dark) -->
+<link href="/static/css/nft-theme.css" rel="stylesheet"/>
+<link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
+<script src="/static/js/theme.js"></script>
+<!-- Lucide Icons -->
+<script src="/static/js/lucide.min.js"></script>
+<script src="/static/js/nft-dialogs.js"></script>
 </head>
 <body class="has-sidebar">
-
-    <!-- MENU LATERAL FIXO (SIDEBAR) -->
-    <aside class="nft-sidebar" id="nftSidebar">
-        <!-- 1. Cabeçalho da Sidebar -->
-        <div class="nft-sidebar-header">
-            <a href="/" class="sidebar-brand-link" title="NFT Logistics - Retornar ao Início">
-                <div class="sidebar-brand-logo-wrap">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_black.svg" alt="NFT" class="logo-theme-black">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_white.svg" alt="NFT" class="logo-theme-white">
-                </div>
-                <div class="sidebar-brand-info">
-                    <span class="sidebar-brand-title">NFT Logistics</span>
-                    <span class="sidebar-brand-badge">Localidades</span>
-                </div>
-            </a>
-            <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
-                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
-            </button>
-        </div>
-
-        <!-- 2. Corpo com Menus e Itens -->
-        <div class="nft-sidebar-body">
-            <!-- Grupo: Módulos -->
-            <div class="sidebar-section-title">Módulos</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/" class="nft-sidebar-btn" title="Portal Inicial">
-                        <span class="sidebar-icon"><i data-lucide="home"></i></span>
-                        <span class="sidebar-label">Início / Módulos</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
-                        <span class="sidebar-label">XML Rascunho</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/di_duimp" class="nft-sidebar-btn" title="Módulo XML da DI ou DUIMP">
-                        <span class="sidebar-icon"><i data-lucide="globe"></i></span>
-                        <span class="sidebar-label">XML da DI ou DUIMP</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/rascunho?abrir_rascunhos=1" class="nft-sidebar-btn" title="Ver e gerenciar Rascunhos Salvos">
-                        <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
-                        <span class="sidebar-label">Rascunhos Salvos</span>
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Grupo: Configurações -->
-            <div class="sidebar-section-title">Configurações</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/empresas" class="nft-sidebar-btn" title="Gestão de Empresas e Cadastros">
-                        <span class="sidebar-icon"><i data-lucide="building-2"></i></span>
-                        <span class="sidebar-label">Empresas</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM &amp; Impostos">
-                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
-                        <span class="sidebar-label">Tabela NCM</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/localidades" class="nft-sidebar-btn active" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
-                        <span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
-                        <span class="sidebar-label">Localidades</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- 3. Rodapé da Sidebar -->
-        <div class="nft-sidebar-footer">
-            <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
-                <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
-                <span class="sidebar-footer-text">Alternar Tema</span>
-            </button>
-            <div class="sidebar-footer-info">
-                <span>NFT Logistics</span>
-                <span>v2.1</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
-    <div class="nft-main-wrapper">
-        <div class="container-fluid px-4 py-3">
-            
-            <!-- Top Header -->
-            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
-                <div class="d-flex align-items-center gap-3">
-                    <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                        <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
-                    </button>
-                    <div>
-                        <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                            <i data-lucide="map-pin" class="text-primary"></i>
-                            <span>Localidades &amp; Códigos Oficiais SEFAZ</span>
-                        </h4>
-                        <small class="text-muted">Banco de Dados de Países (BACEN / &lt;cPais&gt;), Municípios (IBGE / &lt;cMun&gt;) e Consulta Inteligente de CEPs</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cards de Estatísticas -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-4">
-                    <div class="card shadow-sm border card-stat py-2 px-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <small class="text-muted fw-bold">PAÍSES BACEN OFICIAIS</small>
-                                <h4 class="mb-0 fw-bold" id="stat-paises">255</h4>
-                                <small class="text-muted">Códigos oficiais SEFAZ (&lt;cPais&gt;)</small>
-                            </div>
-                            <i data-lucide="globe" class="text-primary" style="width: 32px; height: 32px;"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card shadow-sm border card-stat py-2 px-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <small class="text-muted fw-bold">MUNICÍPIOS DO BRASIL (IBGE)</small>
-                                <h4 class="mb-0 fw-bold" id="stat-municipios">5.571</h4>
-                                <small class="text-muted">Todas as 27 Unidades Federativas</small>
-                            </div>
-                            <i data-lucide="building" class="text-success" style="width: 32px; height: 32px;"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card shadow-sm border card-stat py-2 px-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <small class="text-muted fw-bold">CONSULTA NACIONAL DE CEP</small>
-                                <h4 class="mb-0 fw-bold">ViaCEP + Cache</h4>
-                                <small class="text-muted">Preenchimento automático instantâneo</small>
-                            </div>
-                            <i data-lucide="navigation" class="text-warning" style="width: 32px; height: 32px;"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Abas de Navegação -->
-            <ul class="nav nav-tabs mb-3" id="localidadesTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold d-flex align-items-center gap-2" id="tab-paises-btn" data-bs-toggle="tab" data-bs-target="#tab-paises" type="button" role="tab">
-                        <i data-lucide="globe" style="width: 16px; height: 16px;"></i>
-                        <span>Países Oficiais (BACEN)</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold d-flex align-items-center gap-2" id="tab-municipios-btn" data-bs-toggle="tab" data-bs-target="#tab-municipios" type="button" role="tab">
-                        <i data-lucide="map" style="width: 16px; height: 16px;"></i>
-                        <span>Municípios (IBGE)</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold d-flex align-items-center gap-2" id="tab-cep-btn" data-bs-toggle="tab" data-bs-target="#tab-cep" type="button" role="tab">
-                        <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-                        <span>Consulta e Validação de CEP</span>
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Conteúdo das Abas -->
-            <div class="tab-content">
-                
-                <!-- ABA 1: PAÍSES (BACEN) -->
-                <div class="tab-pane fade show active" id="tab-paises" role="tabpanel">
-                    <div class="card shadow-sm border mb-3">
-                        <div class="card-body p-3">
-                            <div class="row g-2 align-items-center mb-3">
-                                <div class="col-md-6">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-                                        <input type="text" class="form-control" id="search-paises" placeholder="Buscar país por nome ou código BACEN (ex: Brasil, China, 1058, 160)..." oninput="filtrarPaises()">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('search-paises').value=''; filtrarPaises();">Limpar</button>
-                                    </div>
+<!-- MENU LATERAL FIXO (SIDEBAR) -->
+<aside class="nft-sidebar" id="nftSidebar">
+<!-- 1. Cabeçalho da Sidebar -->
+<div class="nft-sidebar-header">
+<a class="sidebar-brand-link" href="/" title="NFT Logistics - Retornar ao Início">
+<div class="sidebar-brand-logo-wrap">
+<img alt="NFT" class="logo-theme-black" src="/static/img/brand/NFT%20Logo%20(3).webp"/>
+<img alt="NFT" class="logo-theme-white" src="/static/img/brand/NFT%20Logo%20(11).webp"/>
+</div>
+<div class="sidebar-brand-info">
+<span class="sidebar-brand-title">NFT Logistics</span>
+<span class="sidebar-brand-badge">Localidades</span>
+</div>
+</a>
+<button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
+<i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+</button>
+</div>
+<!-- 2. Corpo com Menus e Itens -->
+<div class="nft-sidebar-body">
+<!-- Grupo: Módulos -->
+<div class="sidebar-section-title">Módulos</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/" title="Portal Inicial">
+<span class="sidebar-icon"><i data-lucide="home"></i></span>
+<span class="sidebar-label">Início / Módulos</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
+<span class="sidebar-icon"><i data-lucide="file-code"></i></span>
+<span class="sidebar-label">XML Rascunho</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/di_duimp?nova_nota=1" title="Módulo XML da DI ou DUIMP">
+<span class="sidebar-icon"><i data-lucide="globe"></i></span>
+<span class="sidebar-label">XML da DI ou DUIMP</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?abrir_rascunhos=1" title="Ver e gerenciar Rascunhos Salvos">
+<span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+<span class="sidebar-label">Rascunhos Salvos</span>
+</a>
+</li>
+</ul>
+<!-- Grupo: Configurações -->
+<div class="sidebar-section-title">Configurações</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/empresas" title="Gestão de Empresas e Cadastros">
+<span class="sidebar-icon"><i data-lucide="building-2"></i></span>
+<span class="sidebar-label">Empresas</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/banco_ncm" title="Grande Tabela NCM &amp; Impostos">
+<span class="sidebar-icon"><i data-lucide="book-open"></i></span>
+<span class="sidebar-label">Tabela NCM</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn active" href="/localidades" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
+<span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
+<span class="sidebar-label">Localidades</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- 3. Rodapé da Sidebar -->
+<div class="nft-sidebar-footer">
+<button class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+<span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
+<span class="sidebar-footer-text">Alternar Tema</span>
+</button>
+<div class="sidebar-footer-info">
+<span>NFT Logistics</span>
+<span>v2.1</span>
+</div>
+</div>
+</aside>
+<!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
+<div class="nft-main-wrapper">
+<div class="container-fluid px-4 py-3">
+<!-- Top Header -->
+<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+<div class="d-flex align-items-center gap-3">
+<button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+<i data-lucide="menu" style="width: 16px; height: 16px;"></i>
+</button>
+<div>
+<h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
+<i class="text-primary" data-lucide="map-pin"></i>
+<span>Localidades &amp; Códigos Oficiais SEFAZ</span>
+</h4>
+<small class="text-muted">Banco de Dados de Países (BACEN / &lt;cPais&gt;), Municípios (IBGE / &lt;cMun&gt;) e Consulta Inteligente de CEPs</small>
+</div>
+</div>
+</div>
+<!-- Cards de Estatísticas -->
+<div class="row g-3 mb-3">
+<div class="col-md-4">
+<div class="card shadow-sm border card-stat py-2 px-3">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted fw-bold">PAÍSES BACEN OFICIAIS</small>
+<h4 class="mb-0 fw-bold" id="stat-paises">255</h4>
+<small class="text-muted">Códigos oficiais SEFAZ (&lt;cPais&gt;)</small>
+</div>
+<i class="text-primary" data-lucide="globe" style="width: 32px; height: 32px;"></i>
+</div>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card shadow-sm border card-stat py-2 px-3">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted fw-bold">MUNICÍPIOS DO BRASIL (IBGE)</small>
+<h4 class="mb-0 fw-bold" id="stat-municipios">5.571</h4>
+<small class="text-muted">Todas as 27 Unidades Federativas</small>
+</div>
+<i class="text-success" data-lucide="building" style="width: 32px; height: 32px;"></i>
+</div>
+</div>
+</div>
+<div class="col-md-4">
+<div class="card shadow-sm border card-stat py-2 px-3">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted fw-bold">CONSULTA NACIONAL DE CEP</small>
+<h4 class="mb-0 fw-bold">ViaCEP + Cache</h4>
+<small class="text-muted">Preenchimento automático instantâneo</small>
+</div>
+<i class="text-warning" data-lucide="navigation" style="width: 32px; height: 32px;"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- Abas de Navegação -->
+<ul class="nav nav-tabs mb-3" id="localidadesTabs" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active fw-bold d-flex align-items-center gap-2" data-bs-target="#tab-paises" data-bs-toggle="tab" id="tab-paises-btn" role="tab" type="button">
+<i data-lucide="globe" style="width: 16px; height: 16px;"></i>
+<span>Países Oficiais (BACEN)</span>
+</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link fw-bold d-flex align-items-center gap-2" data-bs-target="#tab-municipios" data-bs-toggle="tab" id="tab-municipios-btn" role="tab" type="button">
+<i data-lucide="map" style="width: 16px; height: 16px;"></i>
+<span>Municípios (IBGE)</span>
+</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link fw-bold d-flex align-items-center gap-2" data-bs-target="#tab-cep" data-bs-toggle="tab" id="tab-cep-btn" role="tab" type="button">
+<i data-lucide="search" style="width: 16px; height: 16px;"></i>
+<span>Consulta e Validação de CEP</span>
+</button>
+</li>
+</ul>
+<!-- Conteúdo das Abas -->
+<div class="tab-content">
+<!-- ABA 1: PAÍSES (BACEN) -->
+<div class="tab-pane fade show active" id="tab-paises" role="tabpanel">
+<div class="card shadow-sm border mb-3 mt-3">
+<div class="card-body p-3">
+<div class="row g-2 align-items-center mb-3">
+<div class="col-md-6">
+<div class="input-group input-group-sm">
+<span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+<input class="form-control" id="search-paises" oninput="filtrarPaises()" placeholder="Buscar país por nome ou código BACEN (ex: Brasil, China, 1058, 160)..." type="text"/>
+<button class="btn btn-outline-secondary" onclick="document.getElementById('search-paises').value=''; filtrarPaises();" type="button">Limpar</button>
+</div>
+</div>
+<div class="col-md-6 text-md-end text-muted small">
+                                    Exibindo <span class="fw-bold text-dark" id="lbl-qtd-paises">0</span> países cadastrados.
                                 </div>
-                                <div class="col-md-6 text-md-end text-muted small">
-                                    Exibindo <span id="lbl-qtd-paises" class="fw-bold text-dark">0</span> países cadastrados.
+</div>
+<div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+<table class="table table-hover table-sm align-middle mb-0" id="tabela-paises-list">
+<thead class="table-light sticky-top">
+<tr>
+<th style="width: 120px;">Código BACEN</th>
+<th>Nome do País (Oficial SEFAZ)</th>
+<th class="text-center" style="width: 140px;">Tipo</th>
+<th class="text-end" style="width: 140px;">Ações</th>
+</tr>
+</thead>
+<tbody id="tbody-paises">
+<tr>
+<td class="text-center py-4 text-muted" colspan="4">Carregando países...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- ABA 2: MUNICÍPIOS (IBGE) -->
+<div class="tab-pane fade" id="tab-municipios" role="tabpanel">
+<div class="card shadow-sm border mb-3 mt-3">
+<div class="card-body p-3">
+<div class="row g-2 align-items-center mb-3">
+<div class="col-md-3">
+<select class="form-select form-select-sm" id="select-uf-filtro" onchange="carregarMunicipios(1)">
+<option value="">Todas as UFs (Brasil inteiro)</option>
+<option value="AC">AC - Acre</option>
+<option value="AL">AL - Alagoas</option>
+<option value="AP">AP - Amapa</option>
+<option value="AM">AM - Amazonas</option>
+<option value="BA">BA - Bahia</option>
+<option value="CE">CE - Ceara</option>
+<option value="DF">DF - Distrito Federal</option>
+<option value="ES">ES - Espirito Santo</option>
+<option value="GO">GO - Goias</option>
+<option value="MA">MA - Maranhao</option>
+<option value="MT">MT - Mato Grosso</option>
+<option value="MS">MS - Mato Grosso do Sul</option>
+<option value="MG">MG - Minas Gerais</option>
+<option value="PA">PA - Para</option>
+<option value="PB">PB - Paraiba</option>
+<option value="PR">PR - Parana</option>
+<option value="PE">PE - Pernambuco</option>
+<option value="PI">PI - Piaui</option>
+<option value="RJ">RJ - Rio de Janeiro</option>
+<option value="RN">RN - Rio Grande do Norte</option>
+<option value="RS">RS - Rio Grande do Sul</option>
+<option value="RO">RO - Rondonia</option>
+<option value="RR">RR - Roraima</option>
+<option value="SC">SC - Santa Catarina</option>
+<option selected="" value="SP">SP - Sao Paulo</option>
+<option value="SE">SE - Sergipe</option>
+<option value="TO">TO - Tocantins</option>
+</select>
+</div>
+<div class="col-md-5">
+<div class="input-group input-group-sm">
+<span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+<input class="form-control" id="search-municipios" onkeydown="if(event.key==='Enter') carregarMunicipios(1)" placeholder="Buscar municipio ou codigo IBGE (ex: Sao Paulo, 3550308)..." type="text"/>
+<button class="btn btn-primary" onclick="carregarMunicipios(1)" type="button">Buscar</button>
+</div>
+</div>
+<div class="col-md-4 text-md-end text-muted small">
+                                    Total: <span class="fw-bold text-dark" id="lbl-total-municipios">0</span> municípios encontrados.
                                 </div>
-                            </div>
-
-                            <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
-                                <table class="table table-hover table-sm align-middle mb-0" id="tabela-paises-list">
-                                    <thead class="table-light sticky-top">
-                                        <tr>
-                                            <th style="width: 120px;">Código BACEN</th>
-                                            <th>Nome do País (Oficial SEFAZ)</th>
-                                            <th style="width: 140px;" class="text-center">Tipo</th>
-                                            <th style="width: 140px;" class="text-end">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-paises">
-                                        <tr>
-                                            <td colspan="4" class="text-center py-4 text-muted">Carregando países...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA 2: MUNICÍPIOS (IBGE) -->
-                <div class="tab-pane fade" id="tab-municipios" role="tabpanel">
-                    <div class="card shadow-sm border mb-3">
-                        <div class="card-body p-3">
-                            <div class="row g-2 align-items-center mb-3">
-                                <div class="col-md-3">
-                                    <select class="form-select form-select-sm" id="select-uf-filtro" onchange="carregarMunicipios(1)">
-                                        <option value="">Todas as UFs (Brasil inteiro)</option>
-                                        <option value="AC">AC - Acre</option>
-                                        <option value="AL">AL - Alagoas</option>
-                                        <option value="AP">AP - Amapa</option>
-                                        <option value="AM">AM - Amazonas</option>
-                                        <option value="BA">BA - Bahia</option>
-                                        <option value="CE">CE - Ceara</option>
-                                        <option value="DF">DF - Distrito Federal</option>
-                                        <option value="ES">ES - Espirito Santo</option>
-                                        <option value="GO">GO - Goias</option>
-                                        <option value="MA">MA - Maranhao</option>
-                                        <option value="MT">MT - Mato Grosso</option>
-                                        <option value="MS">MS - Mato Grosso do Sul</option>
-                                        <option value="MG">MG - Minas Gerais</option>
-                                        <option value="PA">PA - Para</option>
-                                        <option value="PB">PB - Paraiba</option>
-                                        <option value="PR">PR - Parana</option>
-                                        <option value="PE">PE - Pernambuco</option>
-                                        <option value="PI">PI - Piaui</option>
-                                        <option value="RJ">RJ - Rio de Janeiro</option>
-                                        <option value="RN">RN - Rio Grande do Norte</option>
-                                        <option value="RS">RS - Rio Grande do Sul</option>
-                                        <option value="RO">RO - Rondonia</option>
-                                        <option value="RR">RR - Roraima</option>
-                                        <option value="SC">SC - Santa Catarina</option>
-                                        <option value="SP" selected>SP - Sao Paulo</option>
-                                        <option value="SE">SE - Sergipe</option>
-                                        <option value="TO">TO - Tocantins</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-                                        <input type="text" class="form-control" id="search-municipios" placeholder="Buscar municipio ou codigo IBGE (ex: Sao Paulo, 3550308)..." onkeydown="if(event.key==='Enter') carregarMunicipios(1)">
-                                        <button class="btn btn-primary" type="button" onclick="carregarMunicipios(1)">Buscar</button>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-md-end text-muted small">
-                                    Total: <span id="lbl-total-municipios" class="fw-bold text-dark">0</span> municípios encontrados.
-                                </div>
-                            </div>
-
-                            <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
-                                <table class="table table-hover table-sm align-middle mb-0">
-                                    <thead class="table-light sticky-top">
-                                        <tr>
-                                            <th style="width: 140px;">Cód. IBGE (&lt;cMun&gt;)</th>
-                                            <th>Nome do Município (&lt;xMun&gt;)</th>
-                                            <th style="width: 80px;" class="text-center">UF</th>
-                                            <th style="width: 100px;" class="text-center">Cód. UF</th>
-                                            <th style="width: 120px;" class="text-end">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-municipios">
-                                        <tr>
-                                            <td colspan="5" class="text-center py-4 text-muted">Carregando municípios...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Paginação -->
-                            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                                <span class="small text-muted" id="lbl-paginacao-mun">Página 1</span>
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-secondary" type="button" id="btn-mun-prev" onclick="mudarPaginaMun(-1)" disabled>Anterior</button>
-                                    <button class="btn btn-outline-secondary" type="button" id="btn-mun-next" onclick="mudarPaginaMun(1)">Próxima</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA 3: CONSULTA DE CEP -->
-                <div class="tab-pane fade" id="tab-cep" role="tabpanel">
-                    <div class="row g-3">
-                        <div class="col-lg-5">
-                            <div class="card shadow-sm border h-100">
-                                <div class="card-header bg-light py-2 fw-bold d-flex align-items-center gap-2">
-                                    <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-                                    <span>Consulta Direta de CEP</span>
-                                </div>
-                                <div class="card-body p-3">
-                                    <label class="form-label small fw-bold mb-1">Informe o CEP</label>
-                                    <div class="input-group mb-2">
-                                        <input type="text" class="form-control font-monospace fw-bold" id="input-teste-cep" placeholder="00000-000 ou 99999-999" maxlength="9">
-                                        <button class="btn btn-primary fw-bold d-flex align-items-center gap-1" type="button" id="btn-consultar-cep" onclick="executarConsultaCep()">
-                                            <i data-lucide="search" style="width: 14px; height: 14px;"></i>
-                                            <span>Consultar</span>
-                                        </button>
-                                    </div>
-                                    <small class="text-muted d-block mb-3">
+</div>
+<div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+<table class="table table-hover table-sm align-middle mb-0">
+<thead class="table-light sticky-top">
+<tr>
+<th style="width: 140px;">Cód. IBGE (&lt;cMun&gt;)</th>
+<th>Nome do Município (&lt;xMun&gt;)</th>
+<th class="text-center" style="width: 80px;">UF</th>
+<th class="text-center" style="width: 100px;">Cód. UF</th>
+<th class="text-end" style="width: 120px;">Ações</th>
+</tr>
+</thead>
+<tbody id="tbody-municipios">
+<tr>
+<td class="text-center py-4 text-muted" colspan="5">Carregando municípios...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Paginação -->
+<div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+<span class="small text-muted" id="lbl-paginacao-mun">Página 1</span>
+<div class="btn-group btn-group-sm">
+<button class="btn btn-outline-secondary" disabled="" id="btn-mun-prev" onclick="mudarPaginaMun(-1)" type="button">Anterior</button>
+<button class="btn btn-outline-secondary" id="btn-mun-next" onclick="mudarPaginaMun(1)" type="button">Próxima</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ABA 3: CONSULTA DE CEP -->
+<div class="tab-pane fade" id="tab-cep" role="tabpanel">
+<div class="row g-3 mt-3">
+<div class="col-lg-5">
+<div class="card shadow-sm border h-100">
+<div class="card-header bg-light py-2 fw-bold d-flex align-items-center gap-2">
+<i data-lucide="search" style="width: 16px; height: 16px;"></i>
+<span>Consulta Direta de CEP</span>
+</div>
+<div class="card-body p-3">
+<label class="form-label small fw-bold mb-1">Informe o CEP</label>
+<div class="input-group mb-2">
+<input class="form-control font-monospace fw-bold" id="input-teste-cep" maxlength="9" placeholder="00000-000 ou 99999-999" type="text"/>
+<button class="btn btn-primary fw-bold d-flex align-items-center gap-1" id="btn-consultar-cep" onclick="executarConsultaCep()" type="button">
+<i data-lucide="search" style="width: 14px; height: 14px;"></i>
+<span>Consultar</span>
+</button>
+</div>
+<small class="text-muted d-block mb-3">
                                         Consulte qualquer CEP brasileiro para obter logradouro, bairro, cidade, UF e código IBGE. Para destinatários estrangeiros, digite <code>99999-999</code>.
                                     </small>
-
-                                    <div class="border rounded p-2 bg-light mb-3">
-                                        <div class="small fw-bold text-muted mb-2">Consultas Rápidas de Teste:</div>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('99999-999')">
+<div class="border rounded p-2 bg-light mb-3">
+<div class="small fw-bold text-muted mb-2">Consultas Rápidas de Teste:</div>
+<div class="d-flex flex-wrap gap-2">
+<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('99999-999')" type="button">
                                                 Exterior (99999-999)
                                             </button>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('01001-000')">
+<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('01001-000')" type="button">
                                                 Praça da Sé (SP)
                                             </button>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('05314-000')">
+<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('05314-000')" type="button">
                                                 Vila Leopoldina (SP)
                                             </button>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('20040-002')">
+<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('20040-002')" type="button">
                                                 Rio de Janeiro (RJ)
                                             </button>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('70150-900')">
+<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('70150-900')" type="button">
                                                 Brasília (DF)
                                             </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="alert alert-info py-2 px-3 small mb-0">
-                                        <div class="fw-bold mb-1"><i data-lucide="info" style="width: 14px; height: 14px;"></i> Como Funciona o Preenchimento Automático:</div>
+</div>
+</div>
+<div class="alert alert-info py-2 px-3 small mb-0">
+<div class="fw-bold mb-1"><i data-lucide="info" style="width: 14px; height: 14px;"></i> Como Funciona o Preenchimento Automático:</div>
                                         Ao preencher o CEP no Emitente, Destinatário ou Transporte das telas de emissão, o sistema busca na base local e no ViaCEP e autopreenche todas as tags do XML.
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-7">
-                            <div class="card shadow-sm border h-100">
-                                <div class="card-header bg-light py-2 fw-bold d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i data-lucide="check-circle" style="width: 16px; height: 16px;" class="text-success"></i>
-                                        <span>Resultado da Consulta</span>
-                                    </div>
-                                    <span class="badge bg-secondary font-monospace" id="badge-cep-status">Aguardando consulta</span>
-                                </div>
-                                <div class="card-body p-3">
-                                    <div id="resultado-cep-vazio" class="text-center py-5 text-muted">
-                                        <i data-lucide="map-pin" style="width: 48px; height: 48px;" class="mb-2 text-secondary opacity-50"></i>
-                                        <p class="mb-0">Digite um CEP ao lado e clique em "Consultar" para visualizar os dados retornados.</p>
-                                    </div>
-
-                                    <div id="resultado-cep-detalhes" style="display: none;">
-                                        <div class="row g-2">
-                                            <div class="col-sm-4">
-                                                <label class="form-label small text-muted mb-0">CEP Formatado</label>
-                                                <div class="fw-bold font-monospace fs-5 text-primary" id="res-cep">-</div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <label class="form-label small text-muted mb-0">CEP Limpo (XML)</label>
-                                                <div class="fw-bold font-monospace fs-5" id="res-cep-limpo">-</div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <label class="form-label small text-muted mb-0">Origem da Resposta</label>
-                                                <div id="res-origem" class="pt-1"><span class="badge bg-success">Cache SQLite</span></div>
-                                            </div>
-
-                                            <div class="col-12"><hr class="my-2"></div>
-
-                                            <div class="col-sm-8">
-                                                <label class="form-label small text-muted mb-0">Logradouro (xLgr)</label>
-                                                <div class="fw-bold" id="res-logradouro">-</div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <label class="form-label small text-muted mb-0">Bairro (xBairro)</label>
-                                                <div class="fw-bold" id="res-bairro">-</div>
-                                            </div>
-
-                                            <div class="col-sm-6">
-                                                <label class="form-label small text-muted mb-0">Município (xMun)</label>
-                                                <div class="fw-bold" id="res-municipio">-</div>
-                                            </div>
-                                            <div class="col-sm-2">
-                                                <label class="form-label small text-muted mb-0">UF</label>
-                                                <div class="fw-bold" id="res-uf">-</div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <label class="form-label small text-muted mb-0">Código IBGE (cMun)</label>
-                                                <div class="fw-bold font-monospace text-success" id="res-ibge">-</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-4 p-2 bg-light border rounded">
-                                            <small class="text-muted fw-bold d-block mb-1">Tags XML Geradas Automaticamente:</small>
-                                            <pre class="mb-0 font-monospace small bg-dark text-white p-2 rounded" id="res-xml-tags">&lt;enderDest&gt;...&lt;/enderDest&gt;</pre>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Scripts Bootstrap e Funções -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+</div>
+</div>
+</div>
+<div class="col-lg-7">
+<div class="card shadow-sm border h-100">
+<div class="card-header bg-light py-2 fw-bold d-flex align-items-center justify-content-between">
+<div class="d-flex align-items-center gap-2">
+<i class="text-success" data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+<span>Resultado da Consulta</span>
+</div>
+<span class="badge bg-secondary font-monospace" id="badge-cep-status">Aguardando consulta</span>
+</div>
+<div class="card-body p-3">
+<div class="text-center py-5 text-muted" id="resultado-cep-vazio">
+<i class="mb-2 text-secondary opacity-50" data-lucide="map-pin" style="width: 48px; height: 48px;"></i>
+<p class="mb-0">Digite um CEP ao lado e clique em "Consultar" para visualizar os dados retornados.</p>
+</div>
+<div id="resultado-cep-detalhes" style="display: none;">
+<div class="row g-2">
+<div class="col-sm-4">
+<label class="form-label small text-muted mb-0">CEP Formatado</label>
+<div class="fw-bold font-monospace fs-5 text-primary" id="res-cep">-</div>
+</div>
+<div class="col-sm-4">
+<label class="form-label small text-muted mb-0">CEP Limpo (XML)</label>
+<div class="fw-bold font-monospace fs-5" id="res-cep-limpo">-</div>
+</div>
+<div class="col-sm-4">
+<label class="form-label small text-muted mb-0">Origem da Resposta</label>
+<div class="pt-1" id="res-origem"><span class="badge bg-success">Cache SQLite</span></div>
+</div>
+<div class="col-12"><hr class="my-2"/></div>
+<div class="col-sm-8">
+<label class="form-label small text-muted mb-0">Logradouro (xLgr)</label>
+<div class="fw-bold" id="res-logradouro">-</div>
+</div>
+<div class="col-sm-4">
+<label class="form-label small text-muted mb-0">Bairro (xBairro)</label>
+<div class="fw-bold" id="res-bairro">-</div>
+</div>
+<div class="col-sm-6">
+<label class="form-label small text-muted mb-0">Município (xMun)</label>
+<div class="fw-bold" id="res-municipio">-</div>
+</div>
+<div class="col-sm-2">
+<label class="form-label small text-muted mb-0">UF</label>
+<div class="fw-bold" id="res-uf">-</div>
+</div>
+<div class="col-sm-4">
+<label class="form-label small text-muted mb-0">Código IBGE (cMun)</label>
+<div class="fw-bold font-monospace text-success" id="res-ibge">-</div>
+</div>
+</div>
+<div class="mt-4 p-2 bg-light border rounded">
+<small class="text-muted fw-bold d-block mb-1">Tags XML Geradas Automaticamente:</small>
+<pre class="mb-0 font-monospace small bg-dark text-white p-2 rounded" id="res-xml-tags">&lt;enderDest&gt;...&lt;/enderDest&gt;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Scripts Bootstrap e Funções -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
         // Inicialização de Ícones
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();

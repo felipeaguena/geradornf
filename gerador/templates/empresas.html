@@ -1,297 +1,285 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empresas & Cadastros - NFT Logistics</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- NFT Logistics Theme (Light & Dark) -->
-    <link rel="stylesheet" href="/static/css/nft-theme.css">
-    <link rel="stylesheet" href="/static/css/nft-sidebar.css">
-    <script src="/static/js/theme.js"></script>
-    <!-- Lucide Icons -->
-    <script src="/static/js/lucide.min.js"></script>
-    <script src="/static/js/nft-dialogs.js"></script>
+    <!-- Favicon -->
+    <link href="/static/img/brand/nftlogo.webp" rel="icon" type="image/webp"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Empresas &amp; Cadastros - NFT Logistics</title>
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- NFT Logistics Theme (Light & Dark) -->
+<link href="/static/css/nft-theme.css" rel="stylesheet"/>
+<link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
+<script src="/static/js/theme.js"></script>
+<!-- Lucide Icons -->
+<script src="/static/js/lucide.min.js"></script>
+<script src="/static/js/nft-dialogs.js"></script>
 </head>
 <body class="has-sidebar">
-
-    <!-- MENU LATERAL FIXO (SIDEBAR) -->
-    <aside class="nft-sidebar" id="nftSidebar">
-        <!-- 1. Cabeçalho da Sidebar -->
-        <div class="nft-sidebar-header">
-            <a href="/" class="sidebar-brand-link" title="NFT Logistics - Retornar ao Início">
-                <div class="sidebar-brand-logo-wrap">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_black.svg" alt="NFT" class="logo-theme-black">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_white.svg" alt="NFT" class="logo-theme-white">
-                </div>
-                <div class="sidebar-brand-info">
-                    <span class="sidebar-brand-title">NFT Logistics</span>
-                    <span class="sidebar-brand-badge">Cadastros</span>
-                </div>
-            </a>
-            <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
-                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
-            </button>
-        </div>
-
-        <!-- 2. Corpo com Menus e Itens -->
-        <div class="nft-sidebar-body">
-            <!-- Grupo: Módulos -->
-            <div class="sidebar-section-title">Módulos</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/" class="nft-sidebar-btn" title="Portal Inicial">
-                        <span class="sidebar-icon"><i data-lucide="home"></i></span>
-                        <span class="sidebar-label">Início / Módulos</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
-                        <span class="sidebar-label">XML Rascunho</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/di_duimp" class="nft-sidebar-btn" title="Módulo XML da DI ou DUIMP">
-                        <span class="sidebar-icon"><i data-lucide="globe"></i></span>
-                        <span class="sidebar-label">XML da DI ou DUIMP</span>
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Grupo: Configurações -->
-            <div class="sidebar-section-title">Configurações</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/empresas" class="nft-sidebar-btn active" title="Gestão de Empresas e Cadastros">
-                        <span class="sidebar-icon"><i data-lucide="building-2"></i></span>
-                        <span class="sidebar-label">Empresas</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM & Impostos">
-                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
-                        <span class="sidebar-label">Tabela NCM</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/localidades" class="nft-sidebar-btn" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
-                        <span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
-                        <span class="sidebar-label">Localidades</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- 3. Rodapé da Sidebar -->
-        <div class="nft-sidebar-footer">
-            <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
-                <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
-                <span class="sidebar-footer-text">Alternar Tema</span>
-            </button>
-            <div class="sidebar-footer-info">
-                <span>NFT Logistics</span>
-                <span>v2.2</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
-    <div class="nft-main-wrapper">
-        <div class="container-fluid px-4 py-3">
-            
-            <!-- Top Header -->
-            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
-                <div class="d-flex align-items-center gap-3">
-                    <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                        <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
-                    </button>
-                    <div>
-                        <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                            <i data-lucide="building-2" class="text-primary"></i>
-                            <span>Empresas &amp; Cadastros</span>
-                        </h4>
-                        <small class="text-muted">Gerenciamento de Emitentes, Clientes, Transportadoras e Armazéns</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Abas de Navegação -->
-            <ul class="nav nav-tabs mb-3" id="empresasTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold d-flex align-items-center gap-2" id="tab-lista-btn" data-bs-toggle="tab" data-bs-target="#tab-lista" type="button" role="tab">
-                        <i data-lucide="list" style="width: 16px; height: 16px;"></i>
-                        <span>Listagem de Empresas</span>
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold d-flex align-items-center gap-2" id="tab-nova-btn" data-bs-toggle="tab" data-bs-target="#tab-nova" type="button" role="tab">
-                        <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
-                        <span>Nova Empresa</span>
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Conteúdo das Abas -->
-            <div class="tab-content">
-                
-                <!-- ABA 1: LISTAGEM DE EMPRESAS -->
-                <div class="tab-pane fade show active" id="tab-lista" role="tabpanel">
-                    <div class="card shadow-sm border mb-3">
-                        <div class="card-body p-3">
-                            <div class="row g-2 align-items-center mb-3">
-                                <div class="col-md-3">
-                                    <select class="form-select form-select-sm" id="filtro-tipo" onchange="filtrarEmpresas()">
-                                        <option value="">Todas as Categorias</option>
-                                        <option value="Emitente">Emitente</option>
-                                        <option value="Cliente">Cliente</option>
-                                        <option value="Transportadora">Transportadora</option>
-                                        <option value="Armazem">Armazém</option>
-                                        <option value="Local de Desembaraço">Local de Desembaraço</option>
-                                    </select>
+<!-- MENU LATERAL FIXO (SIDEBAR) -->
+<aside class="nft-sidebar" id="nftSidebar">
+<!-- 1. Cabeçalho da Sidebar -->
+<div class="nft-sidebar-header">
+<a class="sidebar-brand-link" href="/" title="NFT Logistics - Retornar ao Início">
+<div class="sidebar-brand-logo-wrap">
+<img alt="NFT" class="logo-theme-black" src="/static/img/brand/NFT%20Logo%20(3).webp"/>
+<img alt="NFT" class="logo-theme-white" src="/static/img/brand/NFT%20Logo%20(11).webp"/>
+</div>
+<div class="sidebar-brand-info">
+<span class="sidebar-brand-title">NFT Logistics</span>
+<span class="sidebar-brand-badge">Cadastros</span>
+</div>
+</a>
+<button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
+<i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+</button>
+</div>
+<!-- 2. Corpo com Menus e Itens -->
+<div class="nft-sidebar-body">
+<!-- Grupo: Módulos -->
+<div class="sidebar-section-title">Módulos</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/" title="Portal Inicial">
+<span class="sidebar-icon"><i data-lucide="home"></i></span>
+<span class="sidebar-label">Início / Módulos</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
+<span class="sidebar-icon"><i data-lucide="file-code"></i></span>
+<span class="sidebar-label">XML Rascunho</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/di_duimp?nova_nota=1" title="Módulo XML da DI ou DUIMP">
+<span class="sidebar-icon"><i data-lucide="globe"></i></span>
+<span class="sidebar-label">XML da DI ou DUIMP</span>
+</a>
+</li>
+</ul>
+<!-- Grupo: Configurações -->
+<div class="sidebar-section-title">Configurações</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn active" href="/empresas" title="Gestão de Empresas e Cadastros">
+<span class="sidebar-icon"><i data-lucide="building-2"></i></span>
+<span class="sidebar-label">Empresas</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/banco_ncm" title="Grande Tabela NCM &amp; Impostos">
+<span class="sidebar-icon"><i data-lucide="book-open"></i></span>
+<span class="sidebar-label">Tabela NCM</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/localidades" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
+<span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
+<span class="sidebar-label">Localidades</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- 3. Rodapé da Sidebar -->
+<div class="nft-sidebar-footer">
+<button class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+<span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
+<span class="sidebar-footer-text">Alternar Tema</span>
+</button>
+<div class="sidebar-footer-info">
+<span>NFT Logistics</span>
+<span>v2.2</span>
+</div>
+</div>
+</aside>
+<!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
+<div class="nft-main-wrapper">
+<div class="container-fluid px-4 py-3">
+<!-- Top Header -->
+<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+<div class="d-flex align-items-center gap-3">
+<button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+<i data-lucide="menu" style="width: 16px; height: 16px;"></i>
+</button>
+<div>
+<h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
+<i class="text-primary" data-lucide="building-2"></i>
+<span>Empresas &amp; Cadastros</span>
+</h4>
+<small class="text-muted">Gerenciamento de Emitentes, Clientes, Transportadoras e Armazéns</small>
+</div>
+</div>
+</div>
+<!-- Abas de Navegação -->
+<ul class="nav nav-tabs mb-3" id="empresasTabs" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active fw-bold d-flex align-items-center gap-2" data-bs-target="#tab-lista" data-bs-toggle="tab" id="tab-lista-btn" role="tab" type="button">
+<i data-lucide="list" style="width: 16px; height: 16px;"></i>
+<span>Listagem de Empresas</span>
+</button>
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link fw-bold d-flex align-items-center gap-2" data-bs-target="#tab-nova" data-bs-toggle="tab" id="tab-nova-btn" role="tab" type="button">
+<i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+<span>Nova Empresa</span>
+</button>
+</li>
+</ul>
+<!-- Conteúdo das Abas -->
+<div class="tab-content">
+<!-- ABA 1: LISTAGEM DE EMPRESAS -->
+<div class="tab-pane fade show active" id="tab-lista" role="tabpanel">
+<div class="card shadow-sm border mb-3 mt-3">
+<div class="card-body p-3">
+<div class="row g-2 align-items-center mb-3">
+<div class="col-md-3">
+<select class="form-select form-select-sm" id="filtro-tipo" onchange="filtrarEmpresas()">
+<option value="">Todas as Categorias</option>
+<option value="Emitente">Emitente</option>
+<option value="Cliente">Cliente</option>
+<option value="Transportadora">Transportadora</option>
+<option value="Armazem">Armazém</option>
+<option value="Local de Desembaraço">Local de Desembaraço</option>
+</select>
+</div>
+<div class="col-md-5">
+<div class="input-group input-group-sm">
+<span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+<input class="form-control" id="search-empresa" oninput="filtrarEmpresas()" placeholder="Buscar por Nome, CNPJ..." type="text"/>
+<button class="btn btn-outline-secondary" onclick="document.getElementById('search-empresa').value=''; filtrarEmpresas();" type="button">Limpar</button>
+</div>
+</div>
+<div class="col-md-4 text-md-end text-muted small">
+                                    Total: <span class="fw-bold text-dark" id="lbl-total-empresas">0</span> cadastros.
                                 </div>
-                                <div class="col-md-5">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-                                        <input type="text" class="form-control" id="search-empresa" placeholder="Buscar por Nome, CNPJ..." oninput="filtrarEmpresas()">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('search-empresa').value=''; filtrarEmpresas();">Limpar</button>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-md-end text-muted small">
-                                    Total: <span id="lbl-total-empresas" class="fw-bold text-dark">0</span> cadastros.
-                                </div>
-                            </div>
-
-                            <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
-                                <table class="table table-hover table-sm align-middle mb-0">
-                                    <thead class="table-light sticky-top">
-                                        <tr>
-                                            <th>Tipo</th>
-                                            <th>Nome / Razão Social</th>
-                                            <th>CNPJ/CPF</th>
-                                            <th>Município/UF</th>
-                                            <th class="text-end">Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-empresas">
-                                        <tr>
-                                            <td colspan="5" class="text-center py-4 text-muted">Carregando cadastros...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ABA 2: NOVA EMPRESA -->
-                <div class="tab-pane fade" id="tab-nova" role="tabpanel">
-                    <div class="card shadow-sm border mb-3">
-                        <div class="card-body p-4">
-                            <form id="formEmpresa">
-                                <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Dados Principais</h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label small fw-bold">Categoria / Tipo</label>
-                                        <select class="form-select form-select-sm" id="cad_tipo" required>
-                                            <option value="Emitente">Emitente</option>
-                                            <option value="Cliente">Cliente</option>
-                                            <option value="Transportadora">Transportadora</option>
-                                            <option value="Armazem">Armazém</option>
-                                            <option value="Local de Desembaraço">Local de Desembaraço</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label class="form-label small fw-bold">Nome / Razão Social</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_nome" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Apelido</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_apelido" placeholder="Nome Fantasia / Apelido">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">CNPJ / CPF / IdEstrangeiro</label>
-                                        <input type="text" class="form-control form-control-sm mask-cnpj-cpf" id="cad_cnpj_cpf" placeholder="00.000.000/0000-00">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Inscrição Estadual</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_ie">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Ind. IE</label>
-                                        <select class="form-select form-select-sm" id="cad_ind_ie">
-                                            <option value="1">Contribuinte</option>
-                                            <option value="2">Isento de Contribuição</option>
-                                            <option value="9">Não Contribuinte</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Telefone</label>
-                                        <input type="text" class="form-control form-control-sm mask-telefone" id="cad_fone" placeholder="(00) 00000-0000">
-                                    </div>
-                                </div>
-
-                                <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">CEP</label>
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control font-monospace" id="cad_cep" placeholder="00000-000 ou 99999-999" onblur="buscarCepCad()">
-                                            <button class="btn btn-primary" type="button" onclick="buscarCepCad()"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Logradouro</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_logradouro">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold">Número</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_numero">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Bairro</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_bairro">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">Município</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_municipio">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold">UF</label>
-                                        <input type="text" class="form-control form-control-sm text-uppercase" id="cad_uf" maxlength="2">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold">Cód. Mun (IBGE)</label>
-                                        <input type="text" class="form-control form-control-sm font-monospace" id="cad_cmun">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small fw-bold">País</label>
-                                        <input type="text" class="form-control form-control-sm" id="cad_xpais" value="Brasil">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small fw-bold">Cód. País (BACEN)</label>
-                                        <input type="text" class="form-control form-control-sm font-monospace" id="cad_cpais" value="1058">
-                                    </div>
-                                </div>
-
-                                <div class="mt-4 text-end">
-                                    <button type="submit" class="btn btn-success fw-bold px-4 d-inline-flex align-items-center gap-2">
-                                        <i data-lucide="save"></i> Salvar Empresa
+</div>
+<div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+<table class="table table-hover table-sm align-middle mb-0">
+<thead class="table-light sticky-top">
+<tr>
+<th>Tipo</th>
+<th>Nome / Razão Social</th>
+<th>CNPJ/CPF</th>
+<th>Município/UF</th>
+<th class="text-end">Ações</th>
+</tr>
+</thead>
+<tbody id="tbody-empresas">
+<tr>
+<td class="text-center py-4 text-muted" colspan="5">Carregando cadastros...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- ABA 2: NOVA EMPRESA -->
+<div class="tab-pane fade" id="tab-nova" role="tabpanel">
+<div class="card shadow-sm border mb-3 mt-3">
+<div class="card-body p-4">
+<form id="formEmpresa">
+<h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Dados Principais</h6>
+<div class="row g-3 mb-4">
+<div class="col-md-3">
+<label class="form-label small fw-bold">Categoria / Tipo</label>
+<select class="form-select form-select-sm" id="cad_tipo" required="">
+<option value="Emitente">Emitente</option>
+<option value="Cliente">Cliente</option>
+<option value="Transportadora">Transportadora</option>
+<option value="Armazem">Armazém</option>
+<option value="Local de Desembaraço">Local de Desembaraço</option>
+</select>
+</div>
+<div class="col-md-5">
+<label class="form-label small fw-bold">Nome / Razão Social</label>
+<input class="form-control form-control-sm" id="cad_nome" required="" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Apelido</label>
+<input class="form-control form-control-sm" id="cad_apelido" placeholder="Nome Fantasia / Apelido" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">CNPJ / CPF / IdEstrangeiro</label>
+<input class="form-control form-control-sm mask-cnpj-cpf" id="cad_cnpj_cpf" placeholder="00.000.000/0000-00" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Inscrição Estadual</label>
+<input class="form-control form-control-sm" id="cad_ie" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Ind. IE</label>
+<select class="form-select form-select-sm" id="cad_ind_ie">
+<option value="1">Contribuinte</option>
+<option value="2">Isento de Contribuição</option>
+<option value="9">Não Contribuinte</option>
+</select>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Telefone</label>
+<input class="form-control form-control-sm mask-telefone" id="cad_fone" placeholder="(00) 00000-0000" type="text"/>
+</div>
+</div>
+<h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
+<div class="row g-3">
+<div class="col-md-4">
+<label class="form-label small fw-bold">CEP</label>
+<div class="input-group input-group-sm">
+<input class="form-control font-monospace" id="cad_cep" onblur="buscarCepCad()" placeholder="00000-000 ou 99999-999" type="text"/>
+<button class="btn btn-primary" onclick="buscarCepCad()" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label small fw-bold">Logradouro</label>
+<input class="form-control form-control-sm" id="cad_logradouro" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">Número</label>
+<input class="form-control form-control-sm" id="cad_numero" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Bairro</label>
+<input class="form-control form-control-sm" id="cad_bairro" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Município</label>
+<input class="form-control form-control-sm" id="cad_municipio" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">UF</label>
+<input class="form-control form-control-sm text-uppercase" id="cad_uf" maxlength="2" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">Cód. Mun (IBGE)</label>
+<input class="form-control form-control-sm font-monospace" id="cad_cmun" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">País</label>
+<input class="form-control form-control-sm" id="cad_xpais" type="text" value="Brasil"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small fw-bold">Cód. País (BACEN)</label>
+<input class="form-control form-control-sm font-monospace" id="cad_cpais" type="text" value="1058"/>
+</div>
+</div>
+<div class="mt-4 text-end">
+<button class="btn btn-success fw-bold px-4 d-inline-flex align-items-center gap-2" type="submit">
+<i data-lucide="save"></i> Salvar Empresa
                                     </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts Bootstrap e Funções -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Scripts Bootstrap e Funções -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
             carregarEmpresas();
@@ -551,110 +539,108 @@
                 .catch(err => console.error(err));
         }
     </script>
-    <!-- Modal Edição de Empresa -->
-    <div class="modal fade" id="modalEditarEmpresa" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-light">
-                    <h5 class="modal-title fw-bold"><i data-lucide="edit" style="width: 18px; height: 18px;" class="me-2"></i>Editar Empresa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formEditEmpresa">
-                        <input type="hidden" id="edit_id">
-                        
-                        <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Dados Principais</h6>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-3">
-                                <label class="form-label small fw-bold">Categoria / Tipo</label>
-                                <select class="form-select form-select-sm" id="edit_tipo" required>
-                                    <option value="Emitente">Emitente</option>
-                                    <option value="Cliente">Cliente</option>
-                                    <option value="Transportadora">Transportadora</option>
-                                    <option value="Armazem">Armazém</option>
-                                    <option value="Local de Desembaraço">Local de Desembaraço</option>
-                                </select>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label small fw-bold">Nome / Razão Social</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_nome" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">Apelido</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_apelido" placeholder="Nome Fantasia / Apelido">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">CNPJ / CPF</label>
-                                <input type="text" class="form-control form-control-sm mask-cnpj-cpf" id="edit_cnpj_cpf" placeholder="00.000.000/0000-00">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">Inscrição Estadual (IE)</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_ie">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">Ind. IE</label>
-                                <select class="form-select form-select-sm" id="edit_ind_ie">
-                                    <option value="1">Contribuinte</option>
-                                    <option value="2">Isento de Contribuição</option>
-                                    <option value="9">Não Contribuinte</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">Telefone</label>
-                                <input type="text" class="form-control form-control-sm mask-telefone" id="edit_fone" placeholder="(00) 00000-0000">
-                            </div>
-                        </div>
-
-                        <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">CEP</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control font-monospace" id="edit_cep" placeholder="00000-000" onblur="buscarCepEdit()">
-                                    <button class="btn btn-primary" type="button" onclick="buscarCepEdit()"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold">Logradouro</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_logradouro">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small fw-bold">Número</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_numero">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">Bairro</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_bairro">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">Município</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_municipio">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small fw-bold">UF</label>
-                                <input type="text" class="form-control form-control-sm text-uppercase" id="edit_uf" maxlength="2">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small fw-bold">Cód. Mun (IBGE)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace" id="edit_cmun">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-bold">País</label>
-                                <input type="text" class="form-control form-control-sm" id="edit_xpais">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small fw-bold">Cód. País (BACEN)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace" id="edit_cpais">
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary fw-bold" onclick="salvarEdicaoEmpresa()">Salvar Alterações</button>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- Modal Edição de Empresa -->
+<div class="modal fade" id="modalEditarEmpresa" tabindex="-1">
+<div class="modal-dialog modal-lg">
+<div class="modal-content">
+<div class="modal-header bg-light">
+<h5 class="modal-title fw-bold"><i class="me-2" data-lucide="edit" style="width: 18px; height: 18px;"></i>Editar Empresa</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<form id="formEditEmpresa">
+<input id="edit_id" type="hidden"/>
+<h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Dados Principais</h6>
+<div class="row g-3 mb-4">
+<div class="col-md-3">
+<label class="form-label small fw-bold">Categoria / Tipo</label>
+<select class="form-select form-select-sm" id="edit_tipo" required="">
+<option value="Emitente">Emitente</option>
+<option value="Cliente">Cliente</option>
+<option value="Transportadora">Transportadora</option>
+<option value="Armazem">Armazém</option>
+<option value="Local de Desembaraço">Local de Desembaraço</option>
+</select>
+</div>
+<div class="col-md-5">
+<label class="form-label small fw-bold">Nome / Razão Social</label>
+<input class="form-control form-control-sm" id="edit_nome" required="" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Apelido</label>
+<input class="form-control form-control-sm" id="edit_apelido" placeholder="Nome Fantasia / Apelido" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">CNPJ / CPF</label>
+<input class="form-control form-control-sm mask-cnpj-cpf" id="edit_cnpj_cpf" placeholder="00.000.000/0000-00" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Inscrição Estadual (IE)</label>
+<input class="form-control form-control-sm" id="edit_ie" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Ind. IE</label>
+<select class="form-select form-select-sm" id="edit_ind_ie">
+<option value="1">Contribuinte</option>
+<option value="2">Isento de Contribuição</option>
+<option value="9">Não Contribuinte</option>
+</select>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Telefone</label>
+<input class="form-control form-control-sm mask-telefone" id="edit_fone" placeholder="(00) 00000-0000" type="text"/>
+</div>
+</div>
+<h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
+<div class="row g-3">
+<div class="col-md-4">
+<label class="form-label small fw-bold">CEP</label>
+<div class="input-group input-group-sm">
+<input class="form-control font-monospace" id="edit_cep" onblur="buscarCepEdit()" placeholder="00000-000" type="text"/>
+<button class="btn btn-primary" onclick="buscarCepEdit()" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
+</div>
+</div>
+<div class="col-md-6">
+<label class="form-label small fw-bold">Logradouro</label>
+<input class="form-control form-control-sm" id="edit_logradouro" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">Número</label>
+<input class="form-control form-control-sm" id="edit_numero" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Bairro</label>
+<input class="form-control form-control-sm" id="edit_bairro" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">Município</label>
+<input class="form-control form-control-sm" id="edit_municipio" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">UF</label>
+<input class="form-control form-control-sm text-uppercase" id="edit_uf" maxlength="2" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">Cód. Mun (IBGE)</label>
+<input class="form-control form-control-sm font-monospace" id="edit_cmun" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small fw-bold">País</label>
+<input class="form-control form-control-sm" id="edit_xpais" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small fw-bold">Cód. País (BACEN)</label>
+<input class="form-control form-control-sm font-monospace" id="edit_cpais" type="text"/>
+</div>
+</div>
+</form>
+</div>
+<div class="modal-footer bg-light">
+<button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
+<button class="btn btn-primary fw-bold" onclick="salvarEdicaoEmpresa()" type="button">Salvar Alterações</button>
+</div>
+</div>
+</div>
+</div>
 </body>
 </html>

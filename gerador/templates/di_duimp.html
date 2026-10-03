@@ -1,1096 +1,1022 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador NF-e — XML da DI / DUIMP — NFT Logistics</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- NFT Logistics Theme (Light & Dark) -->
-    <link rel="stylesheet" href="/static/css/nft-theme.css">
-    <link rel="stylesheet" href="/static/css/nft-sidebar.css">
-    <script src="/static/js/theme.js"></script>
-    <!-- Lucide Icons (Minimalist Line SVGs) -->
-    <script src="/static/js/lucide.min.js"></script>
-    <script src="/static/js/nft-dialogs.js"></script>
-    <!-- Tabulator CSS -->
-    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+    <!-- Favicon -->
+    <link href="/static/img/brand/nftlogo.webp" rel="icon" type="image/webp"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gerador NF-e — XML da DI / DUIMP — NFT Logistics</title>
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- NFT Logistics Theme (Light & Dark) -->
+<link href="/static/css/nft-theme.css" rel="stylesheet"/>
+<link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
+<script src="/static/js/theme.js"></script>
+<!-- Lucide Icons (Minimalist Line SVGs) -->
+<script src="/static/js/lucide.min.js"></script>
+<script src="/static/js/nft-dialogs.js"></script>
+<!-- Tabulator CSS -->
+<link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet"/>
+<script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
 </head>
 <body class="has-sidebar">
-
-    <!-- MENU LATERAL FIXO (SIDEBAR) -->
-    <aside class="nft-sidebar" id="nftSidebar">
-        <!-- 1. Cabeçalho da Sidebar -->
-        <div class="nft-sidebar-header">
-            <a href="/" class="sidebar-brand-link" title="NFT Logistics - Retornar ao Início">
-                <div class="sidebar-brand-logo-wrap">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_black.svg" alt="NFT" class="logo-theme-black">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_white.svg" alt="NFT" class="logo-theme-white">
-                </div>
-                <div class="sidebar-brand-info">
-                    <span class="sidebar-brand-title">NFT Logistics</span>
-                    <span class="sidebar-brand-badge">XML DI / DUIMP</span>
-                </div>
-            </a>
-            <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
-                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
-            </button>
-        </div>
-
-        <!-- 2. Corpo com Menus e Itens -->
-        <div class="nft-sidebar-body">
-            
-            <!-- Grupo: Módulos -->
-            <div class="sidebar-section-title">Módulos</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/" class="nft-sidebar-btn" title="Portal Inicial">
-                        <span class="sidebar-icon"><i data-lucide="home"></i></span>
-                        <span class="sidebar-label">Início / Módulos</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
-                        <span class="sidebar-label">XML Rascunho</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/di_duimp" class="nft-sidebar-btn active" title="Módulo XML da DI ou DUIMP">
-                        <span class="sidebar-icon"><i data-lucide="globe"></i></span>
-                        <span class="sidebar-label">XML da DI ou DUIMP</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <button type="button" class="nft-sidebar-btn" onclick="abrirModalListaRascunhos()" title="Ver e gerenciar Rascunhos Salvos">
-                        <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
-                        <span class="sidebar-label">Rascunhos Salvos</span>
-                        <span class="badge bg-secondary-subtle text-muted sidebar-badge badge-counter-rascunhos" id="sidebar-rascunhos-badge">0</span>
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Grupo: Configurações -->
-            <div class="sidebar-section-title">Configurações</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/empresas" class="nft-sidebar-btn" title="Gestão de Empresas e Cadastros">
-                        <span class="sidebar-icon"><i data-lucide="building-2"></i></span>
-                        <span class="sidebar-label">Empresas</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/banco_ncm" class="nft-sidebar-btn" title="Grande Tabela NCM &amp; Impostos">
-                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
-                        <span class="sidebar-label">Tabela NCM</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/localidades" class="nft-sidebar-btn" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
-                        <span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
-                        <span class="sidebar-label">Localidades</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <button type="button" class="nft-sidebar-btn" data-tab="tipo-nota" onclick="sidebarSwitchTab('tipo-nota')" title="Configuração de Impostos &amp; Regras por Operação">
-                        <span class="sidebar-icon"><i data-lucide="settings"></i></span>
-                        <span class="sidebar-label">Tipo de Nota (Impostos)</span>
-                    </button>
-                </li>
-            </ul>
-        </div>
-
-        <!-- 3. Rodapé da Sidebar -->
-        <div class="nft-sidebar-footer">
-            <button type="button" class="sidebar-footer-btn sidebar-footer-btn-primary" onclick="generateXML()" title="Gerar e Baixar Novo XML">
-                <span class="sidebar-icon"><i data-lucide="download"></i></span>
-                <span class="sidebar-footer-text">Gerar Novo XML</span>
-            </button>
-            <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
-                <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
-                <span class="sidebar-footer-text">Alternar Tema</span>
-            </button>
-            <div class="sidebar-footer-info">
-                <span>NFT Logistics</span>
-                <span>v2.1</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
-    <div class="nft-main-wrapper">
-        <div class="container-fluid px-4 py-3">
-            <!-- Top Header Limpo Padronizado -->
-            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
-                <div class="d-flex align-items-center gap-3">
-                    <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                        <i data-lucide="menu"></i>
-                    </button>
-                    <div>
-                        <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                            <span>Editor &amp; Gerador NF-e</span>
-                            <span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 11px; padding: 4px 8px;">XML da DI ou DUIMP</span>
-                        </h4>
-                        <small class="text-muted">Importe a Declaração de Importação (DI) ou DUIMP, selecione o Tipo de Nota e salve rascunhos para continuar a edição</small>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Upload & Rascunhos Card Padronizado (Idêntico ao XML Rascunho) -->
-            <div class="card mb-3 shadow-sm border">
-                <div class="card-body py-2 px-3">
-                    <div class="row align-items-end g-2">
-                        <!-- 1. Campo de Referência Interna -->
-                        <div class="col-xl-2 col-lg-2 col-md-3">
-                            <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
-                                <i data-lucide="tag"></i>
-                                <span>Referência Interna:</span>
-                            </label>
-                            <input type="text" id="referenciaInterna" class="form-control font-monospace" placeholder="Ex: REF-2026/001, PO-998" oninput="atualizarReferenciaRascunho(this.value)">
-                        </div>
-
-                        <!-- 2. Arquivo XML ("Escolher ficheiro") -->
-                        <div class="col-xl-3 col-lg-3 col-md-4">
-                            <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
-                                <i data-lucide="file-up"></i>
-                                <span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
-                            </label>
-                            <input type="file" id="xmlFileInput" class="form-control" accept=".xml">
-                        </div>
-
-                        <!-- 3. Botão Carregar e Processar XML -->
-                        <div class="col-xl-2 col-lg-2 col-md-2">
-                            <button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
-                                <i data-lucide="upload"></i>
-                                <span>Processar XML</span>
-                            </button>
-                        </div>
-
-                        <!-- 4. Botões de Ação de Rascunho -->
-                        <div class="col-xl-5 col-lg-5 col-md-12 d-flex align-items-center gap-2">
-                            <button class="btn btn-outline-success fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
-                                <i data-lucide="save"></i>
-                                <span>Salvar</span>
-                            </button>
-                            <button class="btn btn-outline-secondary fw-bold d-flex align-items-center justify-content-center gap-2" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
-                                <i data-lucide="folder-clock"></i>
-                                <span>Rascunhos</span>
-                                <span class="badge bg-secondary text-white badge-counter-rascunhos" id="badge-total-rascunhos">0</span>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco">
-                                <i data-lucide="rotate-ccw"></i>
-                                <span>Nova Nota</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Linha Inferior com Indicadores de Status e Origem -->
-                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                        <div class="d-flex align-items-center gap-2 small">
-                            <span class="text-muted">Status do Documento:</span>
-                            <span id="status-badge" class="badge bg-secondary py-1 px-2">Aguardando XML</span>
-                            <span id="rascunho-info-tag" class="badge bg-light text-dark border d-none"></span>
-                        </div>
-                        <div id="rascunho-origem-indicator" class="text-muted small font-monospace">
+<!-- MENU LATERAL FIXO (SIDEBAR) -->
+<aside class="nft-sidebar" id="nftSidebar">
+<!-- 1. Cabeçalho da Sidebar -->
+<div class="nft-sidebar-header">
+<a class="sidebar-brand-link" href="/" title="NFT Logistics - Retornar ao Início">
+<div class="sidebar-brand-logo-wrap">
+<img alt="NFT" class="logo-theme-black" src="/static/img/brand/NFT%20Logo%20(3).webp"/>
+<img alt="NFT" class="logo-theme-white" src="/static/img/brand/NFT%20Logo%20(11).webp"/>
+</div>
+<div class="sidebar-brand-info">
+<span class="sidebar-brand-title">NFT Logistics</span>
+<span class="sidebar-brand-badge">XML DI / DUIMP</span>
+</div>
+</a>
+<button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
+<i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+</button>
+</div>
+<!-- 2. Corpo com Menus e Itens -->
+<div class="nft-sidebar-body">
+<!-- Grupo: Módulos -->
+<div class="sidebar-section-title">Módulos</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/" title="Portal Inicial">
+<span class="sidebar-icon"><i data-lucide="home"></i></span>
+<span class="sidebar-label">Início / Módulos</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
+<span class="sidebar-icon"><i data-lucide="file-code"></i></span>
+<span class="sidebar-label">XML Rascunho</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn active" href="/di_duimp?nova_nota=1" title="Módulo XML da DI ou DUIMP">
+<span class="sidebar-icon"><i data-lucide="globe"></i></span>
+<span class="sidebar-label">XML da DI ou DUIMP</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<button class="nft-sidebar-btn" onclick="abrirModalListaRascunhos()" title="Ver e gerenciar Rascunhos Salvos" type="button">
+<span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+<span class="sidebar-label">Rascunhos Salvos</span>
+<span class="badge bg-secondary-subtle text-muted sidebar-badge badge-counter-rascunhos" id="sidebar-rascunhos-badge">0</span>
+</button>
+</li>
+</ul>
+<!-- Grupo: Configurações -->
+<div class="sidebar-section-title">Configurações</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/empresas" title="Gestão de Empresas e Cadastros">
+<span class="sidebar-icon"><i data-lucide="building-2"></i></span>
+<span class="sidebar-label">Empresas</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/banco_ncm" title="Grande Tabela NCM &amp; Impostos">
+<span class="sidebar-icon"><i data-lucide="book-open"></i></span>
+<span class="sidebar-label">Tabela NCM</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/localidades" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
+<span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
+<span class="sidebar-label">Localidades</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<button class="nft-sidebar-btn" data-tab="tipo-nota" onclick="sidebarSwitchTab('tipo-nota')" title="Configuração de Impostos &amp; Regras por Operação" type="button">
+<span class="sidebar-icon"><i data-lucide="settings"></i></span>
+<span class="sidebar-label">Tipo de Nota (Impostos)</span>
+</button>
+</li>
+</ul>
+</div>
+<!-- 3. Rodapé da Sidebar -->
+<div class="nft-sidebar-footer">
+<button class="sidebar-footer-btn sidebar-footer-btn-primary" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
+<span class="sidebar-icon"><i data-lucide="download"></i></span>
+<span class="sidebar-footer-text">Gerar Novo XML</span>
+</button>
+<button class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+<span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
+<span class="sidebar-footer-text">Alternar Tema</span>
+</button>
+<div class="sidebar-footer-info">
+<span>NFT Logistics</span>
+<span>v2.1</span>
+</div>
+</div>
+</aside>
+<!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
+<div class="nft-main-wrapper">
+<div class="container-fluid px-4 py-3">
+<!-- Top Header Limpo Padronizado -->
+<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+<div class="d-flex align-items-center gap-3">
+<button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+<i data-lucide="menu"></i>
+</button>
+<div>
+<h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
+<span>Editor &amp; Gerador NF-e</span>
+<span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 11px; padding: 4px 8px;">XML da DI ou DUIMP</span>
+</h4>
+<small class="text-muted">Importe a Declaração de Importação (DI) ou DUIMP, selecione o Tipo de Nota e salve rascunhos para continuar a edição</small>
+</div>
+</div>
+</div>
+<!-- Upload & Rascunhos Card Padronizado (Idêntico ao XML Rascunho) -->
+<div class="card mb-3 shadow-sm border">
+<div class="card-body py-2 px-3">
+<div class="row align-items-end g-2">
+<!-- 1. Campo de Referência Interna -->
+<div class="col-xl-2 col-lg-2 col-md-3">
+<label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
+<i data-lucide="tag"></i>
+<span>Referência Interna:</span>
+</label>
+<input class="form-control font-monospace" id="referenciaInterna" oninput="atualizarReferenciaRascunho(this.value)" placeholder="Ex: REF-2026/001, PO-998" type="text"/>
+</div>
+<!-- 2. Arquivo XML ("Escolher ficheiro") -->
+<div class="col-xl-3 col-lg-3 col-md-4">
+<label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
+<i data-lucide="file-up"></i>
+<span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
+</label>
+<input accept=".xml" class="form-control" id="xmlFileInput" type="file"/>
+</div>
+<!-- 3. Botão Carregar e Processar XML -->
+<div class="col-xl-2 col-lg-2 col-md-2">
+<button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
+<i data-lucide="upload"></i>
+<span>Processar XML</span>
+</button>
+</div>
+<!-- 4. Botões de Ação de Rascunho -->
+<div class="col-xl-5 col-lg-5 col-md-12 d-flex align-items-center gap-2">
+<button class="btn btn-outline-success fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
+<i data-lucide="save"></i>
+<span>Salvar</span>
+</button>
+<button class="btn btn-outline-secondary fw-bold d-flex align-items-center justify-content-center gap-2" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
+<i data-lucide="folder-clock"></i>
+<span>Rascunhos</span>
+<span class="badge bg-secondary text-white badge-counter-rascunhos" id="badge-total-rascunhos">0</span>
+</button>
+<button class="btn btn-outline-danger fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco" type="button">
+<i data-lucide="rotate-ccw"></i>
+<span>Nova Nota</span>
+</button>
+</div>
+</div>
+<!-- Linha Inferior com Indicadores de Status e Origem -->
+<div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+<div class="d-flex align-items-center gap-2 small">
+<span class="text-muted">Status do Documento:</span>
+<span class="badge bg-secondary py-1 px-2" id="status-badge">Aguardando XML</span>
+<span class="badge bg-light text-dark border d-none" id="rascunho-info-tag"></span>
+</div>
+<div class="text-muted small font-monospace" id="rascunho-origem-indicator">
                             Módulo Ativo: <span class="badge badge-origem-di">XML da DI ou DUIMP</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Navegação de Abas (Etapas da NF-e) Embaixo da Referência Interna -->
-                        <!-- BANNER INFORMATIVO: SESSÃO TEMPORÁRIA RESTAURADA -->
-            <div id="nft-autosave-alert" class="alert alert-info py-2 px-3 mb-3 d-none align-items-center justify-content-between flex-wrap gap-2 shadow-sm border" style="font-size: 12.5px;">
-                <div class="d-flex align-items-center gap-2">
-                    <i data-lucide="history" style="width: 16px; height: 16px;"></i>
-                    <span><strong>Sessão restaurada automaticamente:</strong> Os dados e itens em edição foram preservados com segurança nesta página.</span>
-                    <span class="badge bg-secondary-subtle text-secondary font-monospace" id="nft-autosave-time"></span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar formulário e começar nota em branco">
-                        <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i>
-                        <span>Limpar (Nova Nota)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Navegação de Abas (Etapas da NF-e) Embaixo da Referência Interna -->
+<!-- BANNER INFORMATIVO: SESSÃO TEMPORÁRIA RESTAURADA -->
+<div class="alert alert-info py-2 px-3 mb-3 d-none align-items-center justify-content-between flex-wrap gap-2 shadow-sm border" id="nft-autosave-alert" style="font-size: 12.5px;">
+<div class="d-flex align-items-center gap-2">
+<i data-lucide="history" style="width: 16px; height: 16px;"></i>
+<span><strong>Sessão restaurada automaticamente:</strong> Os dados e itens em edição foram preservados com segurança nesta página.</span>
+<span class="badge bg-secondary-subtle text-secondary font-monospace" id="nft-autosave-time"></span>
+</div>
+<div class="d-flex align-items-center gap-2">
+<button class="btn btn-sm btn-outline-danger py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar formulário e começar nota em branco" type="button">
+<i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i>
+<span>Limpar (Nova Nota)</span>
+</button>
+<button aria-label="Fechar" class="btn-close" onclick="fecharBannerSessaoRestaurada()" style="font-size: 10px;" type="button"></button>
+</div>
+</div>
+<ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+<li class="nav-item" role="presentation">
+<button class="nav-link active" data-bs-target="#cabecalho" data-bs-toggle="tab" id="cabecalho-tab" role="tab" type="button">
+<i data-lucide="clipboard-list"></i> 1. Operação
                     </button>
-                    <button type="button" class="btn-close" style="font-size: 10px;" onclick="fecharBannerSessaoRestaurada()" aria-label="Fechar"></button>
-                </div>
-            </div>
-            <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="cabecalho-tab" data-bs-toggle="tab" data-bs-target="#cabecalho" type="button" role="tab">
-                        <i data-lucide="clipboard-list"></i> 1. Cabeçalho &amp; Operação
+</li><li class="nav-item" role="presentation"><button class="nav-link" data-bs-target="#identificacao" data-bs-toggle="tab" id="identificacao-tab" role="tab" type="button"><i data-lucide="contact"></i> 2. Identificação</button></li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" data-bs-target="#itens" data-bs-toggle="tab" id="itens-tab" role="tab" type="button">
+<i data-lucide="package"></i> 3. Itens da Nota (<span class="text-danger fw-bold" id="itens-badge">0</span>)
                     </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="itens-tab" data-bs-toggle="tab" data-bs-target="#itens" type="button" role="tab">
-                        <i data-lucide="package"></i> 2. Itens da Nota (<span id="itens-badge" class="text-danger fw-bold">0</span>)
+</li>
+<li class="nav-item" role="presentation">
+<button class="nav-link" data-bs-target="#tipo-nota" data-bs-toggle="tab" id="tipo-nota-tab" role="tab" type="button">
+<i data-lucide="settings"></i> 4. Tipo de Nota (Impostos)
                     </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="rodape-tab" data-bs-toggle="tab" data-bs-target="#rodape" type="button" role="tab">
-                        <i data-lucide="receipt"></i> 3. Rodapé &amp; Totais
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tipo-nota-tab" data-bs-toggle="tab" data-bs-target="#tipo-nota" type="button" role="tab">
-                        <i data-lucide="settings"></i> 4. Tipo de Nota (Impostos)
-                    </button>
-                </li>
-            </ul>
-
-            <!-- Conteudo das Abas -->
-            <div class="tab-content bg-white p-3 border rounded shadow-sm mb-4" id="myTabContent">
-        
-        <!-- ABA 1: CABECALHO -->
-        <div class="tab-pane fade show active" id="cabecalho" role="tabpanel">
-            <form id="form-cabecalho">
-                <div class="row g-3">
-                    <div class="col-12"><h6 class="border-bottom pb-1 fw-bold">Identificação e Seleção da Operação</h6></div>
-                    
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold">Número NF-e (nNF)</label>
-                        <input type="text" class="form-control" id="nNF" oninput="calcularChaveAcessoDinamica()">
-                    </div>
-                    <div class="col-md-1">
-                        <label class="form-label small fw-bold">Série</label>
-                        <input type="text" class="form-control" id="serie" oninput="calcularChaveAcessoDinamica()">
-                    </div>
-                    
-                    <!-- SELECT DO TIPO DE OPERACAO: HERDA TUDO NOS ITENS -->
-                    <div class="col-md-3">
-                        <label class="form-label small fw-bold d-flex align-items-center gap-1">
-                            <i data-lucide="target" style="width: 14px; height: 14px;"></i>
-                            <span>Tipo de Operação (Regras Padrão)</span>
-                        </label>
-                        <select id="select_operacao" class="form-select fw-bold border-success" onchange="aoSelecionarOperacao(this.value)">
-                            <option value="">-- Carregando operações cadastradas... --</option>
-                        </select>
-                        <input type="hidden" id="natOp">
-                        <input type="hidden" id="cfop_padrao">
-                    </div>
-
-                    <!-- CHAVE DE ACESSO DA NF-E (44 DÍGITOS - DINÂMICA SEFAZ) -->
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1">
-                                <i data-lucide="key" style="width: 14px; height: 14px;"></i>
-                                <span>Chave de Acesso NF-e (44 dígitos)</span>
-                            </label>
-                            <small class="text-muted font-monospace" style="font-size: 11px;">MOC SEFAZ (Dinâmica)</small>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" class="form-control font-monospace fw-bold text-primary" id="chaveAcessoDisplay" readonly placeholder="Aguardando dados da nota..." style="background-color: var(--surface-secondary); letter-spacing: 0.04em; font-size: 0.88rem;">
-                            <button class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-1" type="button" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa">
-                                <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
-                                <span>Copiar</span>
-                            </button>
-                        </div>
-                        <!-- Campos Ocultos de Apoio a Chave e Identificacao -->
-                        <input type="hidden" id="chaveAcesso">
-                        <input type="hidden" id="tpNF" value="0">
-                        <input type="hidden" id="idDest" value="3">
-                        <input type="hidden" id="cUF" value="35">
-                        <input type="hidden" id="cNF" value="">
-                        <input type="hidden" id="dhEmi" value="">
-                        <input type="hidden" id="mod" value="55">
-                        <input type="hidden" id="tpEmis" value="1">
-                        <input type="hidden" id="cDV" value="">
-                        <input type="hidden" id="verProc" value="4.01_sebrae_b057">
-                    </div>
-
-                    <!-- Caixa de Operação Ativa e Regras Herdadas -->
-                    <div class="col-12">
-                        <div id="card-resumo-heranca" class="card border p-2 px-3 mb-0 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex align-items-center flex-wrap gap-3">
-                                <div><span class="text-muted">Operação:</span> <strong id="lbl-operacao-ativa">Nenhuma selecionada</strong></div>
-                                <div><span class="text-muted">Tipo NF:</span> <span id="lbl-tp-nf-ativo" class="fw-semibold">-</span></div>
-                                <div><span class="text-muted">Destino:</span> <span id="lbl-id-dest-ativo" class="fw-semibold">-</span></div>
-                                <div><span class="text-muted">CFOP:</span> <span id="lbl-cfop-ativo" class="fw-semibold">-</span></div>
-                                <div><span class="text-muted">CSOSN/ICMS:</span> <span id="lbl-icms-ativo" class="fw-semibold">-</span></div>
-                                <div><span class="text-muted">IPI CST:</span> <span id="lbl-ipi-ativo" class="fw-semibold">-</span></div>
-                                <div><span class="text-muted">PIS/COFINS:</span> <span id="lbl-pis-ativo" class="fw-semibold">-</span></div>
-                            </div>
-                            <div>
-                                <button type="button" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" onclick="aplicarOperacaoSelecionadaAosItens()">
-                                    <i data-lucide="zap" style="width: 14px; height: 14px;"></i>
-                                    <span>Reaplicar Regras aos Itens</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NOVO CARD: PARÂMETROS PRINCIPAIS: CÂMBIO PTAX & RATEIO DE DESPESAS (MARINHA MERCANTE, SISCOMEX) -->
-                    <div class="col-12 mt-3" id="card-parametros-rateio-ptax">
-                        <div class="card border shadow-sm">
-                            <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-primary px-2 py-1 d-inline-flex align-items-center gap-1">
-                                        <i data-lucide="globe" style="width: 12px; height: 12px;"></i>
-                                        <span>Parâmetros Principais</span>
-                                    </span>
-                                    <span class="fw-bold">Câmbio Oficial PTAX & Rateios Globais da NF-e</span>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-secondary" id="badge-itens-para-rateio">0 itens carregados</span>
-                                </div>
-                            </div>
-                            <div class="card-body p-3">
-                                <div class="row g-3">
-                                    <!-- PAINEL 1: MOEDA E CÂMBIO PTAX DO BANCO CENTRAL -->
-                                    <div class="col-lg-5 col-md-12 border-end-lg">
-                                        <div class="p-3 rounded bg-light border h-100">
-                                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                                                    <i data-lucide="coins" style="width: 16px; height: 16px;"></i>
-                                                    <span>Moeda Estrangeira &amp; Câmbio PTAX</span>
-                                                </h6>
-                                                <span class="badge bg-info-subtle text-info fw-bold" id="badge-boletim-status">API Bacen Olinda</span>
-                                            </div>
-                                            <small class="text-muted d-block mb-3">
+</li>
+</ul>
+<!-- Conteudo das Abas -->
+<div class="tab-content bg-white p-3 border rounded shadow-sm mb-4" id="myTabContent">
+<!-- ABA 1: CABECALHO -->
+<div class="tab-pane fade show active" id="cabecalho" role="tabpanel">
+<form id="form-cabecalho">
+<div class="row g-3 mt-3">
+<div class="col-12"><h6 class="border-bottom pb-1 fw-bold">Identificação e Seleção da Operação</h6></div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">Número NF-e (nNF)</label>
+<input class="form-control" id="nNF" oninput="calcularChaveAcessoDinamica()" type="text"/>
+</div>
+<div class="col-md-1">
+<label class="form-label small fw-bold">Série</label>
+<input class="form-control" id="serie" oninput="calcularChaveAcessoDinamica()" type="text"/>
+</div>
+<!-- SELECT DO TIPO DE OPERACAO: HERDA TUDO NOS ITENS -->
+<div class="col-md-3">
+<label class="form-label small fw-bold d-flex align-items-center gap-1">
+<i data-lucide="target" style="width: 14px; height: 14px;"></i>
+<span>Tipo de Operação (Regras Padrão)</span>
+</label>
+<select class="form-select fw-bold border-success" id="select_operacao" onchange="aoSelecionarOperacao(this.value)">
+<option value="">-- Carregando operações cadastradas... --</option>
+</select>
+<input id="natOp" type="hidden"/>
+<input id="cfop_padrao" type="hidden"/>
+</div>
+<!-- CHAVE DE ACESSO DA NF-E (44 DÍGITOS - DINÂMICA SEFAZ) -->
+<div class="col-md-6">
+<div class="d-flex justify-content-between align-items-center mb-1">
+<label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1">
+<i data-lucide="key" style="width: 14px; height: 14px;"></i>
+<span>Chave de Acesso NF-e (44 dígitos)</span>
+</label>
+<small class="text-muted font-monospace" style="font-size: 11px;">MOC SEFAZ (Dinâmica)</small>
+</div>
+<div class="input-group">
+<input class="form-control font-monospace fw-bold text-primary" id="chaveAcessoDisplay" placeholder="Aguardando dados da nota..." readonly="" style="background-color: var(--surface-secondary); letter-spacing: 0.04em; font-size: 0.88rem;" type="text"/>
+<button class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-1" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa" type="button">
+<i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+<span>Copiar</span>
+</button>
+</div>
+<!-- Campos Ocultos de Apoio a Chave e Identificacao -->
+<input id="chaveAcesso" type="hidden"/>
+<input id="tpNF" type="hidden" value="0"/>
+<input id="idDest" type="hidden" value="3"/>
+<input id="cUF" type="hidden" value="35"/>
+<input id="cNF" type="hidden" value=""/>
+<input id="dhEmi" type="hidden" value=""/>
+<input id="mod" type="hidden" value="55"/>
+<input id="tpEmis" type="hidden" value="1"/>
+<input id="cDV" type="hidden" value=""/>
+<input id="verProc" type="hidden" value="4.01_sebrae_b057"/>
+</div>
+<!-- Caixa de Operação Ativa e Regras Herdadas -->
+<div class="col-12">
+<div class="card border p-2 px-3 mb-0 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2" id="card-resumo-heranca">
+<div class="d-flex align-items-center flex-wrap gap-3">
+<div><span class="text-muted">Operação:</span> <strong id="lbl-operacao-ativa">Nenhuma selecionada</strong></div>
+<div><span class="text-muted">Tipo NF:</span> <span class="fw-semibold" id="lbl-tp-nf-ativo">-</span></div>
+<div><span class="text-muted">Destino:</span> <span class="fw-semibold" id="lbl-id-dest-ativo">-</span></div>
+<div><span class="text-muted">CFOP:</span> <span class="fw-semibold" id="lbl-cfop-ativo">-</span></div>
+<div><span class="text-muted">CSOSN/ICMS:</span> <span class="fw-semibold" id="lbl-icms-ativo">-</span></div>
+<div><span class="text-muted">IPI CST:</span> <span class="fw-semibold" id="lbl-ipi-ativo">-</span></div>
+<div><span class="text-muted">PIS/COFINS:</span> <span class="fw-semibold" id="lbl-pis-ativo">-</span></div>
+</div>
+<div>
+<button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" onclick="aplicarOperacaoSelecionadaAosItens()" type="button">
+<i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+<span>Reaplicar Regras aos Itens</span>
+</button>
+</div>
+</div>
+</div>
+<!-- NOVO CARD: PARÂMETROS PRINCIPAIS: CÂMBIO PTAX & RATEIO DE DESPESAS (MARINHA MERCANTE, SISCOMEX) -->
+<div class="col-12 mt-3" id="card-parametros-rateio-ptax">
+<div class="card border shadow-sm">
+<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+<div class="d-flex align-items-center gap-2">
+<span class="badge bg-primary px-2 py-1 d-inline-flex align-items-center gap-1">
+<i data-lucide="globe" style="width: 12px; height: 12px;"></i>
+<span>Parâmetros Principais</span>
+</span>
+<span class="fw-bold">Câmbio Oficial PTAX &amp; Rateios Globais da NF-e</span>
+</div>
+<div class="d-flex align-items-center gap-2">
+<span class="badge bg-secondary" id="badge-itens-para-rateio">0 itens carregados</span>
+</div>
+</div>
+<div class="card-body p-3">
+<div class="row g-3">
+<!-- PAINEL 1: MOEDA E CÂMBIO PTAX DO BANCO CENTRAL -->
+<div class="col-lg-5 col-md-12 border-end-lg">
+<div class="p-3 rounded bg-light border h-100">
+<div class="d-flex align-items-center justify-content-between mb-2">
+<h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+<i data-lucide="coins" style="width: 16px; height: 16px;"></i>
+<span>Moeda Estrangeira &amp; Câmbio PTAX</span>
+</h6>
+<span class="badge bg-info-subtle text-info fw-bold" id="badge-boletim-status">API Bacen Olinda</span>
+</div>
+<small class="text-muted d-block mb-3">
                                                 Selecione a moeda e puxe o boletim mais recente da taxa PTAX oficial do Banco Central para cotação aduaneira e registro na NF-e.
                                             </small>
-
-                                            <div class="row g-2">
-                                                <!-- Campo Moeda -->
-                                                <div class="col-sm-7">
-                                                    <label class="form-label small fw-bold mb-1">Moeda da Operação</label>
-                                                    <select id="ptax_moeda" class="form-select form-select-sm fw-bold border-primary" onchange="aoMudarMoedaPtax()">
-                                                        <option value="USD" selected>USD - Dólar dos EUA</option>
-                                                        <option value="EUR">EUR - Euro</option>
-                                                        <option value="GBP">GBP - Libra Esterlina</option>
-                                                        <option value="JPY">JPY - Iene Japonês</option>
-                                                        <option value="CAD">CAD - Dólar Canadense</option>
-                                                        <option value="CHF">CHF - Franco Suíço</option>
-                                                        <option value="AUD">AUD - Dólar Australiano</option>
-                                                        <option value="NOK">NOK - Coroa Norueguesa</option>
-                                                        <option value="SEK">SEK - Coroa Sueca</option>
-                                                        <option value="DKK">DKK - Coroa Dinamarquesa</option>
-                                                        <option value="OUTRA">Outra Moeda / Digitar...</option>
-                                                    </select>
-                                                    <input type="text" class="form-control form-control-sm mt-1 text-uppercase fw-bold font-monospace" id="ptax_moeda_custom" placeholder="Código (Ex: CNY, EUR)" style="display: none;">
-                                                </div>
-
-                                                <!-- Data da Cotação -->
-                                                <div class="col-sm-5">
-                                                    <label class="form-label small fw-bold mb-1">Data Cotação</label>
-                                                    <div class="input-group input-group-sm">
-                                                        <input type="date" class="form-control form-control-sm" id="ptax_data">
-                                                        <button class="btn btn-outline-secondary" type="button" onclick="definirDataPtaxHoje()" title="Definir data de hoje">Hoje</button>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Botão de Consulta à API PTAX -->
-                                                <div class="col-12 mt-2">
-                                                    <button type="button" class="btn btn-primary btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()">
-                                                        <span id="spinner-ptax" class="spinner-border spinner-border-sm d-none" role="status"></span>
-                                                        <i data-lucide="zap" style="width: 15px; height: 15px;"></i>
-                                                        <span>Puxar Taxa PTAX Atual (Boletim Bacen)</span>
-                                                    </button>
-                                                </div>
-
-                                                <!-- Valores de Câmbio Retornados -->
-                                                <div class="col-sm-6 mt-2">
-                                                    <label class="form-label small fw-bold mb-1 text-primary">Taxa PTAX Venda (R$)</label>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text font-monospace fw-bold">R$</span>
-                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold text-primary" id="ptax_cotacao_venda" placeholder="0,0000" onchange="formatarInputVisualBR(this, 4, 4)">
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6 mt-2">
-                                                    <label class="form-label small mb-1 text-muted">Taxa PTAX Compra (R$)</label>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text font-monospace text-muted">R$</span>
-                                                        <input type="text" class="form-control form-control-sm font-monospace text-end text-muted" id="ptax_cotacao_compra" readonly placeholder="0,0000">
-                                                    </div>
-                                                </div>
-
-                                                <!-- Box de Detalhes do Boletim -->
-                                                <div class="col-12">
-                                                    <div id="box-info-boletim" class="p-2 border rounded bg-white small font-monospace mt-1" style="font-size: 11px; display: none;">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <span><strong id="lbl-boletim-tipo">Boletim:</strong> <span id="lbl-boletim-detalhe">-</span></span>
-                                                            <span class="badge bg-success-subtle text-success" id="badge-boletim-ok">Atualizado</span>
-                                                        </div>
-                                                        <div class="text-muted mt-1"><span id="lbl-boletim-datahora">-</span></div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Ações de Câmbio -->
-                                                <div class="col-12 mt-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="chk_ptax_infcpl" checked>
-                                                        <label class="form-check-label small" for="chk_ptax_infcpl">
+<div class="row g-2">
+<!-- Campo Moeda -->
+<div class="col-sm-7">
+<label class="form-label small fw-bold mb-1">Moeda da Operação</label>
+<select class="form-select form-select-sm fw-bold border-primary" id="ptax_moeda" onchange="aoMudarMoedaPtax()">
+<option selected="" value="USD">USD - Dólar dos EUA</option>
+<option value="EUR">EUR - Euro</option>
+<option value="GBP">GBP - Libra Esterlina</option>
+<option value="JPY">JPY - Iene Japonês</option>
+<option value="CAD">CAD - Dólar Canadense</option>
+<option value="CHF">CHF - Franco Suíço</option>
+<option value="AUD">AUD - Dólar Australiano</option>
+<option value="NOK">NOK - Coroa Norueguesa</option>
+<option value="SEK">SEK - Coroa Sueca</option>
+<option value="DKK">DKK - Coroa Dinamarquesa</option>
+<option value="OUTRA">Outra Moeda / Digitar...</option>
+</select>
+<input class="form-control form-control-sm mt-1 text-uppercase fw-bold font-monospace" id="ptax_moeda_custom" placeholder="Código (Ex: CNY, EUR)" style="display: none;" type="text"/>
+</div>
+<!-- Data da Cotação -->
+<div class="col-sm-5">
+<label class="form-label small fw-bold mb-1">Data Cotação</label>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm" id="ptax_data" type="date"/>
+<button class="btn btn-outline-secondary" onclick="definirDataPtaxHoje()" title="Definir data de hoje" type="button">Hoje</button>
+</div>
+</div>
+<!-- Botão de Consulta à API PTAX -->
+<div class="col-12 mt-2">
+<button class="btn btn-primary btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()" type="button">
+<span class="spinner-border spinner-border-sm d-none" id="spinner-ptax" role="status"></span>
+<i data-lucide="zap" style="width: 15px; height: 15px;"></i>
+<span>Puxar Taxa PTAX Atual (Boletim Bacen)</span>
+</button>
+</div>
+<!-- Valores de Câmbio Retornados -->
+<div class="col-sm-6 mt-2">
+<label class="form-label small fw-bold mb-1 text-primary">Taxa PTAX Venda (R$)</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace fw-bold">R$</span>
+<input class="form-control form-control-sm font-monospace text-end fw-bold text-primary" id="ptax_cotacao_venda" onchange="formatarInputVisualBR(this, 4, 4)" placeholder="0,0000" type="text"/>
+</div>
+</div>
+<div class="col-sm-6 mt-2">
+<label class="form-label small mb-1 text-muted">Taxa PTAX Compra (R$)</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace text-muted">R$</span>
+<input class="form-control form-control-sm font-monospace text-end text-muted" id="ptax_cotacao_compra" placeholder="0,0000" readonly="" type="text"/>
+</div>
+</div>
+<!-- Box de Detalhes do Boletim -->
+<div class="col-12">
+<div class="p-2 border rounded bg-white small font-monospace mt-1" id="box-info-boletim" style="font-size: 11px; display: none;">
+<div class="d-flex justify-content-between align-items-center">
+<span><strong id="lbl-boletim-tipo">Boletim:</strong> <span id="lbl-boletim-detalhe">-</span></span>
+<span class="badge bg-success-subtle text-success" id="badge-boletim-ok">Atualizado</span>
+</div>
+<div class="text-muted mt-1"><span id="lbl-boletim-datahora">-</span></div>
+</div>
+</div>
+<!-- Ações de Câmbio -->
+<div class="col-12 mt-2">
+<div class="form-check">
+<input checked="" class="form-check-input" id="chk_ptax_infcpl" type="checkbox"/>
+<label class="form-check-label small" for="chk_ptax_infcpl">
                                                             Gravar taxa de câmbio nas Informações Complementares (<code>infCpl</code>)
                                                         </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 d-flex gap-2">
-                                                    <button type="button" class="btn btn-outline-primary btn-sm flex-fill d-inline-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()">
-                                                        <i data-lucide="file-edit" style="width: 14px; height: 14px;"></i>
-                                                        <span>Registrar Câmbio em infCpl</span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" onclick="converterItensComTaxaPtax()" title="Multiplica o valor unitário e total dos itens pela taxa PTAX">
-                                                        <i data-lucide="arrow-left-right" style="width: 14px; height: 14px;"></i>
-                                                        <span>Converter Itens</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- PAINEL 2: RATEIO DE DESPESAS GLOBAIS ENTRE OS ITENS -->
-                                    <div class="col-lg-7 col-md-12">
-                                        <div class="p-3 rounded bg-light border h-100">
-                                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                                                    <i data-lucide="scale" style="width: 16px; height: 16px;"></i>
-                                                    <span>Rateio Global de Despesas entre os Itens</span>
-                                                </h6>
-                                                <span class="badge bg-warning-subtle text-dark fw-bold">Divisão Centavo-Exata</span>
-                                            </div>
-                                            <small class="text-muted d-block mb-3">
+</div>
+</div>
+<div class="col-12 d-flex gap-2">
+<button class="btn btn-outline-primary btn-sm flex-fill d-inline-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()" type="button">
+<i data-lucide="file-edit" style="width: 14px; height: 14px;"></i>
+<span>Registrar Câmbio em infCpl</span>
+</button>
+<button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" onclick="converterItensComTaxaPtax()" title="Multiplica o valor unitário e total dos itens pela taxa PTAX" type="button">
+<i data-lucide="arrow-left-right" style="width: 14px; height: 14px;"></i>
+<span>Converter Itens</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- PAINEL 2: RATEIO DE DESPESAS GLOBAIS ENTRE OS ITENS -->
+<div class="col-lg-7 col-md-12">
+<div class="p-3 rounded bg-light border h-100">
+<div class="d-flex align-items-center justify-content-between mb-2">
+<h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+<i data-lucide="scale" style="width: 16px; height: 16px;"></i>
+<span>Rateio Global de Despesas entre os Itens</span>
+</h6>
+<span class="badge bg-warning-subtle text-dark fw-bold">Divisão Centavo-Exata</span>
+</div>
+<small class="text-muted d-block mb-3">
                                                 Informe o total das despesas da DI. O sistema distribuirá matematicamente os centavos entre os itens da nota.
                                             </small>
-
-                                            <div class="row g-2">
-                                                <!-- VALOR MARINHA MERCANTE (AFRMM) -->
-                                                <div class="col-sm-6">
-                                                    <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
-                                                        <span class="d-inline-flex align-items-center gap-1"><i data-lucide="anchor" style="width: 13px; height: 13px;"></i> VALOR MARINHA MERCANTE</span>
-                                                        <span class="badge bg-primary-subtle text-primary font-monospace" style="font-size: 10px;">vAFRMM (DI)</span>
-                                                    </label>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text font-monospace fw-bold">R$</span>
-                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vAFRMM" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
-                                                    </div>
-                                                    <small class="text-muted" style="font-size: 10.5px;">Adicional Marinha Mercante lançado na Declaração de Importação</small>
-                                                </div>
-
-                                                <!-- TAXA SISCOMEX -->
-                                                <div class="col-sm-6">
-                                                    <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
-                                                        <span class="d-inline-flex align-items-center gap-1"><i data-lucide="landmark" style="width: 13px; height: 13px;"></i> TAXA SISCOMEX</span>
-                                                        <span class="badge bg-success-subtle text-success font-monospace" style="font-size: 10px;">vDespAdu (II) / vOutro</span>
-                                                    </label>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text font-monospace fw-bold">R$</span>
-                                                        <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vSiscomex" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
-                                                    </div>
-                                                    <small class="text-muted" style="font-size: 10.5px;">Taxa Siscomex da DI lançada em Desp. Aduaneiras e Outras Desp.</small>
-                                                </div>
-
-                                                <!-- Opções de Lançamento da Taxa Siscomex -->
-                                                <div class="col-12 py-1">
-                                                    <div class="d-flex flex-wrap gap-3">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="chk_siscomex_despadu" checked>
-                                                            <label class="form-check-label small" for="chk_siscomex_despadu">
+<div class="row g-2">
+<!-- VALOR MARINHA MERCANTE (AFRMM) -->
+<div class="col-sm-6">
+<label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+<span class="d-inline-flex align-items-center gap-1"><i data-lucide="anchor" style="width: 13px; height: 13px;"></i> VALOR MARINHA MERCANTE</span>
+<span class="badge bg-primary-subtle text-primary font-monospace" style="font-size: 10px;">vAFRMM (DI)</span>
+</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace fw-bold">R$</span>
+<input class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vAFRMM" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+</div>
+<small class="text-muted" style="font-size: 10.5px;">Adicional Marinha Mercante lançado na Declaração de Importação</small>
+</div>
+<!-- TAXA SISCOMEX -->
+<div class="col-sm-6">
+<label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+<span class="d-inline-flex align-items-center gap-1"><i data-lucide="landmark" style="width: 13px; height: 13px;"></i> TAXA SISCOMEX</span>
+<span class="badge bg-success-subtle text-success font-monospace" style="font-size: 10px;">vDespAdu (II) / vOutro</span>
+</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace fw-bold">R$</span>
+<input class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vSiscomex" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+</div>
+<small class="text-muted" style="font-size: 10.5px;">Taxa Siscomex da DI lançada em Desp. Aduaneiras e Outras Desp.</small>
+</div>
+<!-- Opções de Lançamento da Taxa Siscomex -->
+<div class="col-12 py-1">
+<div class="d-flex flex-wrap gap-3">
+<div class="form-check">
+<input checked="" class="form-check-input" id="chk_siscomex_despadu" type="checkbox"/>
+<label class="form-check-label small" for="chk_siscomex_despadu">
                                                                 Ratear em Despesas Aduaneiras (<code>vDespAdu</code> no grupo II)
                                                             </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="chk_siscomex_outro" checked>
-                                                            <label class="form-check-label small" for="chk_siscomex_outro">
+</div>
+<div class="form-check">
+<input checked="" class="form-check-input" id="chk_siscomex_outro" type="checkbox"/>
+<label class="form-check-label small" for="chk_siscomex_outro">
                                                                 Somar em Outras Despesas (<code>vOutro</code>) para compor o Total da NF (<code>vNF</code>)
                                                             </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" id="chk_siscomex_infcpl" checked>
-                                                            <label class="form-check-label small" for="chk_siscomex_infcpl">
+</div>
+<div class="form-check">
+<input checked="" class="form-check-input" id="chk_siscomex_infcpl" type="checkbox"/>
+<label class="form-check-label small" for="chk_siscomex_infcpl">
                                                                 Atualizar <code>TX SISCOMEX R$: ...</code> nas Observações (<code>infCpl</code>)
                                                             </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Outras Despesas Acessórias de Rateio (Colapsável) -->
-                                                <div class="col-12 mt-1">
-                                                    <details class="border rounded p-2 bg-white">
-                                                        <summary class="small fw-bold text-muted d-flex align-items-center gap-1" style="cursor: pointer;">
-                                                            <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i>
-                                                            <span>Outros Rateios (Frete, Seguro e Outras Despesas Globais)</span>
-                                                        </summary>
-                                                        <div class="row g-2 mt-2">
-                                                            <div class="col-sm-4">
-                                                                <label class="form-label small mb-1">Frete Total (vFrete)</label>
-                                                                <div class="input-group input-group-sm">
-                                                                    <span class="input-group-text font-monospace">R$</span>
-                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vFrete" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-4">
-                                                                <label class="form-label small mb-1">Seguro Total (vSeg)</label>
-                                                                <div class="input-group input-group-sm">
-                                                                    <span class="input-group-text font-monospace">R$</span>
-                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vSeg" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-sm-4">
-                                                                <label class="form-label small mb-1">Outras Despesas (vOutro)</label>
-                                                                <div class="input-group input-group-sm">
-                                                                    <span class="input-group-text font-monospace">R$</span>
-                                                                    <input type="text" class="form-control form-control-sm font-monospace text-end" id="rateio_vOutro" placeholder="0,00" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </details>
-                                                </div>
-
-                                                <!-- Critério de Rateio e Botão de Aplicação -->
-                                                <div class="col-sm-6 mt-2">
-                                                    <label class="form-label small fw-bold mb-1">Critério de Proporcionalidade</label>
-                                                    <select class="form-select form-select-sm fw-bold border-secondary" id="rateio_criterio">
-                                                        <option value="vProd" selected>Proporcional ao Valor dos Produtos (vProd)</option>
-                                                        <option value="qCom">Proporcional à Quantidade (qCom)</option>
-                                                        <option value="igual">Dividir Igualmente entre os Itens</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-sm-6 mt-2 d-flex align-items-end">
-                                                    <button type="button" class="btn btn-warning fw-bold text-dark w-100 btn-sm shadow-sm py-2" onclick="executarRateioGlobal()">
-                                                        <i data-lucide="zap" style="width: 14px; height: 14px;"></i> Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- EMITENTE -->
-                    <div class="col-md-6 mt-3">
-                        <div class="card h-100 border">
-                            <div class="card-header bg-light py-2 d-flex align-items-center gap-2 fw-bold"><i data-lucide="building-2" style="width: 15px; height: 15px;"></i> Dados do Emitente</div>
-                            <div class="card-body py-2">
-                                <div class="row g-2">
-                                    <!-- PAÍS DO EMITENTE -->
-                                    <div class="col-md-7">
-                                        <label class="form-label small mb-1 fw-bold">País do Emitente (Nome)</label>
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control form-control-sm fw-bold" id="emit_xPais" list="datalist-paises" placeholder="Selecione ou digite o País" value="Brasil" oninput="aoDigitarPaisEmitente()" onchange="aoMudarPaisEmitente()">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="resetarPaisParaBrasil('emit')" title="Redefinir para Brasil"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label class="form-label small mb-1 fw-bold">Cód. BACEN (&lt;cPais&gt;)</label>
-                                        <input type="text" class="form-control form-control-sm font-monospace fw-bold bg-light" id="emit_cPais" value="1058" readonly>
-                                    </div>
-
-                                    <div class="col-md-8">
-                                        <label class="form-label small mb-1">Razão Social (xNome)</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_xNome">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small mb-1">CNPJ</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_CNPJ" class="form-control form-control-sm mask-cnpj-cpf" placeholder="00.000.000/0000-00" oninput="calcularChaveAcessoDinamica()">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small mb-1">Inscrição Estadual (IE)</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_IE">
-                                    </div>
-                                    <div class="col-md-9">
-                                        <label class="form-label small mb-1">Logradouro (xLgr)</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_xLgr">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small mb-1">Número (nro)</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_nro">
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label class="form-label small mb-1">Bairro</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_xBairro">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small mb-1">Cód. Mun. IBGE</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_cMun" oninput="calcularChaveAcessoDinamica()">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small mb-1">Município (xMun)</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_xMun">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small mb-1">UF</label>
-                                        <input type="text" class="form-control form-control-sm" id="emit_UF" oninput="calcularChaveAcessoDinamica()">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <label class="form-label small mb-1 fw-bold">CEP (Busca Automática)</label>
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control form-control-sm font-monospace" id="emit_CEP" placeholder="00000-000" onblur="buscarCepAuto(this.value, 'emit')">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="buscarCepAuto(document.getElementById('emit_CEP').value, 'emit')" title="Consultar CEP e preencher endereço"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- DESTINATARIO -->
-                    <div class="col-md-6 mt-3">
-                        <div class="card h-100 border">
-                            <div class="card-header bg-light py-2 d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center gap-2 fw-bold">
-                                    <i data-lucide="user" style="width: 15px; height: 15px;"></i>
-                                    <span>Dados do Destinatário</span>
-                                </div>
-                                <span class="badge bg-secondary font-monospace" id="lbl-status-pais-dest">Nacional (Brasil)</span>
-                            </div>
-                            <div class="card-body py-2">
-                                <div class="row g-2">
-                                    <!-- PAÍS DO DESTINATÁRIO -->
-                                    <div class="col-md-7">
-                                        <label class="form-label small mb-1 fw-bold">País do Destinatário (Nome)</label>
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control form-control-sm fw-bold" id="dest_xPais" list="datalist-paises" placeholder="Selecione ou digite o País" value="Brasil" oninput="aoDigitarPaisDestinatario()" onchange="aoMudarPaisDestinatario()">
-                                            <datalist id="datalist-paises"></datalist>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="resetarPaisParaBrasil()" title="Redefinir para Brasil"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label class="form-label small mb-1 fw-bold">Cód. BACEN (&lt;cPais&gt;)</label>
-                                        <input type="text" class="form-control form-control-sm font-monospace fw-bold bg-light" id="dest_cPais" value="1058" readonly>
-                                    </div>
-
-                                    <div class="col-md-8">
-                                        <label class="form-label small mb-1">Nome / Razão Social (xNome)</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_xNome">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small mb-1">CNPJ / CPF / IdEstrangeiro</label>
-                                        <input type="text" class="form-control form-control-sm mask-cnpj-cpf" id="dest_CNPJ_CPF" placeholder="00.000.000/0000-00">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small mb-1">Tipo de Contribuinte (ICMS)</label>
-                                        <select class="form-select form-select-sm" id="dest_indIEDest" onchange="atualizarEstadoInscricaoEstadual()">
-                                            <option value="1">Contribuinte</option>
-                                            <option value="2">Isento de Contribuição</option>
-                                            <option value="9" selected>Não Contribuinte</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small mb-1">Inscrição Estadual (IE)</label>
-                                        <input type="text" class="form-control form-control-sm bg-light" id="dest_IE" placeholder="Apenas p/ Contribuinte ICMS" disabled>
-                                    </div>
-                                    <div class="col-md-9">
-                                        <label class="form-label small mb-1">Logradouro (xLgr)</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_xLgr">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small mb-1">Número (nro)</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_nro">
-                                    </div>
-                                    <div class="col-md-5">
-                                        <label class="form-label small mb-1">Bairro</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_xBairro">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small mb-1">Cód. Mun. IBGE</label>
-                                        <input type="text" class="form-control form-control-sm font-monospace" id="dest_cMun">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small mb-1">Município (xMun)</label>
-                                        <input type="text" class="form-control form-control-sm" id="dest_xMun">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small mb-1">UF</label>
-                                        <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="dest_UF" maxlength="2">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <label class="form-label small mb-1 fw-bold">CEP (Busca Automática / 99999-999)</label>
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control form-control-sm font-monospace" id="dest_CEP" placeholder="00000-000 ou 99999-999" onblur="buscarCepAuto(this.value, 'dest')">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="buscarCepAuto(document.getElementById('dest_CEP').value, 'dest')" title="Consultar CEP e preencher endereço"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- ABA: CONFIGURACOES > TIPO DE NOTA (CONFIGURACAO DE TRIBUTOS PADRAO POR OPERACAO) -->
-        <div class="tab-pane fade" id="tipo-nota" role="tabpanel">
-            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-secondary px-2 py-1 d-inline-flex align-items-center gap-1"><i data-lucide="settings" style="width: 12px; height: 12px;"></i> Configurações</span>
-                    <span class="text-muted">/</span>
-                    <h6 class="mb-0 fw-bold d-inline-flex align-items-center gap-1"><i data-lucide="tag" style="width: 15px; height: 15px;"></i> Tipo de Nota (Impostos &amp; Regras Padrão por Operação)</h6>
-                </div>
-                <small class="text-muted">Gerencie e padronize regras tributárias herdadas automaticamente pelos itens da NF-e.</small>
-            </div>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <div class="card h-100 border">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                            <span>Operações Cadastradas</span>
-                            <button class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1" onclick="novaOperacao()"><i data-lucide="plus" style="width: 13px; height: 13px;"></i> Nova</button>
-                        </div>
-                        <div class="card-body p-2">
-                            <div class="list-group" id="lista-operacoes" style="max-height: 480px; overflow-y: auto;">
-                                <!-- Preenchido dinamicamente via JS -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-8">
-                    <div class="card border">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-                            <span id="titulo-form-op">Configuração da Operação:<br> <strong id="lbl-op-nome">Nova Operação</strong></span>
-                            <div>
-                                <button class="btn btn-sm btn-outline-primary me-2" onclick="capturarImpostosDoXmlAtual()">
-                                    <i data-lucide="download" style="width: 13px; height: 13px;"></i> Puxar Impostos do XML Atual
-                                </button>
-                                <button class="btn btn-sm btn-danger me-2" id="btn-excluir-op" style="display:none;" onclick="excluirOperacaoAtual()">
-                                    <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Excluir
-                                </button>
-                                <button class="btn btn-sm btn-success fw-bold" onclick="salvarOperacao()">
-                                    <i data-lucide="save" style="width: 13px; height: 13px;"></i> Salvar Configuração
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body py-3">
-                            <form id="form-tipo-nota">
-                                <input type="hidden" id="op_id">
-                                
-                                <div class="row g-3">
-                                    <div class="col-md-5">
-                                        <label class="form-label small fw-bold">Nome da Operação (Natureza da Operação - natOp)</label>
-                                        <input type="text" class="form-control text-primary fw-bold" id="op_nome" placeholder="Ex: ADMISSAO TEMPORARIA, OUTRAS ENTRADAS...">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold">CFOP Padrão</label>
-                                        <input type="text" class="form-control fw-bold" id="op_cfop" placeholder="Ex: 3930, 7930, 5914">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label small fw-bold">Tipo da NF (tpNF)</label>
-                                        <select class="form-select fw-bold" id="op_tp_nf">
-                                            <option value="0">0 - Entrada</option>
-                                            <option value="1">1 - Saída</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small fw-bold">Destino Operação (idDest)</label>
-                                        <select class="form-select fw-bold" id="op_id_dest">
-                                            <option value="1">1 - Interna (mesma UF)</option>
-                                            <option value="2">2 - Interestadual</option>
-                                            <option value="3" selected>3 - Com exterior</option>
-                                        </select>
-                                    </div>
-
-                                     <!-- ICMS -->
-                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">1. ICMS</h6></div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small">Origem da Mercadoria (orig)</label>
-                                        <select class="form-select form-select-sm" id="op_orig">
-                                            <option value="0">0 - Nacional</option>
-                                            <option value="1" selected>1 - Estrangeira - Importação direta</option>
-                                            <option value="2">2 - Estrangeira - Adquirida no mercado interno</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label small">CSOSN / CST ICMS</label>
-                                        <select class="form-select form-select-sm" id="op_csosn"></select>
-                                    </div>
-
-                                    <!-- IPI -->
-                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">2. IPI</h6></div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small">Código de Enquadramento (cEnq)</label>
-                                        <input type="text" class="form-control form-control-sm" id="op_c_enq" placeholder="Ex: 102, 999">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small">CST IPI</label>
-                                        <select class="form-select form-select-sm" id="op_cst_ipi"></select>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label small">Alíquota IPI (%)</label>
-                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_p_ipi" value="0.00">
-                                    </div>
-
-                                    <!-- II -->
-                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">3. Imposto de Importação (II)</h6></div>
-                                    <div class="col-md-12">
-                                        <label class="form-label small">Alíquota II Padrão (%)</label>
-                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_aliquota_ii" value="0.00">
-                                    </div>
-
-                                    <!-- PIS & COFINS -->
-                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">4. PIS & COFINS</h6></div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small">CST PIS</label>
-                                        <select class="form-select form-select-sm" id="op_cst_pis"></select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small">Alíquota PIS (%)</label>
-                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_p_pis" value="0.00">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small">CST COFINS</label>
-                                        <select class="form-select form-select-sm" id="op_cst_cofins"></select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label small">Alíquota COFINS (%)</label>
-                                        <input type="number" step="0.01" class="form-control form-control-sm" id="op_p_cofins" value="0.00">
-                                    </div>
-
-                                    <!-- INFORMACOES COMPLEMENTARES -->
-                                    <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">5. Observações Padronizadas da Operação</h6></div>
-                                    <div class="col-12">
-                                        <label class="form-label small">Texto Sugerido para Informações Complementares (infCpl)</label>
-                                        <textarea class="form-control form-control-sm" id="op_inf_cpl" rows="3" placeholder="Texto que será sugerido no rodapé da nota para esta operação..."></textarea>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ABA 2: ITENS DA NOTA (TABELA EM SEQUENCIA ESTILO GOOGLE SHEETS) -->
-        <div class="tab-pane fade" id="itens" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom flex-wrap gap-2">
-                <div>
-                    <h6 class="mb-0 fw-bold">Planilha de Itens da NF-e (det nItem)</h6>
-                    <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
-                </div>
-                <div class="d-flex align-items-center flex-wrap gap-1">
-                    <button type="button" class="btn btn-outline-danger btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade">
-                        <i data-lucide="trash-2"></i>
-                        <span>Excluir Item</span>
-                    </button>
-                    <button type="button" class="btn btn-outline-primary btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="duplicarItensSelecionados()" title="Duplicar item(ns) selecionado(s) na grade">
-                        <i data-lucide="copy"></i>
-                        <span>Duplicar Item</span>
-                    </button>
-                    <button class="btn btn-warning btn-sm fw-bold text-dark me-1 shadow-sm d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
-                        <i data-lucide="scale"></i>
-                        <span>Rateio &amp; PTAX</span>
-                    </button>
-                    <button class="btn btn-outline-info btn-sm me-1 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
-                        <i data-lucide="globe"></i>
-                        <span>Unidades Exportação (uTrib)</span>
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm me-1 d-flex align-items-center gap-1" onclick="recarregarTabelaItens()">
-                        <i data-lucide="refresh-cw"></i>
-                        <span>Redesenhar Grade</span>
-                    </button>
-                    <button class="btn btn-success btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="exportarExcel()">
-                        <i data-lucide="file-spreadsheet"></i>
-                        <span>Exportar Excel (.xlsx)</span>
-                    </button>
-                    <button class="btn btn-primary btn-sm fw-bold d-flex align-items-center gap-1" onclick="document.getElementById('importExcelInput').click()">
-                        <i data-lucide="upload"></i>
-                        <span>Importar Excel (.xlsx)</span>
-                    </button>
-                    <input type="file" id="importExcelInput" style="display:none" accept=".xlsx" onchange="importarExcel(this)">
-                </div>
-            </div>
-
-            <!-- Barra de Status Rápido de Câmbio PTAX & Despesas de Rateio Ativas -->
-            <div class="card border mb-2 p-2 px-3 bg-light d-flex flex-row justify-content-between align-items-center flex-wrap gap-2 shadow-sm" style="font-size: 12.5px;">
-                <div class="d-flex align-items-center flex-wrap gap-3">
-                    <div><span class="text-muted">Moeda:</span> <span id="lbl-bar-ptax-moeda" class="badge bg-secondary">USD</span></div>
-                    <div><span class="text-muted">Cotação PTAX:</span> <strong id="lbl-bar-ptax-taxa" class="text-primary font-monospace">R$ -</strong></div>
-                    <div class="border-start ps-3"><span class="text-muted">Marinha Mercante (AFRMM):</span> <span id="lbl-bar-rateio-afrmm" class="fw-bold font-monospace text-dark">R$ 0,00</span></div>
-                    <div><span class="text-muted">Taxa Siscomex:</span> <span id="lbl-bar-rateio-siscomex" class="fw-bold font-monospace text-dark">R$ 0,00</span></div>
-                    <div><span class="text-muted">Outras Desp. (vOutro):</span> <span id="lbl-bar-rateio-outro" class="fw-bold font-monospace text-dark">R$ 0,00</span></div>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-outline-info btn-sm py-0 px-2 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex">
-                        <i data-lucide="globe" style="width: 12px; height: 12px;"></i> uTrib Exportação
-                    </button>
-                    <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela">
-                        <i data-lucide="zap" style="width: 12px; height: 12px;"></i> Reaplicar Rateio
-                    </button>
-                </div>
-            </div>
-            
-            <div id="itens-table"></div>
-        </div>
-
-        <!-- ABA 3: RODAPE & TOTAIS -->
-        <div class="tab-pane fade" id="rodape" role="tabpanel">
-            <form id="form-rodape">
-                <!-- SEÇÃO 1: DADOS DO TRANSPORTE & CARGA -->
-                <div class="card border mb-3">
-                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                        <span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="truck" style="width: 16px; height: 16px;"></i> Dados do Transporte e Volumes</span>
-                        <small class="text-muted">Grupo &lt;transp&gt; SEFAZ</small>
-                    </div>
-                    <div class="card-body py-3">
-                        <div class="row g-2">
-                            <!-- Modalidade do Frete -->
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold">Modalidade do Frete (modFrete)</label>
-                                <select class="form-select form-select-sm" id="transp_modFrete">
-                                    <option value="0">0 - CIF (Por conta do Remetente)</option>
-                                    <option value="1">1 - FOB (Por conta do Destinatário)</option>
-                                    <option value="2">2 - Terceiros</option>
-                                    <option value="3">3 - Próprio Remetente</option>
-                                    <option value="4">4 - Próprio Destinatário</option>
-                                    <option value="9">9 - Sem Ocorrência de Transporte</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold">CNPJ / CPF Transportadora</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_CNPJ_CPF" class="form-control form-control-sm mask-cnpj-cpf" placeholder="00.000.000/0000-00" placeholder="00.000.000/0000-00">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small mb-1 fw-bold">Razão Social / Nome (xNome)</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_xNome" placeholder="Nome da transportadora">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1 fw-bold">Inscrição Estadual (IE)</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_IE">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold">CEP Transportadora</label>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control form-control-sm font-monospace" id="transp_CEP" placeholder="00000-000" onblur="buscarCepAuto(this.value, 'transp')">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="buscarCepAuto(document.getElementById('transp_CEP').value, 'transp')" title="Buscar CEP da transportadora"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label small mb-1">Endereço Completo (xEnder)</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_xEnder">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold">Município (xMun)</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_xMun">
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label small mb-1 fw-bold">UF</label>
-                                <input type="text" class="form-control form-control-sm text-uppercase font-monospace" id="transp_UF" maxlength="2">
-                            </div>
-                        </div>
-
-                        <hr class="my-3 text-muted">
-
-                        <!-- Dados dos Volumes e Pesos -->
-                        <div class="row g-2 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold text-primary">Qtd. Volumes (qVol)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_qVol" placeholder="Ex: 10">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold text-primary">Espécie de Volumes (esp)</label>
-                                <input type="text" class="form-control form-control-sm" id="transp_esp" placeholder="Ex: CAIXAS, PALETES, VOLUMES">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold text-primary">Peso Líquido Total (kg)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_pesoL" placeholder="0,000" onchange="formatarInputVisualBR(this, 3, 3); aoMudarPesoLiquidoTransporte();">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 fw-bold text-primary">Peso Bruto Total (kg)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="transp_pesoB" placeholder="0,000" onchange="formatarInputVisualBR(this, 3, 3)">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SEÇÃO 2: OBSERVAÇÕES E INFORMAÇÕES COMPLEMENTARES -->
-                <div class="card border mb-3">
-                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
-                        <span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Informações Complementares / Observações da Nota (infCpl)</span>
-                        <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2" onclick="aplicarObsDaOperacao()">
-                            <i data-lucide="file-edit" style="width: 13px; height: 13px;"></i> Puxar Observação Padrão do Tipo de Nota
-                        </button>
-                    </div>
-                    <div class="card-body py-2">
-                        <textarea class="form-control font-monospace form-control-sm" id="infCpl" rows="4" placeholder="Observações de interesse do contribuinte gravadas no XML..."></textarea>
-                    </div>
-                </div>
-
-                <!-- SEÇÃO 3: TOTAIS DA NOTA FISCAL (ICMSTOT) -->
-                <div class="card border">
-                    <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="calculator" style="width: 16px; height: 16px;"></i> Totais da Nota Fiscal (Grupo &lt;total&gt; / &lt;ICMSTot&gt;)</span>
-                            <small class="text-muted d-none d-md-inline">(Valores em R$)</small>
-                        </div>
-                        <button type="button" class="btn btn-primary btn-sm py-1 px-3 fw-bold shadow-sm" onclick="recalcularTotaisDosItens()">
-                            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Recalcular Totais da Nota
-                        </button>
-                    </div>
-                    <div class="card-body py-3">
-                        <!-- Linha de Destaques Comerciais -->
-                        <div class="row g-2 pb-3 mb-3 border-bottom">
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1 fw-bold">Total dos Produtos (vProd)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold" id="tot_vProd" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1">Total do Frete (vFrete)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vFrete" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1">Total do Seguro (vSeg)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vSeg" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1">Outras Despesas (vOutro)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vOutro" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1">Total Desconto (vDesc)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end text-danger" id="tot_vDesc" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label small mb-1 fw-bold text-success">Valor Total da NF (vNF)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end fw-bold text-success border-success" id="tot_vNF" oninput="setVal('vNF', this.value)" onchange="formatarInputVisualBR(this, 2, 2); setVal('vNF', this.value);">
-                                <input type="hidden" id="vNF">
-                            </div>
-                        </div>
-
-                        <!-- Linha de Impostos e Tributos -->
-                        <div class="row g-2">
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Base de Cálculo ICMS (vBC)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vBC" onchange="formatarInputVisualBR(this, 2, 2)">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Total ICMS (vICMS)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vICMS" onchange="formatarInputVisualBR(this, 2, 2)">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Base ICMS ST (vBCST)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vBCST" onchange="formatarInputVisualBR(this, 2, 2)">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Total ICMS ST (vST)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vST" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Total Imposto Importação (vII)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vII" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Total IPI (vIPI)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vIPI" oninput="calcularVNFAutomatico()" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Total PIS (vPIS)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vPIS" onchange="formatarInputVisualBR(this, 2, 2)">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small mb-1 text-muted">Total COFINS (vCOFINS)</label>
-                                <input type="text" class="form-control form-control-sm font-monospace text-end" id="tot_vCOFINS" onchange="formatarInputVisualBR(this, 2, 2)">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-
-    </div>
 </div>
-
+</div>
+</div>
+<!-- Outras Despesas Acessórias de Rateio (Colapsável) -->
+<div class="col-12 mt-1">
+<details class="border rounded p-2 bg-white">
+<summary class="small fw-bold text-muted d-flex align-items-center gap-1" style="cursor: pointer;">
+<i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i>
+<span>Outros Rateios (Frete, Seguro e Outras Despesas Globais)</span>
+</summary>
+<div class="row g-2 mt-2">
+<div class="col-sm-4">
+<label class="form-label small mb-1">Frete Total (vFrete)</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace">R$</span>
+<input class="form-control form-control-sm font-monospace text-end" id="rateio_vFrete" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+</div>
+</div>
+<div class="col-sm-4">
+<label class="form-label small mb-1">Seguro Total (vSeg)</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace">R$</span>
+<input class="form-control form-control-sm font-monospace text-end" id="rateio_vSeg" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+</div>
+</div>
+<div class="col-sm-4">
+<label class="form-label small mb-1">Outras Despesas (vOutro)</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace">R$</span>
+<input class="form-control form-control-sm font-monospace text-end" id="rateio_vOutro" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+</div>
+</div>
+</div>
+</details>
+</div>
+<!-- Critério de Rateio e Botão de Aplicação -->
+<div class="col-sm-6 mt-2">
+<label class="form-label small fw-bold mb-1">Critério de Proporcionalidade</label>
+<select class="form-select form-select-sm fw-bold border-secondary" id="rateio_criterio">
+<option selected="" value="vProd">Proporcional ao Valor dos Produtos (vProd)</option>
+<option value="qCom">Proporcional à Quantidade (qCom)</option>
+<option value="igual">Dividir Igualmente entre os Itens</option>
+</select>
+</div>
+<div class="col-sm-6 mt-2 d-flex align-items-end">
+<button class="btn btn-warning fw-bold text-dark w-100 btn-sm shadow-sm py-2" onclick="executarRateioGlobal()" type="button">
+<i data-lucide="zap" style="width: 14px; height: 14px;"></i> Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)
+                                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- EMITENTE -->
+<!-- DESTINATARIO -->
+</div>
+<div class="col-12 mt-3"><div class="card shadow-sm border mb-3"><div class="card-header bg-light py-2 fw-bold text-secondary"><i data-lucide="package"></i> Volumes e Pesos</div><div class="card-body py-2"><div class="row g-2"><div class="col-md-3">
+<label class="form-label small mb-1 fw-bold text-primary">Qtd. Volumes (qVol)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="transp_qVol" placeholder="Ex: 10" type="text"/>
+</div><div class="col-md-3">
+<label class="form-label small mb-1 fw-bold text-primary">Espécie de Volumes (esp)</label>
+<input class="form-control form-control-sm" id="transp_esp" placeholder="Ex: CAIXAS, PALETES, VOLUMES" type="text"/>
+</div><div class="col-md-3">
+<label class="form-label small mb-1 fw-bold text-primary">Peso Líquido Total (kg)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="transp_pesoL" onchange="formatarInputVisualBR(this, 3, 3); aoMudarPesoLiquidoTransporte();" placeholder="0,000" type="text"/>
+</div><div class="col-md-3">
+<label class="form-label small mb-1 fw-bold text-primary">Peso Bruto Total (kg)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="transp_pesoB" onchange="formatarInputVisualBR(this, 3, 3)" placeholder="0,000" type="text"/>
+</div></div></div></div></div><div class="card border mb-3 mt-3">
+<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+<span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Informações Complementares / Observações da Nota (infCpl)</span>
+<button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="aplicarObsDaOperacao()" type="button">
+<i data-lucide="file-edit" style="width: 13px; height: 13px;"></i> Puxar Observação Padrão do Tipo de Nota
+                        </button>
+</div>
+<div class="card-body py-2">
+<textarea class="form-control font-monospace form-control-sm" id="infCpl" placeholder="Observações de interesse do contribuinte gravadas no XML..." rows="4"></textarea>
+</div>
+</div></form>
+</div><div class="tab-pane fade" id="identificacao" role="tabpanel"><form id="form-identificacao"><div class="row mt-3"><div class="col-md-6 mt-3">
+<div class="card h-100 border mb-3">
+<div class="card-header bg-light py-2 d-flex align-items-center gap-2 fw-bold"><i data-lucide="building-2" style="width: 15px; height: 15px;"></i> Dados do Emitente</div>
+<div class="card-body py-2">
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold text-primary">Preencher Dados do Emitente a partir do Cadastro de Empresas</label><select class="form-select form-select-sm" id="select_emitente" onchange="preencherDadosDeCadastro(this, 'emit')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<!-- PAÍS DO EMITENTE -->
+<div class="col-md-7">
+<label class="form-label small mb-1 fw-bold">País do Emitente (Nome)</label>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm fw-bold" id="emit_xPais" list="datalist-paises" onchange="aoMudarPaisEmitente()" oninput="aoDigitarPaisEmitente()" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
+<button class="btn btn-outline-secondary" onclick="resetarPaisParaBrasil('emit')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+</div>
+</div>
+<div class="col-md-5">
+<label class="form-label small mb-1 fw-bold">Cód. BACEN (&lt;cPais&gt;)</label>
+<input class="form-control form-control-sm font-monospace fw-bold bg-light" id="emit_cPais" readonly="" type="text" value="1058"/>
+</div>
+<div class="col-md-8">
+<label class="form-label small mb-1">Razão Social (xNome)</label>
+<input class="form-control form-control-sm" id="emit_xNome" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small mb-1">CNPJ</label>
+<input class="form-control form-control-sm mask-cnpj-cpf" id="emit_CNPJ" oninput="calcularChaveAcessoDinamica()" placeholder="00.000.000/0000-00" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1">Inscrição Estadual (IE)</label>
+<input class="form-control form-control-sm" id="emit_IE" type="text"/>
+</div>
+<div class="col-md-9">
+<label class="form-label small mb-1">Logradouro (xLgr)</label>
+<input class="form-control form-control-sm" id="emit_xLgr" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1">Número (nro)</label>
+<input class="form-control form-control-sm" id="emit_nro" type="text"/>
+</div>
+<div class="col-md-5">
+<label class="form-label small mb-1">Bairro</label>
+<input class="form-control form-control-sm" id="emit_xBairro" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1">Cód. Mun. IBGE</label>
+<input class="form-control form-control-sm" id="emit_cMun" oninput="calcularChaveAcessoDinamica()" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small mb-1">Município (xMun)</label>
+<input class="form-control form-control-sm" id="emit_xMun" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small mb-1">UF</label>
+<input class="form-control form-control-sm" id="emit_UF" oninput="calcularChaveAcessoDinamica()" type="text"/>
+</div>
+<div class="col-md-8">
+<label class="form-label small mb-1 fw-bold">CEP (Busca Automática)</label>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm font-monospace" id="emit_CEP" onblur="buscarCepAuto(this.value, 'emit')" placeholder="00000-000" type="text"/>
+<button class="btn btn-outline-secondary" onclick="buscarCepAuto(document.getElementById('emit_CEP').value, 'emit')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="col-md-6 mt-3">
+<div class="card h-100 border mb-3">
+<div class="card-header bg-light py-2 d-flex align-items-center justify-content-between">
+<div class="d-flex align-items-center gap-2 fw-bold">
+<i data-lucide="user" style="width: 15px; height: 15px;"></i>
+<span>Dados do Destinatário</span>
+</div>
+<span class="badge bg-secondary font-monospace" id="lbl-status-pais-dest">Nacional (Brasil)</span>
+</div>
+<div class="card-body py-2">
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold text-primary">Preencher Dados do Destinatário a partir do Cadastro</label><select class="form-select form-select-sm" id="select_destinatario" onchange="preencherDadosDeCadastro(this, 'dest')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<!-- PAÍS DO DESTINATÁRIO -->
+<div class="col-md-7">
+<label class="form-label small mb-1 fw-bold">País do Destinatário (Nome)</label>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm fw-bold" id="dest_xPais" list="datalist-paises" onchange="aoMudarPaisDestinatario()" oninput="aoDigitarPaisDestinatario()" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
+<datalist id="datalist-paises"></datalist>
+<button class="btn btn-outline-secondary" onclick="resetarPaisParaBrasil()" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+</div>
+</div>
+<div class="col-md-5">
+<label class="form-label small mb-1 fw-bold">Cód. BACEN (&lt;cPais&gt;)</label>
+<input class="form-control form-control-sm font-monospace fw-bold bg-light" id="dest_cPais" readonly="" type="text" value="1058"/>
+</div>
+<div class="col-md-8">
+<label class="form-label small mb-1">Nome / Razão Social (xNome)</label>
+<input class="form-control form-control-sm" id="dest_xNome" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small mb-1">CNPJ / CPF / IdEstrangeiro</label>
+<input class="form-control form-control-sm mask-cnpj-cpf" id="dest_CNPJ_CPF" placeholder="00.000.000/0000-00" type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small mb-1">Tipo de Contribuinte (ICMS)</label>
+<select class="form-select form-select-sm" id="dest_indIEDest" onchange="atualizarEstadoInscricaoEstadual()">
+<option value="1">Contribuinte</option>
+<option value="2">Isento de Contribuição</option>
+<option selected="" value="9">Não Contribuinte</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small mb-1">Inscrição Estadual (IE)</label>
+<input class="form-control form-control-sm bg-light" disabled="" id="dest_IE" placeholder="Apenas p/ Contribuinte ICMS" type="text"/>
+</div>
+<div class="col-md-9">
+<label class="form-label small mb-1">Logradouro (xLgr)</label>
+<input class="form-control form-control-sm" id="dest_xLgr" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1">Número (nro)</label>
+<input class="form-control form-control-sm" id="dest_nro" type="text"/>
+</div>
+<div class="col-md-5">
+<label class="form-label small mb-1">Bairro</label>
+<input class="form-control form-control-sm" id="dest_xBairro" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1">Cód. Mun. IBGE</label>
+<input class="form-control form-control-sm font-monospace" id="dest_cMun" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small mb-1">Município (xMun)</label>
+<input class="form-control form-control-sm" id="dest_xMun" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small mb-1">UF</label>
+<input class="form-control form-control-sm text-uppercase font-monospace" id="dest_UF" maxlength="2" type="text"/>
+</div>
+<div class="col-md-8">
+<label class="form-label small mb-1 fw-bold">CEP (Busca Automática / 99999-999)</label>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm font-monospace" id="dest_CEP" onblur="buscarCepAuto(this.value, 'dest')" placeholder="00000-000 ou 99999-999" type="text"/>
+<button class="btn btn-outline-secondary" onclick="buscarCepAuto(document.getElementById('dest_CEP').value, 'dest')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></div><div class="row mt-3"><div class="col-12"><div class="card border mb-3">
+<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+<span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="truck" style="width: 16px; height: 16px;"></i> Dados do Transporte e Volumes</span>
+<small class="text-muted">Grupo &lt;transp&gt; SEFAZ</small>
+</div>
+<div class="card-body py-3">
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold text-primary">Preencher Dados da Transportadora a partir do Cadastro</label><select class="form-select form-select-sm" id="select_transportadora" onchange="preencherDadosDeCadastro(this, 'transp')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<!-- Modalidade do Frete -->
+<div class="col-md-3">
+<label class="form-label small mb-1 fw-bold">Modalidade do Frete (modFrete)</label>
+<select class="form-select form-select-sm" id="transp_modFrete">
+<option value="0">0 - CIF (Por conta do Remetente)</option>
+<option value="1">1 - FOB (Por conta do Destinatário)</option>
+<option value="2">2 - Terceiros</option>
+<option value="3">3 - Próprio Remetente</option>
+<option value="4">4 - Próprio Destinatário</option>
+<option value="9">9 - Sem Ocorrência de Transporte</option>
+</select>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 fw-bold">CNPJ / CPF Transportadora</label>
+<input class="form-control form-control-sm mask-cnpj-cpf" id="transp_CNPJ_CPF" placeholder="00.000.000/0000-00" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small mb-1 fw-bold">Razão Social / Nome (xNome)</label>
+<input class="form-control form-control-sm" id="transp_xNome" placeholder="Nome da transportadora" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small mb-1 fw-bold">Inscrição Estadual (IE)</label>
+<input class="form-control form-control-sm" id="transp_IE" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 fw-bold">CEP Transportadora</label>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm font-monospace" id="transp_CEP" onblur="buscarCepAuto(this.value, 'transp')" placeholder="00000-000" type="text"/>
+<button class="btn btn-outline-secondary" onclick="buscarCepAuto(document.getElementById('transp_CEP').value, 'transp')" title="Buscar CEP da transportadora" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+</div>
+</div>
+<div class="col-md-5">
+<label class="form-label small mb-1">Endereço Completo (xEnder)</label>
+<input class="form-control form-control-sm" id="transp_xEnder" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 fw-bold">Município (xMun)</label>
+<input class="form-control form-control-sm" id="transp_xMun" type="text"/>
+</div>
+<div class="col-md-1">
+<label class="form-label small mb-1 fw-bold">UF</label>
+<input class="form-control form-control-sm text-uppercase font-monospace" id="transp_UF" maxlength="2" type="text"/>
+</div>
+</div>
+<hr class="my-3 text-muted"/>
+<!-- Dados dos Volumes e Pesos -->
+<div class="row g-2 align-items-end">
+</div>
+</div>
+</div></div></div></form></div>
+<!-- ABA: CONFIGURACOES > TIPO DE NOTA (CONFIGURACAO DE TRIBUTOS PADRAO POR OPERACAO) -->
+<div class="tab-pane fade" id="tipo-nota" role="tabpanel">
+<div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+<div class="d-flex align-items-center gap-2">
+<span class="badge bg-secondary px-2 py-1 d-inline-flex align-items-center gap-1"><i data-lucide="settings" style="width: 12px; height: 12px;"></i> Configurações</span>
+<span class="text-muted">/</span>
+<h6 class="mb-0 fw-bold d-inline-flex align-items-center gap-1"><i data-lucide="tag" style="width: 15px; height: 15px;"></i> Tipo de Nota (Impostos &amp; Regras Padrão por Operação)</h6>
+</div>
+<small class="text-muted">Gerencie e padronize regras tributárias herdadas automaticamente pelos itens da NF-e.</small>
+</div>
+<div class="row g-3 mt-3">
+<div class="col-md-4">
+<div class="card h-100 border">
+<div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+<span>Operações Cadastradas</span>
+<button class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1" onclick="novaOperacao()"><i data-lucide="plus" style="width: 13px; height: 13px;"></i> Nova</button>
+</div>
+<div class="card-body p-2">
+<div class="list-group" id="lista-operacoes" style="max-height: 480px; overflow-y: auto;">
+<!-- Preenchido dinamicamente via JS -->
+</div>
+</div>
+</div>
+</div>
+<div class="col-md-8">
+<div class="card border">
+<div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+<span id="titulo-form-op">Configuração da Operação:<br/> <strong id="lbl-op-nome">Nova Operação</strong></span>
+<div>
+<button class="btn btn-sm btn-outline-primary me-2" onclick="capturarImpostosDoXmlAtual()">
+<i data-lucide="download" style="width: 13px; height: 13px;"></i> Puxar Impostos do XML Atual
+                                </button>
+<button class="btn btn-sm btn-danger me-2" id="btn-excluir-op" onclick="excluirOperacaoAtual()" style="display:none;">
+<i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Excluir
+                                </button>
+<button class="btn btn-sm btn-success fw-bold" onclick="salvarOperacao()">
+<i data-lucide="save" style="width: 13px; height: 13px;"></i> Salvar Configuração
+                                </button>
+</div>
+</div>
+<div class="card-body py-3">
+<form id="form-tipo-nota">
+<input id="op_id" type="hidden"/>
+<div class="row g-3">
+<div class="col-md-5">
+<label class="form-label small fw-bold">Nome da Operação (Natureza da Operação - natOp)</label>
+<input class="form-control text-primary fw-bold" id="op_nome" placeholder="Ex: ADMISSAO TEMPORARIA, OUTRAS ENTRADAS..." type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">CFOP Padrão</label>
+<input class="form-control fw-bold" id="op_cfop" placeholder="Ex: 3930, 7930, 5914" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">Tipo da NF (tpNF)</label>
+<select class="form-select fw-bold" id="op_tp_nf">
+<option value="0">0 - Entrada</option>
+<option value="1">1 - Saída</option>
+</select>
+</div>
+<div class="col-md-3">
+<label class="form-label small fw-bold">Destino Operação (idDest)</label>
+<select class="form-select fw-bold" id="op_id_dest">
+<option value="1">1 - Interna (mesma UF)</option>
+<option value="2">2 - Interestadual</option>
+<option selected="" value="3">3 - Com exterior</option>
+</select>
+</div>
+<!-- ICMS -->
+<div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">1. ICMS</h6></div>
+<div class="col-md-6">
+<label class="form-label small">Origem da Mercadoria (orig)</label>
+<select class="form-select form-select-sm" id="op_orig">
+<option value="0">0 - Nacional</option>
+<option selected="" value="1">1 - Estrangeira - Importação direta</option>
+<option value="2">2 - Estrangeira - Adquirida no mercado interno</option>
+</select>
+</div>
+<div class="col-md-6">
+<label class="form-label small">CSOSN / CST ICMS</label>
+<select class="form-select form-select-sm" id="op_csosn"></select>
+</div>
+<!-- IPI -->
+<div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">2. IPI</h6></div>
+<div class="col-md-4">
+<label class="form-label small">Código de Enquadramento (cEnq)</label>
+<input class="form-control form-control-sm" id="op_c_enq" placeholder="Ex: 102, 999" type="text"/>
+</div>
+<div class="col-md-4">
+<label class="form-label small">CST IPI</label>
+<select class="form-select form-select-sm" id="op_cst_ipi"></select>
+</div>
+<div class="col-md-4">
+<label class="form-label small">Alíquota IPI (%)</label>
+<input class="form-control form-control-sm" id="op_p_ipi" step="0.01" type="number" value="0.00"/>
+</div>
+<!-- II -->
+<div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">3. Imposto de Importação (II)</h6></div>
+<div class="col-md-12">
+<label class="form-label small">Alíquota II Padrão (%)</label>
+<input class="form-control form-control-sm" id="op_aliquota_ii" step="0.01" type="number" value="0.00"/>
+</div>
+<!-- PIS & COFINS -->
+<div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">4. PIS &amp; COFINS</h6></div>
+<div class="col-md-3">
+<label class="form-label small">CST PIS</label>
+<select class="form-select form-select-sm" id="op_cst_pis"></select>
+</div>
+<div class="col-md-3">
+<label class="form-label small">Alíquota PIS (%)</label>
+<input class="form-control form-control-sm" id="op_p_pis" step="0.01" type="number" value="0.00"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small">CST COFINS</label>
+<select class="form-select form-select-sm" id="op_cst_cofins"></select>
+</div>
+<div class="col-md-3">
+<label class="form-label small">Alíquota COFINS (%)</label>
+<input class="form-control form-control-sm" id="op_p_cofins" step="0.01" type="number" value="0.00"/>
+</div>
+<!-- INFORMACOES COMPLEMENTARES -->
+<div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">5. Observações Padronizadas da Operação</h6></div>
+<div class="col-12">
+<label class="form-label small">Texto Sugerido para Informações Complementares (infCpl)</label>
+<textarea class="form-control form-control-sm" id="op_inf_cpl" placeholder="Texto que será sugerido no rodapé da nota para esta operação..." rows="3"></textarea>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ABA 2: ITENS DA NOTA (TABELA EM SEQUENCIA ESTILO GOOGLE SHEETS) -->
+<div class="tab-pane fade" id="itens" role="tabpanel">
+<div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom flex-wrap gap-2">
+<div>
+<h6 class="mb-0 fw-bold">Planilha de Itens da NF-e (det nItem)</h6>
+<small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
+</div>
+<div class="d-flex align-items-center flex-wrap gap-1">
+<button class="btn btn-outline-danger btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
+<i data-lucide="trash-2"></i>
+<span>Excluir Item</span>
+</button>
+<button class="btn btn-outline-primary btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="duplicarItensSelecionados()" title="Duplicar item(ns) selecionado(s) na grade" type="button">
+<i data-lucide="copy"></i>
+<span>Duplicar Item</span>
+</button>
+<button class="btn btn-warning btn-sm fw-bold text-dark me-1 shadow-sm d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
+<i data-lucide="scale"></i>
+<span>Rateio &amp; PTAX</span>
+</button>
+<button class="btn btn-outline-info btn-sm me-1 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
+<i data-lucide="globe"></i>
+<span>Unidades Exportação (uTrib)</span>
+</button>
+<button class="btn btn-outline-secondary btn-sm me-1 d-flex align-items-center gap-1" onclick="recarregarTabelaItens()">
+<i data-lucide="refresh-cw"></i>
+<span>Redesenhar Grade</span>
+</button>
+<button class="btn btn-success btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="exportarExcel()">
+<i data-lucide="file-spreadsheet"></i>
+<span>Exportar Excel (.xlsx)</span>
+</button>
+<button class="btn btn-primary btn-sm fw-bold d-flex align-items-center gap-1" onclick="document.getElementById('importExcelInput').click()">
+<i data-lucide="upload"></i>
+<span>Importar Excel (.xlsx)</span>
+</button>
+<input accept=".xlsx" id="importExcelInput" onchange="importarExcel(this)" style="display:none" type="file"/>
+</div>
+</div>
+<!-- Barra de Status Rápido de Câmbio PTAX & Despesas de Rateio Ativas -->
+<div class="card border mb-2 p-2 px-3 bg-light d-flex flex-row justify-content-between align-items-center flex-wrap gap-2 shadow-sm mt-3" style="font-size: 12.5px;">
+<div class="d-flex align-items-center flex-wrap gap-3">
+<div><span class="text-muted">Moeda:</span> <span class="badge bg-secondary" id="lbl-bar-ptax-moeda">USD</span></div>
+<div><span class="text-muted">Cotação PTAX:</span> <strong class="text-primary font-monospace" id="lbl-bar-ptax-taxa">R$ -</strong></div>
+<div class="border-start ps-3"><span class="text-muted">Marinha Mercante (AFRMM):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-afrmm">R$ 0,00</span></div>
+<div><span class="text-muted">Taxa Siscomex:</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-siscomex">R$ 0,00</span></div>
+<div><span class="text-muted">Outras Desp. (vOutro):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-outro">R$ 0,00</span></div>
+</div>
+<div class="d-flex align-items-center gap-2">
+<button class="btn btn-outline-info btn-sm py-0 px-2 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex" type="button">
+<i data-lucide="globe" style="width: 12px; height: 12px;"></i> uTrib Exportação
+                    </button>
+<button class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela" type="button">
+<i data-lucide="zap" style="width: 12px; height: 12px;"></i> Reaplicar Rateio
+                    </button>
+</div>
+</div>
+<div id="itens-table"></div>
+<div class="card border mt-4 mb-3">
+<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+<div class="d-flex align-items-center gap-2">
+<span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="calculator" style="width: 16px; height: 16px;"></i> Totais da Nota Fiscal (Grupo &lt;total&gt; / &lt;ICMSTot&gt;)</span>
+<small class="text-muted d-none d-md-inline">(Valores em R$)</small>
+</div>
+<button class="btn btn-primary btn-sm py-1 px-3 fw-bold shadow-sm" onclick="recalcularTotaisDosItens()" type="button">
+<i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Recalcular Totais da Nota
+                        </button>
+</div>
+<div class="card-body py-3">
+<!-- Linha de Destaques Comerciais -->
+<div class="row g-2 pb-3 mb-3 border-bottom">
+<div class="col-md-2">
+<label class="form-label small mb-1 fw-bold">Total dos Produtos (vProd)</label>
+<input class="form-control form-control-sm font-monospace text-end fw-bold" id="tot_vProd" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small mb-1">Total do Frete (vFrete)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vFrete" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small mb-1">Total do Seguro (vSeg)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vSeg" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small mb-1">Outras Despesas (vOutro)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vOutro" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small mb-1">Total Desconto (vDesc)</label>
+<input class="form-control form-control-sm font-monospace text-end text-danger" id="tot_vDesc" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-2">
+<label class="form-label small mb-1 fw-bold text-success">Valor Total da NF (vNF)</label>
+<input class="form-control form-control-sm font-monospace text-end fw-bold text-success border-success" id="tot_vNF" onchange="formatarInputVisualBR(this, 2, 2); setVal('vNF', this.value);" oninput="setVal('vNF', this.value)" type="text"/>
+<input id="vNF" type="hidden"/>
+</div>
+</div>
+<!-- Linha de Impostos e Tributos -->
+<div class="row g-2">
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Base de Cálculo ICMS (vBC)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vBC" onchange="formatarInputVisualBR(this, 2, 2)" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Total ICMS (vICMS)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vICMS" onchange="formatarInputVisualBR(this, 2, 2)" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Base ICMS ST (vBCST)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vBCST" onchange="formatarInputVisualBR(this, 2, 2)" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Total ICMS ST (vST)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vST" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Total Imposto Importação (vII)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vII" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Total IPI (vIPI)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vIPI" onchange="formatarInputVisualBR(this, 2, 2); calcularVNFAutomatico();" oninput="calcularVNFAutomatico()" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Total PIS (vPIS)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vPIS" onchange="formatarInputVisualBR(this, 2, 2)" type="text"/>
+</div>
+<div class="col-md-3">
+<label class="form-label small mb-1 text-muted">Total COFINS (vCOFINS)</label>
+<input class="form-control form-control-sm font-monospace text-end" id="tot_vCOFINS" onchange="formatarInputVisualBR(this, 2, 2)" type="text"/>
+</div>
+</div>
+</div>
+</div></div>
+<!-- ABA 3: RODAPE & TOTAIS -->
+</div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     let itensTable = null;
@@ -4087,167 +4013,161 @@
         }
     });
 </script>
-
 <!-- MODAL: Salvar Rascunho -->
-<div class="modal fade" id="modalSalvarRascunho" tabindex="-1" aria-labelledby="modalSalvarRascunhoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header border-bottom">
-                <h5 class="modal-title d-flex align-items-center gap-2" id="modalSalvarRascunhoLabel">
-                    <i data-lucide="bookmark-plus" style="width: 20px; height: 20px;"></i>
-                    <span>Salvar Rascunho da NF-e (DI / DUIMP)</span>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-muted small text-uppercase">Referência Interna</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-body-tertiary"><i data-lucide="tag" style="width: 16px; height: 16px;"></i></span>
-                        <input type="text" id="rascunho_ref_input" class="form-control" placeholder="Ex: REF-2026-001, DI 26/1234567-8...">
-                    </div>
-                    <div class="form-text">Esta referência permite identificar rapidamente seu trabalho em andamento.</div>
-                </div>
-                
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-muted small text-uppercase">Categoria do Rascunho</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 16px; height: 16px;"></i></span>
-                        <select id="rascunho_cat_select" class="form-select" onchange="verificarCategoriaOutra(this)">
-                            <option value="Importação" selected>Importação</option>
-                            <option value="Geral">Geral</option>
-                            <option value="Exportação">Exportação</option>
-                            <option value="Remessa">Remessa</option>
-                            <option value="Devolução">Devolução</option>
-                            <option value="Venda">Venda</option>
-                            <option value="__nova__">+ Nova Categoria...</option>
-                        </select>
-                    </div>
-                    <input type="text" id="rascunho_cat_custom" class="form-control mt-2 d-none" placeholder="Digite o nome da nova categoria...">
-                </div>
-
-                <div class="card bg-body-tertiary border-0 p-3 mb-2 rounded-3">
-                    <div class="row g-2 small">
-                        <div class="col-6">
-                            <span class="text-muted d-block">Origem:</span>
-                            <span class="badge badge-origem-di"><i data-lucide="globe" style="width: 12px; height: 12px; vertical-align: -1px;"></i> XML da DI ou DUIMP</span>
-                        </div>
-                        <div class="col-6">
-                            <span class="text-muted d-block">Tipo de Operação:</span>
-                            <span class="fw-semibold text-truncate d-block" id="rascunho_modal_op_preview">-</span>
-                        </div>
-                        <div class="col-6 mt-2">
-                            <span class="text-muted d-block">Qtd. Itens:</span>
-                            <span class="fw-bold fs-6 font-monospace" id="rascunho_modal_itens_preview">0</span>
-                        </div>
-                        <div class="col-6 mt-2">
-                            <span class="text-muted d-block">Valor Total Estimado:</span>
-                            <span class="fw-bold fs-6 text-success" id="rascunho_modal_valor_preview">R$ 0,00</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="small text-muted text-center mt-2">
-                    <i data-lucide="shield-check" style="width: 14px; height: 14px; vertical-align: -2px;"></i> O rascunho é gravado em arquivo isolado seguro e indexado no banco de dados.
-                </div>
-            </div>
-            <div class="modal-footer border-top bg-body-tertiary">
-                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2" onclick="confirmarSalvarRascunho()">
-                    <i data-lucide="save" style="width: 16px; height: 16px;"></i>
-                    <span>Gravar Rascunho</span>
-                </button>
-            </div>
-        </div>
-    </div>
+<div aria-hidden="true" aria-labelledby="modalSalvarRascunhoLabel" class="modal fade" id="modalSalvarRascunho" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content shadow-lg border-0">
+<div class="modal-header border-bottom">
+<h5 class="modal-title d-flex align-items-center gap-2" id="modalSalvarRascunhoLabel">
+<i data-lucide="bookmark-plus" style="width: 20px; height: 20px;"></i>
+<span>Salvar Rascunho da NF-e (DI / DUIMP)</span>
+</h5>
+<button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
 </div>
-
+<div class="modal-body p-4">
+<div class="mb-3">
+<label class="form-label fw-bold text-muted small text-uppercase">Referência Interna</label>
+<div class="input-group">
+<span class="input-group-text bg-body-tertiary"><i data-lucide="tag" style="width: 16px; height: 16px;"></i></span>
+<input class="form-control" id="rascunho_ref_input" placeholder="Ex: REF-2026-001, DI 26/1234567-8..." type="text"/>
+</div>
+<div class="form-text">Esta referência permite identificar rapidamente seu trabalho em andamento.</div>
+</div>
+<div class="mb-3">
+<label class="form-label fw-bold text-muted small text-uppercase">Categoria do Rascunho</label>
+<div class="input-group">
+<span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 16px; height: 16px;"></i></span>
+<select class="form-select" id="rascunho_cat_select" onchange="verificarCategoriaOutra(this)">
+<option selected="" value="Importação">Importação</option>
+<option value="Geral">Geral</option>
+<option value="Exportação">Exportação</option>
+<option value="Remessa">Remessa</option>
+<option value="Devolução">Devolução</option>
+<option value="Venda">Venda</option>
+<option value="__nova__">+ Nova Categoria...</option>
+</select>
+</div>
+<input class="form-control mt-2 d-none" id="rascunho_cat_custom" placeholder="Digite o nome da nova categoria..." type="text"/>
+</div>
+<div class="card bg-body-tertiary border-0 p-3 mb-2 rounded-3">
+<div class="row g-2 small">
+<div class="col-6">
+<span class="text-muted d-block">Origem:</span>
+<span class="badge badge-origem-di"><i data-lucide="globe" style="width: 12px; height: 12px; vertical-align: -1px;"></i> XML da DI ou DUIMP</span>
+</div>
+<div class="col-6">
+<span class="text-muted d-block">Tipo de Operação:</span>
+<span class="fw-semibold text-truncate d-block" id="rascunho_modal_op_preview">-</span>
+</div>
+<div class="col-6 mt-2">
+<span class="text-muted d-block">Qtd. Itens:</span>
+<span class="fw-bold fs-6 font-monospace" id="rascunho_modal_itens_preview">0</span>
+</div>
+<div class="col-6 mt-2">
+<span class="text-muted d-block">Valor Total Estimado:</span>
+<span class="fw-bold fs-6 text-success" id="rascunho_modal_valor_preview">R$ 0,00</span>
+</div>
+</div>
+</div>
+<div class="small text-muted text-center mt-2">
+<i data-lucide="shield-check" style="width: 14px; height: 14px; vertical-align: -2px;"></i> O rascunho é gravado em arquivo isolado seguro e indexado no banco de dados.
+                </div>
+</div>
+<div class="modal-footer border-top bg-body-tertiary">
+<button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
+<button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2" onclick="confirmarSalvarRascunho()" type="button">
+<i data-lucide="save" style="width: 16px; height: 16px;"></i>
+<span>Gravar Rascunho</span>
+</button>
+</div>
+</div>
+</div>
+</div>
 <!-- MODAL: Listagem de Rascunhos Salvos -->
-<div class="modal fade" id="modalListaRascunhos" tabindex="-1" aria-labelledby="modalListaRascunhosLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header border-bottom">
-                <div>
-                    <h5 class="modal-title d-flex align-items-center gap-2 mb-0" id="modalListaRascunhosLabel">
-                        <i data-lucide="folder-clock" style="width: 20px; height: 20px;"></i>
-                        <span>Rascunhos Salvos</span>
-                        <span class="badge bg-secondary-subtle text-muted" id="badge-total-rascunhos-modal">0</span>
-                    </h5>
-                    <p class="text-muted small mb-0 mt-1">Gerencie seus rascunhos de notas fiscais gerados no XML Rascunho e no XML DI/DUIMP.</p>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-            </div>
-            <div class="modal-body p-3">
-                <!-- Filtros e Barra de Pesquisa -->
-                <div class="row g-2 mb-3">
-                    <div class="col-md-5">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-body-tertiary"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-                            <input type="text" id="filtro_busca_rascunho" class="form-control" placeholder="Buscar por referência, arquivo ou chave..." oninput="filtrarTabelaRascunhos()">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-body-tertiary"><i data-lucide="layers" style="width: 14px; height: 14px;"></i></span>
-                            <select id="filtro_origem_rascunho" class="form-select" onchange="carregarListaRascunhos()">
-                                <option value="">Todas as Origens</option>
-                                <option value="XML da DI ou DUIMP">XML da DI ou DUIMP</option>
-                                <option value="XML Rascunho">XML Rascunho</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 14px; height: 14px;"></i></span>
-                            <select id="filtro_cat_rascunho" class="form-select" onchange="carregarListaRascunhos()">
-                                <option value="">Todas as Categorias</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-1 d-flex">
-                        <button type="button" class="btn btn-sm btn-outline-secondary w-100" onclick="carregarListaRascunhos()" title="Atualizar Lista">
-                            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Tabela de Rascunhos -->
-                <div class="table-responsive border rounded-3" style="max-height: 480px;">
-                    <table class="table table-sm table-hover align-middle mb-0 small">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th style="width: 20%;">Referência Interna</th>
-                                <th style="width: 10%;">Categoria</th>
-                                <th style="width: 12%;">Origem</th>
-                                <th style="width: 17%;">Tipo de Operação</th>
-                                <th style="width: 6%;" class="text-center" title="Quantidade de Itens">Qtd.</th>
-                                <th style="width: 12%;" class="text-end">Valor Total</th>
-                                <th style="width: 14%;">Última Atualização</th>
-                                <th style="width: 9%;" class="text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-lista-rascunhos">
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">Carregando rascunhos...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer border-top bg-body-tertiary d-flex justify-content-between">
-                <div class="small text-muted" id="info-rodape-rascunhos">
+<div aria-hidden="true" aria-labelledby="modalListaRascunhosLabel" class="modal fade" id="modalListaRascunhos" tabindex="-1">
+<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-content shadow-lg border-0">
+<div class="modal-header border-bottom">
+<div>
+<h5 class="modal-title d-flex align-items-center gap-2 mb-0" id="modalListaRascunhosLabel">
+<i data-lucide="folder-clock" style="width: 20px; height: 20px;"></i>
+<span>Rascunhos Salvos</span>
+<span class="badge bg-secondary-subtle text-muted" id="badge-total-rascunhos-modal">0</span>
+</h5>
+<p class="text-muted small mb-0 mt-1">Gerencie seus rascunhos de notas fiscais gerados no XML Rascunho e no XML DI/DUIMP.</p>
+</div>
+<button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body p-3">
+<!-- Filtros e Barra de Pesquisa -->
+<div class="row g-2 mb-3">
+<div class="col-md-5">
+<div class="input-group input-group-sm">
+<span class="input-group-text bg-body-tertiary"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+<input class="form-control" id="filtro_busca_rascunho" oninput="filtrarTabelaRascunhos()" placeholder="Buscar por referência, arquivo ou chave..." type="text"/>
+</div>
+</div>
+<div class="col-md-3">
+<div class="input-group input-group-sm">
+<span class="input-group-text bg-body-tertiary"><i data-lucide="layers" style="width: 14px; height: 14px;"></i></span>
+<select class="form-select" id="filtro_origem_rascunho" onchange="carregarListaRascunhos()">
+<option value="">Todas as Origens</option>
+<option value="XML da DI ou DUIMP">XML da DI ou DUIMP</option>
+<option value="XML Rascunho">XML Rascunho</option>
+</select>
+</div>
+</div>
+<div class="col-md-3">
+<div class="input-group input-group-sm">
+<span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 14px; height: 14px;"></i></span>
+<select class="form-select" id="filtro_cat_rascunho" onchange="carregarListaRascunhos()">
+<option value="">Todas as Categorias</option>
+</select>
+</div>
+</div>
+<div class="col-md-1 d-flex">
+<button class="btn btn-sm btn-outline-secondary w-100" onclick="carregarListaRascunhos()" title="Atualizar Lista" type="button">
+<i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+</button>
+</div>
+</div>
+<!-- Tabela de Rascunhos -->
+<div class="table-responsive border rounded-3" style="max-height: 480px;">
+<table class="table table-sm table-hover align-middle mb-0 small">
+<thead class="table-light sticky-top">
+<tr>
+<th style="width: 20%;">Referência Interna</th>
+<th style="width: 10%;">Categoria</th>
+<th style="width: 12%;">Origem</th>
+<th style="width: 17%;">Tipo de Operação</th>
+<th class="text-center" style="width: 6%;" title="Quantidade de Itens">Qtd.</th>
+<th class="text-end" style="width: 12%;">Valor Total</th>
+<th style="width: 14%;">Última Atualização</th>
+<th class="text-center" style="width: 9%;">Ações</th>
+</tr>
+</thead>
+<tbody id="tbody-lista-rascunhos">
+<tr>
+<td class="text-center text-muted py-4" colspan="8">Carregando rascunhos...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="modal-footer border-top bg-body-tertiary d-flex justify-content-between">
+<div class="small text-muted" id="info-rodape-rascunhos">
                     Carregando registros...
                 </div>
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Fechar</button>
-            </div>
-        </div>
-    </div>
+<button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" type="button">Fechar</button>
 </div>
-        </div><!-- /container-fluid -->
-    </div><!-- /nft-main-wrapper -->
-
-    <script src="/static/js/nft-sidebar.js"></script>
-    <script src="/static/js/nft-autosave.js"></script>
-    <script>
+</div>
+</div>
+</div>
+</div><!-- /container-fluid -->
+<!-- /nft-main-wrapper -->
+<script src="/static/js/nft-sidebar.js"></script>
+<script src="/static/js/nft-autosave.js"></script>
+<script>
         document.addEventListener('input', function (e) {
             if (e.target.classList.contains('mask-cnpj-cpf')) {
                 let v = e.target.value.replace(/\D/g, '');
@@ -4277,6 +4197,95 @@
                 e.target.value = v;
             }
         });
+    </script>
+<script>
+        // CARREGAR EMPRESAS PARA OS SELECTS DA ABA IDENTIFICAÇÃO
+        let cadastrosDisponiveis = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/empresas')
+                .then(r => r.json())
+                .then(data => {
+                    cadastrosDisponiveis = data;
+                    preencherOpcoesSelect('select_emitente', 'Emitente');
+                    preencherOpcoesSelect('select_destinatario', 'Cliente');
+                    preencherOpcoesSelect('select_transportadora', 'Transportadora');
+                })
+                .catch(err => console.error('Erro ao carregar empresas:', err));
+        });
+
+        function preencherOpcoesSelect(selectId, tipoAlvo) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            
+            // Limpar exceto o primeiro
+            while(sel.options.length > 1) {
+                sel.remove(1);
+            }
+
+            cadastrosDisponiveis.forEach(emp => {
+                // Filtra pelo tipo, mas pode permitir flexibilidade
+                if(emp.tipo === tipoAlvo || emp.tipo === 'Armazem' || emp.tipo === 'Local de Desembaraço' || tipoAlvo === 'Cliente') {
+                    const opt = document.createElement('option');
+                    opt.value = emp.id;
+                    const apelido = emp.apelido ? ` (${emp.apelido})` : '';
+                    opt.text = `${emp.nome}${apelido} - ${emp.cnpj_cpf}`;
+                    sel.appendChild(opt);
+                }
+            });
+        }
+
+        function preencherDadosDeCadastro(selectElem, prefix) {
+            const id = selectElem.value;
+            if(!id) return; // Não faz nada se voltar pro "Selecione..."
+
+            const emp = cadastrosDisponiveis.find(e => e.id == id);
+            if(!emp) return;
+
+            if(prefix === 'emit') {
+                document.getElementById('emit_xNome').value = emp.nome || '';
+                document.getElementById('emit_CNPJ').value = emp.cnpj_cpf || '';
+                document.getElementById('emit_IE').value = emp.ie || '';
+                document.getElementById('emit_xLgr').value = emp.logradouro || '';
+                document.getElementById('emit_nro').value = emp.numero || '';
+                document.getElementById('emit_xBairro').value = emp.bairro || '';
+                document.getElementById('emit_cMun').value = emp.cmun || '';
+                document.getElementById('emit_xMun').value = emp.municipio || '';
+                document.getElementById('emit_UF').value = emp.uf || '';
+                document.getElementById('emit_CEP').value = emp.cep || '';
+                document.getElementById('emit_xPais').value = emp.xpais || 'Brasil';
+                document.getElementById('emit_cPais').value = emp.cpais || '1058';
+                if(window.calcularChaveAcessoDinamica) calcularChaveAcessoDinamica();
+            }
+            else if(prefix === 'dest') {
+                document.getElementById('dest_xNome').value = emp.nome || '';
+                document.getElementById('dest_CNPJ_CPF').value = emp.cnpj_cpf || '';
+                document.getElementById('dest_IE').value = emp.ie || '';
+                document.getElementById('dest_xLgr').value = emp.logradouro || '';
+                document.getElementById('dest_nro').value = emp.numero || '';
+                document.getElementById('dest_xBairro').value = emp.bairro || '';
+                document.getElementById('dest_cMun').value = emp.cmun || '';
+                document.getElementById('dest_xMun').value = emp.municipio || '';
+                document.getElementById('dest_UF').value = emp.uf || '';
+                document.getElementById('dest_CEP').value = emp.cep || '';
+                document.getElementById('dest_xPais').value = emp.xpais || 'Brasil';
+                document.getElementById('dest_cPais').value = emp.cpais || '1058';
+                
+                const indIE = document.getElementById('dest_indIEDest');
+                if(indIE) {
+                    indIE.value = emp.ind_ie || '9';
+                    if(window.atualizarEstadoInscricaoEstadual) atualizarEstadoInscricaoEstadual();
+                }
+            }
+            else if(prefix === 'transp') {
+                document.getElementById('transp_xNome').value = emp.nome || '';
+                document.getElementById('transp_CNPJ_CPF').value = emp.cnpj_cpf || '';
+                document.getElementById('transp_IE').value = emp.ie || '';
+                document.getElementById('transp_xEnder').value = emp.logradouro ? `${emp.logradouro}, ${emp.numero}` : '';
+                document.getElementById('transp_xMun').value = emp.municipio || '';
+                document.getElementById('transp_UF').value = emp.uf || '';
+            }
+        }
     </script>
 </body>
 </html>

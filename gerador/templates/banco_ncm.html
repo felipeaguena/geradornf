@@ -1,281 +1,273 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grande Tabela NCM - Banco de Dados Unificado (NFT Logistics)</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- NFT Logistics Theme (Light & Dark) -->
-    <link rel="stylesheet" href="/static/css/nft-theme.css">
-    <link rel="stylesheet" href="/static/css/nft-sidebar.css">
-    <script src="/static/js/theme.js"></script>
-    <!-- Lucide Icons (Minimalist Line SVGs) -->
-    <script src="/static/js/lucide.min.js"></script>
-    <script src="/static/js/nft-dialogs.js"></script>
+    <!-- Favicon -->
+    <link href="/static/img/brand/nftlogo.webp" rel="icon" type="image/webp"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Grande Tabela NCM - Banco de Dados Unificado (NFT Logistics)</title>
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- NFT Logistics Theme (Light & Dark) -->
+<link href="/static/css/nft-theme.css" rel="stylesheet"/>
+<link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
+<script src="/static/js/theme.js"></script>
+<!-- Lucide Icons (Minimalist Line SVGs) -->
+<script src="/static/js/lucide.min.js"></script>
+<script src="/static/js/nft-dialogs.js"></script>
 </head>
 <body class="has-sidebar">
-
-    <!-- MENU LATERAL FIXO (SIDEBAR) -->
-    <aside class="nft-sidebar" id="nftSidebar">
-        <!-- 1. Cabeçalho da Sidebar -->
-        <div class="nft-sidebar-header">
-            <a href="/" class="sidebar-brand-link" title="NFT Logistics - Retornar ao Início">
-                <div class="sidebar-brand-logo-wrap">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_black.svg" alt="NFT" class="logo-theme-black">
-                    <img src="/static/img/brand/nft_logo_vetor_icone_white.svg" alt="NFT" class="logo-theme-white">
-                </div>
-                <div class="sidebar-brand-info">
-                    <span class="sidebar-brand-title">NFT Logistics</span>
-                    <span class="sidebar-brand-badge">Tabela NCM</span>
-                </div>
-            </a>
-            <button type="button" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" aria-label="Recolher / Fixar Menu">
-                <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
-            </button>
-        </div>
-
-        <!-- 2. Corpo com Menus e Itens -->
-        <div class="nft-sidebar-body">
-            
-            <!-- Grupo: Módulos -->
-            <div class="sidebar-section-title">Módulos</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/" class="nft-sidebar-btn" title="Portal Inicial">
-                        <span class="sidebar-icon"><i data-lucide="home"></i></span>
-                        <span class="sidebar-label">Início / Módulos</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/rascunho" class="nft-sidebar-btn" title="Módulo XML Rascunho">
-                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
-                        <span class="sidebar-label">XML Rascunho</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/di_duimp" class="nft-sidebar-btn" title="Módulo XML da DI ou DUIMP">
-                        <span class="sidebar-icon"><i data-lucide="globe"></i></span>
-                        <span class="sidebar-label">XML da DI ou DUIMP</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/rascunho?abrir_rascunhos=1" class="nft-sidebar-btn" title="Ver e gerenciar Rascunhos Salvos">
-                        <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
-                        <span class="sidebar-label">Rascunhos Salvos</span>
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Grupo: Configurações -->
-            <div class="sidebar-section-title">Configurações</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/empresas" class="nft-sidebar-btn" title="Gestão de Empresas e Cadastros">
-                        <span class="sidebar-icon"><i data-lucide="building-2"></i></span>
-                        <span class="sidebar-label">Empresas</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/banco_ncm" class="nft-sidebar-btn active" title="Grande Tabela NCM &amp; Impostos">
-                        <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
-                        <span class="sidebar-label">Tabela NCM</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/localidades" class="nft-sidebar-btn" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
-                        <span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
-                        <span class="sidebar-label">Localidades</span>
-                    </a>
-                </li>
-            </ul>
-
-            <!-- Grupo: Exportações da Tabela -->
-            <div class="sidebar-section-title">Exportações</div>
-            <ul class="nft-sidebar-nav">
-                <li class="nft-sidebar-item">
-                    <a href="/download_ncm_excel" class="nft-sidebar-btn" title="Baixar Planilha Excel Oficial">
-                        <span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
-                        <span class="sidebar-label">Baixar Excel (.xlsx)</span>
-                    </a>
-                </li>
-                <li class="nft-sidebar-item">
-                    <a href="/download_ncm_json" class="nft-sidebar-btn" title="Baixar Dados em JSON">
-                        <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
-                        <span class="sidebar-label">Baixar JSON</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- 3. Rodapé da Sidebar -->
-        <div class="nft-sidebar-footer">
-            <button type="button" class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro">
-                <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
-                <span class="sidebar-footer-text">Alternar Tema</span>
-            </button>
-            <div class="sidebar-footer-info">
-                <span>NFT Logistics</span>
-                <span>v2.1</span>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
-    <div class="nft-main-wrapper">
-        <div class="container-fluid px-4 py-3">
-            <!-- Top Header Limpo -->
-            <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
-                <div class="d-flex align-items-center gap-3">
-                    <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu">
-                        <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
-                    </button>
-                    <div>
-                        <h4 class="mb-0 fw-bold">Grande Tabela NCM &amp; Impostos</h4>
-                        <small class="text-muted">15.156 registros unificados com Unidades Tributáveis (uTrib) e Alíquotas Oficiais de Importação (II, IPI, PIS, COFINS)</small>
-                    </div>
-                </div>
-            </div>
-
-    <!-- Cards de Estatisticas -->
-    <div class="row g-3 mb-3">
-        <div class="col-md-3">
-            <div class="card shadow-sm border card-stat py-2 px-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-muted fw-bold">TOTAL DE REGISTROS NCM</small>
-                        <h4 class="mb-0 fw-bold" id="stat-total">15.156</h4>
-                    </div>
-                    <i data-lucide="book-open" class="text-muted" style="width: 32px; height: 32px;"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border card-stat py-2 px-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-muted fw-bold">uTRIB EXPORTAÇÃO</small>
-                        <h4 class="mb-0 fw-bold">10.515</h4>
-                        <small class="text-muted">100% dos 8 dígitos</small>
-                    </div>
-                    <i data-lucide="tag" class="text-muted" style="width: 32px; height: 32px;"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border card-stat py-2 px-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-muted fw-bold">ALÍQUOTAS II & IPI</small>
-                        <h4 class="mb-0 fw-bold">100% Mapeadas</h4>
-                        <small class="text-muted">Camex TEC + Receita TIPI</small>
-                    </div>
-                    <i data-lucide="scale" class="text-muted" style="width: 32px; height: 32px;"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border card-stat py-2 px-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-muted fw-bold">PIS & COFINS IMPORTAÇÃO</small>
-                        <h4 class="mb-0 fw-bold">2,10% / 9,65%</h4>
-                        <small class="text-muted">Lei 10.865/04 (Bens) c/ Desonerações</small>
-                    </div>
-                    <i data-lucide="calculator" class="text-muted" style="width: 32px; height: 32px;"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filtros de Pesquisa -->
-    <div class="card shadow-sm border mb-3">
-        <div class="card-body py-3">
-            <div class="row g-2 align-items-end">
-                <div class="col-md-6">
-                    <label class="form-label small fw-bold mb-1">Buscar por Código NCM ou Descrição Oficial:</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-                        <input type="text" id="input-busca" class="form-control" placeholder="Ex: 90189099, 4202, bolsas, instrumentos, catalogo..." onkeydown="if(event.key==='Enter') pesquisarNcm(1)">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small fw-bold mb-1">Filtrar por Unidade Tributável (uTrib):</label>
-                    <select id="select-utrib" class="form-select" onchange="pesquisarNcm(1)">
-                        <option value="">Todas as Unidades</option>
-                        <option value="UN">UN - Unidade</option>
-                        <option value="KG">KG - Quilograma</option>
-                        <option value="PC">PC - Peça</option>
-                        <option value="M">M - Metro</option>
-                        <option value="M2">M2 - Metro Quadrado</option>
-                        <option value="M3">M3 - Metro Cúbico</option>
-                        <option value="PAR">PAR - Par</option>
-                        <option value="L">L - Litro</option>
-                        <option value="MIL">MIL - Milheiro</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button class="btn btn-primary w-100 fw-bold" onclick="pesquisarNcm(1)">
+<!-- MENU LATERAL FIXO (SIDEBAR) -->
+<aside class="nft-sidebar" id="nftSidebar">
+<!-- 1. Cabeçalho da Sidebar -->
+<div class="nft-sidebar-header">
+<a class="sidebar-brand-link" href="/" title="NFT Logistics - Retornar ao Início">
+<div class="sidebar-brand-logo-wrap">
+<img alt="NFT" class="logo-theme-black" src="/static/img/brand/NFT%20Logo%20(3).webp"/>
+<img alt="NFT" class="logo-theme-white" src="/static/img/brand/NFT%20Logo%20(11).webp"/>
+</div>
+<div class="sidebar-brand-info">
+<span class="sidebar-brand-title">NFT Logistics</span>
+<span class="sidebar-brand-badge">Tabela NCM</span>
+</div>
+</a>
+<button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
+<i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+</button>
+</div>
+<!-- 2. Corpo com Menus e Itens -->
+<div class="nft-sidebar-body">
+<!-- Grupo: Módulos -->
+<div class="sidebar-section-title">Módulos</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/" title="Portal Inicial">
+<span class="sidebar-icon"><i data-lucide="home"></i></span>
+<span class="sidebar-label">Início / Módulos</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
+<span class="sidebar-icon"><i data-lucide="file-code"></i></span>
+<span class="sidebar-label">XML Rascunho</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/di_duimp?nova_nota=1" title="Módulo XML da DI ou DUIMP">
+<span class="sidebar-icon"><i data-lucide="globe"></i></span>
+<span class="sidebar-label">XML da DI ou DUIMP</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?abrir_rascunhos=1" title="Ver e gerenciar Rascunhos Salvos">
+<span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+<span class="sidebar-label">Rascunhos Salvos</span>
+</a>
+</li>
+</ul>
+<!-- Grupo: Configurações -->
+<div class="sidebar-section-title">Configurações</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/empresas" title="Gestão de Empresas e Cadastros">
+<span class="sidebar-icon"><i data-lucide="building-2"></i></span>
+<span class="sidebar-label">Empresas</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn active" href="/banco_ncm" title="Grande Tabela NCM &amp; Impostos">
+<span class="sidebar-icon"><i data-lucide="book-open"></i></span>
+<span class="sidebar-label">Tabela NCM</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/localidades" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
+<span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
+<span class="sidebar-label">Localidades</span>
+</a>
+</li>
+</ul>
+<!-- Grupo: Exportações da Tabela -->
+<div class="sidebar-section-title">Exportações</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/download_ncm_excel" title="Baixar Planilha Excel Oficial">
+<span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
+<span class="sidebar-label">Baixar Excel (.xlsx)</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/download_ncm_json" title="Baixar Dados em JSON">
+<span class="sidebar-icon"><i data-lucide="file-code"></i></span>
+<span class="sidebar-label">Baixar JSON</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- 3. Rodapé da Sidebar -->
+<div class="nft-sidebar-footer">
+<button class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+<span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
+<span class="sidebar-footer-text">Alternar Tema</span>
+</button>
+<div class="sidebar-footer-info">
+<span>NFT Logistics</span>
+<span>v2.1</span>
+</div>
+</div>
+</aside>
+<!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
+<div class="nft-main-wrapper">
+<div class="container-fluid px-4 py-3">
+<!-- Top Header Limpo -->
+<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+<div class="d-flex align-items-center gap-3">
+<button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+<i data-lucide="menu" style="width: 16px; height: 16px;"></i>
+</button>
+<div>
+<h4 class="mb-0 fw-bold">Grande Tabela NCM &amp; Impostos</h4>
+<small class="text-muted">15.156 registros unificados com Unidades Tributáveis (uTrib) e Alíquotas Oficiais de Importação (II, IPI, PIS, COFINS)</small>
+</div>
+</div>
+</div>
+<!-- Cards de Estatisticas -->
+<div class="row g-3 mb-3">
+<div class="col-md-3">
+<div class="card shadow-sm border card-stat py-2 px-3">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted fw-bold">TOTAL DE REGISTROS NCM</small>
+<h4 class="mb-0 fw-bold" id="stat-total">15.156</h4>
+</div>
+<i class="text-muted" data-lucide="book-open" style="width: 32px; height: 32px;"></i>
+</div>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card shadow-sm border card-stat py-2 px-3">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted fw-bold">uTRIB EXPORTAÇÃO</small>
+<h4 class="mb-0 fw-bold">10.515</h4>
+<small class="text-muted">100% dos 8 dígitos</small>
+</div>
+<i class="text-muted" data-lucide="tag" style="width: 32px; height: 32px;"></i>
+</div>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card shadow-sm border card-stat py-2 px-3">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted fw-bold">ALÍQUOTAS II &amp; IPI</small>
+<h4 class="mb-0 fw-bold">100% Mapeadas</h4>
+<small class="text-muted">Camex TEC + Receita TIPI</small>
+</div>
+<i class="text-muted" data-lucide="scale" style="width: 32px; height: 32px;"></i>
+</div>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card shadow-sm border card-stat py-2 px-3">
+<div class="d-flex justify-content-between align-items-center">
+<div>
+<small class="text-muted fw-bold">PIS &amp; COFINS IMPORTAÇÃO</small>
+<h4 class="mb-0 fw-bold">2,10% / 9,65%</h4>
+<small class="text-muted">Lei 10.865/04 (Bens) c/ Desonerações</small>
+</div>
+<i class="text-muted" data-lucide="calculator" style="width: 32px; height: 32px;"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- Filtros de Pesquisa -->
+<div class="card shadow-sm border mb-3">
+<div class="card-body py-3">
+<div class="row g-2 align-items-end">
+<div class="col-md-6">
+<label class="form-label small fw-bold mb-1">Buscar por Código NCM ou Descrição Oficial:</label>
+<div class="input-group">
+<span class="input-group-text bg-light"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+<input class="form-control" id="input-busca" onkeydown="if(event.key==='Enter') pesquisarNcm(1)" placeholder="Ex: 90189099, 4202, bolsas, instrumentos, catalogo..." type="text"/>
+</div>
+</div>
+<div class="col-md-3">
+<label class="form-label small fw-bold mb-1">Filtrar por Unidade Tributável (uTrib):</label>
+<select class="form-select" id="select-utrib" onchange="pesquisarNcm(1)">
+<option value="">Todas as Unidades</option>
+<option value="UN">UN - Unidade</option>
+<option value="KG">KG - Quilograma</option>
+<option value="PC">PC - Peça</option>
+<option value="M">M - Metro</option>
+<option value="M2">M2 - Metro Quadrado</option>
+<option value="M3">M3 - Metro Cúbico</option>
+<option value="PAR">PAR - Par</option>
+<option value="L">L - Litro</option>
+<option value="MIL">MIL - Milheiro</option>
+</select>
+</div>
+<div class="col-md-3 d-flex gap-2">
+<button class="btn btn-primary w-100 fw-bold" onclick="pesquisarNcm(1)">
                         Filtrar
                     </button>
-                    <button class="btn btn-outline-secondary" onclick="limparFiltros()">
+<button class="btn btn-outline-secondary" onclick="limparFiltros()">
                         Limpar
                     </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabela de Resultados -->
-    <div class="card shadow-sm border mb-4">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
-            <span class="fw-bold small text-secondary">
-                Mostrando <span id="lbl-contagem" class="text-dark fw-bold">0</span> registros
-            </span>
-            <div class="d-flex align-items-center gap-2">
-                <small class="text-muted">Por página:</small>
-                <select id="select-per-page" class="form-select form-select-sm" style="width: 80px;" onchange="pesquisarNcm(1)">
-                    <option value="25">25</option>
-                    <option value="50" selected>50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive" style="max-height: 560px;">
-                <table class="table table-hover table-striped table-bordered align-middle mb-0 table-ncm">
-                    <thead class="sticky-top">
-                        <tr>
-                            <th style="width: 120px;">Código NCM</th>
-                            <th style="width: 80px;" class="text-center">uTrib</th>
-                            <th>Descrição Oficial do NCM</th>
-                            <th style="width: 85px;" class="text-center">II (%)</th>
-                            <th style="width: 90px;" class="text-center">IPI (%)</th>
-                            <th style="width: 85px;" class="text-center">PIS (%)</th>
-                            <th style="width: 95px;" class="text-center">COFINS (%)</th>
-                            <th style="width: 95px;" class="text-center">Início</th>
-                            <th style="width: 130px;">Ato Legal</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-ncm-corpo">
-                        <tr>
-                            <td colspan="9" class="text-center py-4 text-muted">Carregando dados da tabela NCM...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2">
-            <small class="text-muted" id="lbl-paginacao-info">Página 1 de 1</small>
-            <nav>
-                <ul class="pagination pagination-sm mb-0" id="paginacao-botoes">
-                    <!-- Gerado dinamicamente -->
-                </ul>
-            </nav>
-        </div>
-    </div>
 </div>
-
+</div>
+</div>
+</div>
+<!-- Tabela de Resultados -->
+<div class="card shadow-sm border mb-4">
+<div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+<span class="fw-bold small text-secondary">
+                Mostrando <span class="text-dark fw-bold" id="lbl-contagem">0</span> registros
+            </span>
+<div class="d-flex align-items-center gap-2">
+<small class="text-muted">Por página:</small>
+<select class="form-select form-select-sm" id="select-per-page" onchange="pesquisarNcm(1)" style="width: 80px;">
+<option value="25">25</option>
+<option selected="" value="50">50</option>
+<option value="100">100</option>
+</select>
+</div>
+</div>
+<div class="card-body p-0">
+<div class="table-responsive" style="max-height: 560px;">
+<table class="table table-hover table-striped table-bordered align-middle mb-0 table-ncm">
+<thead class="sticky-top">
+<tr>
+<th style="width: 120px;">Código NCM</th>
+<th class="text-center" style="width: 80px;">uTrib</th>
+<th>Descrição Oficial do NCM</th>
+<th class="text-center" style="width: 85px;">II (%)</th>
+<th class="text-center" style="width: 90px;">IPI (%)</th>
+<th class="text-center" style="width: 85px;">PIS (%)</th>
+<th class="text-center" style="width: 95px;">COFINS (%)</th>
+<th class="text-center" style="width: 95px;">Início</th>
+<th style="width: 130px;">Ato Legal</th>
+</tr>
+</thead>
+<tbody id="tabela-ncm-corpo">
+<tr>
+<td class="text-center py-4 text-muted" colspan="9">Carregando dados da tabela NCM...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card-footer bg-white d-flex justify-content-between align-items-center py-2">
+<small class="text-muted" id="lbl-paginacao-info">Página 1 de 1</small>
+<nav>
+<ul class="pagination pagination-sm mb-0" id="paginacao-botoes">
+<!-- Gerado dinamicamente -->
+</ul>
+</nav>
+</div>
+</div>
+</div>
 <script>
     let paginaAtual = 1;
 
@@ -397,11 +389,10 @@
         pag.appendChild(nextLi);
     }
 </script>
-        </div><!-- /container-fluid -->
-    </div><!-- /nft-main-wrapper -->
-
-    <script src="/static/js/nft-sidebar.js"></script>
-    <script>
+</div><!-- /container-fluid -->
+<!-- /nft-main-wrapper -->
+<script src="/static/js/nft-sidebar.js"></script>
+<script>
         document.addEventListener("DOMContentLoaded", function() {
             if (window.lucide) lucide.createIcons();
         });

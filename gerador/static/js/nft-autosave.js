@@ -171,9 +171,22 @@
 
     // === 4. RESTAURAÇÃO DE SESSÃO TEMPORÁRIA ===
     async function tentarRestaurarSessao() {
-        // Se a URL contém instrução para abrir um rascunho salvo explicitamente, não restaura sessão temporária
         const urlParams = new URLSearchParams(window.location.search);
+        
+        // Se a URL contém instrução para abrir um rascunho salvo, não usa autosave
         if (urlParams.get('carregar_rascunho')) {
+            return;
+        }
+
+        // Se o usuário clicou explicitamente para abrir uma nova nota a partir do menu
+        if (urlParams.get('nova_nota')) {
+            localStorage.removeItem(STORAGE_KEY);
+            await idbDelete(STORAGE_KEY);
+            
+            // Limpar a URL para que F5 depois recupere o autosave da nota em andamento
+            if (window.history.replaceState) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
             return;
         }
 
