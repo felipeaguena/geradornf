@@ -16,6 +16,7 @@
 <!-- Lucide Icons (Minimalist Line SVGs) -->
 <script src="/static/js/lucide.min.js"></script>
 <script src="/static/js/nft-dialogs.js"></script>
+<script src="/static/js/nft-sidebar.js?v=2.3"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -107,6 +108,10 @@
 </div>
 <!-- 3. Rodapé da Sidebar -->
 <div class="nft-sidebar-footer">
+<button class="sidebar-footer-btn" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
+<span class="sidebar-icon" style="color: #ef4444 !important;"><i data-lucide="power"></i></span>
+<span class="sidebar-footer-text" style="color: #ef4444 !important; font-weight: 700;">Desligar</span>
+</button>
 <button class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
 <span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
 <span class="sidebar-footer-text">Alternar Tema</span>
@@ -391,7 +396,6 @@
 </script>
 </div><!-- /container-fluid -->
 <!-- /nft-main-wrapper -->
-<script src="/static/js/nft-sidebar.js"></script>
 <script>
         document.addEventListener("DOMContentLoaded", function() {
             if (window.lucide) lucide.createIcons();

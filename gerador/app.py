@@ -1,4 +1,12 @@
 import os
+import sys
+
+# Garante compatibilidade quando executado via pythonw.exe (sem console)
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, 'w')
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, 'w')
+
 import sqlite3
 import json
 import xml.etree.ElementTree as ET
@@ -2310,7 +2318,24 @@ def api_localidades_cep(cep):
         conn.close()
         return jsonify({'error': f'Erro ao consultar serviço de CEP: {str(e)}'}), 502
 
+@app.route('/api/ping')
+def ping():
+    return jsonify({'status': 'ok', 'port': 1652})
+
+@app.route('/api/shutdown', methods=['POST', 'GET'])
+def shutdown_server():
+    import os, subprocess, threading
+    def kill_proc():
+        import time
+        time.sleep(0.6)
+        try:
+            subprocess.run(f'taskkill /F /T /PID {os.getpid()}', shell=True)
+        except Exception:
+            pass
+    threading.Thread(target=kill_proc).start()
+    return jsonify({'status': 'success', 'message': 'Servidor encerrando...'})
+
 if __name__ == '__main__':
     get_db_connection().close()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=1652)
 

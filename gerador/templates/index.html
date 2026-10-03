@@ -18,6 +18,7 @@
 <!-- Tabulator CSS -->
 <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet"/>
 <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+<script src="/static/js/nft-sidebar.js?v=2.3"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -103,6 +104,10 @@
 <button class="sidebar-footer-btn sidebar-footer-btn-primary" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
 <span class="sidebar-icon"><i data-lucide="download"></i></span>
 <span class="sidebar-footer-text">Gerar Novo XML</span>
+</button>
+<button class="sidebar-footer-btn" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
+<span class="sidebar-icon" style="color: #ef4444 !important;"><i data-lucide="power"></i></span>
+<span class="sidebar-footer-text" style="color: #ef4444 !important; font-weight: 700;">Desligar</span>
 </button>
 <button class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
 <span class="sidebar-icon theme-toggle-btn"><i data-lucide="moon"></i></span>
@@ -4197,7 +4202,6 @@
 </div>
 </div><!-- /container-fluid -->
 <!-- /nft-main-wrapper -->
-<script src="/static/js/nft-sidebar.js"></script>
 <script src="/static/js/nft-autosave.js"></script>
 <script>
         document.addEventListener('input', function (e) {

@@ -21,8 +21,8 @@ pip install -r requirements.txt
 echo [4] Inicializando banco de dados (se nao existir)...
 python init_db.py
 
-echo [5] Abrindo Portal de Modulos em http://localhost:5000...
-start http://localhost:5000
+echo [5] Abrindo Portal de Modulos em http://localhost:1652...
+start http://localhost:1652
 python app.py
 
 pause
