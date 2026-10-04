@@ -373,8 +373,11 @@
             }
         });
 
-        // Salva imediatamente ao sair da tela / fechar aba
-        window.addEventListener('beforeunload', function () {
+        // Salva imediatamente ao sair da tela / fechar aba (a menos que seja desligamento do sistema)
+        window.addEventListener('beforeunload', function (e) {
+            if (window._nftIsShuttingDown) {
+                return;
+            }
             salvarSessaoImediata();
         });
 

@@ -7,6 +7,14 @@
     let isShuttingDown = false;
 
     window.fecharJanelaCompleta = function() {
+        window._nftIsShuttingDown = true;
+        window.onbeforeunload = null;
+
+        // Se houver qualquer elemento focado (ex: input digitando), desfoca para evitar bloqueio do navegador
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            try { document.activeElement.blur(); } catch(e) {}
+        }
+
         // Tenta fechar a aba/janela por multiplas abordagens
         try { window.close(); } catch(e) {}
         try { window.open('', '_self', ''); window.close(); } catch(e) {}
@@ -21,7 +29,7 @@
                 window.location.replace("about:blank");
                 window.close();
             } catch(e) {}
-        }, 150);
+        }, 100);
     };
 
     window.showShutdownOverlay = function(title, msg, isSuccess) {
@@ -73,7 +81,14 @@
 
     window.encerrarServidor = function() {
         if (confirm("Deseja realmente desligar o servidor do Emissor NF-e?")) {
+            window._nftIsShuttingDown = true;
+            window.onbeforeunload = null;
             isShuttingDown = true;
+
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                try { document.activeElement.blur(); } catch(e) {}
+            }
+
             window.showShutdownOverlay("Encerrando Servidor...", "O backend na porta 1652 está sendo finalizado. Fechando a janela...", true);
             
             fetch('/api/shutdown', { method: 'POST' })
@@ -81,7 +96,7 @@
                 .finally(() => {
                     setTimeout(() => {
                         window.fecharJanelaCompleta();
-                    }, 400);
+                    }, 300);
                 });
         }
     };

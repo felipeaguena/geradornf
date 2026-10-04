@@ -2324,14 +2324,43 @@ def ping():
 
 @app.route('/api/shutdown', methods=['POST', 'GET'])
 def shutdown_server():
-    import os, subprocess, threading
+    import os, subprocess, threading, ctypes
+
+    def close_app_windows():
+        try:
+            EnumWindows = ctypes.windll.user32.EnumWindows
+            EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_int, ctypes.c_int)
+            GetWindowText = ctypes.windll.user32.GetWindowTextW
+            GetWindowTextLength = ctypes.windll.user32.GetWindowTextLengthW
+            PostMessage = ctypes.windll.user32.PostMessageW
+            WM_CLOSE = 0x0010
+
+            def foreach_window(hwnd, lParam):
+                length = GetWindowTextLength(hwnd)
+                if length > 0:
+                    buff = ctypes.create_unicode_buffer(length + 1)
+                    GetWindowText(hwnd, buff, length + 1)
+                    title = buff.value
+                    if 'NFT Logistics' in title or 'Emissor NF-e' in title:
+                        PostMessage(hwnd, WM_CLOSE, 0, 0)
+                return True
+
+            EnumWindows(EnumWindowsProc(foreach_window), 0)
+        except Exception:
+            pass
+
     def kill_proc():
         import time
-        time.sleep(0.6)
+        # 1. Envia sinal nativo do Windows para fechar as janelas do sistema
+        close_app_windows()
+        time.sleep(0.4)
+        close_app_windows()
+        time.sleep(0.3)
         try:
             subprocess.run(f'taskkill /F /T /PID {os.getpid()}', shell=True)
         except Exception:
             pass
+
     threading.Thread(target=kill_proc).start()
     return jsonify({'status': 'success', 'message': 'Servidor encerrando...'})
 
