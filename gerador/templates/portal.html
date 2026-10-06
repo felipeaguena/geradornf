@@ -53,6 +53,12 @@
 </a>
 </li>
 <li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/nova_nf?nova_nota=1" title="Módulo Nova NF (Sem XML)">
+<span class="sidebar-icon"><i data-lucide="file-plus-2"></i></span>
+<span class="sidebar-label">Nova NF</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
 <a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
 <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
 <span class="sidebar-label">XML Rascunho</span>
@@ -127,11 +133,36 @@
 </div>
 <!-- The Two Main Options (Each card is a link wrapping the entire div) -->
 <div class="portal-cards-grid">
-<!-- OPÇÃO 1: XML RASCUNHO (Leva ao sistema atual) -->
+<!-- OPÇÃO 1: NOVA NF (Emissão direta sem XML prévio) -->
+<a class="portal-card" href="/nova_nf?nova_nota=1" id="card-nova-nf" title="Clique para abrir o módulo Nova NF">
+<div class="portal-card-img-wrap">
+<img alt="Módulo Nova NF" class="portal-card-img" loading="eager" src="/static/img/cards/card_xml_rascunho.jpg"/>
+<span class="portal-card-badge badge-primary-accent">Módulo 01</span>
+</div>
+<div class="portal-card-content">
+<div>
+<h2 class="portal-card-title">
+<i data-lucide="file-plus-2" style="width: 22px; height: 22px;"></i>
+<span>Nova NF</span>
+</h2>
+<p class="portal-card-desc">
+                            Emissão e digitação direta de NF-e a partir do zero ou via planilha Excel, sem necessidade de carregar XML de modelo prévio.
+                        </p>
+</div>
+<div class="portal-card-cta">
+<span class="text-muted small">Emissão Direta / Sem XML</span>
+<div class="portal-card-cta-btn">
+<span>Acessar Módulo</span>
+<span class="portal-card-arrow"><i data-lucide="arrow-right" style="width: 15px; height: 15px;"></i></span>
+</div>
+</div>
+</div>
+</a>
+<!-- OPÇÃO 2: XML RASCUNHO (Leva ao sistema atual) -->
 <a class="portal-card" href="/rascunho?nova_nota=1" id="card-xml-rascunho" title="Clique para abrir o módulo XML Rascunho">
 <div class="portal-card-img-wrap">
 <img alt="Módulo XML Rascunho" class="portal-card-img" loading="eager" src="/static/img/cards/card_xml_rascunho.jpg"/>
-<span class="portal-card-badge badge-primary-accent">Módulo 01</span>
+<span class="portal-card-badge badge-primary-accent">Módulo 02</span>
 </div>
 <div class="portal-card-content">
 <div>
@@ -152,11 +183,11 @@
 </div>
 </div>
 </a>
-<!-- OPÇÃO 2: XML DA DI OU DUIMP (Leva ao novo sistema duplicado) -->
+<!-- OPÇÃO 3: XML DA DI OU DUIMP (Leva ao novo sistema duplicado) -->
 <a class="portal-card" href="/di_duimp?nova_nota=1" id="card-xml-di-duimp" title="Clique para abrir o módulo XML da DI ou DUIMP">
 <div class="portal-card-img-wrap">
 <img alt="Módulo XML da DI ou DUIMP" class="portal-card-img" loading="eager" src="/static/img/cards/card_xml_di_duimp.jpg"/>
-<span class="portal-card-badge badge-primary-accent">Módulo 02</span>
+<span class="portal-card-badge badge-primary-accent">Módulo 03</span>
 </div>
 <div class="portal-card-content">
 <div>

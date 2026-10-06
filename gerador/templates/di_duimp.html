@@ -52,6 +52,12 @@
 </a>
 </li>
 <li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/nova_nf?nova_nota=1" title="Módulo Nova NF (Sem XML)">
+<span class="sidebar-icon"><i data-lucide="file-plus-2"></i></span>
+<span class="sidebar-label">Nova NF</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
 <a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
 <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
 <span class="sidebar-label">XML Rascunho</span>
@@ -3575,8 +3581,9 @@
         let html = '';
         lista.forEach(r => {
             const isOrigemDI = (r.origem || '').includes('DI');
-            const badgeOrigemClass = isOrigemDI ? 'badge-origem-di' : 'badge-origem-rasc';
-            const iconeOrigem = isOrigemDI ? 'globe' : 'file-code';
+            const isOrigemNova = (r.origem || '') === 'Nova NF';
+            const badgeOrigemClass = isOrigemNova ? 'badge-origem-nova' : (isOrigemDI ? 'badge-origem-di' : 'badge-origem-rasc');
+            const iconeOrigem = isOrigemNova ? 'file-plus-2' : (isOrigemDI ? 'globe' : 'file-code');
             const dataFmt = r.data_atualizacao_formatada || (r.data_atualizacao ? r.data_atualizacao.slice(0, 16).replace('T', ' ') : (r.data_criacao_formatada || '-'));
             const valTotalFmt = formatarNumeroVisualBR(r.valor_total || 0, 2, 2);
 
@@ -3669,6 +3676,8 @@
             if (confirmaMudanca) {
                 if (origemRascunho.includes('DI')) {
                     window.location.href = `/di_duimp?carregar_rascunho=${id}`;
+                } else if (origemRascunho === 'Nova NF') {
+                    window.location.href = `/nova_nf?carregar_rascunho=${id}`;
                 } else {
                     window.location.href = `/rascunho?carregar_rascunho=${id}`;
                 }
@@ -4119,6 +4128,7 @@
 <option value="">Todas as Origens</option>
 <option value="XML da DI ou DUIMP">XML da DI ou DUIMP</option>
 <option value="XML Rascunho">XML Rascunho</option>
+<option value="Nova NF">Nova NF</option>
 </select>
 </div>
 </div>

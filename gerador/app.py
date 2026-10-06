@@ -893,6 +893,10 @@ def index():
 def modulo_di_duimp():
     return render_template('di_duimp.html')
 
+@app.route('/nova_nf')
+def modulo_nova_nf():
+    return render_template('nova_nf.html')
+
 
 # === ROTAS DE EMPRESAS ===
 @app.route('/empresas')

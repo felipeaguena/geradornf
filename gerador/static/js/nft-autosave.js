@@ -14,7 +14,8 @@
 
 (function () {
     const isDI = window.location.pathname.includes('di_duimp');
-    const STORAGE_KEY = isDI ? 'nft_sessao_temp_di_duimp' : 'nft_sessao_temp_rascunho';
+    const isNovaNF = window.location.pathname.includes('nova_nf');
+    const STORAGE_KEY = isNovaNF ? 'nft_sessao_temp_nova_nf' : (isDI ? 'nft_sessao_temp_di_duimp' : 'nft_sessao_temp_rascunho');
     const DB_NAME = 'NFT_Logistics_DB';
     const DB_VERSION = 1;
     const STORE_NAME = 'sessoes_temporarias';
@@ -110,7 +111,7 @@
         const dataFmt = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         return {
-            modulo: window.NOME_MODULO_ORIGEM || (isDI ? 'XML da DI ou DUIMP' : 'XML Rascunho'),
+            modulo: window.NOME_MODULO_ORIGEM || (isNovaNF ? 'Nova NF' : (isDI ? 'XML da DI ou DUIMP' : 'XML Rascunho')),
             timestamp: now.getTime(),
             data_formatada: dataFmt,
             campos: campos,

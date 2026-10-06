@@ -51,13 +51,13 @@
 </a>
 </li>
 <li class="nft-sidebar-item">
-<a class="nft-sidebar-btn" href="/nova_nf?nova_nota=1" title="Módulo Nova NF (Sem XML)">
+<a class="nft-sidebar-btn active" href="/nova_nf?nova_nota=1" title="Módulo Nova NF (Sem XML)">
 <span class="sidebar-icon"><i data-lucide="file-plus-2"></i></span>
 <span class="sidebar-label">Nova NF</span>
 </a>
 </li>
 <li class="nft-sidebar-item">
-<a class="nft-sidebar-btn active" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
+<a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
 <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
 <span class="sidebar-label">XML Rascunho</span>
 </a>
@@ -137,46 +137,31 @@
 <div>
 <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
 <span>Editor &amp; Gerador NF-e</span>
-<span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 11px; padding: 4px 8px;">XML Rascunho</span>
+<span class="badge badge-origem-nova font-monospace" style="font-size: 11px; padding: 4px 8px;">Nova NF</span>
 </h4>
-<small class="text-muted">Importe o XML de modelo, selecione o Tipo de Nota para herdar impostos e salve rascunhos para continuar a edição</small>
+<small class="text-muted">Emissão e digitação direta de NF-e a partir do zero ou via planilha Excel, com herança de impostos por Tipo de Nota</small>
 </div>
 </div>
 </div>
-<!-- Upload & Rascunhos Card (Tarefas 1, 2 e 3) -->
+<!-- Barra de Ações & Rascunhos Card -->
 <div class="card mb-3 shadow-sm border">
 <div class="card-body py-2 px-3">
 <div class="row align-items-end g-2">
-<!-- 1. Campo de Referência Interna (Tarefa 1: ao lado do botão Escolher ficheiro) -->
-<div class="col-xl-2 col-lg-2 col-md-3">
+<!-- 1. Campo de Referência Interna -->
+<div class="col-xl-5 col-lg-5 col-md-6">
 <label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
 <i data-lucide="tag"></i>
-<span>Referência Interna:</span>
+<span>Referência Interna do Documento:</span>
 </label>
-<input class="form-control font-monospace" id="referenciaInterna" oninput="atualizarReferenciaRascunho(this.value)" placeholder="Ex: REF-2026/001, PO-998" type="text"/>
+<input class="form-control font-monospace" id="referenciaInterna" oninput="atualizarReferenciaRascunho(this.value)" placeholder="Ex: NOTA-2026/001, PEDIDO-1050, PO-998" type="text"/>
 </div>
-<!-- 2. Arquivo XML ("Escolher ficheiro") -->
-<div class="col-xl-3 col-lg-3 col-md-4">
-<label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
-<i data-lucide="file-up"></i>
-<span>Arquivo XML de Modelo (Espelho):</span>
-</label>
-<input accept=".xml" class="form-control" id="xmlFileInput" type="file"/>
-</div>
-<!-- 3. Botão Carregar e Processar XML -->
-<div class="col-xl-2 col-lg-2 col-md-2">
-<button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
-<i data-lucide="upload"></i>
-<span>Processar XML</span>
-</button>
-</div>
-<!-- 4. Botões de Ação de Rascunho (Tarefa 2) -->
-<div class="col-xl-5 col-lg-5 col-md-12 d-flex align-items-center gap-2">
+<!-- 2. Botões de Ação de Rascunho -->
+<div class="col-xl-7 col-lg-7 col-md-6 d-flex align-items-center gap-2">
 <button class="btn btn-outline-success fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
 <i data-lucide="save"></i>
-<span>Salvar</span>
+<span>Salvar Rascunho</span>
 </button>
-<button class="btn btn-outline-secondary fw-bold d-flex align-items-center justify-content-center gap-2" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
+<button class="btn btn-outline-secondary fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
 <i data-lucide="folder-clock"></i>
 <span>Rascunhos</span>
 <span class="badge bg-secondary text-white badge-counter-rascunhos" id="badge-total-rascunhos">0</span>
@@ -191,11 +176,11 @@
 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
 <div class="d-flex align-items-center gap-2 small">
 <span class="text-muted">Status do Documento:</span>
-<span class="badge bg-secondary py-1 px-2" id="status-badge">Aguardando XML</span>
+<span class="badge bg-success py-1 px-2" id="status-badge">Em Digitação Direta</span>
 <span class="badge bg-light text-dark border d-none" id="rascunho-info-tag"></span>
 </div>
 <div class="text-muted small font-monospace" id="rascunho-origem-indicator">
-                            Módulo Ativo: <span class="badge badge-origem-rasc">XML Rascunho</span>
+Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
 </div>
 </div>
 </div>
@@ -910,6 +895,10 @@
 <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
 </div>
 <div class="d-flex align-items-center flex-wrap gap-1">
+<button class="btn btn-success btn-sm me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="adicionarNovoItem()" title="Adicionar uma nova linha de produto/item na nota" type="button">
+<i data-lucide="plus-circle"></i>
+<span>+ Adicionar Item</span>
+</button>
 <button class="btn btn-outline-danger btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
 <i data-lucide="trash-2"></i>
 <span>Excluir Item</span>
@@ -2122,6 +2111,105 @@
         }
     }
 
+    async function adicionarNovoItem() {
+        if (!itensTable) {
+            itensCache = itensCache || [];
+        } else {
+            itensCache = itensTable.getData();
+        }
+
+        const novoIndex = itensCache.length + 1;
+        const nomeOp = getVal('select_operacao');
+        const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (nomeOp || '').toUpperCase());
+
+        const novoItem = {
+            nItem: String(novoIndex),
+            cProd: String(novoIndex).padStart(4, '0'),
+            cEAN: "SEM GTIN",
+            xProd: "NOVO ITEM " + novoIndex,
+            NCM: "",
+            CEST: "",
+            CFOP: (op && op.cfop_padrao) ? op.cfop_padrao : (getVal('cfop_padrao') || "5102"),
+            uCom: "UN",
+            qCom: "1.0000",
+            vUnCom: "0.0000",
+            vProd: "0.00",
+            cEANTrib: "SEM GTIN",
+            uTrib: "UN",
+            qTrib: "1.0000",
+            vUnTrib: "0.0000",
+            vFrete: "0.00",
+            vSeg: "0.00",
+            vDesc: "0.00",
+            vOutro: "0.00",
+            indTot: "1",
+            nDI: "",
+            dDI: "",
+            xLocDesemb: "",
+            UFDesemb: "",
+            dDesemb: "",
+            tpViaTransp: "1",
+            vAFRMM: "0.00",
+            tpIntermedio: "1",
+            CNPJ: "",
+            UFTerceiro: "",
+            cExportador: "",
+            nAdicao: "1",
+            nSeqAdic: "1",
+            cFabricante: "",
+            vDescDI: "0.00",
+            nDraw: "",
+            orig: "0",
+            CST_ICMS: (op && op.csosn_icms) ? op.csosn_icms : "00",
+            modBC: "3",
+            vBC_ICMS: "0.00",
+            pICMS: (op && op.aliquota_icms) ? String(op.aliquota_icms) : "0.00",
+            vICMS: "0.00",
+            motDesICMS: "",
+            vICMSDeson: "0.00",
+            pRedBC: "0.00",
+            cEnq: "999",
+            CST_IPI: (op && op.cst_ipi) ? op.cst_ipi : "99",
+            vBC_IPI: "0.00",
+            pIPI: (op && op.aliquota_ipi) ? String(op.aliquota_ipi) : "0.00",
+            vIPI: "0.00",
+            vBC_II: "0.00",
+            vDespAdu: "0.00",
+            vII: "0.00",
+            vIOF: "0.00",
+            CST_PIS: (op && op.cst_pis) ? op.cst_pis : "01",
+            vBC_PIS: "0.00",
+            pPIS: (op && op.aliquota_pis) ? String(op.aliquota_pis) : "1.65",
+            vPIS: "0.00",
+            CST_COFINS: (op && op.cst_cofins) ? op.cst_cofins : "01",
+            vBC_COFINS: "0.00",
+            pCOFINS: (op && op.aliquota_cofins) ? String(op.aliquota_cofins) : "7.60",
+            vCOFINS: "0.00",
+            infAdProd: ""
+        };
+
+        itensCache.push(novoItem);
+        if (itensTable) {
+            itensTable.setData(itensCache);
+        } else {
+            inicializarTabulator(itensCache);
+        }
+
+        const badgeItens = document.getElementById('itens-badge');
+        if (badgeItens) badgeItens.innerText = itensCache.length;
+
+        recalcularTotaisDosItens(true);
+        atualizarBadgesRateioEItens();
+
+        // Rola até o novo item
+        if (itensTable) {
+            const rows = itensTable.getRows();
+            if (rows && rows.length > 0) {
+                rows[rows.length - 1].scrollTo();
+            }
+        }
+    }
+
     // Definicao de todas as colunas de det nItem
     const colunasItensDef = [
         {
@@ -2354,7 +2442,7 @@
                 // Se não foi passada explicitamente, busca a última escolha persistida no banco de dados
                 if (!opParaSelecionar) {
                     try {
-                        const resUltima = await fetch('/api/config/ultima_operacao?modulo=rascunho');
+                        const resUltima = await fetch('/api/config/ultima_operacao?modulo=nova_nf');
                         const dataUltima = await resUltima.json();
                         if (dataUltima && dataUltima.status === 'success' && dataUltima.ultima_operacao) {
                             const existe = operacoesCache.some(o => o.nome_operacao.toUpperCase() === dataUltima.ultima_operacao.toUpperCase());
@@ -2645,7 +2733,7 @@
             fetch('/api/config/ultima_operacao', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ modulo: 'rascunho', nome_operacao: nomeOp || '' })
+                body: JSON.stringify({ modulo: 'nova_nf', nome_operacao: nomeOp || '' })
             }).catch(e => console.warn("Erro ao salvar ultima operacao:", e));
         }
     }
@@ -3118,8 +3206,9 @@
 
     // === GERAR NOVO XML ===
     async function generateXML() {
-        if(!xmlOriginalData) {
-            alert("Por favor, faça o upload de um XML de modelo antes de gerar!");
+        const itensAtuais = itensTable ? itensTable.getData() : (itensCache || []);
+        if(!itensAtuais || itensAtuais.length === 0) {
+            alert("A nota não possui nenhum item cadastrado. Adicione ou importe itens antes de gerar o XML!");
             return;
         }
 
@@ -3277,19 +3366,9 @@
     // =========================================================================
     // SISTEMA DE RASCUNHOS SALVOS (ARQUIVOS ISOLADOS + BANCO DE DADOS UNIFICADO)
     // =========================================================================
-    window.NOME_MODULO_ORIGEM = "XML Rascunho";
+    window.NOME_MODULO_ORIGEM = "Nova NF";
     window.idRascunhoAtual = null;
-    window.nomeArquivoOriginal = "";
-
-    // Armazena nome do arquivo quando o usuário seleciona um XML
-    const xmlInputEl = document.getElementById('xml_file');
-    if (xmlInputEl) {
-        xmlInputEl.addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                window.nomeArquivoOriginal = e.target.files[0].name;
-            }
-        });
-    }
+    window.nomeArquivoOriginal = "Nova_Nota.xml";
 
     // Monitora campo de Referência Interna principal para manter sincronizado
     function obterReferenciaInterna() {
@@ -3613,9 +3692,9 @@
         let html = '';
         lista.forEach(r => {
             const isOrigemDI = (r.origem || '').includes('DI');
-            const isOrigemNova = (r.origem || '') === 'Nova NF';
+            const isOrigemNova = (r.origem || '').includes('Nova');
             const badgeOrigemClass = isOrigemNova ? 'badge-origem-nova' : (isOrigemDI ? 'badge-origem-di' : 'badge-origem-rasc');
-            const iconeOrigem = isOrigemNova ? 'file-plus-2' : (isOrigemDI ? 'globe' : 'file-code');
+            const iconeOrigem = isOrigemNova ? 'plus-circle' : (isOrigemDI ? 'globe' : 'file-code');
             const dataFmt = r.data_atualizacao_formatada || (r.data_atualizacao ? r.data_atualizacao.slice(0, 16).replace('T', ' ') : (r.data_criacao_formatada || '-'));
             const valTotalFmt = formatarNumeroVisualBR(r.valor_total || 0, 2, 2);
 
@@ -3636,7 +3715,7 @@
                 <td>
                     <span class="badge ${badgeOrigemClass} d-inline-flex align-items-center gap-1" style="font-size: 11px; padding: 3px 6px;">
                         <i data-lucide="${iconeOrigem}" style="width: 11px; height: 11px;"></i>
-                        <span>${r.origem || 'XML Rascunho'}</span>
+                        <span>${r.origem || 'Nova NF'}</span>
                     </span>
                 </td>
                 <td>
@@ -3708,7 +3787,7 @@
             if (confirmaMudanca) {
                 if (origemRascunho.includes('DI')) {
                     window.location.href = `/di_duimp?carregar_rascunho=${id}`;
-                } else if (origemRascunho === 'Nova NF') {
+                } else if (origemRascunho.includes('Nova')) {
                     window.location.href = `/nova_nf?carregar_rascunho=${id}`;
                 } else {
                     window.location.href = `/rascunho?carregar_rascunho=${id}`;
@@ -4101,7 +4180,7 @@
 <div class="row g-2 small">
 <div class="col-6">
 <span class="text-muted d-block">Origem:</span>
-<span class="badge badge-origem-rasc"><i data-lucide="file-code" style="width: 12px; height: 12px; vertical-align: -1px;"></i> XML Rascunho</span>
+<span class="badge badge-origem-nova"><i data-lucide="plus-circle" style="width: 12px; height: 12px; vertical-align: -1px;"></i> Nova NF</span>
 </div>
 <div class="col-6">
 <span class="text-muted d-block">Tipo de Operação:</span>
@@ -4142,7 +4221,7 @@
 <span>Rascunhos Salvos</span>
 <span class="badge bg-secondary-subtle text-muted" id="badge-total-rascunhos-modal">0</span>
 </h5>
-<p class="text-muted small mb-0 mt-1">Gerencie seus rascunhos de notas fiscais gerados no XML Rascunho e no XML DI/DUIMP.</p>
+<p class="text-muted small mb-0 mt-1">Gerencie seus rascunhos de notas fiscais gerados no XML Rascunho, XML DI/DUIMP e Nova NF.</p>
 </div>
 <button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
 </div>
@@ -4160,9 +4239,9 @@
 <span class="input-group-text bg-body-tertiary"><i data-lucide="layers" style="width: 14px; height: 14px;"></i></span>
 <select class="form-select" id="filtro_origem_rascunho" onchange="carregarListaRascunhos()">
 <option value="">Todas as Origens</option>
+<option value="Nova NF">Nova NF</option>
 <option value="XML Rascunho">XML Rascunho</option>
 <option value="XML da DI ou DUIMP">XML da DI ou DUIMP</option>
-<option value="Nova NF">Nova NF</option>
 </select>
 </div>
 </div>
