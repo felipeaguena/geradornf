@@ -2026,8 +2026,29 @@ def generate_xml():
         with os.fdopen(fd, 'wb') as f:
             f.write(final_xml)
 
+        ref_interna = (data.get('referencia_interna') or '').strip()
         n_nf = cabecalho.get('nNF') or 'nova'
-        return send_file(temp_path, as_attachment=True, download_name=f"NFe_{n_nf}.xml")
+        nat_op = (cabecalho.get('natOp') or cabecalho.get('select_operacao') or data.get('tipo_operacao') or '').strip()
+
+        # Limpar parenteses da operacao (ex: "(5102) VENDA DE MERCADORIA" -> "VENDA DE MERCADORIA")
+        nat_op_limpa = re.sub(r'\(.*?\)', '', nat_op).strip()
+
+        partes_nome = []
+        if ref_interna:
+            partes_nome.append(ref_interna)
+        else:
+            partes_nome.append(f"NFe_{n_nf}")
+
+        if nat_op_limpa:
+            partes_nome.append(nat_op_limpa)
+
+        nome_base = " - ".join(partes_nome)
+        nome_sanitizado = re.sub(r'[\\/:*?"<>|]+', '_', nome_base).strip().replace(' ', '_')
+        while '__' in nome_sanitizado:
+            nome_sanitizado = nome_sanitizado.replace('__', '_')
+        nome_arquivo = nome_sanitizado if nome_sanitizado.endswith('.xml') else f"{nome_sanitizado}.xml"
+
+        return send_file(temp_path, as_attachment=True, download_name=nome_arquivo)
     except Exception as e:
         import traceback
         traceback.print_exc()

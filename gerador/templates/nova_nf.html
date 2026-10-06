@@ -3297,6 +3297,7 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
                 dest_xPais: getVal('dest_xPais') || (window.currentCabecalho && window.currentCabecalho.dest_xPais) || 'Brasil',
                 verProc: getVal('verProc') || '4.01_sebrae_b057'
             },
+            referencia_interna: (typeof obterReferenciaInterna === 'function' ? obterReferenciaInterna() : (getVal('referenciaInterna') || getVal('referencia_interna') || '')).trim(),
             itens: itensLimpos,
             rodape: {
                 infCpl: getVal('infCpl'),
@@ -3349,7 +3350,27 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = "NFe_" + (getVal('nNF') || "gerada") + ".xml";
+            const refDoc = (typeof obterReferenciaInterna === 'function' ? obterReferenciaInterna() : (getVal('referenciaInterna') || getVal('referencia_interna') || '')).trim();
+            const opRaw = (getVal('select_operacao') || getVal('natOp') || '').trim();
+            // Remove qualquer conteúdo entre parênteses (ex: "(5102) " -> "")
+            const opLimpa = opRaw.replace(/\(.*?\)/g, '').trim();
+
+            let nomeFinalBase = "";
+            if (refDoc && opLimpa) {
+                nomeFinalBase = `${refDoc} - ${opLimpa}`;
+            } else if (refDoc) {
+                nomeFinalBase = refDoc;
+            } else if (opLimpa) {
+                nomeFinalBase = `NFe_${getVal('nNF') || 'gerada'} - ${opLimpa}`;
+            } else {
+                nomeFinalBase = `NFe_${getVal('nNF') || 'gerada'}`;
+            }
+
+            let nomeSanitizado = nomeFinalBase.replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_');
+            while (nomeSanitizado.includes('__')) {
+                nomeSanitizado = nomeSanitizado.replace('__', '_');
+            }
+            a.download = nomeSanitizado.endsWith('.xml') ? nomeSanitizado : `${nomeSanitizado}.xml`;
             document.body.appendChild(a);
             a.click();
             a.remove();
