@@ -12,7 +12,7 @@ import json
 import xml.etree.ElementTree as ET
 from flask import Flask, render_template, request, jsonify, send_file, redirect
 import tempfile
-import pandas as pd
+import openpyxl
 import io
 import re
 import urllib.request
@@ -2032,16 +2032,27 @@ def generate_xml():
 # === ROTAS: EXCEL ===
 @app.route('/export_excel', methods=['POST'])
 def export_excel():
-    data = request.json
+    data = request.json or {}
     itens = data.get('itens', [])
     if not itens:
         return jsonify({"error": "Nenhum item para exportar"}), 400
     
-    df = pd.DataFrame(itens)
-    output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Itens')
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Itens"
     
+    headers = []
+    for item in itens:
+        for k in item.keys():
+            if k not in headers:
+                headers.append(k)
+    
+    ws.append(headers)
+    for item in itens:
+        ws.append([item.get(k, "") for k in headers])
+    
+    output = io.BytesIO()
+    wb.save(output)
     output.seek(0)
     return send_file(output, download_name="Itens_NFe.xlsx", as_attachment=True, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -2052,9 +2063,21 @@ def import_excel():
     
     file = request.files['file']
     try:
-        df = pd.read_excel(file)
-        df = df.fillna("")
-        itens = df.to_dict(orient='records')
+        wb = openpyxl.load_workbook(file, data_only=True)
+        ws = wb.active
+        rows = list(ws.iter_rows(values_only=True))
+        if not rows:
+            return jsonify({"itens": []})
+        
+        headers = [str(col).strip() if col is not None else f"col_{idx}" for idx, col in enumerate(rows[0])]
+        itens = []
+        for row in rows[1:]:
+            if all(v is None or str(v).strip() == "" for v in row):
+                continue
+            item = {}
+            for h, v in zip(headers, row):
+                item[h] = "" if v is None else v
+            itens.append(item)
         return jsonify({"itens": itens})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

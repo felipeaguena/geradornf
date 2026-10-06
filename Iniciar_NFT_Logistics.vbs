@@ -10,50 +10,73 @@ Else
 End If
 
 strBat = strGeradorDir & "\.run_server.bat"
+WshShell.CurrentDirectory = strGeradorDir
 
-' 1. Executa o backend Flask em segundo plano ocultando 100% o console (parametro 0)
-WshShell.Run "cmd.exe /c " & Chr(34) & strBat & Chr(34), 0, False
-
-' 2. Aguarda o servidor responder no /api/ping antes de abrir o navegador
-On Error Resume Next
-Set oHttp = CreateObject("MSXML2.ServerXMLHTTP.6.0")
-If Err.Number <> 0 Then
-    Err.Clear
-    Set oHttp = CreateObject("MSXML2.ServerXMLHTTP")
-End If
-On Error GoTo 0
-
-If Not oHttp Is Nothing Then
-    oHttp.setTimeouts 500, 500, 500, 500
-    For i = 1 To 40 ' Tenta a cada 300ms por ate 12 segundos
-        On Error Resume Next
-        oHttp.Open "GET", "http://localhost:1652/api/ping", False
-        oHttp.Send
+Function CheckServer()
+    Dim http
+    CheckServer = False
+    On Error Resume Next
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+    If Err.Number <> 0 Then
+        Err.Clear
+        Set http = CreateObject("MSXML2.ServerXMLHTTP")
+    End If
+    If Not http Is Nothing Then
+        http.setTimeouts 400, 400, 400, 400
+        http.Open "GET", "http://127.0.0.1:1652/api/ping", False
+        http.Send
         If Err.Number = 0 Then
-            If oHttp.Status = 200 Then
-                On Error GoTo 0
-                Exit For
+            If http.Status = 200 Then
+                CheckServer = True
             End If
         End If
-        On Error GoTo 0
+    End If
+    On Error GoTo 0
+End Function
+
+' 1. Verifica se o backend já está respondendo
+bServerRunning = CheckServer()
+
+' Se ainda não estiver rodando, inicia o backend Flask em segundo plano
+If Not bServerRunning Then
+    WshShell.Run "cmd.exe /c " & Chr(34) & strBat & Chr(34), 0, False
+
+    ' 2. Aguarda o servidor responder no /api/ping antes de abrir o navegador
+    For i = 1 To 50 ' Tenta por até 15 segundos (50 x 300ms)
+        If CheckServer() Then
+            bServerRunning = True
+            Exit For
+        End If
         WScript.Sleep 300
     Next
-Else
-    WScript.Sleep 2000
 End If
 
-' 3. Localiza Chrome ou Edge para abrir em modo App (Janela de aplicativo independente que permite fechar via window.close)
-strUrl = "http://localhost:1652"
+If Not bServerRunning Then
+    MsgBox "O servidor do sistema (porta 1652) não respondeu a tempo." & vbCrLf & vbCrLf & _
+           "Dica de diagnóstico:" & vbCrLf & _
+           "Execute o arquivo 'gerador\.run_server.bat' para ver se há alguma mensagem de erro do Python no terminal.", _
+           vbExclamation, "NFT Logistics - Aviso"
+    WScript.Quit
+End If
+
+' 3. Localiza Chrome ou Edge para abrir em modo App (janela de aplicativo independente)
+strUrl = "http://127.0.0.1:1652"
 strBrowserCmd = ""
 
-If fso.FileExists("C:\Program Files\Google\Chrome\Application\chrome.exe") Then
-    strBrowserCmd = """C:\Program Files\Google\Chrome\Application\chrome.exe"" --app=" & strUrl
-ElseIf fso.FileExists("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe") Then
-    strBrowserCmd = """C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"" --app=" & strUrl
-ElseIf fso.FileExists("C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe") Then
-    strBrowserCmd = """C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"" --app=" & strUrl
-ElseIf fso.FileExists("C:\Program Files\Microsoft\Edge\Application\msedge.exe") Then
-    strBrowserCmd = """C:\Program Files\Microsoft\Edge\Application\msedge.exe"" --app=" & strUrl
+strLocalAppData = WshShell.ExpandEnvironmentStrings("%LOCALAPPDATA%")
+strProgramFiles = WshShell.ExpandEnvironmentStrings("%ProgramFiles%")
+strProgramFilesX86 = WshShell.ExpandEnvironmentStrings("%ProgramFiles(x86)%")
+
+If fso.FileExists(strProgramFiles & "\Google\Chrome\Application\chrome.exe") Then
+    strBrowserCmd = """" & strProgramFiles & "\Google\Chrome\Application\chrome.exe"" --app=" & strUrl
+ElseIf fso.FileExists(strProgramFilesX86 & "\Google\Chrome\Application\chrome.exe") Then
+    strBrowserCmd = """" & strProgramFilesX86 & "\Google\Chrome\Application\chrome.exe"" --app=" & strUrl
+ElseIf fso.FileExists(strLocalAppData & "\Google\Chrome\Application\chrome.exe") Then
+    strBrowserCmd = """" & strLocalAppData & "\Google\Chrome\Application\chrome.exe"" --app=" & strUrl
+ElseIf fso.FileExists(strProgramFiles & "\Microsoft\Edge\Application\msedge.exe") Then
+    strBrowserCmd = """" & strProgramFiles & "\Microsoft\Edge\Application\msedge.exe"" --app=" & strUrl
+ElseIf fso.FileExists(strProgramFilesX86 & "\Microsoft\Edge\Application\msedge.exe") Then
+    strBrowserCmd = """" & strProgramFilesX86 & "\Microsoft\Edge\Application\msedge.exe"" --app=" & strUrl
 Else
     strBrowserCmd = strUrl
 End If
