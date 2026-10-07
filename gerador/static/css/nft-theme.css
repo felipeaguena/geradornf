@@ -1526,3 +1526,16 @@ textarea.form-control-sm {
 
 
 
+/* --- CORRECAO TABULATOR COLUNAS CONGELADAS (ITENS DA NOTA) --- */
+.tabulator .tabulator-row .tabulator-cell.tabulator-frozen {
+    background-color: var(--surface) !important;
+}
+.tabulator .tabulator-row.tabulator-selectable:hover .tabulator-cell.tabulator-frozen {
+    background-color: var(--surface-secondary) !important;
+}
+.tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen {
+    background-color: var(--primary-subtle) !important;
+}
+.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen {
+    background-color: var(--primary-subtle) !important;
+}
