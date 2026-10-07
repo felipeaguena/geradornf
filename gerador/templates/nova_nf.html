@@ -389,14 +389,18 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
                                                         </label>
 </div>
 </div>
-<div class="col-12 d-flex gap-2">
-<button class="btn btn-outline-primary btn-sm flex-fill d-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()" type="button">
+<div class="col-12 d-flex flex-wrap gap-2">
+<button class="btn btn-outline-primary btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()" type="button">
 <i data-lucide="file-text"></i>
 <span>Registrar Câmbio em infCpl</span>
 </button>
-<button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" onclick="converterItensComTaxaPtax()" title="Multiplica o valor unitário e total dos itens pela taxa PTAX" type="button">
+<button class="btn btn-outline-secondary btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" onclick="converterItensComTaxaPtax()" title="Multiplica o valor unitário e total dos itens pela taxa PTAX (1 única vez)" type="button">
 <i data-lucide="arrow-left-right"></i>
-<span>Converter Itens</span>
+<span>Converter Itens (1ª vez)</span>
+</button>
+<button class="btn btn-warning btn-sm fw-bold flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="recalcularConversaoItens()" title="Recalcula o valor dos itens dividindo pela taxa anterior e multiplicando pela nova taxa PTAX" type="button">
+<i data-lucide="refresh-cw"></i>
+<span>Recalcular Conversão</span>
 </button>
 </div>
 </div>
@@ -940,6 +944,10 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
 <div><span class="text-muted">Outras Desp. (vOutro):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-outro">R$ 0,00</span></div>
 </div>
 <div class="d-flex align-items-center gap-2">
+<button class="btn btn-warning btn-sm py-0 px-2 fw-semibold text-dark shadow-sm d-flex align-items-center gap-1" onclick="recalcularConversaoItens()" title="Recalcula a conversão de moeda dos itens com base na nova taxa PTAX" type="button">
+<i data-lucide="refresh-cw"></i>
+<span>Recalcular Conversão</span>
+</button>
 <button class="btn btn-outline-info btn-sm py-0 px-2 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex" type="button">
 <i data-lucide="globe"></i>
 <span>uTrib Exportação</span>
@@ -1522,8 +1530,15 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
             return;
         }
 
+        // Verifica se algum item já foi convertido anteriormente
+        const itensJaConvertidos = itens.filter(it => parseNum(it.taxa_conversao) > 0);
+        if (itensJaConvertidos.length > 0) {
+            alert(`Atenção: ${itensJaConvertidos.length} item(ns) já possuem conversão de moeda registrada.\n\nPara ajustar com uma nova taxa de câmbio, utilize a opção "Recalcular Conversão". A conversão inicial só pode ser executada 1 única vez.`);
+            return;
+        }
+
         const moeda = obterMoedaSelecionada();
-        const conf = await nftConfirm(`Deseja converter os itens usando a Taxa PTAX de R$ ${formatarNumeroVisualBR(taxa, 4, 4)} por ${moeda}?\n\nOs campos Valor Unitário (vUnCom/vUnTrib) e Valor Total (vProd) dos ${itens.length} itens serão multiplicados pela taxa de câmbio.`, {
+        const conf = await nftConfirm(`Deseja converter os itens usando a Taxa PTAX de R$ ${formatarNumeroVisualBR(taxa, 4, 4)} por ${moeda}?\n\nEsta conversão inicial multiplica os valores unitários (vUnCom/vUnTrib) e total (vProd) dos ${itens.length} itens pela taxa de câmbio.\n(Para trocas posteriores de taxa, utilize o botão "Recalcular Conversão").`, {
             title: 'Converter Valores com PTAX',
             type: 'info',
             confirmText: 'Converter Itens'
@@ -1542,6 +1557,12 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
             it.vUnCom = novoUnit.toFixed(4);
             it.vUnTrib = novoUnit.toFixed(4);
             it.vProd = novoProd.toFixed(2);
+            it.moeda_conversao = moeda;
+            it.taxa_conversao = taxa.toFixed(4);
+
+            const vFrete = parseNum(it.vFrete);
+            const vSeg = parseNum(it.vSeg);
+            it.vBC_II = (novoProd + vFrete + vSeg).toFixed(2);
         });
 
         itensCache = itens;
@@ -1549,7 +1570,70 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
             itensTable.setData(itensCache);
         }
         recalcularTotaisDosItens(true);
-        alert(`Conversão com Taxa PTAX (R$ ${formatarNumeroVisualBR(taxa, 4, 4)}) concluída com sucesso para os ${itens.length} itens!`);
+        alert(`Conversão com Taxa PTAX (R$ ${formatarNumeroVisualBR(taxa, 4, 4)} / ${moeda}) concluída com sucesso para os ${itens.length} itens!`);
+    }
+
+    async function recalcularConversaoItens() {
+        const novaTaxa = parseNum(getVal('ptax_cotacao_venda'));
+        if (novaTaxa <= 0) {
+            alert("Informe ou consulte a nova Taxa PTAX válida antes de recalcular a conversão.");
+            return;
+        }
+
+        const itens = (itensTable) ? itensTable.getData() : itensCache;
+        if (!itens || itens.length === 0) {
+            alert("Nenhum item carregado para recalcular.");
+            return;
+        }
+
+        const moeda = obterMoedaSelecionada();
+
+        // Identifica itens que já têm taxa de conversão registrada
+        const itensConvertidos = itens.filter(it => parseNum(it.taxa_conversao) > 0);
+        if (itensConvertidos.length === 0) {
+            alert("Nenhum item possui taxa de conversão anterior gravada.\n\nExecute primeiro o botão 'Converter Itens' para registrar a moeda e a taxa inicial.");
+            return;
+        }
+
+        const conf = await nftConfirm(`Deseja RECALCULAR a conversão dos ${itens.length} itens para a nova taxa de R$ ${formatarNumeroVisualBR(novaTaxa, 4, 4)} por ${moeda}?\n\nRegra: O valor atual de cada item será dividido pela taxa anterior e multiplicado pela nova taxa do dia.`, {
+            title: 'Recalcular Conversão de Câmbio',
+            type: 'warning',
+            confirmText: 'Recalcular Conversão'
+        });
+        if (!conf) {
+            return;
+        }
+
+        let afetados = 0;
+        itens.forEach(it => {
+            const taxaAnterior = parseNum(it.taxa_conversao);
+            if (taxaAnterior > 0) {
+                const vUnComAtual = parseNum(it.vUnCom);
+                const qComNum = parseNum(it.qCom) || 1;
+
+                // Divide pela taxa anterior para voltar ao valor na moeda estrangeira e multiplica pela nova taxa
+                const novoUnit = (vUnComAtual / taxaAnterior) * novaTaxa;
+                const novoProd = novoUnit * qComNum;
+
+                it.vUnCom = novoUnit.toFixed(4);
+                it.vUnTrib = novoUnit.toFixed(4);
+                it.vProd = novoProd.toFixed(2);
+                it.moeda_conversao = moeda;
+                it.taxa_conversao = novaTaxa.toFixed(4);
+
+                const vFrete = parseNum(it.vFrete);
+                const vSeg = parseNum(it.vSeg);
+                it.vBC_II = (novoProd + vFrete + vSeg).toFixed(2);
+                afetados++;
+            }
+        });
+
+        itensCache = itens;
+        if (itensTable) {
+            itensTable.setData(itensCache);
+        }
+        recalcularTotaisDosItens(true);
+        alert(`Recálculo de conversão concluído com sucesso para ${afetados} item(ns)!\nNova Taxa: R$ ${formatarNumeroVisualBR(novaTaxa, 4, 4)} (${moeda}).`);
     }
 
     // === ALGORITMO DE RATEIO PROPORCIONAL CENTAVO-EXATO (HARE-NIEMEYER) ===
@@ -2185,6 +2269,8 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
             vBC_COFINS: "0.00",
             pCOFINS: (op && op.aliquota_cofins) ? String(op.aliquota_cofins) : "7.60",
             vCOFINS: "0.00",
+            moeda_conversao: "",
+            taxa_conversao: "",
             infAdProd: ""
         };
 
@@ -2233,6 +2319,8 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
         {title:"Qtd. Com.", field:"qCom", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Com.", field:"vUnCom", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Total Prod.", field:"vProd", width:125, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:"fw-bold text-primary"},
+        {title:"Moeda Conv.", field:"moeda_conversao", width:85, hozAlign:"center", headerHozAlign:"center", cssClass:"font-monospace fw-semibold text-secondary"},
+        {title:"Câmbio Utilizado", field:"taxa_conversao", width:125, hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, cssClass:"font-monospace text-secondary"},
         {title:"Un. Trib.", field:"uTrib", width:85, editor:"input"},
         {title:"Qtd. Trib.", field:"qTrib", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Trib.", field:"vUnTrib", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
