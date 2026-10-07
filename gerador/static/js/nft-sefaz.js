@@ -30,7 +30,7 @@ async function verificarStatusCertificado() {
                     <div class="fw-bold">${data.fim}</div>
                 </div>
                 <div class="col-12 mt-2">
-                    <span class="badge bg-success"><i data-lucide="check-circle" class="me-1"></i> Certificado Válido e Pronto para Uso</span>
+                    <span class="badge bg-info-subtle text-info fw-bold"><i data-lucide="check-circle" class="me-1"></i> Certificado Válido e Pronto para Uso</span>
                 </div>
             `;
         } else {
@@ -159,9 +159,9 @@ function atualizarTabelaHistorico(retorno, chave, ambiente = 2) {
     
     tr.innerHTML = `
         <td>${now}</td>
-        <td><span class="badge ${ambienteClass}">${ambienteText}</span></td>
+        <td><span class="badge bg-info-subtle text-info fw-bold">${ambienteText}</span></td>
         <td class="text-start" style="font-size: 11px;">${chave}</td>
-        <td><span class="badge ${cstatBadge}">${retorno.cstat || 'ERRO'}</span></td>
+        <td><span class="badge bg-info-subtle text-info fw-bold">${retorno.cstat || 'ERRO'}</span></td>
         <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${retorno.xmotivo || retorno.message || retorno.error || ''}">
             ${retorno.xmotivo || retorno.message || retorno.error || ''}
         </td>

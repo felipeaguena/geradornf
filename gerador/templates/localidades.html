@@ -30,7 +30,7 @@
 </div>
 <div class="sidebar-brand-info">
 <span class="sidebar-brand-title">NFT Logistics</span>
-<span class="sidebar-brand-badge">Localidades</span>
+<span class="badge sidebar-brand-badge bg-info-subtle text-info fw-bold">Localidades</span>
 </div>
 </a>
 <button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
@@ -125,7 +125,7 @@
 <!-- Top Header -->
 <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
 <div class="d-flex align-items-center gap-3">
-<button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+<button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
 <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
 </button>
 <div>
@@ -208,7 +208,7 @@
 <div class="input-group input-group-sm">
 <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
 <input class="form-control form-control-sm" id="search-paises" oninput="filtrarPaises()" placeholder="Buscar país por nome ou código BACEN (ex: Brasil, China, 1058, 160)..." type="text"/>
-<button class="btn btn-outline-secondary" onclick="document.getElementById('search-paises').value=''; filtrarPaises();" type="button">Limpar</button>
+<button class="btn-nft" onclick="document.getElementById('search-paises').value=''; filtrarPaises();" type="button">Limpar</button>
 </div>
 </div>
 <div class="col-md-6 text-md-end text-muted small">
@@ -276,7 +276,7 @@
 <div class="input-group input-group-sm">
 <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
 <input class="form-control form-control-sm" id="search-municipios" onkeydown="if(event.key==='Enter') carregarMunicipios(1)" placeholder="Buscar municipio ou codigo IBGE (ex: Sao Paulo, 3550308)..." type="text"/>
-<button class="btn btn-primary" onclick="carregarMunicipios(1)" type="button">Buscar</button>
+<button class="btn-nft" onclick="carregarMunicipios(1)" type="button">Buscar</button>
 </div>
 </div>
 <div class="col-md-4 text-md-end text-muted small">
@@ -305,8 +305,8 @@
 <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
 <span class="small text-muted" id="lbl-paginacao-mun">Página 1</span>
 <div class="btn-group btn-group-sm">
-<button class="btn btn-outline-secondary" disabled="" id="btn-mun-prev" onclick="mudarPaginaMun(-1)" type="button">Anterior</button>
-<button class="btn btn-outline-secondary" id="btn-mun-next" onclick="mudarPaginaMun(1)" type="button">Próxima</button>
+<button class="btn-nft" disabled="" id="btn-mun-prev" onclick="mudarPaginaMun(-1)" type="button">Anterior</button>
+<button class="btn-nft" id="btn-mun-next" onclick="mudarPaginaMun(1)" type="button">Próxima</button>
 </div>
 </div>
 </div>
@@ -317,7 +317,7 @@
 <div class="row g-3 mt-3">
 <div class="col-lg-5">
 <div class="card shadow-sm border h-100">
-<div class="card-header bg-light py-2 fw-bold d-flex align-items-center gap-2">
+<div class="card-header py-2 fw-bold d-flex align-items-center gap-2 text-secondary">
 <i data-lucide="search" style="width: 16px; height: 16px;"></i>
 <span>Consulta Direta de CEP</span>
 </div>
@@ -325,7 +325,7 @@
 <label class="form-label small fw-bold mb-1">Informe o CEP</label>
 <div class="input-group input-group-sm mb-2">
 <input class="form-control form-control-sm font-monospace fw-bold" id="input-teste-cep" maxlength="9" placeholder="00000-000 ou 99999-999" type="text"/>
-<button class="btn btn-primary fw-bold d-flex align-items-center gap-1" id="btn-consultar-cep" onclick="executarConsultaCep()" type="button">
+<button class="btn-nft fw-bold d-flex align-items-center gap-1" id="btn-consultar-cep" onclick="executarConsultaCep()" type="button">
 <i data-lucide="search" style="width: 14px; height: 14px;"></i>
 <span>Consultar</span>
 </button>
@@ -336,19 +336,19 @@
 <div class="border rounded p-2 bg-light mb-3">
 <div class="small fw-bold text-muted mb-2">Consultas Rápidas de Teste:</div>
 <div class="d-flex flex-wrap gap-2">
-<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('99999-999')" type="button">
+<button class="btn-nft" onclick="testarCepPredefinido('99999-999')" type="button">
                                                 Exterior (99999-999)
                                             </button>
-<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('01001-000')" type="button">
+<button class="btn-nft" onclick="testarCepPredefinido('01001-000')" type="button">
                                                 Praça da Sé (SP)
                                             </button>
-<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('05314-000')" type="button">
+<button class="btn-nft" onclick="testarCepPredefinido('05314-000')" type="button">
                                                 Vila Leopoldina (SP)
                                             </button>
-<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('20040-002')" type="button">
+<button class="btn-nft" onclick="testarCepPredefinido('20040-002')" type="button">
                                                 Rio de Janeiro (RJ)
                                             </button>
-<button class="btn btn-outline-secondary btn-sm" onclick="testarCepPredefinido('70150-900')" type="button">
+<button class="btn-nft" onclick="testarCepPredefinido('70150-900')" type="button">
                                                 Brasília (DF)
                                             </button>
 </div>
@@ -362,12 +362,12 @@
 </div>
 <div class="col-lg-7">
 <div class="card shadow-sm border h-100">
-<div class="card-header bg-light py-2 fw-bold d-flex align-items-center justify-content-between">
+<div class="card-header py-2 fw-bold d-flex align-items-center justify-content-between text-secondary">
 <div class="d-flex align-items-center gap-2">
 <i class="text-success" data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
 <span>Resultado da Consulta</span>
 </div>
-<span class="badge bg-secondary font-monospace" id="badge-cep-status">Aguardando consulta</span>
+<span class="badge font-monospace bg-info-subtle text-info fw-bold" id="badge-cep-status">Aguardando consulta</span>
 </div>
 <div class="card-body p-3">
 <div class="text-center py-5 text-muted" id="resultado-cep-vazio">
@@ -386,7 +386,7 @@
 </div>
 <div class="col-sm-4">
 <label class="form-label small text-muted mb-0">Origem da Resposta</label>
-<div class="pt-1" id="res-origem"><span class="badge bg-success">Cache SQLite</span></div>
+<div class="pt-1" id="res-origem"><span class="badge bg-info-subtle text-info fw-bold">Cache SQLite</span></div>
 </div>
 <div class="col-12"><hr class="my-2"/></div>
 <div class="col-sm-8">
@@ -461,16 +461,16 @@
             lista.forEach(p => {
                 const isBrasil = (p.codigo === '1058');
                 const badgeTipo = isBrasil 
-                    ? `<span class="badge bg-success">Nacional</span>` 
-                    : `<span class="badge bg-secondary-subtle text-secondary">Exterior</span>`;
+                    ? `<span class="badge bg-info-subtle text-info fw-bold">Nacional</span>` 
+                    : `<span class="badge bg-info-subtle text-info fw-bold">Exterior</span>`;
                 
                 html += `
                     <tr>
-                        <td><span class="badge font-monospace bg-light text-dark border px-2 py-1">${p.codigo}</span></td>
+                        <td><span class="badge font-monospace px-2 py-1 bg-info-subtle text-info fw-bold">${p.codigo}</span></td>
                         <td class="fw-bold">${p.nome}</td>
                         <td class="text-center">${badgeTipo}</td>
                         <td class="text-end">
-                            <button class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="copiarTexto('${p.codigo}')" title="Copiar Código BACEN">
+                            <button class="btn-nft py-0 px-2" onclick="copiarTexto('${p.codigo}')" title="Copiar Código BACEN">
                                 <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copiar
                             </button>
                         </td>
@@ -535,12 +535,12 @@
             items.forEach(m => {
                 html += `
                     <tr>
-                        <td><span class="badge font-monospace bg-light text-dark border px-2 py-1">${m.codigo_ibge}</span></td>
+                        <td><span class="badge font-monospace px-2 py-1 bg-info-subtle text-info fw-bold">${m.codigo_ibge}</span></td>
                         <td class="fw-bold">${m.nome}</td>
-                        <td class="text-center"><span class="badge bg-primary-subtle text-primary">${m.uf}</span></td>
+                        <td class="text-center"><span class="badge bg-info-subtle text-info fw-bold">${m.uf}</span></td>
                         <td class="text-center text-muted font-monospace">${m.c_uf || '-'}</td>
                         <td class="text-end">
-                            <button class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="copiarTexto('${m.codigo_ibge}')" title="Copiar Código IBGE">
+                            <button class="btn-nft py-0 px-2" onclick="copiarTexto('${m.codigo_ibge}')" title="Copiar Código IBGE">
                                 <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Copiar
                             </button>
                         </td>
@@ -604,15 +604,15 @@
             if (data.exterior) {
                 badgeStatus.className = 'badge bg-warning text-dark font-monospace';
                 badgeStatus.innerText = 'Exterior (99999-999)';
-                resOrigem.innerHTML = `<span class="badge bg-warning text-dark">Destinatário Exterior</span>`;
+                resOrigem.innerHTML = `<span class="badge bg-info-subtle text-info fw-bold">Destinatário Exterior</span>`;
             } else if (data.cached) {
                 badgeStatus.className = 'badge bg-success font-monospace';
                 badgeStatus.innerText = 'Sucesso (Base Local SQLite)';
-                resOrigem.innerHTML = `<span class="badge bg-success">Cache SQLite Local</span>`;
+                resOrigem.innerHTML = `<span class="badge bg-info-subtle text-info fw-bold">Cache SQLite Local</span>`;
             } else {
                 badgeStatus.className = 'badge bg-primary font-monospace';
                 badgeStatus.innerText = 'Sucesso (ViaCEP Online)';
-                resOrigem.innerHTML = `<span class="badge bg-primary">ViaCEP (Armazenado no Cache)</span>`;
+                resOrigem.innerHTML = `<span class="badge bg-info-subtle text-info fw-bold">ViaCEP (Armazenado no Cache)</span>`;
             }
 
             document.getElementById('res-logradouro').innerText = data.logradouro || (data.exterior ? 'EXTERIOR' : 'Não informado');

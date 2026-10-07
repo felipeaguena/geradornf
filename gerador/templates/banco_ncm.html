@@ -30,7 +30,7 @@
 </div>
 <div class="sidebar-brand-info">
 <span class="sidebar-brand-title">NFT Logistics</span>
-<span class="sidebar-brand-badge">Tabela NCM</span>
+<span class="badge sidebar-brand-badge bg-info-subtle text-info fw-bold">Tabela NCM</span>
 </div>
 </a>
 <button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
@@ -141,7 +141,7 @@
 <!-- Top Header Limpo -->
 <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
 <div class="d-flex align-items-center gap-3">
-<button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+<button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
 <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
 </button>
 <div>
@@ -227,10 +227,10 @@
 </select>
 </div>
 <div class="col-md-3 d-flex gap-2">
-<button class="btn btn-primary w-100 fw-bold" onclick="pesquisarNcm(1)">
+<button class="btn-nft w-100 fw-bold" onclick="pesquisarNcm(1)">
                         Filtrar
                     </button>
-<button class="btn btn-outline-secondary" onclick="limparFiltros()">
+<button class="btn-nft" onclick="limparFiltros()">
                         Limpar
                     </button>
 </div>
@@ -239,7 +239,7 @@
 </div>
 <!-- Tabela de Resultados -->
 <div class="card shadow-sm border mb-4">
-<div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+<div class="card-header d-flex justify-content-between align-items-center py-2 text-secondary">
 <span class="fw-bold small text-secondary">
                 Mostrando <span class="text-dark fw-bold" id="lbl-contagem">0</span> registros
             </span>
@@ -325,33 +325,33 @@
                 let html = '';
                 data.items.forEach(it => {
                     const utribBadge = it.utrib 
-                        ? `<span class="badge bg-success badge-utrib" title="${it.descricao_utrib || ''}">${it.utrib}</span>` 
+                        ? `<span class="badge badge-utrib bg-info-subtle text-info fw-bold" title="${it.descricao_utrib || ''}">${it.utrib}</span>` 
                         : `<span class="text-muted small">-</span>`;
                     
                     let iiBadge = '<span class="text-muted small">-</span>';
                     if (it.aliquota_ii !== null && it.aliquota_ii !== undefined) {
-                        iiBadge = `<span class="badge bg-info-subtle text-info border border-info-subtle fw-bold">${Number(it.aliquota_ii).toFixed(2)}%</span>`;
+                        iiBadge = `<span class="badge bg-info-subtle text-info fw-bold">${Number(it.aliquota_ii).toFixed(2)}%</span>`;
                     }
 
                     let ipiBadge = '<span class="text-muted small">-</span>';
                     if (it.aliquota_ipi !== null && it.aliquota_ipi !== undefined) {
                         if (it.aliquota_ipi === 'NT') {
-                            ipiBadge = `<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle" title="Não Tributado">NT (0%)</span>`;
+                            ipiBadge = `<span class="badge bg-info-subtle text-info fw-bold" title="Não Tributado">NT (0%)</span>`;
                         } else {
-                            ipiBadge = `<span class="badge bg-warning-subtle text-dark border border-warning-subtle fw-bold">${it.aliquota_ipi}%</span>`;
+                            ipiBadge = `<span class="badge bg-info-subtle text-info fw-bold">${it.aliquota_ipi}%</span>`;
                         }
                     }
 
                     let pisBadge = '<span class="text-muted small">-</span>';
                     if (it.aliquota_pis !== null && it.aliquota_pis !== undefined) {
                         const isZero = Number(it.aliquota_pis) === 0;
-                        pisBadge = `<span class="badge ${isZero ? 'bg-light text-muted border' : 'bg-success-subtle text-success border border-success-subtle fw-bold'}" title="${it.regime_pis_cofins || ''}">${Number(it.aliquota_pis).toFixed(2)}%</span>`;
+                        pisBadge = `<span class="badge bg-info-subtle text-info fw-bold" title="${it.regime_pis_cofins || ''}">${Number(it.aliquota_pis).toFixed(2)}%</span>`;
                     }
 
                     let cofinsBadge = '<span class="text-muted small">-</span>';
                     if (it.aliquota_cofins !== null && it.aliquota_cofins !== undefined) {
                         const isZero = Number(it.aliquota_cofins) === 0;
-                        cofinsBadge = `<span class="badge ${isZero ? 'bg-light text-muted border' : 'border fw-bold'}" style="${isZero ? '' : 'background-color: #f3e8fd; color: #6f42c1; border-color: #d8b4fe !important;'}" title="${it.regime_pis_cofins || ''}">${Number(it.aliquota_cofins).toFixed(2)}%</span>`;
+                        cofinsBadge = `<span class="badge bg-info-subtle text-info fw-bold" style="${isZero ? '' : 'background-color: #f3e8fd; color: #6f42c1; border-color: #d8b4fe !important;'}" title="${it.regime_pis_cofins || ''}">${Number(it.aliquota_cofins).toFixed(2)}%</span>`;
                     }
 
                     const ato = (it.tipo_ato && it.numero_ato) ? `${it.tipo_ato} ${it.numero_ato}/${it.ano_ato}` : '-';

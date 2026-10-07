@@ -37,8 +37,8 @@
                     <div class="modal-footer py-2 px-4 d-flex justify-content-between" style="border-top: 1px solid var(--border); background-color: var(--surface-secondary);">
                         <span class="text-muted small" id="modalAnaliseFooterInfo">NFT Logistics XML Validator</span>
                         <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Fechar e Revisar</button>
-                            <button type="button" class="btn btn-primary btn-sm px-3 fw-bold d-flex align-items-center gap-1 shadow-sm" id="btnGerarXMLModal" onclick="fecharModalEGerarXML()">
+                            <button type="button" class="btn-nft px-3" data-bs-dismiss="modal">Fechar e Revisar</button>
+                            <button type="button" class="btn-nft px-3 fw-bold d-flex align-items-center gap-1 shadow-sm" id="btnGerarXMLModal" onclick="fecharModalEGerarXML()">
                                 <i data-lucide="download" style="width: 15px; height: 15px;"></i>
                                 <span>Gerar Novo XML</span>
                             </button>
@@ -304,7 +304,7 @@
                 <div class="col-6 col-md-3">
                     <div class="p-2 px-3 rounded-3 border bg-light text-center h-100">
                         <small class="text-muted d-block" style="font-size: 11px;">Montagem XML</small>
-                        <span class="badge ${resumo.xml_construido ? 'bg-success' : 'bg-danger'} py-1 px-2" style="font-size: 11px;">
+                        <span class="badge py-1 px-2 bg-info-subtle text-info fw-bold" style="font-size: 11px;">
                             ${resumo.xml_construido ? '100% Ok' : 'Incompleto'}
                         </span>
                     </div>
@@ -319,12 +319,12 @@
                 <li class="list-group-item d-flex justify-content-between align-items-start gap-2 py-2 px-3 border-danger-subtle" style="background-color: rgba(239, 68, 68, 0.03);">
                     <div class="ms-1 me-auto">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge bg-danger" style="font-size: 10.5px;">${e.categoria || 'Erro'}</span>
+                            <span class="badge bg-info-subtle text-info fw-bold" style="font-size: 10.5px;">${e.categoria || 'Erro'}</span>
                             <strong class="text-dark" style="font-size: 13px;">${e.campo || ''}</strong>
                         </div>
                         <div class="text-secondary small">${e.mensagem || ''}</div>
                     </div>
-                    <button type="button" class="btn btn-outline-danger btn-xs py-0 px-2 mt-1 shadow-none" onclick="irParaAbaAnalise('${e.aba}')" title="Ir para a aba para corrigir este campo" style="font-size: 11px; border-radius: 4px; white-space: nowrap;">
+                    <button type="button" class="btn-nft py-0 px-2 mt-1 shadow-none" onclick="irParaAbaAnalise('${e.aba}')" title="Ir para a aba para corrigir este campo" style="font-size: 11px; border-radius: 4px; white-space: nowrap;">
                         Corrigir na ${e.aba || 'Aba'} &rarr;
                     </button>
                 </li>
@@ -332,7 +332,7 @@
 
             errosHtml = `
                 <div class="card border border-danger mb-3 shadow-sm rounded-3 overflow-hidden">
-                    <div class="card-header bg-danger text-white py-2 px-3 d-flex justify-content-between align-items-center">
+                    <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center text-secondary">
                         <span class="fw-bold d-flex align-items-center gap-2" style="font-size: 13px;">
                             <i data-lucide="alert-octagon" style="width: 16px; height: 16px;"></i>
                             O que precisa ser corrigido (${totalErros}):
@@ -352,12 +352,12 @@
                 <li class="list-group-item d-flex justify-content-between align-items-start gap-2 py-2 px-3 border-warning-subtle" style="background-color: rgba(245, 158, 11, 0.03);">
                     <div class="ms-1 me-auto">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge bg-warning text-dark" style="font-size: 10.5px;">${a.categoria || 'Aviso'}</span>
+                            <span class="badge bg-info-subtle text-info fw-bold" style="font-size: 10.5px;">${a.categoria || 'Aviso'}</span>
                             <strong class="text-dark" style="font-size: 13px;">${a.campo || ''}</strong>
                         </div>
                         <div class="text-secondary small">${a.mensagem || ''}</div>
                     </div>
-                    <button type="button" class="btn btn-outline-warning text-dark btn-xs py-0 px-2 mt-1 shadow-none" onclick="irParaAbaAnalise('${a.aba}')" title="Ir para a aba para revisar este campo" style="font-size: 11px; border-radius: 4px; white-space: nowrap;">
+                    <button type="button" class="btn-nft text-dark py-0 px-2 mt-1 shadow-none" onclick="irParaAbaAnalise('${a.aba}')" title="Ir para a aba para revisar este campo" style="font-size: 11px; border-radius: 4px; white-space: nowrap;">
                         Revisar na ${a.aba || 'Aba'} &rarr;
                     </button>
                 </li>
@@ -365,7 +365,7 @@
 
             alertasHtml = `
                 <div class="card border border-warning mb-3 shadow-sm rounded-3 overflow-hidden">
-                    <div class="card-header bg-warning text-dark py-2 px-3 d-flex justify-content-between align-items-center">
+                    <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center text-secondary">
                         <span class="fw-bold d-flex align-items-center gap-2" style="font-size: 13px;">
                             <i data-lucide="alert-triangle" style="width: 16px; height: 16px;"></i>
                             Alertas e Recomendações (${totalAlertas}):

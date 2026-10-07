@@ -23,6 +23,7 @@ import random
 import hashlib
 import base64
 import sefaz_client
+import zipfile
 
 import sefaz_client
 
@@ -3200,7 +3201,7 @@ def api_sefaz_enviar():
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             chave,
-            2, # tpAmb = 2 (Homologação)
+            tpAmb, # changed from hardcoded 2
             retorno.get('cstat', ''),
             retorno.get('xmotivo', ''),
             retorno.get('recibo', ''),
@@ -3214,6 +3215,47 @@ def api_sefaz_enviar():
         return jsonify(retorno)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/sefaz/download/pdf/<chave>', methods=['GET'])
+def download_pdf(chave):
+    # For now, return the template PDF
+    pdf_path = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+    if os.path.exists(pdf_path):
+        return send_file(pdf_path, as_attachment=True, download_name=f"{chave}-danfe.pdf")
+    return "PDF não encontrado", 404
+
+@app.route('/api/sefaz/download/xml/<chave>', methods=['GET'])
+def download_xml(chave):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT xml_envio, xml_retorno FROM historico_sefaz WHERE chave_nfe = ? ORDER BY id DESC LIMIT 1", (chave,))
+    row = c.fetchone()
+    conn.close()
+    
+    if row and row['xml_envio']:
+        xml_data = row['xml_envio']
+        return send_file(io.BytesIO(xml_data.encode('utf-8')), as_attachment=True, download_name=f"{chave}-nfe.xml", mimetype='application/xml')
+    return "XML não encontrado", 404
+
+@app.route('/api/sefaz/download/zip/<chave>', methods=['GET'])
+def download_zip(chave):
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT xml_envio FROM historico_sefaz WHERE chave_nfe = ? ORDER BY id DESC LIMIT 1", (chave,))
+    row = c.fetchone()
+    conn.close()
+    
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+        pdf_path = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+        if os.path.exists(pdf_path):
+            zf.write(pdf_path, f"{chave}-danfe.pdf")
+            
+        if row and row['xml_envio']:
+            zf.writestr(f"{chave}-nfe.xml", row['xml_envio'])
+            
+    memory_file.seek(0)
+    return send_file(memory_file, as_attachment=True, download_name=f"{chave}-export.zip", mimetype='application/zip')
 
 if __name__ == '__main__':
     get_db_connection().close()

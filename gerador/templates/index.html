@@ -35,7 +35,7 @@
 </div>
 <div class="sidebar-brand-info">
 <span class="sidebar-brand-title">NFT Logistics</span>
-<span class="sidebar-brand-badge">XML Rascunho</span>
+<span class="badge sidebar-brand-badge bg-info-subtle text-info fw-bold">XML Rascunho</span>
 </div>
 </a>
 <button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
@@ -75,7 +75,7 @@
 <button class="nft-sidebar-btn" onclick="abrirModalListaRascunhos()" title="Ver e gerenciar Rascunhos Salvos" type="button">
 <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
 <span class="sidebar-label">Rascunhos Salvos</span>
-<span class="badge bg-secondary-subtle text-muted sidebar-badge badge-counter-rascunhos" id="sidebar-rascunhos-badge">0</span>
+<span class="badge sidebar-badge badge-counter-rascunhos bg-info-subtle text-info fw-bold" id="sidebar-rascunhos-badge">0</span>
 </button>
 </li>
 </ul>
@@ -144,13 +144,13 @@
 <!-- Top Header Limpo -->
 <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
 <div class="d-flex align-items-center gap-3">
-<button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+<button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
 <i data-lucide="menu"></i>
 </button>
 <div>
 <h4 class="mb-0 fw-bold d-flex align-items-center gap-2">
 <span>Editor &amp; Gerador NF-e</span>
-<span class="badge bg-secondary-subtle text-secondary font-monospace" style="font-size: 11px; padding: 4px 8px;">XML Rascunho</span>
+<span class="badge font-monospace bg-info-subtle text-info fw-bold" style="font-size: 11px; padding: 4px 8px;">XML Rascunho</span>
 </h4>
 <small class="text-muted">Importe o XML de modelo, selecione o Tipo de Nota para herdar impostos e salve rascunhos para continuar a edição</small>
 </div>
@@ -178,23 +178,23 @@
 </div>
 <!-- 3. Botão Carregar e Processar XML -->
 <div class="col-xl-2 col-lg-2 col-md-2">
-<button class="btn btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
+<button class="btn-nft w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
 <i data-lucide="upload"></i>
 <span>Processar XML</span>
 </button>
 </div>
 <!-- 4. Botões de Ação de Rascunho (Tarefa 2) -->
 <div class="col-xl-5 col-lg-5 col-md-12 d-flex align-items-center gap-2">
-<button class="btn btn-outline-success fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
+<button class="btn-nft fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
 <i data-lucide="save"></i>
 <span>Salvar</span>
 </button>
-<button class="btn btn-outline-secondary fw-bold d-flex align-items-center justify-content-center gap-2" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
+<button class="btn-nft fw-bold d-flex align-items-center justify-content-center gap-2" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
 <i data-lucide="folder-clock"></i>
 <span>Rascunhos</span>
-<span class="badge bg-secondary text-white badge-counter-rascunhos" id="badge-total-rascunhos">0</span>
+<span class="badge badge-counter-rascunhos bg-info-subtle text-info fw-bold" id="badge-total-rascunhos">0</span>
 </button>
-<button class="btn btn-outline-danger fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco" type="button">
+<button class="btn-nft fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco" type="button">
 <i data-lucide="rotate-ccw"></i>
 <span>Nova Nota</span>
 </button>
@@ -204,11 +204,11 @@
 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
 <div class="d-flex align-items-center gap-2 small">
 <span class="text-muted">Status do Documento:</span>
-<span class="badge bg-secondary py-1 px-2" id="status-badge">Aguardando XML</span>
-<span class="badge bg-light text-dark border d-none" id="rascunho-info-tag"></span>
+<span class="badge py-1 px-2 bg-info-subtle text-info fw-bold" id="status-badge">Aguardando XML</span>
+<span class="badge d-none bg-info-subtle text-info fw-bold" id="rascunho-info-tag"></span>
 </div>
 <div class="text-muted small font-monospace" id="rascunho-origem-indicator">
-                            Módulo Ativo: <span class="badge badge-origem-rasc">XML Rascunho</span>
+                            Módulo Ativo: <span class="badge badge-origem-rasc bg-info-subtle text-info fw-bold">XML Rascunho</span>
 </div>
 </div>
 </div>
@@ -219,10 +219,10 @@
 <div class="d-flex align-items-center gap-2">
 <i data-lucide="history" style="width: 16px; height: 16px;"></i>
 <span><strong>Sessão restaurada automaticamente:</strong> Os dados e itens em edição foram preservados com segurança nesta página.</span>
-<span class="badge bg-secondary-subtle text-secondary font-monospace" id="nft-autosave-time"></span>
+<span class="badge font-monospace bg-info-subtle text-info fw-bold" id="nft-autosave-time"></span>
 </div>
 <div class="d-flex align-items-center gap-2">
-<button class="btn btn-sm btn-outline-danger py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar formulário e começar nota em branco" type="button">
+<button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar formulário e começar nota em branco" type="button">
 <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i>
 <span>Limpar (Nova Nota)</span>
 </button>
@@ -289,7 +289,7 @@
 </div>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace fw-bold text-primary" id="chaveAcessoDisplay" placeholder="Aguardando dados da nota..." readonly="" style="background-color: var(--surface-secondary); letter-spacing: 0.04em; font-size: 0.88rem;" type="text"/>
-<button class="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-1" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa" type="button">
+<button class="btn-nft px-3 d-flex align-items-center gap-1" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa" type="button">
 <i data-lucide="copy"></i>
 <span>Copiar</span>
 </button>
@@ -316,8 +316,8 @@
 <span class="text-muted fw-normal" style="font-size: 11px;">(Tag SEFAZ: &lt;NFref&gt;&lt;refNFe&gt;)</span>
 </label>
 <div class="d-flex align-items-center gap-2">
-<span class="badge bg-secondary font-monospace" id="refNFe_badge" style="font-size: 11px;">0 / 44 dígitos</span>
-<button class="btn btn-outline-primary btn-sm py-0 px-2 d-inline-flex align-items-center gap-1" onclick="sincronizarRefNFeComInfCpl(true)" style="height: 24px; font-size: 11.5px;" title="Adicionar ou atualizar a nota referenciada nas Informações Complementares" type="button">
+<span class="badge font-monospace bg-info-subtle text-info fw-bold" id="refNFe_badge" style="font-size: 11px;">0 / 44 dígitos</span>
+<button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="sincronizarRefNFeComInfCpl(true)" style="height: 24px; font-size: 11.5px;" title="Adicionar ou atualizar a nota referenciada nas Informações Complementares" type="button">
 <i data-lucide="plus-circle" style="width: 12px; height: 12px;"></i>
 <span>Incluir em Inf. Complementares</span>
 </button>
@@ -325,7 +325,7 @@
 </div>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="refNFe" maxlength="44" oninput="aoDigitarRefNFe(this)" placeholder="Digite ou cole os 44 dígitos numéricos da chave de acesso da nota referenciada" style="letter-spacing: 0.05em; font-size: 0.88rem;" type="text"/>
-<button class="btn btn-outline-secondary btn-sm px-2 d-flex align-items-center gap-1" onclick="limparRefNFe()" title="Limpar nota referenciada" type="button">
+<button class="btn-nft px-2 d-flex align-items-center gap-1" onclick="limparRefNFe()" title="Limpar nota referenciada" type="button">
 <i data-lucide="x" style="width: 13px; height: 13px;"></i>
 <span>Limpar</span>
 </button>
@@ -349,7 +349,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <div><span class="text-muted">PIS/COFINS:</span> <span class="fw-semibold" id="lbl-pis-ativo">-</span></div>
 </div>
 <div>
-<button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" onclick="aplicarOperacaoSelecionadaAosItens()" type="button">
+<button class="btn-nft d-flex align-items-center gap-1" onclick="aplicarOperacaoSelecionadaAosItens()" type="button">
 <i data-lucide="refresh-cw"></i>
 <span>Reaplicar Regras aos Itens</span>
 </button>
@@ -359,13 +359,13 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <!-- NOVO CARD: PARÂMETROS PRINCIPAIS: CÂMBIO PTAX & RATEIO DE DESPESAS (MARINHA MERCANTE, SISCOMEX) -->
 <div class="col-12 mt-3" id="card-parametros-rateio-ptax">
 <div class="card border shadow-sm">
-<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+<div class="card-header py-2 d-flex justify-content-between align-items-center flex-wrap gap-2 text-secondary">
 <div class="d-flex align-items-center gap-2">
-<span class="badge bg-primary px-2 py-1 d-flex align-items-center gap-1"><i data-lucide="sliders"></i> Parâmetros Principais</span>
+<span class="badge px-2 py-1 d-flex align-items-center gap-1 bg-info-subtle text-info fw-bold"><i data-lucide="sliders"></i> Parâmetros Principais</span>
 <span class="fw-bold">Câmbio Oficial PTAX &amp; Rateios Globais da NF-e</span>
 </div>
 <div class="d-flex align-items-center gap-2">
-<span class="badge bg-secondary" id="badge-itens-para-rateio">0 itens carregados</span>
+<span class="badge bg-info-subtle text-info fw-bold" id="badge-itens-para-rateio">0 itens carregados</span>
 </div>
 </div>
 <div class="card-body p-3">
@@ -407,12 +407,12 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <label class="form-label small fw-bold mb-1">Data Cotação</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm" id="ptax_data" type="date"/>
-<button class="btn btn-outline-secondary" onclick="definirDataPtaxHoje()" title="Definir data de hoje" type="button">Hoje</button>
+<button class="btn-nft" onclick="definirDataPtaxHoje()" title="Definir data de hoje" type="button">Hoje</button>
 </div>
 </div>
 <!-- Botão de Consulta à API PTAX -->
 <div class="col-12 mt-2">
-<button class="btn btn-primary btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()" type="button">
+<button class="btn-nft w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()" type="button">
 <span class="spinner-border spinner-border-sm d-none" id="spinner-ptax" role="status"></span>
 <i data-lucide="zap"></i>
 <span>Puxar Taxa PTAX Atual (Boletim Bacen)</span>
@@ -420,7 +420,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </div>
 <!-- Valores de Câmbio Retornados -->
 <div class="col-sm-6 mt-2">
-<label class="form-label small fw-bold mb-1 text-primary">Taxa PTAX Venda (R$)</label>
+<label class="form-label small fw-bold mb-1">Taxa PTAX Venda (R$)</label>
 <div class="input-group input-group-sm">
 <span class="input-group-text font-monospace fw-bold">R$</span>
 <input class="form-control form-control-sm font-monospace text-end fw-bold text-primary" id="ptax_cotacao_venda" onchange="formatarInputVisualBR(this, 4, 4)" placeholder="0,0000" type="text"/>
@@ -438,7 +438,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <div class="p-2 border rounded bg-white small font-monospace mt-1" id="box-info-boletim" style="font-size: 11px; display: none;">
 <div class="d-flex justify-content-between align-items-center">
 <span><strong id="lbl-boletim-tipo">Boletim:</strong> <span id="lbl-boletim-detalhe">-</span></span>
-<span class="badge bg-success-subtle text-success" id="badge-boletim-ok">Atualizado</span>
+<span class="badge bg-info-subtle text-info fw-bold" id="badge-boletim-ok">Atualizado</span>
 </div>
 <div class="text-muted mt-1"><span id="lbl-boletim-datahora">-</span></div>
 </div>
@@ -453,11 +453,11 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </div>
 </div>
 <div class="col-12 d-flex flex-wrap gap-2">
-<button class="btn btn-outline-primary btn-sm flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()" type="button">
+<button class="btn-nft flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()" type="button">
 <i data-lucide="file-text"></i>
 <span>Registrar Câmbio em infCpl</span>
 </button>
-<button class="btn btn-warning btn-sm fw-bold flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="recalcularConversaoItens()" title="Recalcula o valor dos itens dividindo pela taxa anterior e multiplicando pela nova taxa PTAX" type="button">
+<button class="btn-nft fw-bold flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="recalcularConversaoItens()" title="Recalcula o valor dos itens dividindo pela taxa anterior e multiplicando pela nova taxa PTAX" type="button">
 <i data-lucide="refresh-cw"></i>
 <span>Recalcular Conversão</span>
 </button>
@@ -473,7 +473,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <i data-lucide="scale"></i>
 <span>Rateio Global de Despesas entre os Itens</span>
 </h6>
-<span class="badge bg-warning-subtle text-dark fw-bold">Divisão Centavo-Exata</span>
+<span class="badge bg-info-subtle text-info fw-bold">Divisão Centavo-Exata</span>
 </div>
 <small class="text-muted d-block mb-3">
                                                 Informe o total das despesas da DI. O sistema distribuirá matematicamente os centavos entre os itens da nota.
@@ -483,7 +483,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <div class="col-sm-6">
 <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
 <span class="d-flex align-items-center gap-1"><i data-lucide="anchor"></i> VALOR MARINHA MERCANTE</span>
-<span class="badge bg-primary-subtle text-primary font-monospace" style="font-size: 10px;">vAFRMM (DI)</span>
+<span class="badge font-monospace bg-info-subtle text-info fw-bold" style="font-size: 10px;">vAFRMM (DI)</span>
 </label>
 <div class="input-group input-group-sm">
 <span class="input-group-text font-monospace fw-bold">R$</span>
@@ -495,7 +495,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <div class="col-sm-6">
 <label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
 <span class="d-flex align-items-center gap-1"><i data-lucide="landmark"></i> TAXA SISCOMEX</span>
-<span class="badge bg-success-subtle text-success font-monospace" style="font-size: 10px;">vDespAdu (II) / vOutro</span>
+<span class="badge font-monospace bg-info-subtle text-info fw-bold" style="font-size: 10px;">vDespAdu (II) / vOutro</span>
 </label>
 <div class="input-group input-group-sm">
 <span class="input-group-text font-monospace fw-bold">R$</span>
@@ -568,7 +568,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </select>
 </div>
 <div class="col-sm-6 mt-2 d-flex align-items-end">
-<button class="btn btn-warning fw-bold text-dark w-100 btn-sm shadow-sm py-2 d-flex align-items-center justify-content-center gap-2" onclick="executarRateioGlobal()" type="button">
+<button class="btn-nft fw-bold text-dark w-100 shadow-sm py-2 d-flex align-items-center justify-content-center gap-2" onclick="executarRateioGlobal()" type="button">
 <i data-lucide="calculator"></i>
 <span>Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)</span>
 </button>
@@ -583,32 +583,32 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <!-- EMITENTE -->
 <!-- DESTINATARIO -->
 </div>
-<div class="col-12 mt-3"><div class="card shadow-sm border mb-3"><div class="card-header bg-light py-2 fw-bold text-secondary"><i data-lucide="package"></i> Volumes e Pesos</div><div class="card-body py-2"><div class="row g-2"><div class="col-md-3">
-<label class="form-label small mb-1 fw-bold text-primary">Qtd. Volumes (qVol)</label>
+<div class="col-12 mt-3"><div class="card shadow-sm border mb-3"><div class="card-header py-2 fw-bold text-secondary"><i data-lucide="package"></i> Volumes e Pesos</div><div class="card-body py-2"><div class="row g-2"><div class="col-md-3">
+<label class="form-label small fw-bold mb-1">Qtd. Volumes (qVol)</label>
 <input class="form-control form-control-sm font-monospace text-end" id="transp_qVol" placeholder="Ex: 10" type="text"/>
 </div><div class="col-md-3">
-<label class="form-label small mb-1 fw-bold text-primary">Espécie de Volumes (esp)</label>
+<label class="form-label small fw-bold mb-1">Espécie de Volumes (esp)</label>
 <input class="form-control form-control-sm" id="transp_esp" placeholder="Ex: CAIXAS, PALETES, VOLUMES" type="text"/>
 </div><div class="col-md-3">
-<label class="form-label small mb-1 fw-bold text-primary">Peso Líquido Total (kg)</label>
+<label class="form-label small fw-bold mb-1">Peso Líquido Total (kg)</label>
 <input class="form-control form-control-sm font-monospace text-end" id="transp_pesoL" onchange="formatarInputVisualBR(this, 3, 3); aoMudarPesoLiquidoTransporte();" placeholder="0,000" type="text"/>
 </div><div class="col-md-3">
-<label class="form-label small mb-1 fw-bold text-primary">Peso Bruto Total (kg)</label>
+<label class="form-label small fw-bold mb-1">Peso Bruto Total (kg)</label>
 <input class="form-control form-control-sm font-monospace text-end" id="transp_pesoB" onchange="formatarInputVisualBR(this, 3, 3)" placeholder="0,000" type="text"/>
 </div></div></div></div></div>
 
 <!-- DADOS DE EXPORTAÇÃO (SEFAZ: <exporta>) -->
 <div class="col-12 mt-3" id="secao_exportacao" style="display: none;">
     <div class="card shadow-sm border mb-3">
-        <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center text-secondary">
             <span class="fw-bold d-flex align-items-center gap-1 text-secondary">
                 <i data-lucide="plane-takeoff"></i>
                 <span>Exportação</span>
                 <span class="text-muted fw-normal" style="font-size: 11px;">(Tag SEFAZ: &lt;exporta&gt;)</span>
             </span>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-secondary font-monospace" style="font-size: 11px;">Opcional (CFOP 7xxx / Exterior)</span>
-                <button class="btn btn-outline-secondary btn-sm py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparCamposExportacao()" style="height: 24px; font-size: 11px;" title="Limpar campos de exportação" type="button">
+                <span class="badge font-monospace bg-info-subtle text-info fw-bold" style="font-size: 11px;">Opcional (CFOP 7xxx / Exterior)</span>
+                <button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparCamposExportacao()" style="height: 24px; font-size: 11px;" title="Limpar campos de exportação" type="button">
                     <i data-lucide="eraser" style="width: 12px; height: 12px;"></i>
                     <span>Limpar</span>
                 </button>
@@ -617,7 +617,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
         <div class="card-body py-2">
             <div class="row g-2">
                 <div class="col-md-3">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="exporta_UFSaidaPais">UF de embarque</label>
+                    <label class="form-label small fw-bold mb-1" for="exporta_UFSaidaPais">UF de embarque</label>
                     <select class="form-select form-select-sm font-monospace" id="exporta_UFSaidaPais">
                         <option value="">Selecione a UF...</option>
                         <option value="AC">AC</option>
@@ -650,11 +650,11 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
                     </select>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="exporta_xLocExporta">Local de embarque</label>
+                    <label class="form-label small fw-bold mb-1" for="exporta_xLocExporta">Local de embarque</label>
                     <input class="form-control form-control-sm" id="exporta_xLocExporta" maxlength="60" placeholder="Ex: PORTO DE SANTOS, AEROPORTO DE VIRACOPOS" type="text"/>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="exporta_xLocDespacho">Local de despacho</label>
+                    <label class="form-label small fw-bold mb-1" for="exporta_xLocDespacho">Local de despacho</label>
                     <input class="form-control form-control-sm" id="exporta_xLocDespacho" maxlength="60" placeholder="Ex: RECINTO ALFANDEGADO SANTOS (Opcional)" type="text"/>
                 </div>
             </div>
@@ -665,12 +665,12 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <!-- IDENTIFICAÇÃO DA IMPORTAÇÃO -->
 <div class="col-12 mt-3">
     <div class="card shadow-sm border mb-3">
-        <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center text-secondary">
             <span class="fw-bold d-flex align-items-center gap-1 text-secondary">
                 <i data-lucide="globe"></i>
                 <span>Identificação da Importação</span>
             </span>
-            <button class="btn btn-outline-primary btn-sm py-0 px-2 d-flex align-items-center gap-1 shadow-sm" onclick="repassarImportacaoParaItens()" title="Repassar estes dados de importação para todos os itens da nota" type="button">
+            <button class="btn-nft py-0 px-2 d-flex align-items-center gap-1 shadow-sm" onclick="repassarImportacaoParaItens()" title="Repassar estes dados de importação para todos os itens da nota" type="button">
                 <i data-lucide="arrow-down-to-dot" style="width: 14px; height: 14px;"></i>
                 <span>Repassar para itens</span>
             </button>
@@ -678,15 +678,15 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
         <div class="card-body py-2">
             <div class="row g-2">
                 <div class="col-md-3">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="import_nDI">Número DI/DSI/DA/DRI-E/DUImp</label>
+                    <label class="form-label small fw-bold mb-1" for="import_nDI">Número DI/DSI/DA/DRI-E/DUImp</label>
                     <input class="form-control form-control-sm font-monospace" id="import_nDI" placeholder="Ex: 24/1234567-8 ou DUImp" type="text"/>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="import_dDI">Data Registro</label>
+                    <label class="form-label small fw-bold mb-1" for="import_dDI">Data Registro</label>
                     <input class="form-control form-control-sm" id="import_dDI" type="date"/>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label small mb-1 fw-bold text-primary d-flex justify-content-between align-items-center" for="import_cExportador">
+                    <label class="form-label small fw-bold mb-1" for="import_cExportador">
                         <span>Cód. Exportador</span>
                         <a class="text-decoration-none small text-muted" href="javascript:void(0)" onclick="puxarNomeDestinatarioParaExportador()" title="Puxar Nome do Destinatário">
                             <i data-lucide="user-check" style="width: 12px; height: 12px;"></i> Puxar Destinatário
@@ -694,13 +694,13 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
                     </label>
                     <div class="input-group input-group-sm">
                         <input class="form-control form-control-sm" id="import_cExportador" placeholder="Puxa o Nome do Destinatário..." type="text"/>
-                        <button class="btn btn-outline-secondary" onclick="puxarNomeDestinatarioParaExportador()" title="Puxar Nome dos Dados do Destinatário" type="button">
+                        <button class="btn-nft" onclick="puxarNomeDestinatarioParaExportador()" title="Puxar Nome dos Dados do Destinatário" type="button">
                             <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i>
                         </button>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="import_tpIntermedio">Tipo de Importação</label>
+                    <label class="form-label small fw-bold mb-1" for="import_tpIntermedio">Tipo de Importação</label>
                     <select class="form-select form-select-sm" id="import_tpIntermedio">
                         <option value="1">1 - Por conta própria</option>
                         <option value="2">2 - Por conta e ordem</option>
@@ -708,7 +708,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="import_tpViaTransp">Via de Transporte</label>
+                    <label class="form-label small fw-bold mb-1" for="import_tpViaTransp">Via de Transporte</label>
                     <select class="form-select form-select-sm" id="import_tpViaTransp">
                         <option value="1">1 - Marítima</option>
                         <option value="2">2 - Fluvial</option>
@@ -723,15 +723,15 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="import_UFDesemb">Desembaraço - UF</label>
+                    <label class="form-label small fw-bold mb-1" for="import_UFDesemb">Desembaraço - UF</label>
                     <input class="form-control form-control-sm text-uppercase text-center font-monospace" id="import_UFDesemb" maxlength="2" placeholder="Ex: SP" type="text"/>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="import_xLocDesemb">Desembaraço - Local</label>
+                    <label class="form-label small fw-bold mb-1" for="import_xLocDesemb">Desembaraço - Local</label>
                     <input class="form-control form-control-sm" id="import_xLocDesemb" placeholder="Ex: PORTO DE SANTOS" type="text"/>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label small mb-1 fw-bold text-primary" for="import_dDesemb">Desembaraço - Data</label>
+                    <label class="form-label small fw-bold mb-1" for="import_dDesemb">Desembaraço - Data</label>
                     <input class="form-control form-control-sm" id="import_dDesemb" type="date"/>
                 </div>
             </div>
@@ -740,12 +740,12 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </div>
 
 <div class="card border mb-3 mt-3">
-<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+<div class="card-header py-2 d-flex justify-content-between align-items-center text-secondary">
 <span class="fw-bold d-flex align-items-center gap-1">
 <i data-lucide="file-text"></i>
 <span>Informações Complementares / Observações da Nota (infCpl)</span>
 </span>
-<button class="btn btn-outline-primary btn-sm py-0 px-2 d-flex align-items-center gap-1" onclick="aplicarObsDaOperacao()" type="button">
+<button class="btn-nft py-0 px-2 d-flex align-items-center gap-1" onclick="aplicarObsDaOperacao()" type="button">
 <i data-lucide="file-text"></i>
 <span>Puxar Observação Padrão do Tipo de Nota</span>
 </button>
@@ -754,7 +754,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <!-- SELETOR DE FEIRA PARA infCpl -->
 <div class="row g-2 align-items-center mb-2 pb-2 border-bottom">
 <div class="col-md-8 col-lg-7">
-<label class="form-label small fw-bold text-primary mb-1 d-flex align-items-center gap-1" for="select_feira_infcpl">
+<label class="form-label small fw-bold mb-1" for="select_feira_infcpl">
 <i data-lucide="calendar-days" style="width: 14px; height: 14px;"></i>
 <span>Adicionar Dados da Feira nas Observações</span>
 </label>
@@ -763,11 +763,11 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <select class="form-select form-select-sm" id="select_feira_infcpl" onchange="aoSelecionarFeiraInfCpl(this)">
 <option value="">Selecione uma feira para adicionar em infCpl...</option>
 </select>
-<button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" onclick="aplicarTextoFeiraSelecionada(true)" title="Inserir ou atualizar dados da feira em infCpl" type="button">
+<button class="btn-nft d-flex align-items-center gap-1" onclick="aplicarTextoFeiraSelecionada(true)" title="Inserir ou atualizar dados da feira em infCpl" type="button">
 <i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
 <span>Inserir</span>
 </button>
-<button class="btn btn-outline-secondary btn-sm" onclick="limparTextoFeiraInfCpl()" title="Remover texto da feira de infCpl" type="button">
+<button class="btn-nft" onclick="limparTextoFeiraInfCpl()" title="Remover texto da feira de infCpl" type="button">
 <i data-lucide="x" style="width: 13px; height: 13px;"></i>
 </button>
 </div>
@@ -785,11 +785,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
 <div class="col-12 mt-2 mb-3">
     <div class="card border border-success shadow-sm">
-        <div class="card-header bg-success-subtle py-2 d-flex justify-content-between align-items-center">
+        <div class="card-header py-2 d-flex justify-content-between align-items-center text-secondary">
             <span class="fw-bold text-success d-flex align-items-center gap-1">
                 <i data-lucide="shield-check"></i> Certificado Digital (A1)
             </span>
-            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 d-flex align-items-center gap-1" onclick="verificarStatusCertificado()">
+            <button type="button" class="btn-nft py-0 px-2 d-flex align-items-center gap-1" onclick="verificarStatusCertificado()">
                 <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Verificar
             </button>
         </div>
@@ -805,18 +805,18 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
 <div class="col-md-6 mt-3">
 <div class="card h-100 border mb-3">
-<div class="card-header bg-light py-2 d-flex align-items-center gap-1">
+<div class="card-header py-2 d-flex align-items-center gap-1 text-secondary">
 <i data-lucide="building-2"></i>
 <span>Dados do Emitente</span>
 </div>
 <div class="card-body py-2">
-<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold text-primary">Preencher Dados do Emitente a partir do Cadastro de Empresas</label><select class="form-select form-select-sm" id="select_emitente" onchange="preencherDadosDeCadastro(this, 'emit')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold mb-1">Preencher Dados do Emitente a partir do Cadastro de Empresas</label><select class="form-select form-select-sm" id="select_emitente" onchange="preencherDadosDeCadastro(this, 'emit')"><option value="">Selecione para preencher automaticamente...</option></select></div>
 <!-- PAÍS DO EMITENTE -->
 <div class="col-md-7">
 <label class="form-label small mb-1 fw-bold">País do Emitente (Nome)</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm fw-bold" id="emit_xPais" list="datalist-paises" onchange="aoMudarPaisEmitente()" oninput="aoDigitarPaisEmitente()" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
-<button class="btn btn-outline-secondary" onclick="resetarPaisParaBrasil('emit')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+<button class="btn-nft" onclick="resetarPaisParaBrasil('emit')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
 </div>
 </div>
 <div class="col-md-5">
@@ -872,7 +872,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <label class="form-label small mb-1 fw-bold">CEP (Busca Automática)</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="emit_CEP" onblur="buscarCepAuto(this.value, 'emit')" placeholder="00000-000" type="text"/>
-<button class="btn btn-outline-secondary" onclick="buscarCepAuto(document.getElementById('emit_CEP').value, 'emit')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+<button class="btn-nft" onclick="buscarCepAuto(document.getElementById('emit_CEP').value, 'emit')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
 </div>
 </div>
 </div>
@@ -880,22 +880,22 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 </div><div class="col-md-6 mt-3">
 <div class="card h-100 border mb-3">
-<div class="card-header bg-light py-2 d-flex align-items-center justify-content-between">
+<div class="card-header py-2 d-flex align-items-center justify-content-between text-secondary">
 <div class="d-flex align-items-center gap-1">
 <i data-lucide="user"></i>
 <span>Dados do Destinatário</span>
 </div>
-<span class="badge bg-secondary font-monospace" id="lbl-status-pais-dest">Nacional (Brasil)</span>
+<span class="badge font-monospace bg-info-subtle text-info fw-bold" id="lbl-status-pais-dest">Nacional (Brasil)</span>
 </div>
 <div class="card-body py-2">
-<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold text-primary">Preencher Dados do Destinatário a partir do Cadastro</label><select class="form-select form-select-sm" id="select_destinatario" onchange="preencherDadosDeCadastro(this, 'dest')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold mb-1">Preencher Dados do Destinatário a partir do Cadastro</label><select class="form-select form-select-sm" id="select_destinatario" onchange="preencherDadosDeCadastro(this, 'dest')"><option value="">Selecione para preencher automaticamente...</option></select></div>
 <!-- PAÍS DO DESTINATÁRIO -->
 <div class="col-md-7">
 <label class="form-label small mb-1 fw-bold">País do Destinatário (Nome)</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm fw-bold" id="dest_xPais" list="datalist-paises" onchange="aoMudarPaisDestinatario()" oninput="aoDigitarPaisDestinatario()" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
 <datalist id="datalist-paises"></datalist>
-<button class="btn btn-outline-secondary" onclick="resetarPaisParaBrasil()" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+<button class="btn-nft" onclick="resetarPaisParaBrasil()" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
 </div>
 </div>
 <div class="col-md-5">
@@ -950,14 +950,14 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <label class="form-label small mb-1 fw-bold">CEP (Busca Automática / 99999-999)</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="dest_CEP" onblur="buscarCepAuto(this.value, 'dest')" placeholder="00000-000 ou 99999-999" type="text"/>
-<button class="btn btn-outline-secondary" onclick="buscarCepAuto(document.getElementById('dest_CEP').value, 'dest')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+<button class="btn-nft" onclick="buscarCepAuto(document.getElementById('dest_CEP').value, 'dest')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div></div><div class="row mt-3"><div class="col-12"><div class="card border mb-3">
-<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+<div class="card-header py-2 d-flex justify-content-between align-items-center text-secondary">
 <span class="fw-bold d-flex align-items-center gap-1">
 <i data-lucide="truck"></i>
 <span>Dados do Transporte e Volumes</span>
@@ -965,7 +965,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <small class="text-muted">Grupo &lt;transp&gt; SEFAZ</small>
 </div>
 <div class="card-body py-3">
-<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold text-primary">Preencher Dados da Transportadora a partir do Cadastro</label><select class="form-select form-select-sm" id="select_transportadora" onchange="preencherDadosDeCadastro(this, 'transp')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold mb-1">Preencher Dados da Transportadora a partir do Cadastro</label><select class="form-select form-select-sm" id="select_transportadora" onchange="preencherDadosDeCadastro(this, 'transp')"><option value="">Selecione para preencher automaticamente...</option></select></div>
 <!-- Modalidade do Frete -->
 <div class="col-md-3">
 <label class="form-label small mb-1 fw-bold">Modalidade do Frete (modFrete)</label>
@@ -994,7 +994,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <label class="form-label small mb-1 fw-bold">CEP Transportadora</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="transp_CEP" onblur="buscarCepAuto(this.value, 'transp')" placeholder="00000-000" type="text"/>
-<button class="btn btn-outline-secondary" onclick="buscarCepAuto(document.getElementById('transp_CEP').value, 'transp')" title="Buscar CEP da transportadora" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
+<button class="btn-nft" onclick="buscarCepAuto(document.getElementById('transp_CEP').value, 'transp')" title="Buscar CEP da transportadora" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
 </div>
 </div>
 <div class="col-md-5">
@@ -1020,7 +1020,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="tab-pane fade" id="historico-sefaz" role="tabpanel">
     <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
         <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-success-subtle text-success px-2 py-1 d-flex align-items-center gap-1"><i data-lucide="activity"></i> SEFAZ</span>
+            <span class="badge px-2 py-1 d-flex align-items-center gap-1 bg-info-subtle text-info fw-bold"><i data-lucide="activity"></i> SEFAZ</span>
             <span class="text-muted">/</span>
             <h6 class="mb-0 fw-bold d-flex align-items-center gap-2"><i data-lucide="send"></i> Emissão &amp; Histórico (Homologação)</h6>
         </div>
@@ -1029,11 +1029,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
     <div class="row g-3">
         <div class="col-12 text-center py-4 border rounded bg-light">
-            <button class="btn btn-success btn-lg fw-bold d-inline-flex align-items-center gap-2 shadow mb-2" id="btn-enviar-sefaz" onclick="enviarNfeSefaz(2)" type="button">
+            <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow mb-2" id="btn-enviar-sefaz" onclick="enviarNfeSefaz(2)" type="button">
                 <i data-lucide="send"></i>
                 <span>Assinar e Enviar NF-e para SEFAZ (Homologação)</span>
             </button>
-            <button class="btn btn-danger btn-lg fw-bold d-inline-flex align-items-center gap-2 shadow ms-md-3 mb-2" id="btn-enviar-sefaz-prod" onclick="enviarNfeSefaz(1)" type="button">
+            <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow ms-md-3 mb-2" id="btn-enviar-sefaz-prod" onclick="enviarNfeSefaz(1)" type="button">
                 <i data-lucide="send"></i>
                 <span>Assinar e Enviar NF-e para SEFAZ (Produção)</span>
             </button>
@@ -1067,7 +1067,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="tab-pane fade" id="tipo-nota" role="tabpanel">
 <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
 <div class="d-flex align-items-center gap-2">
-<span class="badge bg-secondary px-2 py-1 d-flex align-items-center gap-1"><i data-lucide="settings"></i> Configurações</span>
+<span class="badge px-2 py-1 d-flex align-items-center gap-1 bg-info-subtle text-info fw-bold"><i data-lucide="settings"></i> Configurações</span>
 <span class="text-muted">/</span>
 <h6 class="mb-0 fw-bold d-flex align-items-center gap-2"><i data-lucide="tag"></i> Tipo de Nota (Impostos &amp; Regras Padrão por Operação)</h6>
 </div>
@@ -1076,9 +1076,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="row g-3 mt-3">
 <div class="col-md-4">
 <div class="card h-100 border">
-<div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+<div class="card-header d-flex justify-content-between align-items-center py-2 text-secondary">
 <span>Operações Cadastradas</span>
-<button class="btn btn-sm btn-outline-success d-flex align-items-center gap-1" onclick="novaOperacao()"><i data-lucide="plus"></i> Nova</button>
+<button class="btn-nft d-flex align-items-center gap-1" onclick="novaOperacao()"><i data-lucide="plus"></i> Nova</button>
 </div>
 <div class="card-body p-2">
 <div class="list-group" id="lista-operacoes" style="max-height: 480px; overflow-y: auto;">
@@ -1089,19 +1089,19 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 <div class="col-md-8">
 <div class="card border">
-<div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+<div class="card-header d-flex justify-content-between align-items-center py-2 text-secondary">
 <span id="titulo-form-op">Configuração da Operação:<br/>
 <strong id="lbl-op-nome">Nova Operação</strong></span>
 <div class="d-flex align-items-center gap-1">
-<button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" onclick="capturarImpostosDoXmlAtual()">
+<button class="btn-nft d-flex align-items-center gap-1" onclick="capturarImpostosDoXmlAtual()">
 <i data-lucide="download"></i>
 <span>Puxar Impostos do XML</span>
 </button>
-<button class="btn btn-sm btn-danger d-flex align-items-center gap-1" id="btn-excluir-op" onclick="excluirOperacaoAtual()" style="display:none;">
+<button class="btn-nft d-flex align-items-center gap-1" id="btn-excluir-op" onclick="excluirOperacaoAtual()" style="display:none;">
 <i data-lucide="trash-2"></i>
 <span>Excluir</span>
 </button>
-<button class="btn btn-sm btn-success fw-bold d-flex align-items-center gap-1" onclick="salvarOperacao()">
+<button class="btn-nft fw-bold d-flex align-items-center gap-1" onclick="salvarOperacao()">
 <i data-lucide="save"></i>
 <span>Salvar Configuração</span>
 </button>
@@ -1207,35 +1207,35 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
 </div>
 <div class="d-flex align-items-center flex-wrap gap-1">
-<button class="btn btn-success btn-sm me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="adicionarNovoItem()" title="Adicionar um novo item na nota" type="button">
+<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="adicionarNovoItem()" title="Adicionar um novo item na nota" type="button">
 <i data-lucide="plus-circle"></i>
 <span>+ Adicionar Item</span>
 </button>
-<button class="btn btn-outline-danger btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
+<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
 <i data-lucide="trash-2"></i>
 <span>Excluir Item</span>
 </button>
-<button class="btn btn-outline-primary btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="duplicarItensSelecionados()" title="Duplicar item(ns) selecionado(s) na grade" type="button">
+<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="duplicarItensSelecionados()" title="Duplicar item(ns) selecionado(s) na grade" type="button">
 <i data-lucide="copy"></i>
 <span>Duplicar Item</span>
 </button>
-<button class="btn btn-warning btn-sm fw-bold text-dark me-1 shadow-sm d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
+<button class="btn-nft fw-bold text-dark me-1 shadow-sm d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
 <i data-lucide="scale"></i>
 <span>Rateio &amp; PTAX</span>
 </button>
-<button class="btn btn-outline-info btn-sm me-1 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
+<button class="btn-nft me-1 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
 <i data-lucide="globe"></i>
 <span>Unidades Exportação (uTrib)</span>
 </button>
-<button class="btn btn-outline-secondary btn-sm me-1 d-flex align-items-center gap-1" onclick="recarregarTabelaItens()">
+<button class="btn-nft me-1 d-flex align-items-center gap-1" onclick="recarregarTabelaItens()">
 <i data-lucide="refresh-cw"></i>
 <span>Redesenhar Grade</span>
 </button>
-<button class="btn btn-success btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="exportarExcel()">
+<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="exportarExcel()">
 <i data-lucide="file-spreadsheet"></i>
 <span>Exportar Excel (.xlsx)</span>
 </button>
-<button class="btn btn-primary btn-sm fw-bold d-flex align-items-center gap-1" onclick="document.getElementById('importExcelInput').click()">
+<button class="btn-nft fw-bold d-flex align-items-center gap-1" onclick="document.getElementById('importExcelInput').click()">
 <i data-lucide="upload"></i>
 <span>Importar Excel (.xlsx)</span>
 </button>
@@ -1245,22 +1245,22 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <!-- Barra de Status Rápido de Câmbio PTAX & Despesas de Rateio Ativas -->
 <div class="card border mb-2 p-2 px-3 bg-light d-flex flex-row justify-content-between align-items-center flex-wrap gap-2 shadow-sm mt-3" style="font-size: 12.5px;">
 <div class="d-flex align-items-center flex-wrap gap-3">
-<div><span class="text-muted">Moeda:</span> <span class="badge bg-secondary" id="lbl-bar-ptax-moeda">USD</span></div>
+<div><span class="text-muted">Moeda:</span> <span class="badge bg-info-subtle text-info fw-bold" id="lbl-bar-ptax-moeda">USD</span></div>
 <div><span class="text-muted">Cotação PTAX:</span> <strong class="text-primary font-monospace" id="lbl-bar-ptax-taxa">R$ -</strong></div>
 <div class="border-start ps-3"><span class="text-muted">Marinha Mercante (AFRMM):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-afrmm">R$ 0,00</span></div>
 <div><span class="text-muted">Taxa Siscomex:</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-siscomex">R$ 0,00</span></div>
 <div><span class="text-muted">Outras Desp. (vOutro):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-outro">R$ 0,00</span></div>
 </div>
 <div class="d-flex align-items-center gap-2">
-<button class="btn btn-warning btn-sm py-0 px-2 fw-semibold text-dark shadow-sm d-flex align-items-center gap-1" onclick="recalcularConversaoItens()" title="Recalcula a conversão de moeda dos itens com base na nova taxa PTAX" type="button">
+<button class="btn-nft py-0 px-2 fw-semibold text-dark shadow-sm d-flex align-items-center gap-1" onclick="recalcularConversaoItens()" title="Recalcula a conversão de moeda dos itens com base na nova taxa PTAX" type="button">
 <i data-lucide="refresh-cw"></i>
 <span>Recalcular Conversão</span>
 </button>
-<button class="btn btn-outline-info btn-sm py-0 px-2 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex" type="button">
+<button class="btn-nft py-0 px-2 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex" type="button">
 <i data-lucide="globe"></i>
 <span>uTrib Exportação</span>
 </button>
-<button class="btn btn-outline-primary btn-sm py-0 px-2 fw-semibold d-flex align-items-center gap-1" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela" type="button">
+<button class="btn-nft py-0 px-2 fw-semibold d-flex align-items-center gap-1" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela" type="button">
 <i data-lucide="refresh-cw"></i>
 <span>Reaplicar Rateio</span>
 </button>
@@ -1268,7 +1268,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 <div id="itens-table"></div>
 <div class="card border mt-4 mb-3">
-<div class="card-header bg-light py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+<div class="card-header py-2 d-flex justify-content-between align-items-center flex-wrap gap-2 text-secondary">
 <div class="d-flex align-items-center gap-2">
 <span class="fw-bold d-flex align-items-center gap-1">
 <i data-lucide="calculator"></i>
@@ -1276,7 +1276,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </span>
 <small class="text-muted d-none d-md-inline">(Valores em R$)</small>
 </div>
-<button class="btn btn-primary btn-sm py-1 px-3 fw-bold shadow-sm d-flex align-items-center gap-1" onclick="recalcularTotaisDosItens()" type="button">
+<button class="btn-nft py-1 px-3 fw-bold shadow-sm d-flex align-items-center gap-1" onclick="recalcularTotaisDosItens()" type="button">
 <i data-lucide="calculator"></i>
 <span>Recalcular Totais da Nota</span>
 </button>
@@ -2391,7 +2391,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             }
         }
         if (val === 0) {
-            fb.innerHTML = '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle" style="font-size: 10px;">ℹ️ Zerado (0,00): Sem rateio</span>';
+            fb.innerHTML = '<span class="badge bg-info-subtle text-info fw-bold" style="font-size: 10px;">ℹ️ Zerado (0,00): Sem rateio</span>';
         } else {
             fb.innerHTML = '';
         }
@@ -2654,7 +2654,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             headerHozAlign: "center",
             headerSort: false,
             formatter: function() {
-                return '<button type="button" class="btn btn-link p-0 text-primary border-0 bg-transparent shadow-none d-inline-flex align-items-center justify-content-center btn-editar-item" title="Editar este item no pop-up dedicado" style="width: 24px; height: 24px; cursor: pointer; text-decoration: none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>';
+                return '<button type="button" class="btn-nft btn-link p-0 text-primary border-0 bg-transparent shadow-none d-inline-flex align-items-center justify-content-center" title="Editar este item no pop-up dedicado" style="width: 24px; height: 24px; cursor: pointer; text-decoration: none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>';
             },
             cellClick: function(e, cell) {
                 e.stopPropagation();
@@ -4257,7 +4257,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     ${r.categoria || 'Geral'}
                 </td>
                 <td>
-                    <span class="badge ${badgeOrigemClass} d-inline-flex align-items-center gap-1" style="font-size: 11px; padding: 3px 6px;">
+                    <span class="badge d-inline-flex align-items-center gap-1 bg-info-subtle text-info fw-bold" style="font-size: 11px; padding: 3px 6px;">
                         <i data-lucide="${iconeOrigem}" style="width: 11px; height: 11px;"></i>
                         <span>${r.origem || 'XML Rascunho'}</span>
                     </span>
@@ -4281,11 +4281,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 </td>
                 <td class="text-center">
                     <div class="d-flex justify-content-center gap-1">
-                        <button type="button" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 px-2 py-0" style="font-size: 11.5px; height: 26px;" onclick="carregarRascunho(${r.id}, '${r.origem}')" title="Carregar e continuar edição deste rascunho">
+                        <button type="button" class="btn-nft d-inline-flex align-items-center gap-1 px-2 py-0" style="font-size: 11.5px; height: 26px;" onclick="carregarRascunho(${r.id}, '${r.origem}')" title="Carregar e continuar edição deste rascunho">
                             <i data-lucide="folder-open" style="width: 12px; height: 12px;"></i>
                             <span>Abrir</span>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center px-1 py-0" style="height: 26px;" onclick="excluirRascunho(${r.id}, '${(r.referencia_interna || '').replace(/'/g, "\\'")}')" title="Excluir este rascunho">
+                        <button type="button" class="btn-nft d-inline-flex align-items-center px-1 py-0" style="height: 26px;" onclick="excluirRascunho(${r.id}, '${(r.referencia_interna || '').replace(/'/g, "\\'")}')" title="Excluir este rascunho">
                             <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
                         </button>
                     </div>
@@ -4750,7 +4750,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="row g-2 small">
 <div class="col-6">
 <span class="text-muted d-block">Origem:</span>
-<span class="badge badge-origem-rasc"><i data-lucide="file-code" style="width: 12px; height: 12px; vertical-align: -1px;"></i> XML Rascunho</span>
+<span class="badge badge-origem-rasc bg-info-subtle text-info fw-bold"><i data-lucide="file-code" style="width: 12px; height: 12px; vertical-align: -1px;"></i> XML Rascunho</span>
 </div>
 <div class="col-6">
 <span class="text-muted d-block">Tipo de Operação:</span>
@@ -4771,8 +4771,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 </div>
 </div>
 <div class="modal-footer border-top bg-body-tertiary">
-<button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
-<button class="btn btn-sm btn-primary d-inline-flex align-items-center gap-2" onclick="confirmarSalvarRascunho()" type="button">
+<button class="btn-nft" data-bs-dismiss="modal" type="button">Cancelar</button>
+<button class="btn-nft d-inline-flex align-items-center gap-2" onclick="confirmarSalvarRascunho()" type="button">
 <i data-lucide="save" style="width: 16px; height: 16px;"></i>
 <span>Gravar Rascunho</span>
 </button>
@@ -4789,7 +4789,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <h5 class="modal-title d-flex align-items-center gap-2 mb-0" id="modalListaRascunhosLabel">
 <i data-lucide="folder-clock" style="width: 20px; height: 20px;"></i>
 <span>Rascunhos Salvos</span>
-<span class="badge bg-secondary-subtle text-muted" id="badge-total-rascunhos-modal">0</span>
+<span class="badge bg-info-subtle text-info fw-bold" id="badge-total-rascunhos-modal">0</span>
 </h5>
 <p class="text-muted small mb-0 mt-1">Gerencie seus rascunhos de notas fiscais gerados no XML Rascunho e no XML DI/DUIMP.</p>
 </div>
@@ -4824,7 +4824,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 </div>
 <div class="col-md-1 d-flex">
-<button class="btn btn-sm btn-outline-secondary w-100" onclick="carregarListaRascunhos()" title="Atualizar Lista" type="button">
+<button class="btn-nft w-100" onclick="carregarListaRascunhos()" title="Atualizar Lista" type="button">
 <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
 </button>
 </div>
@@ -4856,7 +4856,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="small text-muted" id="info-rodape-rascunhos">
                     Carregando registros...
                 </div>
-<button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" type="button">Fechar</button>
+<button class="btn-nft" data-bs-dismiss="modal" type="button">Fechar</button>
 </div>
 </div>
 </div>

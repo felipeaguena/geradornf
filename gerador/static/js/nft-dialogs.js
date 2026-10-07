@@ -30,8 +30,8 @@
                     <div class="nft-dialog-message" id="nft-dialog-message"></div>
                 </div>
                 <div class="nft-dialog-actions" id="nft-dialog-actions">
-                    <button type="button" class="btn btn-outline-secondary nft-dialog-btn-cancel" id="nft-dialog-btn-cancel">Cancelar</button>
-                    <button type="button" class="btn btn-primary nft-dialog-btn-confirm" id="nft-dialog-btn-confirm">OK</button>
+                    <button type="button" class="btn-nft nft-dialog-btn-cancel" id="nft-dialog-btn-cancel">Cancelar</button>
+                    <button type="button" class="btn-nft nft-dialog-btn-confirm" id="nft-dialog-btn-confirm">OK</button>
                 </div>
             </div>
         `;

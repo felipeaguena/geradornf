@@ -156,11 +156,20 @@
     ],
     "sefaz_history": [
       {
+        "data": "07/10/2026, 18:38:40",
+        "ambiente": "<span class=\"badge bg-secondary\">Homologação</span>",
+        "chave": "3526 0547 9984 4100 0198 5500 1000 0000 0510 2050 8013",
+        "status": "<span class=\"badge bg-success\">104</span>",
+        "motivo": "\n            Lote processado\n        ",
+        "motivoTitle": "Lote processado",
+        "protocolo": "\n            \n            \n        "
+      },
+      {
         "data": "07/10/2026, 16:59:14",
         "ambiente": "<span class=\"badge bg-secondary\">Homologação</span>",
         "chave": "3526 0547 9984 4100 0198 5500 1000 0000 0510 2050 8013",
         "status": "<span class=\"badge bg-warning text-dark\">656</span>",
-        "motivo": "\n            Rejeição: Consumo Indevido\n        ",
+        "motivo": "\n                                \n            Rejeição: Consumo Indevido\n        \n                            ",
         "motivoTitle": "Rejeição: Consumo Indevido",
         "protocolo": "\n            \n            \n        "
       }
@@ -172,5 +181,5 @@
     "origem": "XML Rascunho",
     "tipo_operacao": "REMESSA PARA FEIRA"
   },
-  "data_salvo": "07/10/2026 16:59:14"
+  "data_salvo": "07/10/2026 18:38:40"
 }

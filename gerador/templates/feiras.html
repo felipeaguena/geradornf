@@ -29,7 +29,7 @@
             </div>
             <div class="sidebar-brand-info">
                 <span class="sidebar-brand-title">NFT Logistics</span>
-                <span class="sidebar-brand-badge">Descrição da Feira</span>
+                <span class="badge sidebar-brand-badge bg-info-subtle text-info fw-bold">Descrição da Feira</span>
             </div>
         </a>
         <button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
@@ -122,7 +122,7 @@
         <!-- Top Header -->
         <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border flex-wrap gap-2">
             <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+                <button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
                     <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
                 </button>
                 <div>
@@ -135,15 +135,15 @@
             </div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <!-- BOTÃO EXTRA PARA INCLUIR / GERENCIAR LOCAL DE ENTREGA -->
-                <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" onclick="abrirModalGerenciarLocais()" title="Cadastrar ou gerenciar centros de exposições e locais de entrega">
+                <button class="btn-nft d-flex align-items-center gap-1" onclick="abrirModalGerenciarLocais()" title="Cadastrar ou gerenciar centros de exposições e locais de entrega">
                     <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
                     <span>Locais</span>
                 </button>
-                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" onclick="sincronizarPlanilhaGoogle()" title="Sincronizar dados a partir da planilha oficial do Google Sheets">
+                <button class="btn-nft d-flex align-items-center gap-1" onclick="sincronizarPlanilhaGoogle()" title="Sincronizar dados a partir da planilha oficial do Google Sheets">
                     <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
                     <span>Sincronizar Sheets</span>
                 </button>
-                <button class="btn btn-sm btn-primary d-flex align-items-center gap-1" onclick="abrirModalNovaFeira()">
+                <button class="btn-nft d-flex align-items-center gap-1" onclick="abrirModalNovaFeira()">
                     <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
                     <span>Nova Feira</span>
                 </button>
@@ -158,7 +158,7 @@
                         <div class="input-group input-group-sm">
                             <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
                             <input class="form-control form-control-sm" id="busca-feira" oninput="filtrarFeiras()" placeholder="Buscar por Nome da Feira, Local ou Organizador..." type="text"/>
-                            <button class="btn btn-outline-secondary" onclick="document.getElementById('busca-feira').value=''; filtrarFeiras();" type="button">Limpar</button>
+                            <button class="btn-nft" onclick="document.getElementById('busca-feira').value=''; filtrarFeiras();" type="button">Limpar</button>
                         </div>
                     </div>
                     <div class="col-md-6 text-md-end text-muted small">
@@ -230,7 +230,7 @@
                                 <label class="form-label small fw-bold mb-0" for="feira_local">
                                     Local de Entrega / Pavilhão
                                 </label>
-                                <button type="button" class="btn btn-link p-0 text-decoration-none small text-primary d-inline-flex align-items-center gap-1" onclick="abrirModalNovoLocalRapido()" style="font-size: 11.5px;">
+                                <button type="button" class="btn-nft btn-link p-0 text-decoration-none small text-primary d-inline-flex align-items-center gap-1" onclick="abrirModalNovoLocalRapido()" style="font-size: 11.5px;">
                                     <i data-lucide="plus-circle" style="width: 12px; height: 12px;"></i>
                                     <span>Cadastrar Novo Local</span>
                                 </button>
@@ -249,8 +249,8 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                        <button type="button" class="btn btn-sm btn-outline-secondary px-3" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-sm btn-primary px-4 d-inline-flex align-items-center gap-1" id="btnSalvarFeira">
+                        <button type="button" class="btn-nft px-3" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn-nft px-4 d-inline-flex align-items-center gap-1" id="btnSalvarFeira">
                             <i data-lucide="save" style="width: 14px; height: 14px;"></i>
                             <span>Salvar Feira</span>
                         </button>
@@ -290,8 +290,8 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end gap-2 mt-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="limparFormLocal()" id="btn-cancelar-edit-local" style="display:none;">Cancelar Edição</button>
-                                <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" id="btn-salvar-local">
+                                <button type="button" class="btn-nft" onclick="limparFormLocal()" id="btn-cancelar-edit-local" style="display:none;">Cancelar Edição</button>
+                                <button type="submit" class="btn-nft d-inline-flex align-items-center gap-1" id="btn-salvar-local">
                                     <i data-lucide="check" style="width: 13px; height: 13px;"></i>
                                     <span id="btn-salvar-local-txt">Salvar Local</span>
                                 </button>
@@ -323,7 +323,7 @@
                 </div>
             </div>
             <div class="modal-footer py-2 px-3 bg-light">
-                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn-nft" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
@@ -403,10 +403,10 @@
                     <td class="small text-muted text-nowrap" style="white-space: nowrap;" title="${escapeHtml(endFmt)}">${escapeHtml(endFmt) || '<span class="text-muted">-</span>'}</td>
                     <td class="text-end text-nowrap">
                         <div class="d-flex justify-content-end gap-1">
-                            <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" onclick="prepararEdicaoLocal(${l.id})" title="Editar local">
+                            <button type="button" class="btn-nft py-0 px-2" onclick="prepararEdicaoLocal(${l.id})" title="Editar local">
                                 <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i>
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="excluirLocal(${l.id}, '${nomeEsc}')" title="Excluir local">
+                            <button type="button" class="btn-nft py-0 px-2" onclick="excluirLocal(${l.id}, '${nomeEsc}')" title="Excluir local">
                                 <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
                             </button>
                         </div>
@@ -574,24 +574,24 @@
                         <span>${escapeHtml(f.data_feira || '-')}</span>
                     </td>
                     <td class="small text-nowrap">
-                        <span class="badge bg-light text-dark border font-monospace px-2 py-1" style="font-size: 11.5px;">
+                        <span class="badge font-monospace px-2 py-1 bg-info-subtle text-info fw-bold" style="font-size: 11.5px;">
                             ${escapeHtml(f.deadline || '-')}
                         </span>
                     </td>
                     <td class="small">
-                        <span class="badge bg-light text-primary border px-2 py-1 d-inline-flex align-items-center gap-1" style="font-size: 11.5px;">
+                        <span class="badge px-2 py-1 d-inline-flex align-items-center gap-1 bg-info-subtle text-info fw-bold" style="font-size: 11.5px;">
                             <i data-lucide="map-pin" style="width: 12px; height: 12px;"></i>
                             <span>${escapeHtml(f.local || '-')}</span>
                         </span>
                     </td>
                     <td class="text-end text-nowrap">
                         <div class="d-flex justify-content-end gap-1">
-                            <button class="btn btn-sm btn-outline-primary py-0 px-2 d-inline-flex align-items-center gap-1"
+                            <button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1"
                                     onclick="abrirModalEditarFeira(${f.id})" style="height: 26px; font-size: 11.5px;" title="Editar informações da feira">
                                 <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i>
                                 <span>Editar</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger py-0 px-2 d-inline-flex align-items-center"
+                            <button class="btn-nft py-0 px-2 d-inline-flex align-items-center"
                                     onclick="excluirFeira(${f.id}, '${nomeEscaped}')" style="height: 26px;" title="Excluir feira">
                                 <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
                             </button>

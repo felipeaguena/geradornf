@@ -48,7 +48,7 @@
                         <div>
                             <div class="d-flex align-items-center gap-2">
                                 <h5 class="modal-title fw-bold mb-0 text-body" id="modalItemDetalheTitle">Item da NF-e</h5>
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace" id="modalItemBadgeNum">#1</span>
+                                <span class="badge font-monospace bg-info-subtle text-info fw-bold" id="modalItemBadgeNum">#1</span>
                             </div>
                             <small class="text-muted" id="modalItemSubtitle">Preenchimento objetivo de produtos, quantidades, rateios e impostos.</small>
                         </div>
@@ -63,7 +63,7 @@
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-semibold d-flex align-items-center justify-content-center gap-2 py-2" id="tab-item-geral-btn" data-bs-toggle="tab" data-bs-target="#tab-item-geral" type="button" role="tab">
                                 <span>📦 1. Produto & Valores</span>
-                                <span class="badge bg-success-subtle text-success font-monospace" id="modal-badge-resumo-vprod">R$ 0,00</span>
+                                <span class="badge font-monospace bg-info-subtle text-info fw-bold" id="modal-badge-resumo-vprod">R$ 0,00</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -217,7 +217,7 @@
                                                 <input type="number" step="0.01" class="form-control form-control-sm text-end font-monospace" id="m_item_pICMS" value="0.00">
                                             </div>
                                             <div class="col-12">
-                                                <label class="form-label small mb-1 fw-bold text-primary">Valor ICMS R$ (vICMS)</label>
+                                                <label class="form-label small fw-bold mb-1">Valor ICMS R$ (vICMS)</label>
                                                 <input type="text" class="form-control form-control-sm text-end font-monospace fw-bold bg-body-tertiary" id="m_item_vICMS" value="0.00">
                                             </div>
                                         </div>
@@ -338,7 +338,7 @@
                                     <div class="card border p-3 bg-body-tertiary">
                                         <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-1">
                                             <h6 class="fw-bold mb-0 text-primary">Unidade Tributável na SEFAZ (uTrib / qTrib / vUnTrib)</h6>
-                                            <button type="button" class="btn btn-xs btn-outline-primary py-0 px-2" id="btn-copiar-com-para-trib">
+                                            <button type="button" class="btn-nft py-0 px-2" id="btn-copiar-com-para-trib">
                                                 Copiar Comercial ➔ Tributável
                                             </button>
                                         </div>
@@ -465,14 +465,14 @@
                 <!-- RODAPÉ DO POPUP -->
                 <div class="modal-footer border-top bg-body-tertiary py-2 px-3 d-flex justify-content-between">
                     <div>
-                        <button type="button" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1" id="btn-recalcular-impostos-modal" title="Recalcular automaticamente ICMS, IPI, PIS e COFINS com base no Total do Produto">
+                        <button type="button" class="btn-nft d-inline-flex align-items-center gap-1" id="btn-recalcular-impostos-modal" title="Recalcular automaticamente ICMS, IPI, PIS e COFINS com base no Total do Produto">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                             <span>Recalcular Impostos</span>
                         </button>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-success btn-sm fw-bold px-3 d-inline-flex align-items-center gap-2 shadow-sm" id="btn-salvar-item-modal">
+                        <button type="button" class="btn-nft" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn-nft fw-bold px-3 d-inline-flex align-items-center gap-2 shadow-sm" id="btn-salvar-item-modal">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             <span id="btn-salvar-item-modal-texto">Salvar Item</span>
                         </button>
