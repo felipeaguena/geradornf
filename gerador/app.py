@@ -22,6 +22,9 @@ from datetime import datetime, date, timedelta
 import random
 import hashlib
 import base64
+import sefaz_client
+
+import sefaz_client
 
 NFE_NS = "http://www.portalfiscal.inf.br/nfe"
 DS_NS = "http://www.w3.org/2000/09/xmldsig#"
@@ -3169,6 +3172,48 @@ def shutdown_server():
 
     threading.Thread(target=kill_proc).start()
     return jsonify({'status': 'success', 'message': 'Servidor encerrando...'})
+
+@app.route('/api/certificado/status', methods=['GET'])
+def api_certificado_status():
+    info = sefaz_client.get_certificate_info()
+    return jsonify(info)
+
+@app.route('/api/sefaz/enviar', methods=['POST'])
+def api_sefaz_enviar():
+    try:
+        data = request.json
+        xml_string = data.get('xml')
+        chave = data.get('chave', 'N/A')
+        tpAmb = int(data.get('tpAmb', 2))
+        
+        if not xml_string:
+            return jsonify({'error': 'XML não fornecido'}), 400
+            
+        xml_assinado = sefaz_client.assinar_xml(xml_string)
+        retorno = sefaz_client.enviar_nfe(xml_assinado, uf='SP', tpAmb=tpAmb)
+        
+        # Salvar no histórico
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO historico_sefaz (chave_nfe, tpAmb, cstat, xmotivo, recibo, protocolo, xml_envio, xml_retorno)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            chave,
+            2, # tpAmb = 2 (Homologação)
+            retorno.get('cstat', ''),
+            retorno.get('xmotivo', ''),
+            retorno.get('recibo', ''),
+            retorno.get('protocolo', ''),
+            xml_assinado,
+            retorno.get('response_xml', '')
+        ))
+        conn.commit()
+        conn.close()
+        
+        return jsonify(retorno)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     get_db_connection().close()

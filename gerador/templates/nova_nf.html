@@ -230,6 +230,11 @@ Módulo Ativo: <span class="badge badge-origem-nova">Nova NF</span>
 <i data-lucide="settings"></i> 4. Tipo de Nota (Impostos)
                     </button>
 </li>
+<li class="nav-item" role="presentation">
+<button class="nav-link bg-success-subtle text-success fw-bold" data-bs-target="#historico-sefaz" data-bs-toggle="tab" id="historico-sefaz-tab" role="tab" type="button">
+<i data-lucide="activity"></i> 5. SEFAZ (Envio &amp; Histórico)
+                    </button>
+</li>
 </ul>
 <!-- Conteudo das Abas -->
 <div class="tab-content bg-white p-3 border rounded shadow-sm mb-4" id="myTabContent">
@@ -765,7 +770,29 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <textarea class="form-control font-monospace form-control-sm" id="infCpl" placeholder="Observações de interesse do contribuinte gravadas no XML..." rows="4"></textarea>
 </div>
 </div></form>
-</div><div class="tab-pane fade" id="identificacao" role="tabpanel"><form id="form-identificacao"><div class="row mt-3"><div class="col-md-6 mt-3">
+</div><div class="tab-pane fade" id="identificacao" role="tabpanel"><form id="form-identificacao"><div class="row mt-3">
+
+<div class="col-12 mt-2 mb-3">
+    <div class="card border border-success shadow-sm">
+        <div class="card-header bg-success-subtle py-2 d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-success d-flex align-items-center gap-1">
+                <i data-lucide="shield-check"></i> Certificado Digital (A1)
+            </span>
+            <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 d-flex align-items-center gap-1" onclick="verificarStatusCertificado()">
+                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Verificar
+            </button>
+        </div>
+        <div class="card-body py-2">
+            <div class="row g-2" id="cert-info-container">
+                <div class="col-12 text-muted small">
+                    Clique em "Verificar" para carregar as informações do certificado.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6 mt-3">
 <div class="card h-100 border mb-3">
 <div class="card-header bg-light py-2 d-flex align-items-center gap-1">
 <i data-lucide="building-2"></i>
@@ -978,6 +1005,53 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 </div>
 </div></div></div></form></div>
+<!-- ABA: SEFAZ HISTORICO E ENVIO -->
+<div class="tab-pane fade" id="historico-sefaz" role="tabpanel">
+    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-success-subtle text-success px-2 py-1 d-flex align-items-center gap-1"><i data-lucide="activity"></i> SEFAZ</span>
+            <span class="text-muted">/</span>
+            <h6 class="mb-0 fw-bold d-flex align-items-center gap-2"><i data-lucide="send"></i> Emissão &amp; Histórico (Homologação)</h6>
+        </div>
+        <small class="text-muted">Ambiente de Testes (Homologação). Notas emitidas aqui não possuem valor fiscal.</small>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 text-center py-4 border rounded bg-light">
+            <button class="btn btn-success btn-lg fw-bold d-inline-flex align-items-center gap-2 shadow mb-2" id="btn-enviar-sefaz" onclick="enviarNfeSefaz(2)" type="button">
+                <i data-lucide="send"></i>
+                <span>Assinar e Enviar NF-e para SEFAZ (Homologação)</span>
+            </button>
+            <button class="btn btn-danger btn-lg fw-bold d-inline-flex align-items-center gap-2 shadow ms-md-3 mb-2" id="btn-enviar-sefaz-prod" onclick="enviarNfeSefaz(1)" type="button">
+                <i data-lucide="send"></i>
+                <span>Assinar e Enviar NF-e para SEFAZ (Produção)</span>
+            </button>
+            <div class="mt-2 text-muted small">Certifique-se de que o rascunho está salvo e não há erros de validação antes de enviar.</div>
+        </div>
+
+        <div class="col-12 mt-4">
+            <h6 class="fw-bold mb-2"><i data-lucide="history"></i> Histórico de Envios nesta Sessão</h6>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered table-hover font-monospace text-center" style="font-size: 12px;">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Ambiente</th>
+                            <th>Chave da NF-e</th>
+                            <th>cStat</th>
+                            <th>Motivo</th>
+                            <th>Recibo/Protocolo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-historico-sefaz">
+                        <tr><td colspan="6" class="text-muted py-3">Nenhum envio realizado nesta sessão ainda.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ABA: CONFIGURACOES > TIPO DE NOTA (CONFIGURACAO DE TRIBUTOS PADRAO POR OPERACAO) -->
 <div class="tab-pane fade" id="tipo-nota" role="tabpanel">
 <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
@@ -3643,7 +3717,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
     }
 
     // === GERAR NOVO XML ===
-    async function generateXML() {
+    window.obterXMLFinal = () => generateXML(true);
+    async function generateXML(returnTextOnly = false) {
         const itensAtuais = itensTable ? itensTable.getData() : (itensCache || []);
         if(!itensAtuais || itensAtuais.length === 0) {
             alert("A nota não possui nenhum item cadastrado. Adicione ou importe itens antes de gerar o XML!");
@@ -3781,7 +3856,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             }
         };
 
-        fetch('/generate_xml', {
+        return fetch('/generate_xml', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -3791,9 +3866,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 const errData = await res.json().catch(() => ({}));
                 throw new Error(errData.error || `Erro HTTP ${res.status}`);
             }
-            return res.blob();
+            return returnTextOnly ? res.text() : res.blob();
         })
-        .then(blob => {
+        .then(data => {
+            if (returnTextOnly) return data;
+            const blob = data;
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -3988,7 +4065,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
     }
 
-    async function confirmarSalvarRascunho() {
+    async function confirmarSalvarRascunho(silent = false) {
         const refInput = document.getElementById('rascunho_ref_input');
         const refVal = (refInput ? refInput.value : '').trim();
 
@@ -4027,6 +4104,24 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             : parseNum(getVal('tot_vNF') || getVal('vNF'));
         const opFinal = window._rascunhoTipoOperacaoCalc || getVal('natOp') || getVal('select_operacao') || '';
 
+        // Captura Histórico SEFAZ
+        const sefazHistory = [];
+        const rows = document.querySelectorAll('#tbody-historico-sefaz tr');
+        rows.forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 6) {
+                sefazHistory.push({
+                    data: cells[0].innerHTML,
+                    ambiente: cells[1].innerHTML,
+                    chave: cells[2].innerHTML,
+                    status: cells[3].innerHTML,
+                    motivo: cells[4].innerHTML,
+                    motivoTitle: cells[4].getAttribute('title') || '',
+                    protocolo: cells[5].innerHTML
+                });
+            }
+        });
+
         const payloadRascunho = {
             id: window.idRascunhoAtual,
             referencia_interna: refVal,
@@ -4041,6 +4136,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             dados_completos: {
                 cabecalho: cabecalhoDados,
                 itens: itensDados,
+                sefaz_history: sefazHistory,
                 xml_original: xmlOriginalData || '',
                 nome_arquivo_original: window.nomeArquivoOriginal || '',
                 referencia_interna: refVal,
@@ -4059,25 +4155,27 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             const result = await resp.json();
 
             if (!resp.ok) {
-                alert("Erro ao salvar rascunho: " + (result.erro || "Falha na comunicação."));
+                if (!silent) alert("Erro ao salvar rascunho: " + (result.erro || "Falha na comunicação."));
                 return;
             }
 
             window.idRascunhoAtual = result.id;
 
-            // Fecha modal
-            const modalEl = document.getElementById('modalSalvarRascunho');
-            if (modalEl) {
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
+            if (!silent) {
+                // Fecha modal só se não for silencioso
+                const modalEl = document.getElementById('modalSalvarRascunho');
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+
+                atualizarContadorRascunhos();
+
+                alert(`✅ Rascunho salvo com sucesso!\n\nID: #${result.id}\nReferência: ${refVal || "(Não informada)"}\nCategoria: ${catVal}\nOrigem: ${window.NOME_MODULO_ORIGEM}\nArquivo isolado gerado e gravado no servidor.`);
             }
-
-            atualizarContadorRascunhos();
-
-            alert(`✅ Rascunho salvo com sucesso!\n\nID: #${result.id}\nReferência: ${refVal || "(Não informada)"}\nCategoria: ${catVal}\nOrigem: ${window.NOME_MODULO_ORIGEM}\nArquivo isolado gerado e gravado no servidor.`);
         } catch (err) {
             console.error("Erro ao salvar rascunho:", err);
-            alert("Erro inesperado ao salvar rascunho: " + err);
+            if (!silent) alert("Erro inesperado ao salvar rascunho: " + err);
         }
     }
 
@@ -4335,7 +4433,29 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 verificarExibicaoSecaoExportacao();
             }
 
-            // 6. Atualiza badge da área de upload
+            // 6. Restaura Histórico SEFAZ do rascunho
+            if (dados.sefaz_history && dados.sefaz_history.length > 0) {
+                const tbody = document.getElementById('tbody-historico-sefaz');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    dados.sefaz_history.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${item.data || ''}</td>
+                            <td>${item.ambiente || ''}</td>
+                            <td class="text-start" style="font-size: 11px;">${item.chave || ''}</td>
+                            <td>${item.status || ''}</td>
+                            <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.motivoTitle || ''}">
+                                ${item.motivo || ''}
+                            </td>
+                            <td>${item.protocolo || ''}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            // 7. Atualiza badge da área de upload
             const badgeUpload = document.getElementById('status-badge');
             if (badgeUpload) {
                 badgeUpload.className = "badge bg-success py-2 px-3 w-100";
@@ -4768,6 +4888,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div><!-- /container-fluid -->
 <!-- /nft-main-wrapper -->
 <script src="/static/js/nft-autosave.js"></script>
+<script src="/static/js/nft-sefaz.js"></script>
 <script>
         document.addEventListener('input', function (e) {
             if (e.target.classList.contains('mask-cnpj-cpf')) {

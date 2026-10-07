@@ -107,6 +107,24 @@
             itens = window.itensCache;
         }
 
+        // Captura Histórico SEFAZ
+        const sefazHistory = [];
+        const rows = document.querySelectorAll('#tbody-historico-sefaz tr');
+        rows.forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            if (cells.length >= 6) {
+                sefazHistory.push({
+                    data: cells[0].innerHTML,
+                    ambiente: cells[1].innerHTML,
+                    chave: cells[2].innerHTML,
+                    status: cells[3].innerHTML,
+                    motivo: cells[4].innerHTML,
+                    motivoTitle: cells[4].getAttribute('title') || '',
+                    protocolo: cells[5].innerHTML
+                });
+            }
+        });
+
         const now = new Date();
         const dataFmt = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -116,6 +134,7 @@
             data_formatada: dataFmt,
             campos: campos,
             itens: itens,
+            sefaz_history: sefazHistory,
             xml_original: window.xmlOriginalData || '',
             nome_arquivo_original: window.nomeArquivoOriginal || '',
             id_rascunho_atual: window.idRascunhoAtual || null,
@@ -298,7 +317,29 @@
                 window.atualizarBadgesRateioEItens();
             }
 
-            // 7. Atualiza badge de status de upload
+            // 7. Restaura Histórico SEFAZ
+            if (sessionData.sefaz_history && sessionData.sefaz_history.length > 0) {
+                const tbody = document.getElementById('tbody-historico-sefaz');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    sessionData.sefaz_history.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${item.data}</td>
+                            <td>${item.ambiente}</td>
+                            <td class="text-start" style="font-size: 11px;">${item.chave}</td>
+                            <td>${item.status}</td>
+                            <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.motivoTitle || ''}">
+                                ${item.motivo}
+                            </td>
+                            <td>${item.protocolo}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            // 8. Atualiza badge de status de upload
             const badgeUpload = document.getElementById('status-badge');
             if (badgeUpload) {
                 badgeUpload.className = "badge bg-info py-2 px-3 w-100";
