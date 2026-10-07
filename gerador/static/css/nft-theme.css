@@ -427,49 +427,144 @@ textarea.form-control-sm {
   background-color: var(--primary-subtle) !important;
 }
 
+/* Cabeçalho - 3 Primeiras Colunas Fixas (Fundo Sólido e Opaco) */
+.tabulator .tabulator-header .tabulator-col.tabulator-frozen,
+.tabulator .tabulator-header .tabulator-col:nth-child(-n+3) {
+  background-color: #f8fafc !important;
+  position: sticky !important;
+  z-index: 12 !important;
+}
+
+.dark .tabulator .tabulator-header,
+.dark .tabulator .tabulator-header .tabulator-col,
+.dark .tabulator .tabulator-header .tabulator-col.tabulator-frozen,
+.dark .tabulator .tabulator-header .tabulator-col:nth-child(-n+3),
+[data-theme="dark"] .tabulator .tabulator-header,
+[data-theme="dark"] .tabulator .tabulator-header .tabulator-col,
+[data-theme="dark"] .tabulator .tabulator-header .tabulator-col.tabulator-frozen,
+[data-theme="dark"] .tabulator .tabulator-header .tabulator-col:nth-child(-n+3) {
+  background-color: #222834 !important;
+  color: #ffffff !important;
+  position: sticky !important;
+  z-index: 12 !important;
+}
+
+/* --- LIGHT THEME: LINHA NORMAL (ODD) --- */
 .tabulator .tabulator-row {
-  background-color: var(--surface) !important;
+  background-color: #ffffff !important;
   color: var(--foreground) !important;
   border-bottom: 1px solid var(--border) !important;
 }
 
+.tabulator .tabulator-row .tabulator-cell.tabulator-frozen,
+.tabulator .tabulator-row .tabulator-cell:nth-child(-n+3) {
+  background-color: #ffffff !important;
+  position: sticky !important;
+  z-index: 10 !important;
+}
+
+/* --- LIGHT THEME: LINHA PAR (EVEN) --- */
 .tabulator .tabulator-row.tabulator-row-even {
-  background-color: var(--surface-secondary) !important;
+  background-color: #f8fafc !important;
 }
 
-.tabulator .tabulator-row:hover {
-  background-color: var(--primary-subtle) !important;
+.tabulator .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen,
+.tabulator .tabulator-row.tabulator-row-even .tabulator-cell:nth-child(-n+3) {
+  background-color: #f8fafc !important;
+  position: sticky !important;
+  z-index: 10 !important;
 }
 
-/* Dark Theme - Seção de Itens da Nota e Tabelas: Fonte escura no hover para contraste nítido */
+/* --- LIGHT THEME: HOVER --- */
+.tabulator .tabulator-row:hover,
+.tabulator .tabulator-row:hover .tabulator-cell,
+.tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
+.tabulator .tabulator-row:hover .tabulator-cell:nth-child(-n+3) {
+  background-color: #fff1eb !important;
+  color: var(--foreground) !important;
+}
+
+/* --- DARK THEME: LINHA NORMAL (ODD) --- */
+.dark .tabulator .tabulator-row,
+[data-theme="dark"] .tabulator .tabulator-row {
+  background-color: #1a1e27 !important;
+  color: #e6ecf5 !important;
+}
+
+.dark .tabulator .tabulator-row .tabulator-cell.tabulator-frozen,
+.dark .tabulator .tabulator-row .tabulator-cell:nth-child(-n+3),
+[data-theme="dark"] .tabulator .tabulator-row .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] .tabulator .tabulator-row .tabulator-cell:nth-child(-n+3) {
+  background-color: #1a1e27 !important;
+  position: sticky !important;
+  z-index: 10 !important;
+}
+
+/* --- DARK THEME: LINHA PAR (EVEN) --- */
+.dark .tabulator .tabulator-row.tabulator-row-even,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-row-even {
+  background-color: #222834 !important;
+}
+
+.dark .tabulator .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen,
+.dark .tabulator .tabulator-row.tabulator-row-even .tabulator-cell:nth-child(-n+3),
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-row-even .tabulator-cell:nth-child(-n+3) {
+  background-color: #222834 !important;
+  position: sticky !important;
+  z-index: 10 !important;
+}
+
+/* --- DARK THEME: HOVER --- */
 .dark .tabulator .tabulator-row:hover,
 .dark .tabulator .tabulator-row:hover .tabulator-cell,
+.dark .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
+.dark .tabulator .tabulator-row:hover .tabulator-cell:nth-child(-n+3),
 .dark #itens .tabulator .tabulator-row:hover,
 .dark #itens .tabulator .tabulator-row:hover .tabulator-cell,
 .dark #itens-table .tabulator-row:hover,
 .dark #itens-table .tabulator-row:hover .tabulator-cell,
+.dark #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen,
+.dark #itens-table .tabulator-row:hover .tabulator-cell:nth-child(-n+3),
 [data-theme="dark"] .tabulator .tabulator-row:hover,
 [data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell,
-[data-theme="dark"] #itens .tabulator .tabulator-row:hover,
-[data-theme="dark"] #itens .tabulator .tabulator-row:hover .tabulator-cell,
-[data-theme="dark"] #itens-table .tabulator-row:hover,
-[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell {
-  color: #11141a !important;
-}
-
-.dark .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
-.dark #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen,
 [data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen {
-  background-color: var(--primary-subtle) !important;
-  color: #11141a !important;
+[data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell:nth-child(-n+3),
+[data-theme="dark"] #itens-table .tabulator-row:hover,
+[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell,
+[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell:nth-child(-n+3) {
+  background-color: #2c3545 !important;
+  color: #ffffff !important;
 }
 
 .dark .tabulator .tabulator-row:hover .text-primary,
 .dark #itens-table .tabulator-row:hover .text-primary,
 [data-theme="dark"] .tabulator .tabulator-row:hover .text-primary,
 [data-theme="dark"] #itens-table .tabulator-row:hover .text-primary {
-  color: #9a3412 !important;
+  color: #fa6c38 !important;
+}
+
+/* Botão de Edição Rápida na Tabela de Itens (Clean / Sem borda) */
+.btn-editar-item {
+  color: var(--primary, #0d6efd) !important;
+  opacity: 0.8;
+  border-radius: 4px;
+  transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
+}
+.btn-editar-item:hover {
+  opacity: 1;
+  background-color: rgba(13, 110, 253, 0.12) !important;
+  transform: scale(1.12);
+}
+.dark .btn-editar-item,
+[data-theme="dark"] .btn-editar-item {
+  color: #60a5fa !important;
+}
+.dark .btn-editar-item:hover,
+[data-theme="dark"] .btn-editar-item:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #93c5fd !important;
 }
 
 .tabulator .tabulator-cell {
@@ -1341,26 +1436,59 @@ textarea.form-control-sm {
 /* ==========================================================================
    24. TABELAS: SELEÇÃO DE LINHAS (TABULATOR ROW SELECTION)
    ========================================================================== */
-.tabulator .tabulator-row.tabulator-selected {
-  background-color: rgba(237, 90, 36, 0.12) !important;
+/* Light Theme - Seleção de Linhas: Fundo Opaco da Mesma Cor em Todas as Células e Colunas Fixas */
+.tabulator .tabulator-row.tabulator-selected,
+.tabulator .tabulator-row.tabulator-selected .tabulator-cell,
+.tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+.tabulator .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
+#itens-table .tabulator-row.tabulator-selected,
+#itens-table .tabulator-row.tabulator-selected .tabulator-cell,
+#itens-table .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+#itens-table .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3) {
+  background-color: #ffe6dc !important;
+  color: #161110 !important;
 }
 
-/* Dark Theme - Seleção com fundo Laranja --primary sólido e texto em alto contraste */
+.tabulator .tabulator-row.tabulator-selected:hover,
+.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
+.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
+.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3),
+#itens-table .tabulator-row.tabulator-selected:hover,
+#itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell,
+#itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
+#itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3) {
+  background-color: #ffd8c7 !important;
+  color: #161110 !important;
+}
+
+/* Dark Theme - Seleção de Linhas: Fundo Opaco da Mesma Cor em Todas as Células e Colunas Fixas */
 .dark .tabulator .tabulator-row.tabulator-selected,
 .dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
 .dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
 .dark #itens .tabulator .tabulator-row.tabulator-selected,
 .dark #itens .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
 .dark #itens-table .tabulator-row.tabulator-selected,
 .dark #itens-table .tabulator-row.tabulator-selected .tabulator-cell,
+.dark #itens-table .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+.dark #itens-table .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
 [data-theme="dark"] .tabulator .tabulator-row.tabulator-selected,
 [data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
 [data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
 [data-theme="dark"] #itens .tabulator .tabulator-row.tabulator-selected,
 [data-theme="dark"] #itens .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
 [data-theme="dark"] #itens-table .tabulator-row.tabulator-selected,
-[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell {
+[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell,
+[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3) {
   background-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+/* Ícone de editar branco com nitidez quando linha estiver selecionada no tema escuro */
+.dark .tabulator .tabulator-row.tabulator-selected .btn-editar-item,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .btn-editar-item {
   color: #ffffff !important;
 }
 
@@ -1380,9 +1508,11 @@ textarea.form-control-sm {
 .dark .tabulator .tabulator-row.tabulator-selected:hover,
 .dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
 .dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
+.dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3),
 [data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover,
 [data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen {
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
+[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3) {
   background-color: var(--primary-hover) !important;
   color: #ffffff !important;
 }

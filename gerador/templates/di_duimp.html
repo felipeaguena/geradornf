@@ -21,6 +21,8 @@
 <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
 <script defer src="/static/js/nft-sidebar.js?v=2.7"></script>
 <script defer src="/static/js/nft-item-modal.js?v=1.0"></script>
+<script defer src="/static/js/nft-analise-rascunho.js?v=1.0"></script>
+<script defer src="/static/js/nft-exportacao.js?v=1.0"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -115,18 +117,23 @@
 </div>
 <!-- 3. Rodapé da Sidebar -->
 <div class="nft-sidebar-footer">
+<button class="sidebar-footer-btn sidebar-footer-btn-analisar" onclick="analisarRascunho()" title="Analisar e Verificar Rascunho do XML" type="button">
+<span class="sidebar-icon"><i data-lucide="shield-check"></i></span>
+<span class="sidebar-footer-text">Analisar Rascunho</span>
+</button>
 <button class="sidebar-footer-btn sidebar-footer-btn-primary" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
 <span class="sidebar-icon"><i data-lucide="download"></i></span>
 <span class="sidebar-footer-text">Gerar Novo XML</span>
 </button>
-<button class="sidebar-footer-btn" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
+<div class="sidebar-footer-actions">
+<button class="sidebar-footer-btn sidebar-footer-btn-power" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
 <span class="sidebar-icon" style="color: #ef4444 !important;"><i data-lucide="power"></i></span>
 <span class="sidebar-footer-text" style="color: #ef4444 !important; font-weight: 700;">Desligar</span>
 </button>
-<button class="sidebar-footer-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
-<span class="sidebar-icon theme-toggle-btn"><i data-lucide="sun-moon"></i></span>
-<span class="sidebar-footer-text">Alternar Tema</span>
+<button class="sidebar-footer-btn theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+<i data-lucide="moon"></i>
 </button>
+</div>
 <div class="sidebar-footer-info">
 <span>NFT Logistics</span>
 <span>v2.1</span>
@@ -592,6 +599,71 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <label class="form-label small mb-1 fw-bold text-primary">Peso Bruto Total (kg)</label>
 <input class="form-control form-control-sm font-monospace text-end" id="transp_pesoB" onchange="formatarInputVisualBR(this, 3, 3)" placeholder="0,000" type="text"/>
 </div></div></div></div></div>
+
+<!-- DADOS DE EXPORTAÇÃO (SEFAZ: <exporta>) -->
+<div class="col-12 mt-3" id="secao_exportacao" style="display: none;">
+    <div class="card shadow-sm border mb-3">
+        <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+            <span class="fw-bold d-flex align-items-center gap-1 text-secondary">
+                <i data-lucide="plane-takeoff"></i>
+                <span>Exportação</span>
+                <span class="text-muted fw-normal" style="font-size: 11px;">(Tag SEFAZ: &lt;exporta&gt;)</span>
+            </span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-secondary font-monospace" style="font-size: 11px;">Opcional (CFOP 7xxx / Exterior)</span>
+                <button class="btn btn-outline-secondary btn-sm py-0 px-2 d-inline-flex align-items-center gap-1" onclick="limparCamposExportacao()" style="height: 24px; font-size: 11px;" title="Limpar campos de exportação" type="button">
+                    <i data-lucide="eraser" style="width: 12px; height: 12px;"></i>
+                    <span>Limpar</span>
+                </button>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="exporta_UFSaidaPais">UF de embarque</label>
+                    <select class="form-select form-select-sm font-monospace" id="exporta_UFSaidaPais">
+                        <option value="">Selecione a UF...</option>
+                        <option value="AC">AC</option>
+                        <option value="AL">AL</option>
+                        <option value="AM">AM</option>
+                        <option value="AP">AP</option>
+                        <option value="BA">BA</option>
+                        <option value="CE">CE</option>
+                        <option value="DF">DF</option>
+                        <option value="ES">ES</option>
+                        <option value="GO">GO</option>
+                        <option value="MA">MA</option>
+                        <option value="MG">MG</option>
+                        <option value="MS">MS</option>
+                        <option value="MT">MT</option>
+                        <option value="PA">PA</option>
+                        <option value="PB">PB</option>
+                        <option value="PE">PE</option>
+                        <option value="PI">PI</option>
+                        <option value="PR">PR</option>
+                        <option value="RJ">RJ</option>
+                        <option value="RN">RN</option>
+                        <option value="RO">RO</option>
+                        <option value="RR">RR</option>
+                        <option value="RS">RS</option>
+                        <option value="SC">SC</option>
+                        <option value="SE">SE</option>
+                        <option value="SP">SP</option>
+                        <option value="TO">TO</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="exporta_xLocExporta">Local de embarque</label>
+                    <input class="form-control form-control-sm" id="exporta_xLocExporta" maxlength="60" placeholder="Ex: PORTO DE SANTOS, AEROPORTO DE VIRACOPOS" type="text"/>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="exporta_xLocDespacho">Local de despacho</label>
+                    <input class="form-control form-control-sm" id="exporta_xLocDespacho" maxlength="60" placeholder="Ex: RECINTO ALFANDEGADO SANTOS (Opcional)" type="text"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- IDENTIFICAÇÃO DA IMPORTAÇÃO -->
 <div class="col-12 mt-3">
@@ -2516,6 +2588,27 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
     // Definicao de todas as colunas de det nItem
     const colunasItensDef = [
         {
+            title: "",
+            headerTooltip: "Editar item",
+            field: "_acoes",
+            width: 38,
+            frozen: true,
+            hozAlign: "center",
+            headerHozAlign: "center",
+            headerSort: false,
+            formatter: function() {
+                return '<button type="button" class="btn btn-link p-0 text-primary border-0 bg-transparent shadow-none d-inline-flex align-items-center justify-content-center btn-editar-item" title="Editar este item no pop-up dedicado" style="width: 24px; height: 24px; cursor: pointer; text-decoration: none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>';
+            },
+            cellClick: function(e, cell) {
+                e.stopPropagation();
+                const row = cell.getRow();
+                const rowData = row.getData();
+                if (window.abrirModalItemEditar) {
+                    window.abrirModalItemEditar(rowData, row.getPosition(true) - 1);
+                }
+            }
+        },
+        {
             formatter: "rowSelection",
             titleFormatter: "rowSelection",
             hozAlign: "center",
@@ -2525,26 +2618,6 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             frozen: true,
             cellClick: function(e, cell) {
                 cell.getRow().toggleSelect();
-            }
-        },
-        {
-            title: "Ações",
-            field: "_acoes",
-            width: 75,
-            frozen: true,
-            hozAlign: "center",
-            headerHozAlign: "center",
-            headerSort: false,
-            formatter: function() {
-                return '<button type="button" class="btn btn-xs btn-outline-primary py-0 px-2 d-inline-flex align-items-center gap-1 shadow-sm" title="Editar este item no pop-up dedicado" style="height: 24px; font-size: 11.5px; border-radius: 4px; font-weight: 600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Editar</span></button>';
-            },
-            cellClick: function(e, cell) {
-                e.stopPropagation();
-                const row = cell.getRow();
-                const rowData = row.getData();
-                if (window.abrirModalItemEditar) {
-                    window.abrirModalItemEditar(rowData, row.getPosition(true) - 1);
-                }
             }
         },
         {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center", editor:"input"},
@@ -3639,7 +3712,10 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 dest_CEP: getVal('dest_CEP'),
                 dest_cPais: getVal('dest_cPais') || (window.currentCabecalho && window.currentCabecalho.dest_cPais) || '1058',
                 dest_xPais: getVal('dest_xPais') || (window.currentCabecalho && window.currentCabecalho.dest_xPais) || 'Brasil',
-                verProc: getVal('verProc') || '4.01_sebrae_b057'
+                verProc: getVal('verProc') || '4.01_sebrae_b057',
+                exporta_UFSaidaPais: getVal('exporta_UFSaidaPais'),
+                exporta_xLocExporta: getVal('exporta_xLocExporta'),
+                exporta_xLocDespacho: getVal('exporta_xLocDespacho')
             },
             referencia_interna: (typeof obterReferenciaInterna === 'function' ? obterReferenciaInterna() : (getVal('referencia_interna') || getVal('referenciaInterna') || '')).trim(),
             itens: itensLimpos,
@@ -3658,6 +3734,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     esp: getVal('transp_esp'),
                     pesoL: mutatorLimparNumero(getVal('transp_pesoL')),
                     pesoB: mutatorLimparNumero(getVal('transp_pesoB'))
+                },
+                exportacao: {
+                    UFSaidaPais: getVal('exporta_UFSaidaPais'),
+                    xLocExporta: getVal('exporta_xLocExporta'),
+                    xLocDespacho: getVal('exporta_xLocDespacho')
                 },
                 totais: {
                     vProd: mutatorLimparNumero(getVal('tot_vProd')),
@@ -3918,6 +3999,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
             'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
             'rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vFrete', 'rateio_vSeg', 'rateio_vOutro', 'ptax_data', 'ptax_moeda', 'ptax_moeda_custom', 'ptax_cotacao_venda', 'criterio_rateio',
+            'exporta_UFSaidaPais', 'exporta_xLocExporta', 'exporta_xLocDespacho',
             'infCpl', 'select_operacao', 'referencia_interna', 'referenciaInterna'
         ];
 
@@ -4237,6 +4319,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             calcularChaveAcessoDinamica();
             atualizarBadgeRefNFe((getVal('refNFe') || '').length);
             atualizarBadgesRateioEItens();
+            if (typeof verificarExibicaoSecaoExportacao === 'function') {
+                verificarExibicaoSecaoExportacao();
+            }
 
             // 6. Atualiza badge da área de upload
             const badgeUpload = document.getElementById('status-badge');

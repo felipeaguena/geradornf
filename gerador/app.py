@@ -886,6 +886,29 @@ def build_nfe_element(cabecalho, itens, rodape):
         inf_adic = ET.SubElement(inf_nfe, f'{{{NFE_NS}}}infAdic')
         ET.SubElement(inf_adic, f'{{{NFE_NS}}}infCpl').text = inf_cpl[:5000]
 
+    # 8.1 exporta (Informações de exportação - MOC SEFAZ v4.00)
+    exporta_data = rodape.get('exportacao') or cabecalho.get('exportacao') or {}
+    uf_saida = str(exporta_data.get('UFSaidaPais') or cabecalho.get('exporta_UFSaidaPais') or rodape.get('exporta_UFSaidaPais') or '').strip().upper()
+    x_loc_exporta = remover_acentos_nfe(exporta_data.get('xLocExporta') or cabecalho.get('exporta_xLocExporta') or rodape.get('exporta_xLocExporta') or '').strip()
+    x_loc_despacho = remover_acentos_nfe(exporta_data.get('xLocDespacho') or cabecalho.get('exporta_xLocDespacho') or rodape.get('exporta_xLocDespacho') or '').strip()
+
+    cfop_padrao = str(cabecalho.get('cfop_padrao') or '').strip()
+    has_cfop_7 = cfop_padrao.startswith('7') or any(str(it.get('CFOP') or '').strip().startswith('7') for it in itens)
+    nat_op_str = str(cabecalho.get('natOp') or cabecalho.get('select_operacao') or '').upper()
+    is_op_exportacao = (
+        has_cfop_7 or 
+        id_dest == '3' or 
+        'EXPORTA' in nat_op_str or 
+        'REEXPORTA' in nat_op_str
+    )
+
+    if is_op_exportacao and uf_saida and x_loc_exporta:
+        exporta_el = ET.SubElement(inf_nfe, f'{{{NFE_NS}}}exporta')
+        ET.SubElement(exporta_el, f'{{{NFE_NS}}}UFSaidaPais').text = uf_saida[:2]
+        ET.SubElement(exporta_el, f'{{{NFE_NS}}}xLocExporta').text = x_loc_exporta[:60]
+        if x_loc_despacho:
+            ET.SubElement(exporta_el, f'{{{NFE_NS}}}xLocDespacho').text = x_loc_despacho[:60]
+
     # 9. Signature (Obrigatorio para importacao no Emissor Gratuito Sebrae/DSEN)
     append_signature(root, inf_nfe)
 
@@ -1960,12 +1983,23 @@ def upload_xml():
             "vNF": get_text(icms_tot, 'vNF')
         }
 
-        # Extrair Rodape
+        # Extrair Rodape e Exportacao
         infAdic = inf_nfe.find('.//{http://www.portalfiscal.inf.br/nfe}infAdic')
+        exporta_el = inf_nfe.find('.//{http://www.portalfiscal.inf.br/nfe}exporta')
+        exporta_dict = {
+            "UFSaidaPais": get_text(exporta_el, 'UFSaidaPais') if exporta_el is not None else "",
+            "xLocExporta": get_text(exporta_el, 'xLocExporta') if exporta_el is not None else "",
+            "xLocDespacho": get_text(exporta_el, 'xLocDespacho') if exporta_el is not None else ""
+        }
+        cabecalho['exporta_UFSaidaPais'] = exporta_dict['UFSaidaPais']
+        cabecalho['exporta_xLocExporta'] = exporta_dict['xLocExporta']
+        cabecalho['exporta_xLocDespacho'] = exporta_dict['xLocDespacho']
+
         rodape = {
             "vNF": totais.get("vNF") or get_text(inf_nfe.find('.//{http://www.portalfiscal.inf.br/nfe}total'), 'vNF'),
             "infCpl": get_text(infAdic, 'infCpl'),
             "transporte": transporte,
+            "exportacao": exporta_dict,
             "totais": totais
         }
 
@@ -2017,6 +2051,421 @@ def upload_xml():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# === ROTA: ANALISAR RASCUNHO (VALIDAÇÃO DE ESQUEMA & REGRAS SEFAZ) ===
+def validar_dados_nfe(cabecalho, itens, rodape, referencia_interna=''):
+    erros = []
+    alertas = []
+
+    def safe_float(v):
+        if v is None:
+            return 0.0
+        s = str(v).strip()
+        if not s:
+            return 0.0
+        if ',' in s and '.' in s:
+            s = s.replace('.', '').replace(',', '.')
+        elif ',' in s:
+            s = s.replace(',', '.')
+        try:
+            return float(s)
+        except ValueError:
+            return 0.0
+
+    # 1. Validação dos Itens (Grade de Produtos)
+    if not itens or len(itens) == 0:
+        erros.append({
+            "categoria": "Itens da Nota",
+            "aba": "3. Itens da Nota",
+            "campo": "Grade de Itens",
+            "mensagem": "Nenhum item adicionado à nota fiscal. A SEFAZ exige ao menos 1 item."
+        })
+    else:
+        for idx, it in enumerate(itens, start=1):
+            n_item = it.get('nItem') or idx
+            c_prod = str(it.get('cProd') or '').strip()
+            if not c_prod:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - Cód. Prod.",
+                    "mensagem": f"Item #{n_item}: Código do produto (cProd) é obrigatório."
+                })
+
+            x_prod = str(it.get('xProd') or '').strip()
+            if not x_prod:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - Descrição",
+                    "mensagem": f"Item #{n_item}: Descrição do produto (xProd) é obrigatória."
+                })
+            elif len(x_prod) > 120:
+                alertas.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - Descrição",
+                    "mensagem": f"Item #{n_item}: Descrição tem {len(x_prod)} caracteres (limite SEFAZ é 120, será truncada)."
+                })
+
+            ncm = re.sub(r'\D', '', str(it.get('NCM') or ''))
+            if not ncm:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - NCM",
+                    "mensagem": f"Item #{n_item}: NCM é obrigatório para validação tributária."
+                })
+            elif len(ncm) != 8:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - NCM",
+                    "mensagem": f"Item #{n_item}: NCM deve conter exatamente 8 dígitos numéricos (atual: {len(ncm)})."
+                })
+
+            cfop = re.sub(r'\D', '', str(it.get('CFOP') or ''))
+            if not cfop:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - CFOP",
+                    "mensagem": f"Item #{n_item}: CFOP é obrigatório."
+                })
+            elif len(cfop) != 4:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - CFOP",
+                    "mensagem": f"Item #{n_item}: CFOP deve conter exatamente 4 dígitos numéricos."
+                })
+
+            u_com = str(it.get('uCom') or '').strip()
+            if not u_com:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - Un. Com.",
+                    "mensagem": f"Item #{n_item}: Unidade comercial (uCom) é obrigatória."
+                })
+
+            q_com = safe_float(it.get('qCom'))
+            if q_com <= 0:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - Qtd. Com.",
+                    "mensagem": f"Item #{n_item}: Quantidade comercial (qCom) deve ser maior que zero."
+                })
+
+            v_un_com = safe_float(it.get('vUnCom'))
+            if v_un_com <= 0:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - V. Unit. Com.",
+                    "mensagem": f"Item #{n_item}: Valor unitário (vUnCom) deve ser maior que zero."
+                })
+
+            v_prod = safe_float(it.get('vProd'))
+            if v_prod <= 0:
+                erros.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - V. Total Prod.",
+                    "mensagem": f"Item #{n_item}: Valor total do produto (vProd) deve ser maior que zero."
+                })
+
+            u_trib = str(it.get('uTrib') or '').strip()
+            if not u_trib:
+                alertas.append({
+                    "categoria": "Itens da Nota",
+                    "aba": "3. Itens da Nota",
+                    "campo": f"Item #{n_item} - Un. Trib.",
+                    "mensagem": f"Item #{n_item}: Unidade tributável (uTrib) não informada."
+                })
+
+            q_trib = safe_float(it.get('qTrib'))
+            id_dest = str(cabecalho.get('idDest') or '1')
+            if q_trib <= 0:
+                if id_dest == '3':
+                    erros.append({
+                        "categoria": "Itens da Nota",
+                        "aba": "3. Itens da Nota",
+                        "campo": f"Item #{n_item} - Qtd. Trib.",
+                        "mensagem": f"Item #{n_item}: Quantidade tributável (qTrib) é obrigatória em operações de exportação/exterior."
+                    })
+                else:
+                    alertas.append({
+                        "categoria": "Itens da Nota",
+                        "aba": "3. Itens da Nota",
+                        "campo": f"Item #{n_item} - Qtd. Trib.",
+                        "mensagem": f"Item #{n_item}: Quantidade tributável (qTrib) zerada ou em branco."
+                    })
+
+            if cfop.startswith('3'):
+                n_di = str(it.get('nDI') or '').strip()
+                if not n_di:
+                    alertas.append({
+                        "categoria": "Importação",
+                        "aba": "3. Itens da Nota",
+                        "campo": f"Item #{n_item} - Nº DI",
+                        "mensagem": f"Item #{n_item}: CFOP de importação ({cfop}) requer preenchimento do Nº da DI/DUIMP."
+                    })
+
+    # 2. Identificação da NF-e (ide)
+    n_nf = str(cabecalho.get('nNF') or '').strip()
+    if not n_nf or not n_nf.isdigit() or int(n_nf) <= 0:
+        erros.append({
+            "categoria": "Identificação",
+            "aba": "1. Identificação",
+            "campo": "Número da NF (nNF)",
+            "mensagem": "Número da NF deve ser preenchido com um número inteiro maior que zero."
+        })
+
+    serie = str(cabecalho.get('serie') or '').strip()
+    if not serie or not serie.isdigit():
+        erros.append({
+            "categoria": "Identificação",
+            "aba": "1. Identificação",
+            "campo": "Série",
+            "mensagem": "Série da nota fiscal deve conter apenas números."
+        })
+
+    nat_op = str(cabecalho.get('natOp') or cabecalho.get('select_operacao') or '').strip()
+    if not nat_op:
+        erros.append({
+            "categoria": "Identificação",
+            "aba": "1. Identificação",
+            "campo": "Natureza da Operação (natOp)",
+            "mensagem": "Natureza da Operação é campo obrigatório pela SEFAZ."
+        })
+    elif len(nat_op) > 60:
+        alertas.append({
+            "categoria": "Identificação",
+            "aba": "1. Identificação",
+            "campo": "Natureza da Operação",
+            "mensagem": f"Natureza da Operação possui {len(nat_op)} caracteres (limite máximo é 60)."
+        })
+
+    ref_nfe = re.sub(r'\D', '', str(cabecalho.get('refNFe') or cabecalho.get('chave_referenciada') or ''))
+    if ref_nfe:
+        if len(ref_nfe) != 44:
+            erros.append({
+                "categoria": "Identificação",
+                "aba": "1. Identificação",
+                "campo": "Chave Referenciada (refNFe)",
+                "mensagem": f"Chave de acesso referenciada deve conter exatamente 44 dígitos numéricos (atual: {len(ref_nfe)})."
+            })
+    else:
+        # Se for operação de devolução (ou finNFe=4), a SEFAZ exige obrigatoriamente a NF referenciada
+        fin_nfe = str(cabecalho.get('finNFe') or '1')
+        cfop_ref = str(cabecalho.get('cfop_padrao') or '').strip()
+        cfops_devolucao = ('1201', '1202', '2201', '2202', '5201', '5202', '6201', '6202', '7201', '7202')
+        is_devolucao = (fin_nfe == '4' or cfop_ref in cfops_devolucao or 'DEVOLU' in nat_op.upper())
+        if is_devolucao:
+            alertas.append({
+                "categoria": "Identificação",
+                "aba": "1. Identificação",
+                "campo": "Chave Referenciada (refNFe)",
+                "mensagem": "Operações de Devolução (ou finNFe=4) exigem obrigatoriamente a Chave de Acesso da NF-e referenciada (tag <NFref>) conforme MOC da SEFAZ."
+            })
+
+    # 3. Emitente (emit)
+    emit_cnpj = re.sub(r'\D', '', str(cabecalho.get('emit_CNPJ') or ''))
+    if not emit_cnpj:
+        erros.append({
+            "categoria": "Emitente",
+            "aba": "2. Emitente",
+            "campo": "CNPJ Emitente",
+            "mensagem": "CNPJ do emitente é obrigatório."
+        })
+    elif len(emit_cnpj) != 14:
+        erros.append({
+            "categoria": "Emitente",
+            "aba": "2. Emitente",
+            "campo": "CNPJ Emitente",
+            "mensagem": f"CNPJ do emitente inválido (deve ter 14 dígitos, atual: {len(emit_cnpj)})."
+        })
+
+    emit_x_nome = str(cabecalho.get('emit_xNome') or '').strip()
+    if not emit_x_nome:
+        erros.append({
+            "categoria": "Emitente",
+            "aba": "2. Emitente",
+            "campo": "Razão Social Emitente",
+            "mensagem": "Razão Social do emitente é obrigatória."
+        })
+
+    emit_uf = str(cabecalho.get('emit_UF') or '').strip()
+    if not emit_uf or len(emit_uf) != 2:
+        erros.append({
+            "categoria": "Emitente",
+            "aba": "2. Emitente",
+            "campo": "UF Emitente",
+            "mensagem": "UF do emitente deve conter a sigla de 2 letras do Estado."
+        })
+
+    # 4. Destinatário (dest)
+    dest_x_nome = str(cabecalho.get('dest_xNome') or '').strip()
+    if not dest_x_nome:
+        erros.append({
+            "categoria": "Destinatário",
+            "aba": "2. Destinatário",
+            "campo": "Razão Social / Nome Destinatário",
+            "mensagem": "Nome ou Razão Social do destinatário é obrigatório."
+        })
+
+    id_dest = str(cabecalho.get('idDest') or '1')
+    if id_dest == '3':
+        dest_uf = str(cabecalho.get('dest_UF') or '').strip().upper()
+        if dest_uf and dest_uf != 'EX':
+            alertas.append({
+                "categoria": "Destinatário",
+                "aba": "2. Destinatário",
+                "campo": "UF Destinatário",
+                "mensagem": "Operação para o exterior (idDest=3) deve ter UF do destinatário preenchida como 'EX'."
+            })
+        id_estrangeiro = str(cabecalho.get('dest_idEstrangeiro') or '').strip()
+        if not id_estrangeiro:
+            alertas.append({
+                "categoria": "Destinatário",
+                "aba": "2. Destinatário",
+                "campo": "ID Estrangeiro",
+                "mensagem": "ID Estrangeiro não informado para cliente no exterior."
+            })
+    else:
+        dest_doc = re.sub(r'\D', '', str(cabecalho.get('dest_CNPJ_CPF') or ''))
+        if not dest_doc:
+            erros.append({
+                "categoria": "Destinatário",
+                "aba": "2. Destinatário",
+                "campo": "CNPJ / CPF Destinatário",
+                "mensagem": "CNPJ ou CPF do destinatário é obrigatório em operações nacionais."
+            })
+        elif len(dest_doc) not in (11, 14):
+            erros.append({
+                "categoria": "Destinatário",
+                "aba": "2. Destinatário",
+                "campo": "CNPJ / CPF Destinatário",
+                "mensagem": f"Documento do destinatário inválido (CPF deve ter 11 dígitos, CNPJ deve ter 14 dígitos, atual: {len(dest_doc)})."
+            })
+
+    # 5. Informações de Exportação (exporta - MOC SEFAZ v4.00)
+    exporta_data = rodape.get('exportacao') or cabecalho.get('exportacao') or {}
+    uf_exp = str(exporta_data.get('UFSaidaPais') or cabecalho.get('exporta_UFSaidaPais') or rodape.get('exporta_UFSaidaPais') or '').strip().upper()
+    loc_exp = str(exporta_data.get('xLocExporta') or cabecalho.get('exporta_xLocExporta') or rodape.get('exporta_xLocExporta') or '').strip()
+    loc_desp = str(exporta_data.get('xLocDespacho') or cabecalho.get('exporta_xLocDespacho') or rodape.get('exporta_xLocDespacho') or '').strip()
+
+    cfop_padrao = str(cabecalho.get('cfop_padrao') or '').strip()
+    has_cfop_7 = cfop_padrao.startswith('7') or any(str(it.get('CFOP') or '').strip().startswith('7') for it in itens)
+    nat_op_upper = nat_op.upper()
+    is_op_exportacao = (has_cfop_7 or id_dest == '3' or 'EXPORTA' in nat_op_upper or 'REEXPORTA' in nat_op_upper)
+
+    if uf_exp or loc_exp or loc_desp:
+        if not is_op_exportacao:
+            alertas.append({
+                "categoria": "Exportação",
+                "aba": "2. Transporte",
+                "campo": "Grupo de Exportação (<exporta>)",
+                "mensagem": "Campos de exportação preenchidos em operação que não possui CFOP 7xxx nem destinatário exterior (Rejeição SEFAZ 527)."
+            })
+        if loc_exp and not uf_exp:
+            erros.append({
+                "categoria": "Exportação",
+                "aba": "2. Transporte",
+                "campo": "UF de Embarque (UFSaidaPais)",
+                "mensagem": "UF de embarque é obrigatória para o grupo de exportação da NF-e."
+            })
+        elif uf_exp and len(uf_exp) != 2:
+            erros.append({
+                "categoria": "Exportação",
+                "aba": "2. Transporte",
+                "campo": "UF de Embarque (UFSaidaPais)",
+                "mensagem": "UF de embarque deve conter a sigla de 2 letras de um Estado brasileiro válido."
+            })
+        if uf_exp and not loc_exp:
+            erros.append({
+                "categoria": "Exportação",
+                "aba": "2. Transporte",
+                "campo": "Local de Embarque (xLocExporta)",
+                "mensagem": "Local de embarque é obrigatório quando a UF de embarque for informada."
+            })
+        elif loc_exp and len(loc_exp) > 60:
+            alertas.append({
+                "categoria": "Exportação",
+                "aba": "2. Transporte",
+                "campo": "Local de Embarque (xLocExporta)",
+                "mensagem": f"Local de embarque possui {len(loc_exp)} caracteres (limite máximo é 60)."
+            })
+        if loc_desp and len(loc_desp) > 60:
+            alertas.append({
+                "categoria": "Exportação",
+                "aba": "2. Transporte",
+                "campo": "Local de Despacho (xLocDespacho)",
+                "mensagem": f"Local de despacho possui {len(loc_desp)} caracteres (limite máximo é 60)."
+            })
+
+    # 5. Totais e Conferência Financeira
+    totais = rodape.get('totais', {}) if isinstance(rodape, dict) else {}
+    soma_itens = sum(safe_float(it.get('vProd')) for it in itens) if itens else 0.0
+    tot_v_prod = safe_float(totais.get('vProd'))
+    if tot_v_prod > 0 and abs(soma_itens - tot_v_prod) > 0.05:
+        alertas.append({
+            "categoria": "Totais da NF",
+            "aba": "4. Totais",
+            "campo": "Total dos Produtos (vProd)",
+            "mensagem": f"A soma dos produtos dos itens (R$ {soma_itens:,.2f}) difere do total informado no rodapé (R$ {tot_v_prod:,.2f})."
+        })
+
+    # 6. Teste de Estruturação do XML
+    xml_construido = False
+    if len(erros) == 0:
+        try:
+            xml_root = build_nfe_element(cabecalho, itens, rodape)
+            xml_str = ET.tostring(xml_root, encoding='utf-8').decode('utf-8')
+            if '<NFe' in xml_str and '</NFe>' in xml_str:
+                xml_construido = True
+        except Exception as e:
+            erros.append({
+                "categoria": "Esquema XML",
+                "aba": "Geral",
+                "campo": "Estrutura XML",
+                "mensagem": f"Falha na montagem da estrutura do XML da NF-e: {str(e)}"
+            })
+
+    return {
+        "valido": len(erros) == 0,
+        "total_erros": len(erros),
+        "total_alertas": len(alertas),
+        "erros": erros,
+        "alertas": alertas,
+        "resumo": {
+            "n_nf": n_nf or '1',
+            "serie": serie or '1',
+            "operacao": nat_op or 'Não definida',
+            "destinatario": dest_x_nome or 'Não informado',
+            "total_itens": len(itens) if itens else 0,
+            "valor_total_produtos": soma_itens,
+            "xml_construido": xml_construido
+        }
+    }
+
+@app.route('/api/analisar_rascunho', methods=['POST'])
+def api_analisar_rascunho():
+    try:
+        data = request.json or {}
+        cabecalho = data.get('cabecalho', {})
+        itens = data.get('itens', [])
+        rodape = data.get('rodape', {})
+        ref_interna = data.get('referencia_interna', '')
+
+        resultado = validar_dados_nfe(cabecalho, itens, rodape, ref_interna)
+        return jsonify({"sucesso": True, **resultado})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"sucesso": False, "error": f"Erro ao analisar rascunho: {str(e)}"}), 500
 
 # === ROTA: GERAR XML ===
 @app.route('/generate_xml', methods=['POST'])
@@ -2302,6 +2751,20 @@ def api_localidades_municipios():
         "limit": limit,
         "items": [dict(r) for r in rows]
     })
+
+@app.route('/api/localidades/ufs')
+def api_localidades_ufs():
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        rows = c.execute("SELECT DISTINCT uf FROM tabela_municipios WHERE uf IS NOT NULL AND uf != '' ORDER BY uf ASC").fetchall()
+        ufs = [r[0] for r in rows if r[0]]
+        conn.close()
+    except Exception:
+        ufs = []
+    if not ufs:
+        ufs = ['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO']
+    return jsonify(ufs)
 
 @app.route('/api/localidades/cep/<cep>')
 def api_localidades_cep(cep):
