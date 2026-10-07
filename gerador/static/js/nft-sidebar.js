@@ -293,11 +293,53 @@
         });
     }
 
+    // Sincroniza o badge sob o logo da Sidebar com a tela ativa
+    function syncSidebarBrandBadge() {
+        const badgeEl = document.querySelector('.sidebar-brand-badge');
+        if (!badgeEl) return;
+
+        const path = (window.location.pathname || '/').toLowerCase();
+
+        // Mapeamento específico por rota
+        const routeMap = {
+            '/': 'Portal NF-e',
+            '/nova_nf': 'Nova NF',
+            '/rascunho': 'XML Rascunho',
+            '/editor': 'XML Rascunho',
+            '/di_duimp': 'XML DI / DUIMP',
+            '/duimp': 'XML DI / DUIMP',
+            '/empresas': 'Empresas',
+            '/banco_ncm': 'Tabela NCM',
+            '/localidades': 'Localidades',
+            '/feiras': 'Descrição da Feira'
+        };
+
+        if (routeMap[path]) {
+            badgeEl.textContent = routeMap[path];
+            return;
+        }
+
+        // Fallback: se houver botão ativo na sidebar
+        const activeBtn = document.querySelector('.nft-sidebar-btn.active');
+        if (activeBtn) {
+            const labelEl = activeBtn.querySelector('.sidebar-label');
+            if (labelEl) {
+                const text = labelEl.textContent.trim();
+                if (text.includes('Início') || text.includes('Portal')) {
+                    badgeEl.textContent = 'Portal NF-e';
+                } else if (text) {
+                    badgeEl.textContent = text;
+                }
+            }
+        }
+    }
+
     // Executa ao carregar o DOM
     document.addEventListener('DOMContentLoaded', function () {
         initSidebarState();
         initTabListeners();
         initBadgeObserver();
+        syncSidebarBrandBadge();
 
         // Detecta aba ativa inicial
         const activeTab = document.querySelector('.nav-tabs .nav-link.active');

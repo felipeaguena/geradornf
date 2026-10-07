@@ -18,7 +18,8 @@
 <!-- Tabulator CSS -->
 <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_bootstrap5.min.css" rel="stylesheet"/>
 <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-<script defer src="/static/js/nft-sidebar.js?v=2.6"></script>
+<script defer src="/static/js/nft-sidebar.js?v=2.7"></script>
+<script defer src="/static/js/nft-item-modal.js?v=1.0"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -32,7 +33,7 @@
 </div>
 <div class="sidebar-brand-info">
 <span class="sidebar-brand-title">NFT Logistics</span>
-<span class="sidebar-brand-badge">Emissor NF-e</span>
+<span class="sidebar-brand-badge">XML Rascunho</span>
 </div>
 </a>
 <button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
@@ -982,6 +983,10 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
 </div>
 <div class="d-flex align-items-center flex-wrap gap-1">
+<button class="btn btn-success btn-sm me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="adicionarNovoItem()" title="Adicionar um novo item na nota" type="button">
+<i data-lucide="plus-circle"></i>
+<span>+ Adicionar Item</span>
+</button>
 <button class="btn btn-outline-danger btn-sm me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
 <i data-lucide="trash-2"></i>
 <span>Excluir Item</span>
@@ -1128,6 +1133,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
     let itensCache = [];
     let operacoesCache = [];
     let impostoModeloXml = null;
+    window.itensCache = itensCache;
+    window.operacoesCache = operacoesCache;
 
     // Atalho para abrir a aba Tipo de Nota
     function abrirAbaTipoNota(event) {
@@ -2405,6 +2412,12 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
     }
 
+    function adicionarNovoItem() {
+        if (window.abrirModalItemNovo) {
+            window.abrirModalItemNovo();
+        }
+    }
+
     // Definicao de todas as colunas de det nItem
     const colunasItensDef = [
         {
@@ -2417,6 +2430,26 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             frozen: true,
             cellClick: function(e, cell) {
                 cell.getRow().toggleSelect();
+            }
+        },
+        {
+            title: "Ações",
+            field: "_acoes",
+            width: 75,
+            frozen: true,
+            hozAlign: "center",
+            headerHozAlign: "center",
+            headerSort: false,
+            formatter: function() {
+                return '<button type="button" class="btn btn-xs btn-outline-primary py-0 px-2 d-inline-flex align-items-center gap-1 shadow-sm" title="Editar este item no pop-up dedicado" style="height: 24px; font-size: 11.5px; border-radius: 4px; font-weight: 600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg><span>Editar</span></button>';
+            },
+            cellClick: function(e, cell) {
+                e.stopPropagation();
+                const row = cell.getRow();
+                const rowData = row.getData();
+                if (window.abrirModalItemEditar) {
+                    window.abrirModalItemEditar(rowData, row.getPosition(true) - 1);
+                }
             }
         },
         {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center", editor:"input"},
@@ -2501,6 +2534,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             renderHorizontal: "basic",
             placeholder: "Nenhum item carregado. Selecione e carregue o XML acima."
         });
+        window.itensTable = itensTable;
 
         itensTable.on("dataChanged", function() {
             if (window.triggerAutoSave) window.triggerAutoSave();
