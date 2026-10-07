@@ -72,7 +72,7 @@ def get_db_connection():
             conn.commit()
         
         tables = [t[0] for t in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-        if 'tabela_csts' not in tables or 'tabela_paises' not in tables or 'tabela_municipios' not in tables:
+        if 'tabela_csts' not in tables or 'tabela_paises' not in tables or 'tabela_municipios' not in tables or 'tabela_feiras' not in tables or 'tabela_locais_entrega' not in tables:
             import init_db
             init_db.init_db()
 
@@ -425,6 +425,12 @@ def build_nfe_element(cabecalho, itens, rodape):
     if not ver_proc or ver_proc in ('4.01', '4.00'):
         ver_proc = '4.01_sebrae_b057'
     ET.SubElement(ide, f'{{{NFE_NS}}}verProc').text = ver_proc
+
+    # 1.1 NFref (Nota Fiscal Referenciada - MOC SEFAZ)
+    ref_nfe = re.sub(r'\D', '', str(cabecalho.get('refNFe') or cabecalho.get('chave_referenciada') or '')).strip()
+    if len(ref_nfe) == 44:
+        nf_ref = ET.SubElement(ide, f'{{{NFE_NS}}}NFref')
+        ET.SubElement(nf_ref, f'{{{NFE_NS}}}refNFe').text = ref_nfe
     
     # 2. emit
     emit = ET.SubElement(inf_nfe, f'{{{NFE_NS}}}emit')
@@ -870,6 +876,11 @@ def build_nfe_element(cabecalho, itens, rodape):
 
     # 8. infAdic
     inf_cpl = str(rodape.get('infCpl') or '').strip()
+    if ref_nfe and len(ref_nfe) == 44:
+        if ref_nfe not in inf_cpl:
+            texto_ref = f"NF-e Referenciada: {ref_nfe}"
+            inf_cpl = f"{inf_cpl} | {texto_ref}".strip(' |') if inf_cpl else texto_ref
+
     if inf_cpl:
         inf_adic = ET.SubElement(inf_nfe, f'{{{NFE_NS}}}infAdic')
         ET.SubElement(inf_adic, f'{{{NFE_NS}}}infCpl').text = inf_cpl[:5000]
@@ -1828,9 +1839,12 @@ def upload_xml():
         tpEmis_val = get_text(ide, 'tpEmis') or '1'
         cDV_val = get_text(ide, 'cDV')
 
+        ref_nfe_val = get_text(ide, 'refNFe')
+
         cabecalho = {
             "nNF": get_text(ide, 'nNF'),
             "serie": get_text(ide, 'serie'),
+            "refNFe": ref_nfe_val,
             "natOp": natOp_val,
             "tpNF": tpNF_val,
             "idDest": idDest_val,
@@ -2365,6 +2379,286 @@ def api_localidades_cep(cep):
     except Exception as e:
         conn.close()
         return jsonify({'error': f'Erro ao consultar serviço de CEP: {str(e)}'}), 502
+
+# === ROTAS: DESCRIÇÃO DA FEIRA (FEIRAS DO ANO) ===
+
+@app.route('/feiras')
+def feiras_page():
+    return render_template('feiras.html')
+
+@app.route('/api/feiras', methods=['GET', 'POST'])
+def api_feiras():
+    conn = get_db_connection()
+    c = conn.cursor()
+    if request.method == 'GET':
+        termo = (request.args.get('busca') or '').strip().lower()
+        if termo:
+            query = """
+                SELECT f.id, f.nome, f.data_feira, f.deadline, f.local, f.organizador, f.data_criacao, f.data_atualizacao,
+                       l.endereco AS endereco_local
+                FROM tabela_feiras f
+                LEFT JOIN tabela_locais_entrega l ON UPPER(TRIM(f.local)) = UPPER(TRIM(l.nome))
+                WHERE LOWER(f.nome) LIKE ? OR LOWER(f.local) LIKE ? OR LOWER(f.organizador) LIKE ?
+                ORDER BY f.nome ASC
+            """
+            p = f"%{termo}%"
+            rows = c.execute(query, (p, p, p)).fetchall()
+        else:
+            query = """
+                SELECT f.id, f.nome, f.data_feira, f.deadline, f.local, f.organizador, f.data_criacao, f.data_atualizacao,
+                       l.endereco AS endereco_local
+                FROM tabela_feiras f
+                LEFT JOIN tabela_locais_entrega l ON UPPER(TRIM(f.local)) = UPPER(TRIM(l.nome))
+                ORDER BY f.nome ASC
+            """
+            rows = c.execute(query).fetchall()
+        
+        lista = []
+        for r in rows:
+            lista.append({
+                'id': r['id'],
+                'nome': r['nome'],
+                'data_feira': r['data_feira'] or '',
+                'deadline': r['deadline'] or '',
+                'local': r['local'] or '',
+                'organizador': r['organizador'] or '',
+                'endereco_local': r['endereco_local'] or '',
+                'data_criacao': r['data_criacao'],
+                'data_atualizacao': r['data_atualizacao']
+            })
+        conn.close()
+        return jsonify(lista)
+
+    elif request.method == 'POST':
+        data = request.json or {}
+        nome = (data.get('nome') or '').strip()
+        if not nome:
+            conn.close()
+            return jsonify({'error': 'O Nome da Feira é obrigatório.'}), 400
+
+        data_feira = (data.get('data_feira') or '').strip()
+        deadline = (data.get('deadline') or '').strip()
+        local = (data.get('local') or '').strip()
+        organizador = (data.get('organizador') or '').strip()
+
+        c.execute("""
+            INSERT INTO tabela_feiras (nome, data_feira, deadline, local, organizador, data_atualizacao)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        """, (nome, data_feira, deadline, local, organizador))
+        new_id = c.lastrowid
+        conn.commit()
+        conn.close()
+        return jsonify({'status': 'success', 'id': new_id, 'message': 'Feira cadastrada com sucesso!'}), 201
+
+@app.route('/api/feiras/<int:feira_id>', methods=['GET', 'PUT', 'DELETE'])
+def api_feira_item(feira_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    if request.method == 'GET':
+        r = c.execute("""
+            SELECT f.*, l.endereco AS endereco_local
+            FROM tabela_feiras f
+            LEFT JOIN tabela_locais_entrega l ON UPPER(TRIM(f.local)) = UPPER(TRIM(l.nome))
+            WHERE f.id = ?
+        """, (feira_id,)).fetchone()
+        conn.close()
+        if not r:
+            return jsonify({'error': 'Feira não encontrada.'}), 404
+        return jsonify({
+            'id': r['id'],
+            'nome': r['nome'],
+            'data_feira': r['data_feira'] or '',
+            'deadline': r['deadline'] or '',
+            'local': r['local'] or '',
+            'organizador': r['organizador'] or '',
+            'endereco_local': r['endereco_local'] or '',
+            'data_criacao': r['data_criacao'],
+            'data_atualizacao': r['data_atualizacao']
+        })
+
+    elif request.method == 'PUT':
+        data = request.json or {}
+        nome = (data.get('nome') or '').strip()
+        if not nome:
+            conn.close()
+            return jsonify({'error': 'O Nome da Feira é obrigatório.'}), 400
+
+        data_feira = (data.get('data_feira') or '').strip()
+        deadline = (data.get('deadline') or '').strip()
+        local = (data.get('local') or '').strip()
+        organizador = (data.get('organizador') or '').strip()
+
+        c.execute("""
+            UPDATE tabela_feiras
+            SET nome = ?, data_feira = ?, deadline = ?, local = ?, organizador = ?, data_atualizacao = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (nome, data_feira, deadline, local, organizador, feira_id))
+        conn.commit()
+        conn.close()
+        return jsonify({'status': 'success', 'message': 'Feira atualizada com sucesso!'})
+
+    elif request.method == 'DELETE':
+        c.execute("DELETE FROM tabela_feiras WHERE id = ?", (feira_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'status': 'success', 'message': 'Feira removida com sucesso!'})
+
+@app.route('/api/feiras/sync_sheets', methods=['POST'])
+def api_feiras_sync_sheets():
+    """Tenta atualizar a base a partir do Google Sheets caso o link esteja público, ou retorna instrução amigável"""
+    import urllib.request, csv, io
+    url = 'https://docs.google.com/spreadsheets/d/1AdyWmSlqCaVaPJ0khW2siap-kVzNxu-n8kdyZu5u7SU/export?format=csv&gid=82185219'
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            content = resp.read().decode('utf-8', errors='ignore')
+            reader = csv.reader(io.StringIO(content.strip()))
+            rows = list(reader)
+            # Lê a partir da linha 3 (índice 2)
+            if len(rows) > 2:
+                conn = get_db_connection()
+                c = conn.cursor()
+                count = 0
+                for r in rows[2:]:
+                    if not r or len(r) < 2: continue
+                    nome = r[1].strip() if len(r) > 1 else ""
+                    if not nome: continue
+                    data_feira = r[2].strip() if len(r) > 2 else ""
+                    deadline = r[3].strip() if len(r) > 3 else ""
+                    local = r[4].strip() if len(r) > 4 else ""
+                    organizador = r[5].strip() if len(r) > 5 else ""
+
+                    # Upsert por nome
+                    existente = c.execute("SELECT id FROM tabela_feiras WHERE LOWER(nome) = ?", (nome.lower(),)).fetchone()
+                    if existente:
+                        c.execute("""
+                            UPDATE tabela_feiras
+                            SET data_feira = ?, deadline = ?, local = ?, organizador = ?, data_atualizacao = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        """, (data_feira, deadline, local, organizador, existente['id']))
+                    else:
+                        c.execute("""
+                            INSERT INTO tabela_feiras (nome, data_feira, deadline, local, organizador)
+                            VALUES (?, ?, ?, ?, ?)
+                        """, (nome, data_feira, deadline, local, organizador))
+                    count += 1
+                conn.commit()
+                conn.close()
+                return jsonify({'status': 'success', 'message': f'{count} feiras sincronizadas da planilha do Google!'})
+    except Exception as e:
+        pass
+    return jsonify({
+        'status': 'warning',
+        'message': 'A planilha do Google Sheets requer permissão de Leitor público ("Qualquer pessoa com o link"). A base local já contém todas as 88 feiras e pode ser editada normalmente!'
+    })
+
+# === ROTAS: LOCAIS DE ENTREGA (CENTROS DE EXPOSIÇÕES) ===
+
+@app.route('/api/locais_entrega', methods=['GET', 'POST'])
+def api_locais_entrega():
+    conn = get_db_connection()
+    c = conn.cursor()
+    if request.method == 'GET':
+        termo = (request.args.get('busca') or '').strip().lower()
+        if termo:
+            query = """
+                SELECT id, nome, endereco, data_criacao, data_atualizacao
+                FROM tabela_locais_entrega
+                WHERE LOWER(nome) LIKE ? OR LOWER(endereco) LIKE ?
+                ORDER BY nome ASC
+            """
+            p = f"%{termo}%"
+            rows = c.execute(query, (p, p)).fetchall()
+        else:
+            query = """
+                SELECT id, nome, endereco, data_criacao, data_atualizacao
+                FROM tabela_locais_entrega
+                ORDER BY nome ASC
+            """
+            rows = c.execute(query).fetchall()
+
+        lista = []
+        for r in rows:
+            lista.append({
+                'id': r['id'],
+                'nome': r['nome'],
+                'endereco': r['endereco'] or '',
+                'data_criacao': r['data_criacao'],
+                'data_atualizacao': r['data_atualizacao']
+            })
+        conn.close()
+        return jsonify(lista)
+
+    elif request.method == 'POST':
+        data = request.json or {}
+        nome = (data.get('nome') or '').strip()
+        if not nome:
+            conn.close()
+            return jsonify({'error': 'O Nome do Local é obrigatório.'}), 400
+
+        endereco = re.sub(r'[\r\n]+', ' - ', (data.get('endereco') or '')).strip()
+        endereco = re.sub(r'\s+', ' ', endereco)
+
+        try:
+            c.execute("""
+                INSERT INTO tabela_locais_entrega (nome, endereco, data_atualizacao)
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+            """, (nome, endereco))
+            new_id = c.lastrowid
+            conn.commit()
+            conn.close()
+            return jsonify({'status': 'success', 'id': new_id, 'message': 'Local de entrega cadastrado com sucesso!'}), 201
+        except sqlite3.IntegrityError:
+            conn.close()
+            return jsonify({'error': 'Já existe um local cadastrado com esse nome.'}), 409
+
+@app.route('/api/locais_entrega/<int:local_id>', methods=['GET', 'PUT', 'DELETE'])
+def api_local_entrega_item(local_id):
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    if request.method == 'GET':
+        r = c.execute("SELECT * FROM tabela_locais_entrega WHERE id = ?", (local_id,)).fetchone()
+        conn.close()
+        if not r:
+            return jsonify({'error': 'Local não encontrado.'}), 404
+        return jsonify({
+            'id': r['id'],
+            'nome': r['nome'],
+            'endereco': r['endereco'] or '',
+            'data_criacao': r['data_criacao'],
+            'data_atualizacao': r['data_atualizacao']
+        })
+
+    elif request.method == 'PUT':
+        data = request.json or {}
+        nome = (data.get('nome') or '').strip()
+        if not nome:
+            conn.close()
+            return jsonify({'error': 'O Nome do Local é obrigatório.'}), 400
+
+        endereco = re.sub(r'[\r\n]+', ' - ', (data.get('endereco') or '')).strip()
+        endereco = re.sub(r'\s+', ' ', endereco)
+
+        try:
+            c.execute("""
+                UPDATE tabela_locais_entrega
+                SET nome = ?, endereco = ?, data_atualizacao = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """, (nome, endereco, local_id))
+            conn.commit()
+            conn.close()
+            return jsonify({'status': 'success', 'message': 'Local atualizado com sucesso!'})
+        except sqlite3.IntegrityError:
+            conn.close()
+            return jsonify({'error': 'Já existe outro local cadastrado com esse nome.'}), 409
+
+    elif request.method == 'DELETE':
+        c.execute("DELETE FROM tabela_locais_entrega WHERE id = ?", (local_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'status': 'success', 'message': 'Local removido com sucesso!'})
 
 @app.route('/api/ping')
 def ping():

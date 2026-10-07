@@ -98,6 +98,12 @@
 </a>
 </li>
 <li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/feiras" title="Descrição da Feira (Feiras do Ano)">
+<span class="sidebar-icon"><i data-lucide="calendar-days"></i></span>
+<span class="sidebar-label">Descrição da Feira</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
 <button class="nft-sidebar-btn" data-tab="tipo-nota" onclick="sidebarSwitchTab('tipo-nota')" title="Configuração de Impostos &amp; Regras por Operação" type="button">
 <span class="sidebar-icon"><i data-lucide="settings"></i></span>
 <span class="sidebar-label">Tipo de Nota (Impostos)</span>
@@ -288,6 +294,36 @@
 <input id="cDV" type="hidden" value=""/>
 <input id="verProc" type="hidden" value="4.01_sebrae_b057"/>
 </div>
+<!-- NOTA FISCAL REFERENCIADA (NFREF - CHAVE DE ACESSO DE 44 DÍGITOS) -->
+<div class="col-md-12">
+<div class="p-2 border rounded bg-light">
+<div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+<label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1" for="refNFe">
+<i data-lucide="file-check" style="width: 14px; height: 14px;"></i>
+<span>Nota Fiscal Referenciada (Chave de Acesso)</span>
+<span class="text-muted fw-normal" style="font-size: 11px;">(Tag SEFAZ: &lt;NFref&gt;&lt;refNFe&gt;)</span>
+</label>
+<div class="d-flex align-items-center gap-2">
+<span class="badge bg-secondary font-monospace" id="refNFe_badge" style="font-size: 11px;">0 / 44 dígitos</span>
+<button class="btn btn-outline-primary btn-sm py-0 px-2 d-inline-flex align-items-center gap-1" onclick="sincronizarRefNFeComInfCpl(true)" style="height: 24px; font-size: 11.5px;" title="Adicionar ou atualizar a nota referenciada nas Informações Complementares" type="button">
+<i data-lucide="plus-circle" style="width: 12px; height: 12px;"></i>
+<span>Incluir em Inf. Complementares</span>
+</button>
+</div>
+</div>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm font-monospace" id="refNFe" maxlength="44" oninput="aoDigitarRefNFe(this)" placeholder="Digite ou cole os 44 dígitos numéricos da chave de acesso da nota referenciada" style="letter-spacing: 0.05em; font-size: 0.88rem;" type="text"/>
+<button class="btn btn-outline-secondary btn-sm px-2 d-flex align-items-center gap-1" onclick="limparRefNFe()" title="Limpar nota referenciada" type="button">
+<i data-lucide="x" style="width: 13px; height: 13px;"></i>
+<span>Limpar</span>
+</button>
+</div>
+<small class="text-muted d-block mt-1" style="font-size: 11px;">
+Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída no grupo <code>&lt;NFref&gt;</code> do XML e também sincronizada automaticamente nas informações complementares (<code>infCpl</code>).
+</small>
+</div>
+</div>
+
 <!-- Caixa de Operação Ativa e Regras Herdadas -->
 <div class="col-12">
 <div class="card border p-2 px-3 mb-0 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2" id="card-resumo-heranca">
@@ -559,6 +595,33 @@
 </button>
 </div>
 <div class="card-body py-2">
+<!-- SELETOR DE FEIRA PARA infCpl -->
+<div class="row g-2 align-items-center mb-2 pb-2 border-bottom">
+<div class="col-md-8 col-lg-7">
+<label class="form-label small fw-bold text-primary mb-1 d-flex align-items-center gap-1" for="select_feira_infcpl">
+<i data-lucide="calendar-days" style="width: 14px; height: 14px;"></i>
+<span>Adicionar Dados da Feira nas Observações</span>
+</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text bg-white"><i data-lucide="map-pin" style="width: 13px; height: 13px;"></i></span>
+<select class="form-select form-select-sm" id="select_feira_infcpl" onchange="aoSelecionarFeiraInfCpl(this)">
+<option value="">Selecione uma feira para adicionar em infCpl...</option>
+</select>
+<button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" onclick="aplicarTextoFeiraSelecionada(true)" title="Inserir ou atualizar dados da feira em infCpl" type="button">
+<i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
+<span>Inserir</span>
+</button>
+<button class="btn btn-outline-secondary btn-sm" onclick="limparTextoFeiraInfCpl()" title="Remover texto da feira de infCpl" type="button">
+<i data-lucide="x" style="width: 13px; height: 13px;"></i>
+</button>
+</div>
+</div>
+<div class="col-md-4 col-lg-5 text-md-end pt-md-3">
+<small class="text-muted" style="font-size: 11px;">
+Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Data} NO {Local} BRASIL. {Endereço}</code>
+</small>
+</div>
+</div>
 <textarea class="form-control font-monospace form-control-sm" id="infCpl" placeholder="Observações de interesse do contribuinte gravadas no XML..." rows="4"></textarea>
 </div>
 </div></form>
@@ -1533,6 +1596,181 @@
         gravarPtaxEmInfCpl(moeda, taxa, tipoBoletim, dataCotacao, true);
     }
 
+    // Funções de manipulação e sincronização da Nota Fiscal Referenciada (refNFe)
+    function aoDigitarRefNFe(inputEl) {
+        if (!inputEl) return;
+        const limpo = (inputEl.value || '').replace(/\D/g, '').slice(0, 44);
+        inputEl.value = limpo;
+        atualizarBadgeRefNFe(limpo.length);
+        if (limpo.length === 44) {
+            sincronizarRefNFeComInfCpl(false);
+        }
+    }
+
+    function atualizarBadgeRefNFe(qtd) {
+        const badge = document.getElementById('refNFe_badge');
+        if (!badge) return;
+        badge.innerText = `${qtd} / 44 dígitos`;
+        if (qtd === 44) {
+            badge.className = "badge bg-success font-monospace";
+        } else if (qtd > 0) {
+            badge.className = "badge bg-warning text-dark font-monospace";
+        } else {
+            badge.className = "badge bg-secondary font-monospace";
+        }
+    }
+
+    function sincronizarRefNFeComInfCpl(alertar = false) {
+        const chave = (getVal('refNFe') || '').replace(/\D/g, '').trim();
+        if (chave.length !== 44) {
+            if (alertar) {
+                alert(`A Chave de Acesso da NF referenciada deve conter exatamente 44 dígitos numéricos (atualmente: ${chave.length}).`);
+            }
+            return;
+        }
+
+        let infCplAtual = getVal('infCpl') || '';
+        const textoRef = `NF-e Referenciada: ${chave}`;
+        const regexRef = /NF-e\s+Referenciada\s*:\s*\d{44}/i;
+
+        if (regexRef.test(infCplAtual)) {
+            infCplAtual = infCplAtual.replace(regexRef, textoRef);
+        } else {
+            infCplAtual = infCplAtual.trim() ? (infCplAtual.trim() + "  " + textoRef) : textoRef;
+        }
+
+        setVal('infCpl', infCplAtual);
+        if (alertar) {
+            alert("Nota Referenciada incluída com sucesso nas Informações Complementares (infCpl)!");
+        }
+    }
+
+    function limparRefNFe() {
+        setVal('refNFe', '');
+        atualizarBadgeRefNFe(0);
+        let infCplAtual = getVal('infCpl') || '';
+        const regexRef = /\s*NF-e\s+Referenciada\s*:\s*\d{44}/gi;
+        if (regexRef.test(infCplAtual)) {
+            infCplAtual = infCplAtual.replace(regexRef, '').trim();
+            setVal('infCpl', infCplAtual);
+        }
+    }
+
+    // === VINCULAR DESCRIÇÃO DA FEIRA EM infCpl ===
+    let feirasInfCplCache = [];
+
+    async function carregarFeirasParaInfCpl() {
+        try {
+            const resp = await fetch('/api/feiras');
+            if (!resp.ok) return;
+            feirasInfCplCache = await resp.json() || [];
+
+            const sel = document.getElementById('select_feira_infcpl');
+            if (!sel) return;
+
+            const valAtual = sel.value;
+            sel.innerHTML = '<option value="">Selecione uma feira para adicionar em infCpl...</option>';
+            feirasInfCplCache.forEach(f => {
+                const ano = extrairAnoPrazo(f);
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.textContent = `${f.nome} (${ano}) - ${f.data_feira} - ${f.local}`;
+                sel.appendChild(opt);
+            });
+            if (valAtual) sel.value = valAtual;
+            sincronizarSelectFeiraComInfCpl();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        } catch (err) {
+            console.error("Erro ao carregar feiras para infCpl:", err);
+        }
+    }
+
+    function extrairAnoPrazo(feira) {
+        if (!feira) return new Date().getFullYear().toString();
+        if (feira.deadline) {
+            const m = String(feira.deadline).match(/\b(20\d{2})\b/);
+            if (m) return m[1];
+        }
+        if (feira.data_feira) {
+            const m = String(feira.data_feira).match(/\b(20\d{2})\b/);
+            if (m) return m[1];
+        }
+        return new Date().getFullYear().toString();
+    }
+
+    function gerarTextoFeiraInfCpl(feira) {
+        if (!feira) return '';
+        const nomeFeira = (feira.nome || '').trim();
+        const ano = extrairAnoPrazo(feira);
+        const dataFeira = (feira.data_feira || '').trim();
+        const localEntrega = (feira.local || '').trim();
+        const endereco = (feira.endereco_local || '').trim();
+
+        let texto = `CARGA DESTINADA A ${nomeFeira} ${ano} A SER REALIZADA ENTRE ${dataFeira} NO ${localEntrega} BRASIL.`;
+        if (endereco) {
+            texto += ` ${endereco}`;
+        }
+        return texto;
+    }
+
+    function aoSelecionarFeiraInfCpl(selEl) {
+        if (!selEl || !selEl.value) return;
+        aplicarTextoFeiraSelecionada(false);
+    }
+
+    function aplicarTextoFeiraSelecionada(alertar = false) {
+        const sel = document.getElementById('select_feira_infcpl');
+        if (!sel || !sel.value) {
+            if (alertar) alert("Selecione uma feira na lista antes de inserir.");
+            return;
+        }
+
+        const feiraId = parseInt(sel.value, 10);
+        const feira = feirasInfCplCache.find(f => f.id === feiraId);
+        if (!feira) return;
+
+        const textoFeira = gerarTextoFeiraInfCpl(feira);
+        if (!textoFeira) return;
+
+        let infCplAtual = getVal('infCpl') || '';
+        const regexFeira = /CARGA DESTINADA A\s+.*?(?=(?:\r?\n|  |TX\s+BACEN|TX\s+SISCOMEX|NF-e\s+Referenciada|$))/i;
+
+        if (regexFeira.test(infCplAtual)) {
+            infCplAtual = infCplAtual.replace(regexFeira, textoFeira);
+        } else {
+            infCplAtual = infCplAtual.trim() ? (infCplAtual.trim() + "  " + textoFeira) : textoFeira;
+        }
+
+        setVal('infCpl', infCplAtual);
+        if (window.triggerAutoSave) window.triggerAutoSave();
+        if (alertar) {
+            alert("Dados da feira inseridos com sucesso nas Informações Complementares (infCpl)!");
+        }
+    }
+
+    function limparTextoFeiraInfCpl() {
+        const sel = document.getElementById('select_feira_infcpl');
+        if (sel) sel.value = '';
+
+        let infCplAtual = getVal('infCpl') || '';
+        const regexFeira = /\s*CARGA DESTINADA A\s+.*?(?=(?:\r?\n|  |TX\s+BACEN|TX\s+SISCOMEX|NF-e\s+Referenciada|$))/gi;
+        if (regexFeira.test(infCplAtual)) {
+            infCplAtual = infCplAtual.replace(regexFeira, '').trim();
+            setVal('infCpl', infCplAtual);
+            if (window.triggerAutoSave) window.triggerAutoSave();
+        }
+    }
+
+    function sincronizarSelectFeiraComInfCpl() {
+        const infCplAtual = (getVal('infCpl') || '').toUpperCase();
+        const sel = document.getElementById('select_feira_infcpl');
+        if (!sel || !feirasInfCplCache.length || !infCplAtual.includes('CARGA DESTINADA A')) return;
+        const encontrada = feirasInfCplCache.find(f => f.nome && infCplAtual.includes(f.nome.toUpperCase()));
+        if (encontrada) {
+            sel.value = encontrada.id;
+        }
+    }
+
     async function recalcularConversaoItens() {
         const novaTaxa = parseNum(getVal('ptax_cotacao_venda'));
         if (novaTaxa <= 0) {
@@ -2233,6 +2471,7 @@
         // 1. Carregar Operações cadastradas do banco e CSTs oficiais
         carregarCSTsOficiais();
         carregarTiposOperacao();
+        carregarFeirasParaInfCpl();
         atualizarCamposIdentificacao('0', '3');
         atualizarEstadoInscricaoEstadual();
         calcularChaveAcessoDinamica();
@@ -2945,6 +3184,16 @@
             } else {
                 calcularChaveAcessoDinamica();
             }
+
+            // Nota Fiscal Referenciada (NFref)
+            if (c.refNFe) {
+                const refLimpa = String(c.refNFe).replace(/\D/g, '').slice(0, 44);
+                setVal('refNFe', refLimpa);
+                atualizarBadgeRefNFe(refLimpa.length);
+            } else {
+                setVal('refNFe', '');
+                atualizarBadgeRefNFe(0);
+            }
             
             // Guarda modelo tributario do XML para capturar se quiser
             impostoModeloXml = data.imposto_modelo;
@@ -3217,6 +3466,7 @@
             cabecalho: {
                 nNF: getVal('nNF'),
                 serie: getVal('serie'),
+                refNFe: (getVal('refNFe') || '').replace(/\D/g, '').slice(0, 44),
                 natOp: getVal('natOp') || getVal('select_operacao'),
                 cfop_padrao: getVal('cfop_padrao'),
                 tpNF: getVal('tpNF'),
@@ -3527,7 +3777,7 @@
 
         // Coleta todos os campos do formulário
         const idsCabecalho = [
-            'nNF', 'serie', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
+            'nNF', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
             'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
             'dest_xNome', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
             'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
@@ -3850,6 +4100,7 @@
             atualizarCamposIdentificacao(getVal('tpNF'), getVal('idDest'));
             atualizarEstadoInscricaoEstadual();
             calcularChaveAcessoDinamica();
+            atualizarBadgeRefNFe((getVal('refNFe') || '').length);
             atualizarBadgesRateioEItens();
 
             // 6. Atualiza badge da área de upload
