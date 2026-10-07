@@ -154,7 +154,7 @@
 <i data-lucide="tag"></i>
 <span>Referência Interna:</span>
 </label>
-<input class="form-control font-monospace" id="referenciaInterna" oninput="atualizarReferenciaRascunho(this.value)" placeholder="Ex: REF-2026/001, PO-998" type="text"/>
+<input class="form-control form-control-sm font-monospace" id="referenciaInterna" oninput="atualizarReferenciaRascunho(this.value)" placeholder="Ex: REF-2026/001, PO-998" type="text"/>
 </div>
 <!-- 2. Arquivo XML ("Escolher ficheiro") -->
 <div class="col-xl-3 col-lg-3 col-md-4">
@@ -162,7 +162,7 @@
 <i data-lucide="file-up"></i>
 <span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
 </label>
-<input accept=".xml" class="form-control" id="xmlFileInput" type="file"/>
+<input accept=".xml" class="form-control form-control-sm" id="xmlFileInput" type="file"/>
 </div>
 <!-- 3. Botão Carregar e Processar XML -->
 <div class="col-xl-2 col-lg-2 col-md-2">
@@ -243,11 +243,11 @@
 <div class="col-12"><h6 class="border-bottom pb-1 fw-bold">Identificação e Seleção da Operação</h6></div>
 <div class="col-md-2">
 <label class="form-label small fw-bold">Número NF-e (nNF)</label>
-<input class="form-control" id="nNF" oninput="calcularChaveAcessoDinamica()" type="text"/>
+<input class="form-control form-control-sm" id="nNF" oninput="calcularChaveAcessoDinamica()" type="text"/>
 </div>
 <div class="col-md-1">
 <label class="form-label small fw-bold">Série</label>
-<input class="form-control" id="serie" oninput="calcularChaveAcessoDinamica()" type="text"/>
+<input class="form-control form-control-sm" id="serie" oninput="calcularChaveAcessoDinamica()" type="text"/>
 </div>
 <!-- SELECT DO TIPO DE OPERACAO: HERDA TUDO NOS ITENS -->
 <div class="col-md-3">
@@ -255,7 +255,7 @@
 <i data-lucide="target" style="width: 14px; height: 14px;"></i>
 <span>Tipo de Operação (Regras Padrão)</span>
 </label>
-<select class="form-select fw-bold border-success" id="select_operacao" onchange="aoSelecionarOperacao(this.value)">
+<select class="form-select form-select-sm fw-bold border-success" id="select_operacao" onchange="aoSelecionarOperacao(this.value)">
 <option value="">-- Carregando operações cadastradas... --</option>
 </select>
 <input id="natOp" type="hidden"/>
@@ -270,8 +270,8 @@
 </label>
 <small class="text-muted font-monospace" style="font-size: 11px;">MOC SEFAZ (Dinâmica)</small>
 </div>
-<div class="input-group">
-<input class="form-control font-monospace fw-bold text-primary" id="chaveAcessoDisplay" placeholder="Aguardando dados da nota..." readonly="" style="background-color: var(--surface-secondary); letter-spacing: 0.04em; font-size: 0.88rem;" type="text"/>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm font-monospace fw-bold text-primary" id="chaveAcessoDisplay" placeholder="Aguardando dados da nota..." readonly="" style="background-color: var(--surface-secondary); letter-spacing: 0.04em; font-size: 0.88rem;" type="text"/>
 <button class="btn btn-outline-secondary btn-sm px-3 d-inline-flex align-items-center gap-1" id="btnCopiarChave" onclick="copiarChaveAcesso()" title="Copiar chave de acesso completa" type="button">
 <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
 <span>Copiar</span>
@@ -809,22 +809,22 @@
 <div class="row g-3">
 <div class="col-md-5">
 <label class="form-label small fw-bold">Nome da Operação (Natureza da Operação - natOp)</label>
-<input class="form-control text-primary fw-bold" id="op_nome" placeholder="Ex: ADMISSAO TEMPORARIA, OUTRAS ENTRADAS..." type="text"/>
+<input class="form-control form-control-sm text-primary fw-bold" id="op_nome" placeholder="Ex: ADMISSAO TEMPORARIA, OUTRAS ENTRADAS..." type="text"/>
 </div>
 <div class="col-md-2">
 <label class="form-label small fw-bold">CFOP Padrão</label>
-<input class="form-control fw-bold" id="op_cfop" placeholder="Ex: 3930, 7930, 5914" type="text"/>
+<input class="form-control form-control-sm fw-bold" id="op_cfop" placeholder="Ex: 3930, 7930, 5914" type="text"/>
 </div>
 <div class="col-md-2">
 <label class="form-label small fw-bold">Tipo da NF (tpNF)</label>
-<select class="form-select fw-bold" id="op_tp_nf">
+<select class="form-select form-select-sm fw-bold" id="op_tp_nf">
 <option value="0">0 - Entrada</option>
 <option value="1">1 - Saída</option>
 </select>
 </div>
 <div class="col-md-3">
 <label class="form-label small fw-bold">Destino Operação (idDest)</label>
-<select class="form-select fw-bold" id="op_id_dest">
+<select class="form-select form-select-sm fw-bold" id="op_id_dest">
 <option value="1">1 - Interna (mesma UF)</option>
 <option value="2">2 - Interestadual</option>
 <option selected="" value="3">3 - Com exterior</option>
@@ -4143,17 +4143,17 @@
 <div class="modal-body p-4">
 <div class="mb-3">
 <label class="form-label fw-bold text-muted small text-uppercase">Referência Interna</label>
-<div class="input-group">
+<div class="input-group input-group-sm">
 <span class="input-group-text bg-body-tertiary"><i data-lucide="tag" style="width: 16px; height: 16px;"></i></span>
-<input class="form-control" id="rascunho_ref_input" placeholder="Ex: REF-2026-001, DI 26/1234567-8..." type="text"/>
+<input class="form-control form-control-sm" id="rascunho_ref_input" placeholder="Ex: REF-2026-001, DI 26/1234567-8..." type="text"/>
 </div>
 <div class="form-text">Esta referência permite identificar rapidamente seu trabalho em andamento.</div>
 </div>
 <div class="mb-3">
 <label class="form-label fw-bold text-muted small text-uppercase">Categoria do Rascunho</label>
-<div class="input-group">
+<div class="input-group input-group-sm">
 <span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 16px; height: 16px;"></i></span>
-<select class="form-select" id="rascunho_cat_select" onchange="verificarCategoriaOutra(this)">
+<select class="form-select form-select-sm" id="rascunho_cat_select" onchange="verificarCategoriaOutra(this)">
 <option selected="" value="Importação">Importação</option>
 <option value="Geral">Geral</option>
 <option value="Exportação">Exportação</option>
@@ -4163,7 +4163,7 @@
 <option value="__nova__">+ Nova Categoria...</option>
 </select>
 </div>
-<input class="form-control mt-2 d-none" id="rascunho_cat_custom" placeholder="Digite o nome da nova categoria..." type="text"/>
+<input class="form-control form-control-sm mt-2 d-none" id="rascunho_cat_custom" placeholder="Digite o nome da nova categoria..." type="text"/>
 </div>
 <div class="card bg-body-tertiary border-0 p-3 mb-2 rounded-3">
 <div class="row g-2 small">
@@ -4220,13 +4220,13 @@
 <div class="col-md-5">
 <div class="input-group input-group-sm">
 <span class="input-group-text bg-body-tertiary"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-<input class="form-control" id="filtro_busca_rascunho" oninput="filtrarTabelaRascunhos()" placeholder="Buscar por referência, arquivo ou chave..." type="text"/>
+<input class="form-control form-control-sm" id="filtro_busca_rascunho" oninput="filtrarTabelaRascunhos()" placeholder="Buscar por referência, arquivo ou chave..." type="text"/>
 </div>
 </div>
 <div class="col-md-3">
 <div class="input-group input-group-sm">
 <span class="input-group-text bg-body-tertiary"><i data-lucide="layers" style="width: 14px; height: 14px;"></i></span>
-<select class="form-select" id="filtro_origem_rascunho" onchange="carregarListaRascunhos()">
+<select class="form-select form-select-sm" id="filtro_origem_rascunho" onchange="carregarListaRascunhos()">
 <option value="">Todas as Origens</option>
 <option value="XML da DI ou DUIMP">XML da DI ou DUIMP</option>
 <option value="XML Rascunho">XML Rascunho</option>
@@ -4237,7 +4237,7 @@
 <div class="col-md-3">
 <div class="input-group input-group-sm">
 <span class="input-group-text bg-body-tertiary"><i data-lucide="folder" style="width: 14px; height: 14px;"></i></span>
-<select class="form-select" id="filtro_cat_rascunho" onchange="carregarListaRascunhos()">
+<select class="form-select form-select-sm" id="filtro_cat_rascunho" onchange="carregarListaRascunhos()">
 <option value="">Todas as Categorias</option>
 </select>
 </div>

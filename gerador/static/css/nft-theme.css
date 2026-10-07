@@ -257,7 +257,7 @@ small.text-muted {
   border-color: var(--muted-foreground) !important;
 }
 
-/* --- 7. INPUTS, SELECTS E FORM CONTROLS --- */
+/* --- 7. INPUTS, SELECTS E FORM CONTROLS (PADRONIZAÇÃO DE ALTURA E ALINHAMENTO) --- */
 .form-control,
 .form-select,
 .input-group-text {
@@ -265,9 +265,31 @@ small.text-muted {
   color: var(--foreground) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  padding: 0.45rem 0.75rem;
+  font-size: 0.8125rem;
+  min-height: 31px;
+  height: 31px;
+  padding: 0.25rem 0.5rem;
+  line-height: 1.4;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.form-control-sm,
+.form-select-sm,
+.input-group-sm > .form-control,
+.input-group-sm > .form-select,
+.input-group-sm > .input-group-text,
+.input-group-sm > .btn {
+  min-height: 31px !important;
+  height: 31px !important;
+  font-size: 0.8125rem !important;
+  padding: 0.25rem 0.5rem !important;
+  line-height: 1.4 !important;
+}
+
+textarea.form-control,
+textarea.form-control-sm {
+  min-height: auto !important;
+  height: auto !important;
 }
 
 .form-control::placeholder {

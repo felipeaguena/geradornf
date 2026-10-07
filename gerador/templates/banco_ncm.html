@@ -199,14 +199,14 @@
 <div class="row g-2 align-items-end">
 <div class="col-md-6">
 <label class="form-label small fw-bold mb-1">Buscar por Código NCM ou Descrição Oficial:</label>
-<div class="input-group">
+<div class="input-group input-group-sm">
 <span class="input-group-text bg-light"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-<input class="form-control" id="input-busca" onkeydown="if(event.key==='Enter') pesquisarNcm(1)" placeholder="Ex: 90189099, 4202, bolsas, instrumentos, catalogo..." type="text"/>
+<input class="form-control form-control-sm" id="input-busca" onkeydown="if(event.key==='Enter') pesquisarNcm(1)" placeholder="Ex: 90189099, 4202, bolsas, instrumentos, catalogo..." type="text"/>
 </div>
 </div>
 <div class="col-md-3">
 <label class="form-label small fw-bold mb-1">Filtrar por Unidade Tributável (uTrib):</label>
-<select class="form-select" id="select-utrib" onchange="pesquisarNcm(1)">
+<select class="form-select form-select-sm" id="select-utrib" onchange="pesquisarNcm(1)">
 <option value="">Todas as Unidades</option>
 <option value="UN">UN - Unidade</option>
 <option value="KG">KG - Quilograma</option>

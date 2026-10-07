@@ -200,7 +200,7 @@
 <div class="col-md-6">
 <div class="input-group input-group-sm">
 <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-<input class="form-control" id="search-paises" oninput="filtrarPaises()" placeholder="Buscar país por nome ou código BACEN (ex: Brasil, China, 1058, 160)..." type="text"/>
+<input class="form-control form-control-sm" id="search-paises" oninput="filtrarPaises()" placeholder="Buscar país por nome ou código BACEN (ex: Brasil, China, 1058, 160)..." type="text"/>
 <button class="btn btn-outline-secondary" onclick="document.getElementById('search-paises').value=''; filtrarPaises();" type="button">Limpar</button>
 </div>
 </div>
@@ -268,7 +268,7 @@
 <div class="col-md-5">
 <div class="input-group input-group-sm">
 <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
-<input class="form-control" id="search-municipios" onkeydown="if(event.key==='Enter') carregarMunicipios(1)" placeholder="Buscar municipio ou codigo IBGE (ex: Sao Paulo, 3550308)..." type="text"/>
+<input class="form-control form-control-sm" id="search-municipios" onkeydown="if(event.key==='Enter') carregarMunicipios(1)" placeholder="Buscar municipio ou codigo IBGE (ex: Sao Paulo, 3550308)..." type="text"/>
 <button class="btn btn-primary" onclick="carregarMunicipios(1)" type="button">Buscar</button>
 </div>
 </div>
@@ -316,8 +316,8 @@
 </div>
 <div class="card-body p-3">
 <label class="form-label small fw-bold mb-1">Informe o CEP</label>
-<div class="input-group mb-2">
-<input class="form-control font-monospace fw-bold" id="input-teste-cep" maxlength="9" placeholder="00000-000 ou 99999-999" type="text"/>
+<div class="input-group input-group-sm mb-2">
+<input class="form-control form-control-sm font-monospace fw-bold" id="input-teste-cep" maxlength="9" placeholder="00000-000 ou 99999-999" type="text"/>
 <button class="btn btn-primary fw-bold d-flex align-items-center gap-1" id="btn-consultar-cep" onclick="executarConsultaCep()" type="button">
 <i data-lucide="search" style="width: 14px; height: 14px;"></i>
 <span>Consultar</span>
