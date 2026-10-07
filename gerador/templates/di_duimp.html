@@ -591,7 +591,86 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </div><div class="col-md-3">
 <label class="form-label small mb-1 fw-bold text-primary">Peso Bruto Total (kg)</label>
 <input class="form-control form-control-sm font-monospace text-end" id="transp_pesoB" onchange="formatarInputVisualBR(this, 3, 3)" placeholder="0,000" type="text"/>
-</div></div></div></div></div><div class="card border mb-3 mt-3">
+</div></div></div></div></div>
+
+<!-- IDENTIFICAÇÃO DA IMPORTAÇÃO -->
+<div class="col-12 mt-3">
+    <div class="card shadow-sm border mb-3">
+        <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+            <span class="fw-bold d-flex align-items-center gap-1 text-secondary">
+                <i data-lucide="globe"></i>
+                <span>Identificação da Importação</span>
+            </span>
+            <button class="btn btn-outline-primary btn-sm py-0 px-2 d-flex align-items-center gap-1 shadow-sm" onclick="repassarImportacaoParaItens()" title="Repassar estes dados de importação para todos os itens da nota" type="button">
+                <i data-lucide="arrow-down-to-dot" style="width: 14px; height: 14px;"></i>
+                <span>Repassar para itens</span>
+            </button>
+        </div>
+        <div class="card-body py-2">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="import_nDI">Número DI/DSI/DA/DRI-E/DUImp</label>
+                    <input class="form-control form-control-sm font-monospace" id="import_nDI" placeholder="Ex: 24/1234567-8 ou DUImp" type="text"/>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="import_dDI">Data Registro</label>
+                    <input class="form-control form-control-sm" id="import_dDI" type="date"/>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small mb-1 fw-bold text-primary d-flex justify-content-between align-items-center" for="import_cExportador">
+                        <span>Cód. Exportador</span>
+                        <a class="text-decoration-none small text-muted" href="javascript:void(0)" onclick="puxarNomeDestinatarioParaExportador()" title="Puxar Nome do Destinatário">
+                            <i data-lucide="user-check" style="width: 12px; height: 12px;"></i> Puxar Destinatário
+                        </a>
+                    </label>
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm" id="import_cExportador" placeholder="Puxa o Nome do Destinatário..." type="text"/>
+                        <button class="btn btn-outline-secondary" onclick="puxarNomeDestinatarioParaExportador()" title="Puxar Nome dos Dados do Destinatário" type="button">
+                            <i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="import_tpIntermedio">Tipo de Importação</label>
+                    <select class="form-select form-select-sm" id="import_tpIntermedio">
+                        <option value="1">1 - Por conta própria</option>
+                        <option value="2">2 - Por conta e ordem</option>
+                        <option value="3">3 - Por encomenda</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="import_tpViaTransp">Via de Transporte</label>
+                    <select class="form-select form-select-sm" id="import_tpViaTransp">
+                        <option value="1">1 - Marítima</option>
+                        <option value="2">2 - Fluvial</option>
+                        <option value="3">3 - Lacustre</option>
+                        <option value="4">4 - Aérea</option>
+                        <option value="5">5 - Postal</option>
+                        <option value="6">6 - Ferroviária</option>
+                        <option value="7">7 - Rodoviária</option>
+                        <option value="8">8 - Conduto / Rede Transmissão</option>
+                        <option value="9">9 - Meios Próprios</option>
+                        <option value="10">10 - Entrada / Saída Ficta</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="import_UFDesemb">Desembaraço - UF</label>
+                    <input class="form-control form-control-sm text-uppercase text-center font-monospace" id="import_UFDesemb" maxlength="2" placeholder="Ex: SP" type="text"/>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="import_xLocDesemb">Desembaraço - Local</label>
+                    <input class="form-control form-control-sm" id="import_xLocDesemb" placeholder="Ex: PORTO DE SANTOS" type="text"/>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small mb-1 fw-bold text-primary" for="import_dDesemb">Desembaraço - Data</label>
+                    <input class="form-control form-control-sm" id="import_dDesemb" type="date"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border mb-3 mt-3">
 <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
 <span class="fw-bold d-inline-flex align-items-center gap-2"><i data-lucide="file-text" style="width: 16px; height: 16px;"></i> Informações Complementares / Observações da Nota (infCpl)</span>
 <button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="aplicarObsDaOperacao()" type="button">
@@ -3292,6 +3371,16 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             if (c.verProc) setVal('verProc', c.verProc);
             if (typeof aoMudarPaisDestinatario === 'function') aoMudarPaisDestinatario();
 
+            // Identificação da Importação
+            setVal('import_nDI', c.import_nDI || '');
+            setVal('import_dDI', c.import_dDI || '');
+            setVal('import_cExportador', c.import_cExportador || c.dest_xNome || '');
+            setVal('import_tpViaTransp', c.import_tpViaTransp || '1');
+            setVal('import_tpIntermedio', c.import_tpIntermedio || '1');
+            setVal('import_UFDesemb', c.import_UFDesemb || '');
+            setVal('import_xLocDesemb', c.import_xLocDesemb || '');
+            setVal('import_dDesemb', c.import_dDesemb || '');
+
             // 2. Preenchimento Seguro do Rodape
             const r = data.rodape || {};
             setVal('infCpl', r.infCpl || '');
@@ -3825,6 +3914,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             'nNF', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
             'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
             'dest_xNome', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
+            'import_nDI', 'import_dDI', 'import_cExportador', 'import_tpViaTransp', 'import_tpIntermedio', 'import_UFDesemb', 'import_xLocDesemb', 'import_dDesemb',
             'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
             'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
             'rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vFrete', 'rateio_vSeg', 'rateio_vOutro', 'ptax_data', 'ptax_moeda', 'ptax_moeda_custom', 'ptax_cotacao_venda', 'criterio_rateio',
@@ -4690,6 +4780,12 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 if(indIE) {
                     indIE.value = emp.ind_ie || '9';
                     if(window.atualizarEstadoInscricaoEstadual) atualizarEstadoInscricaoEstadual();
+                }
+
+                const expEl = document.getElementById('import_cExportador');
+                if (expEl && (!expEl.value || expEl.dataset.autoSynced === 'true')) {
+                    expEl.value = emp.nome || '';
+                    expEl.dataset.autoSynced = 'true';
                 }
             }
             else if(prefix === 'transp') {

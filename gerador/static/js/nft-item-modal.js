@@ -811,19 +811,28 @@
         document.getElementById('m_item_vUnTrib').value = "0.0000";
         document.getElementById('m_item_cEANTrib').value = "SEM GTIN";
 
-        // Dados DI
-        const elDiGeral = document.getElementById('di_numero') || document.getElementById('numero_di');
+        // Dados DI herdados da Identificação da Importação no cabeçalho (se preenchidos)
+        const elDiGeral = document.getElementById('import_nDI') || document.getElementById('di_numero') || document.getElementById('numero_di');
+        const elDdiGeral = document.getElementById('import_dDI');
+        const elLocDesembGeral = document.getElementById('import_xLocDesemb');
+        const elUfDesembGeral = document.getElementById('import_UFDesemb');
+        const elDDesembGeral = document.getElementById('import_dDesemb');
+        const elViaTranspGeral = document.getElementById('import_tpViaTransp');
+        const elIntermedioGeral = document.getElementById('import_tpIntermedio');
+        const elExportadorGeral = document.getElementById('import_cExportador') || document.getElementById('dest_xNome');
+
         document.getElementById('m_item_nDI').value = elDiGeral ? elDiGeral.value : "";
-        document.getElementById('m_item_dDI').value = "";
-        document.getElementById('m_item_xLocDesemb').value = "";
-        document.getElementById('m_item_UFDesemb').value = "";
-        document.getElementById('m_item_dDesemb').value = "";
-        document.getElementById('m_item_tpViaTransp').value = "1";
+        document.getElementById('m_item_dDI').value = elDdiGeral ? elDdiGeral.value : "";
+        document.getElementById('m_item_xLocDesemb').value = elLocDesembGeral ? elLocDesembGeral.value : "";
+        document.getElementById('m_item_UFDesemb').value = elUfDesembGeral ? elUfDesembGeral.value : "";
+        document.getElementById('m_item_dDesemb').value = elDDesembGeral ? elDDesembGeral.value : "";
+        document.getElementById('m_item_tpViaTransp').value = elViaTranspGeral ? elViaTranspGeral.value : "1";
+        document.getElementById('m_item_tpIntermedio').value = elIntermedioGeral ? elIntermedioGeral.value : "1";
         document.getElementById('m_item_vAFRMM').value = "0.00";
         document.getElementById('m_item_nAdicao').value = "1";
         document.getElementById('m_item_nSeqAdic').value = "1";
         document.getElementById('m_item_cFabricante').value = "";
-        document.getElementById('m_item_cExportador').value = "";
+        document.getElementById('m_item_cExportador').value = elExportadorGeral ? elExportadorGeral.value : "";
         document.getElementById('m_item_moeda_conversao').value = "";
         document.getElementById('m_item_taxa_conversao').value = "";
 
@@ -934,6 +943,7 @@
         document.getElementById('m_item_UFDesemb').value = rowData.UFDesemb || "";
         document.getElementById('m_item_dDesemb').value = rowData.dDesemb || "";
         document.getElementById('m_item_tpViaTransp').value = String(rowData.tpViaTransp || "1");
+        document.getElementById('m_item_tpIntermedio').value = String(rowData.tpIntermedio || "1");
         document.getElementById('m_item_vAFRMM').value = formatNum(rowData.vAFRMM, 2);
         document.getElementById('m_item_nAdicao').value = String(rowData.nAdicao || "1");
         document.getElementById('m_item_nSeqAdic').value = String(rowData.nSeqAdic || "1");
@@ -1115,17 +1125,99 @@
         window.abrirModalItemNovo();
     };
 
+    // ==========================================
+    // IDENTIFICAÇÃO DA IMPORTAÇÃO & SINCRONIZAÇÃO
+    // ==========================================
+    window.puxarNomeDestinatarioParaExportador = function () {
+        const destNome = document.getElementById('dest_xNome');
+        const exp = document.getElementById('import_cExportador');
+        if (exp) {
+            if (destNome && destNome.value) {
+                exp.value = destNome.value.trim();
+                exp.dataset.autoSynced = 'true';
+            } else {
+                exp.value = '';
+            }
+        }
+    };
+
+    window.repassarImportacaoParaItens = function () {
+        const nDI = (document.getElementById('import_nDI')?.value || '').trim();
+        const dDI = document.getElementById('import_dDI')?.value || '';
+        const cExportador = (document.getElementById('import_cExportador')?.value || '').trim();
+        const tpViaTransp = document.getElementById('import_tpViaTransp')?.value || '1';
+        const tpIntermedio = document.getElementById('import_tpIntermedio')?.value || '1';
+        const UFDesemb = (document.getElementById('import_UFDesemb')?.value || '').trim().toUpperCase();
+        const xLocDesemb = (document.getElementById('import_xLocDesemb')?.value || '').trim().toUpperCase();
+        const dDesemb = document.getElementById('import_dDesemb')?.value || '';
+
+        let lista = getListaItensAtual();
+
+        if (!lista || lista.length === 0) {
+            const msgInfo = 'ℹ️ Dados de importação gravados como padrão! Ao adicionar novos itens, esses dados serão herdados automaticamente.';
+            if (typeof window.nftAlert === 'function') {
+                window.nftAlert(msgInfo, 'info');
+            } else {
+                alert(msgInfo);
+            }
+            return;
+        }
+
+        lista.forEach(item => {
+            item.nDI = nDI;
+            item.dDI = dDI;
+            item.cExportador = cExportador;
+            item.tpViaTransp = tpViaTransp;
+            item.tpIntermedio = tpIntermedio;
+            item.UFDesemb = UFDesemb;
+            item.xLocDesemb = xLocDesemb;
+            item.dDesemb = dDesemb;
+        });
+
+        aplicarListaItensAtual(lista);
+
+        const msgSucesso = `✅ Dados de importação repassados com sucesso para todos os ${lista.length} itens da nota!`;
+        if (typeof window.nftAlert === 'function') {
+            window.nftAlert(msgSucesso, 'success');
+        } else {
+            alert(msgSucesso);
+        }
+    };
+
+    window.inicializarSincronizacaoImportacao = function () {
+        const destNome = document.getElementById('dest_xNome');
+        const exp = document.getElementById('import_cExportador');
+        if (destNome && exp) {
+            const aoMudarDestNome = function () {
+                if (!exp.value || exp.dataset.autoSynced === 'true') {
+                    exp.value = destNome.value;
+                    exp.dataset.autoSynced = 'true';
+                }
+            };
+            destNome.addEventListener('input', aoMudarDestNome);
+            destNome.addEventListener('change', aoMudarDestNome);
+            exp.addEventListener('input', function () {
+                exp.dataset.autoSynced = 'false';
+            });
+            if (destNome.value && !exp.value) {
+                exp.value = destNome.value.trim();
+                exp.dataset.autoSynced = 'true';
+            }
+        }
+    };
+
     // Inicialização ao carregar o DOM
     document.addEventListener('DOMContentLoaded', function () {
-        // Se a página atual possuir a aba de itens (#itens ou #itens-table)
         if (document.getElementById('itens') || document.getElementById('itens-table')) {
             injectItemModalHTML();
         }
+        window.inicializarSincronizacaoImportacao();
     });
 
     if (document.body) {
         if (document.getElementById('itens') || document.getElementById('itens-table')) {
             injectItemModalHTML();
         }
+        window.inicializarSincronizacaoImportacao();
     }
 })();

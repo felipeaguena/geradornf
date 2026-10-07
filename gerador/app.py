@@ -612,22 +612,23 @@ def build_nfe_element(cabecalho, itens, rodape):
         ET.SubElement(prod, f'{{{NFE_NS}}}indTot').text = '1'
         
         # DI
-        n_di = str(item.get('nDI') or '').strip()
+        n_di = str(item.get('nDI') or cabecalho.get('import_nDI') or '').strip()
         if not cfop_item.startswith('7') and n_di:
             di_el = ET.SubElement(prod, f'{{{NFE_NS}}}DI')
             ET.SubElement(di_el, f'{{{NFE_NS}}}nDI').text = n_di[:15]
-            ET.SubElement(di_el, f'{{{NFE_NS}}}dDI').text = format_date(item.get('dDI'))
-            ET.SubElement(di_el, f'{{{NFE_NS}}}xLocDesemb').text = str(item.get('xLocDesemb') or 'PORTO DE SANTOS')[:60]
-            ET.SubElement(di_el, f'{{{NFE_NS}}}UFDesemb').text = str(item.get('UFDesemb') or 'SP')[:2]
-            ET.SubElement(di_el, f'{{{NFE_NS}}}dDesemb').text = format_date(item.get('dDesemb') or item.get('dDI'))
-            ET.SubElement(di_el, f'{{{NFE_NS}}}tpViaTransp').text = str(item.get('tpViaTransp') or '1')
+            ET.SubElement(di_el, f'{{{NFE_NS}}}dDI').text = format_date(item.get('dDI') or cabecalho.get('import_dDI'))
+            ET.SubElement(di_el, f'{{{NFE_NS}}}xLocDesemb').text = str(item.get('xLocDesemb') or cabecalho.get('import_xLocDesemb') or 'PORTO DE SANTOS')[:60]
+            ET.SubElement(di_el, f'{{{NFE_NS}}}UFDesemb').text = str(item.get('UFDesemb') or cabecalho.get('import_UFDesemb') or 'SP')[:2]
+            ET.SubElement(di_el, f'{{{NFE_NS}}}dDesemb').text = format_date(item.get('dDesemb') or cabecalho.get('import_dDesemb') or item.get('dDI') or cabecalho.get('import_dDI'))
+            ET.SubElement(di_el, f'{{{NFE_NS}}}tpViaTransp').text = str(item.get('tpViaTransp') or cabecalho.get('import_tpViaTransp') or '1')
             
             v_afrmm = format_dec(item.get('vAFRMM'), 2)
-            if not is_zero(v_afrmm) or str(item.get('tpViaTransp')) == '1':
+            via_transp_final = str(item.get('tpViaTransp') or cabecalho.get('import_tpViaTransp') or '1')
+            if not is_zero(v_afrmm) or via_transp_final == '1':
                 ET.SubElement(di_el, f'{{{NFE_NS}}}vAFRMM').text = v_afrmm
                 
-            ET.SubElement(di_el, f'{{{NFE_NS}}}tpIntermedio').text = str(item.get('tpIntermedio') or '1')
-            ET.SubElement(di_el, f'{{{NFE_NS}}}cExportador').text = str(item.get('cExportador') or cabecalho.get('dest_xNome') or 'EXPORTADOR')[:60]
+            ET.SubElement(di_el, f'{{{NFE_NS}}}tpIntermedio').text = str(item.get('tpIntermedio') or cabecalho.get('import_tpIntermedio') or '1')
+            ET.SubElement(di_el, f'{{{NFE_NS}}}cExportador').text = str(item.get('cExportador') or cabecalho.get('import_cExportador') or cabecalho.get('dest_xNome') or 'EXPORTADOR')[:60]
             
             adi_el = ET.SubElement(di_el, f'{{{NFE_NS}}}adi')
             raw_adic = re.sub(r'\D', '', str(item.get('nAdicao') or idx)).lstrip('0')
