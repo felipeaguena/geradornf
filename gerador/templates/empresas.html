@@ -205,7 +205,14 @@
 <option value="Local de Desembaraço">Local de Desembaraço</option>
 </select>
 </div>
-<div class="col-md-5">
+<div class="col-md-3">
+<label class="form-label small fw-bold text-primary">Localização</label>
+<select class="form-select form-select-sm fw-bold border-primary" id="cad_localidade" onchange="aoMudarLocalidade('cad')">
+<option value="Brasil" selected>Brasil</option>
+<option value="Exterior">Exterior</option>
+</select>
+</div>
+<div class="col-md-6">
 <label class="form-label small fw-bold">Nome / Razão Social</label>
 <input class="form-control form-control-sm" id="cad_nome" required="" type="text"/>
 </div>
@@ -269,11 +276,14 @@
 </div>
 <div class="col-md-4">
 <label class="form-label small fw-bold">País</label>
-<input class="form-control form-control-sm" id="cad_xpais" type="text" value="Brasil"/>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm fw-semibold" id="cad_xpais" list="datalist-paises" onchange="aoMudarPaisEmpresa('cad')" oninput="aoDigitarPaisEmpresa('cad')" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
+<button class="btn btn-outline-secondary" onclick="resetarPaisEmpresa('cad')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+</div>
 </div>
 <div class="col-md-3">
 <label class="form-label small fw-bold">Cód. País (BACEN)</label>
-<input class="form-control form-control-sm font-monospace" id="cad_cpais" type="text" value="1058"/>
+<input class="form-control form-control-sm font-monospace bg-light fw-bold" id="cad_cpais" readonly="" type="text" value="1058"/>
 </div>
 </div>
 <div class="mt-4 text-end">
@@ -294,6 +304,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
             carregarEmpresas();
+            carregarDatalistPaises();
         });
 
         let empresasCache = [];
@@ -395,6 +406,10 @@
             document.getElementById('edit_xpais').value = emp.xpais || 'Brasil';
             document.getElementById('edit_cpais').value = emp.cpais || '1058';
 
+            const ehExterior = (emp.uf === 'EX') || (emp.cpais && String(emp.cpais) !== '1058') || (emp.xpais && emp.xpais.trim().toUpperCase() !== 'BRASIL');
+            document.getElementById('edit_localidade').value = ehExterior ? 'Exterior' : 'Brasil';
+            aplicarRegrasExterior('edit', ehExterior);
+
             const modal = new bootstrap.Modal(document.getElementById('modalEditarEmpresa'));
             modal.show();
         }
@@ -466,6 +481,7 @@
                 if(res.ok) {
                     alert('Cadastro salvo com sucesso!');
                     e.target.reset();
+                    aplicarRegrasExterior('cad', false);
                     carregarEmpresas();
                     document.getElementById('tab-lista-btn').click();
                 } else {
@@ -507,6 +523,161 @@
             }
         });
 
+        let paisesBacenCache = [];
+
+        function carregarDatalistPaises() {
+            fetch('/api/localidades/paises')
+                .then(r => r.json())
+                .then(data => {
+                    paisesBacenCache = data || [];
+                    const datalist = document.getElementById('datalist-paises');
+                    if (datalist) {
+                        datalist.innerHTML = paisesBacenCache.map(p => 
+                            `<option value="${p.nome}" data-codigo="${p.codigo}">${p.codigo} - ${p.nome}</option>`
+                        ).join('');
+                    }
+                })
+                .catch(err => console.warn("Erro ao carregar lista de países:", err));
+        }
+
+        function aplicarRegrasExterior(prefix, ehExterior) {
+            const cnpjElem = document.getElementById(prefix + '_cnpj_cpf');
+            const ieElem = document.getElementById(prefix + '_ie');
+            const indIeElem = document.getElementById(prefix + '_ind_ie');
+            const munElem = document.getElementById(prefix + '_municipio');
+            const ufElem = document.getElementById(prefix + '_uf');
+            const cmunElem = document.getElementById(prefix + '_cmun');
+            const xpaisElem = document.getElementById(prefix + '_xpais');
+            const cpaisElem = document.getElementById(prefix + '_cpais');
+
+            if (ehExterior) {
+                if (cnpjElem) {
+                    cnpjElem.disabled = true;
+                    cnpjElem.value = '';
+                    cnpjElem.classList.add('bg-light');
+                }
+                if (ieElem) {
+                    ieElem.disabled = true;
+                    ieElem.value = '';
+                    ieElem.classList.add('bg-light');
+                }
+                if (indIeElem) {
+                    indIeElem.disabled = true;
+                    indIeElem.value = '9';
+                    indIeElem.classList.add('bg-light');
+                }
+                if (ufElem) {
+                    ufElem.value = 'EX';
+                    ufElem.readOnly = true;
+                    ufElem.classList.add('bg-light');
+                }
+                if (munElem) {
+                    munElem.value = 'Exterior';
+                }
+                if (cmunElem) {
+                    cmunElem.value = '9999999';
+                }
+                if (xpaisElem && (xpaisElem.value.trim().toUpperCase() === 'BRASIL' || !xpaisElem.value.trim())) {
+                    xpaisElem.value = '';
+                    if (cpaisElem) cpaisElem.value = '';
+                }
+            } else {
+                if (cnpjElem) {
+                    cnpjElem.disabled = false;
+                    cnpjElem.classList.remove('bg-light');
+                }
+                if (ieElem) {
+                    ieElem.disabled = false;
+                    ieElem.classList.remove('bg-light');
+                }
+                if (indIeElem) {
+                    indIeElem.disabled = false;
+                    indIeElem.classList.remove('bg-light');
+                }
+                if (ufElem) {
+                    ufElem.readOnly = false;
+                    ufElem.classList.remove('bg-light');
+                    if (ufElem.value === 'EX') ufElem.value = '';
+                }
+                if (munElem && munElem.value === 'Exterior') {
+                    munElem.value = '';
+                }
+                if (cmunElem && cmunElem.value === '9999999') {
+                    cmunElem.value = '';
+                }
+                if (xpaisElem && (!xpaisElem.value.trim() || xpaisElem.value.trim().toUpperCase() !== 'BRASIL')) {
+                    xpaisElem.value = 'Brasil';
+                    if (cpaisElem) cpaisElem.value = '1058';
+                }
+            }
+        }
+
+        function aoMudarLocalidade(prefix) {
+            const locSelect = document.getElementById(prefix + '_localidade');
+            const ehExterior = locSelect ? (locSelect.value === 'Exterior') : false;
+            aplicarRegrasExterior(prefix, ehExterior);
+        }
+
+        function aoDigitarPaisEmpresa(prefix) {
+            const xpaisElem = document.getElementById(prefix + '_xpais');
+            const cpaisElem = document.getElementById(prefix + '_cpais');
+            if (!xpaisElem) return;
+
+            const val = (xpaisElem.value || '').trim().toUpperCase();
+            if (!val) return;
+
+            const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
+            if (encontrado) {
+                if (cpaisElem) cpaisElem.value = encontrado.codigo;
+                xpaisElem.value = encontrado.nome;
+                if (encontrado.codigo !== '1058') {
+                    const locSelect = document.getElementById(prefix + '_localidade');
+                    if (locSelect && locSelect.value !== 'Exterior') {
+                        locSelect.value = 'Exterior';
+                        aplicarRegrasExterior(prefix, true);
+                    }
+                }
+            }
+        }
+
+        function aoMudarPaisEmpresa(prefix) {
+            const xpaisElem = document.getElementById(prefix + '_xpais');
+            const cpaisElem = document.getElementById(prefix + '_cpais');
+            if (!xpaisElem) return;
+
+            const val = (xpaisElem.value || '').trim().toUpperCase();
+            if (paisesBacenCache.length > 0 && val) {
+                const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
+                if (encontrado) {
+                    if (cpaisElem) cpaisElem.value = encontrado.codigo;
+                    xpaisElem.value = encontrado.nome;
+                    if (encontrado.codigo !== '1058') {
+                        const locSelect = document.getElementById(prefix + '_localidade');
+                        if (locSelect && locSelect.value !== 'Exterior') {
+                            locSelect.value = 'Exterior';
+                            aplicarRegrasExterior(prefix, true);
+                        }
+                    }
+                    return;
+                }
+            }
+            if (val === 'BRASIL') {
+                if (cpaisElem) cpaisElem.value = '1058';
+            }
+        }
+
+        function resetarPaisEmpresa(prefix) {
+            const xpaisElem = document.getElementById(prefix + '_xpais');
+            const cpaisElem = document.getElementById(prefix + '_cpais');
+            const locSelect = document.getElementById(prefix + '_localidade');
+            if (xpaisElem) xpaisElem.value = 'Brasil';
+            if (cpaisElem) cpaisElem.value = '1058';
+            if (locSelect) {
+                locSelect.value = 'Brasil';
+                aplicarRegrasExterior(prefix, false);
+            }
+        }
+
         // BUSCA DE CEP AUTOMATICA
         function processarRetornoCep(data, prefixo) {
             if (data.error) {
@@ -516,11 +687,16 @@
             if (data.exterior) {
                 document.getElementById(prefixo + '_logradouro').value = 'EXTERIOR';
                 document.getElementById(prefixo + '_bairro').value = 'EXTERIOR';
-                document.getElementById(prefixo + '_municipio').value = 'EXTERIOR';
+                document.getElementById(prefixo + '_municipio').value = 'Exterior';
                 document.getElementById(prefixo + '_uf').value = 'EX';
                 document.getElementById(prefixo + '_cmun').value = '9999999';
                 document.getElementById(prefixo + '_xpais').value = 'CHINA, REPUBLICA POPULAR';
                 document.getElementById(prefixo + '_cpais').value = '160';
+                const locSelect = document.getElementById(prefixo + '_localidade');
+                if (locSelect) {
+                    locSelect.value = 'Exterior';
+                    aplicarRegrasExterior(prefixo, true);
+                }
             } else {
                 if(data.logradouro) document.getElementById(prefixo + '_logradouro').value = data.logradouro;
                 if(data.bairro) document.getElementById(prefixo + '_bairro').value = data.bairro;
@@ -529,6 +705,11 @@
                 if(data.ibge) document.getElementById(prefixo + '_cmun').value = data.ibge;
                 document.getElementById(prefixo + '_xpais').value = 'Brasil';
                 document.getElementById(prefixo + '_cpais').value = '1058';
+                const locSelect = document.getElementById(prefixo + '_localidade');
+                if (locSelect) {
+                    locSelect.value = 'Brasil';
+                    aplicarRegrasExterior(prefixo, false);
+                }
             }
         }
 
@@ -573,7 +754,14 @@
 <option value="Local de Desembaraço">Local de Desembaraço</option>
 </select>
 </div>
-<div class="col-md-5">
+<div class="col-md-3">
+<label class="form-label small fw-bold text-primary">Localização</label>
+<select class="form-select form-select-sm fw-bold border-primary" id="edit_localidade" onchange="aoMudarLocalidade('edit')">
+<option value="Brasil" selected>Brasil</option>
+<option value="Exterior">Exterior</option>
+</select>
+</div>
+<div class="col-md-6">
 <label class="form-label small fw-bold">Nome / Razão Social</label>
 <input class="form-control form-control-sm" id="edit_nome" required="" type="text"/>
 </div>
@@ -582,15 +770,15 @@
 <input class="form-control form-control-sm" id="edit_apelido" placeholder="Nome Fantasia / Apelido" type="text"/>
 </div>
 <div class="col-md-4">
-<label class="form-label small fw-bold">CNPJ / CPF</label>
+<label class="form-label small fw-bold" id="lbl_edit_cnpj_cpf">CNPJ / CPF</label>
 <input class="form-control form-control-sm mask-cnpj-cpf" id="edit_cnpj_cpf" placeholder="00.000.000/0000-00" type="text"/>
 </div>
 <div class="col-md-4">
-<label class="form-label small fw-bold">Inscrição Estadual (IE)</label>
+<label class="form-label small fw-bold" id="lbl_edit_ie">Inscrição Estadual (IE)</label>
 <input class="form-control form-control-sm" id="edit_ie" type="text"/>
 </div>
 <div class="col-md-4">
-<label class="form-label small fw-bold">Ind. IE</label>
+<label class="form-label small fw-bold" id="lbl_edit_ind_ie">Ind. IE</label>
 <select class="form-select form-select-sm" id="edit_ind_ie">
 <option value="1">Contribuinte</option>
 <option value="2">Isento de Contribuição</option>
@@ -637,11 +825,14 @@
 </div>
 <div class="col-md-4">
 <label class="form-label small fw-bold">País</label>
-<input class="form-control form-control-sm" id="edit_xpais" type="text"/>
+<div class="input-group input-group-sm">
+<input class="form-control form-control-sm fw-semibold" id="edit_xpais" list="datalist-paises" onchange="aoMudarPaisEmpresa('edit')" oninput="aoDigitarPaisEmpresa('edit')" placeholder="Selecione ou digite o País" type="text"/>
+<button class="btn btn-outline-secondary" onclick="resetarPaisEmpresa('edit')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+</div>
 </div>
 <div class="col-md-3">
 <label class="form-label small fw-bold">Cód. País (BACEN)</label>
-<input class="form-control form-control-sm font-monospace" id="edit_cpais" type="text"/>
+<input class="form-control form-control-sm font-monospace bg-light fw-bold" id="edit_cpais" readonly="" type="text"/>
 </div>
 </div>
 </form>
@@ -653,5 +844,6 @@
 </div>
 </div>
 </div>
+<datalist id="datalist-paises"></datalist>
 </body>
 </html>

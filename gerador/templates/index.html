@@ -590,9 +590,18 @@
 <label class="form-label small mb-1">CNPJ</label>
 <input class="form-control form-control-sm mask-cnpj-cpf" id="emit_CNPJ" oninput="calcularChaveAcessoDinamica()" placeholder="00.000.000/0000-00" type="text"/>
 </div>
-<div class="col-md-3">
+<div class="col-md-5">
 <label class="form-label small mb-1">Inscrição Estadual (IE)</label>
 <input class="form-control form-control-sm" id="emit_IE" type="text"/>
+</div>
+<div class="col-md-7">
+<label class="form-label small mb-1 fw-bold">Regime Tributário (CRT)</label>
+<select class="form-select form-select-sm fw-semibold" id="emit_CRT">
+<option value="1" selected>1 - Simples Nacional</option>
+<option value="2">2 - Simples Nacional - excesso de sublimite de receita bruta</option>
+<option value="3">3 - Regime Normal</option>
+<option value="4">4 - Simples Nacional - Microempreendedor Individual - MEI</option>
+</select>
 </div>
 <div class="col-md-9">
 <label class="form-label small mb-1">Logradouro (xLgr)</label>
@@ -2961,6 +2970,8 @@
             // Emitente
             setVal('emit_xNome', c.emit_xNome);
             setVal('emit_CNPJ', c.emit_CNPJ);
+            if (c.emit_IE) setVal('emit_IE', c.emit_IE);
+            if (c.emit_CRT) setVal('emit_CRT', c.emit_CRT);
             setVal('emit_xLgr', c.emit_xLgr);
             setVal('emit_nro', c.emit_nro);
             setVal('emit_xBairro', c.emit_xBairro);
@@ -3228,7 +3239,7 @@
                 emit_UF: getVal('emit_UF'),
                 emit_CEP: getVal('emit_CEP'),
                 emit_IE: getVal('emit_IE') || (window.currentCabecalho && window.currentCabecalho.emit_IE) || '138843326117',
-                emit_CRT: (window.currentCabecalho && window.currentCabecalho.emit_CRT) || '1',
+                emit_CRT: getVal('emit_CRT') || (window.currentCabecalho && window.currentCabecalho.emit_CRT) || '1',
                 
                 dest_xNome: getVal('dest_xNome'),
                 dest_CNPJ_CPF: getVal('dest_CNPJ_CPF'),
@@ -3517,7 +3528,7 @@
         // Coleta todos os campos do formulário
         const idsCabecalho = [
             'nNF', 'serie', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
-            'emit_xNome', 'emit_CNPJ', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
+            'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
             'dest_xNome', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
             'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
             'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
@@ -4362,6 +4373,9 @@
                 document.getElementById('emit_CEP').value = emp.cep || '';
                 document.getElementById('emit_xPais').value = emp.xpais || 'Brasil';
                 document.getElementById('emit_cPais').value = emp.cpais || '1058';
+                if(emp.crt && document.getElementById('emit_CRT')) {
+                    document.getElementById('emit_CRT').value = String(emp.crt);
+                }
                 if(window.calcularChaveAcessoDinamica) calcularChaveAcessoDinamica();
             }
             else if(prefix === 'dest') {
