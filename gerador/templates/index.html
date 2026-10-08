@@ -901,12 +901,20 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <label class="form-label small mb-1 fw-bold">Cód. BACEN (&lt;cPais&gt;)</label>
 <input class="form-control form-control-sm font-monospace fw-bold bg-light" id="dest_cPais" readonly="" type="text" value="1058"/>
 </div>
-<div class="col-md-8">
+<div class="col-md-5">
 <label class="form-label small mb-1">Nome / Razão Social (xNome)</label>
 <input class="form-control form-control-sm" id="dest_xNome" type="text"/>
 </div>
+<div class="col-md-3">
+<label class="form-label small mb-1 fw-bold">Tipo de Documento</label>
+<select class="form-select form-select-sm" id="dest_tpDoc" onchange="atualizarTipoDocumentoDestinatario()">
+<option value="CNPJ" selected>CNPJ</option>
+<option value="CPF">CPF</option>
+<option value="Estrangeiro">Estrangeiro</option>
+</select>
+</div>
 <div class="col-md-4">
-<label class="form-label small mb-1">CNPJ / CPF / IdEstrangeiro</label>
+<label class="form-label small mb-1" id="lbl_dest_CNPJ_CPF">CNPJ / CPF / IdEstrangeiro</label>
 <input class="form-control form-control-sm mask-cnpj-cpf" id="dest_CNPJ_CPF" placeholder="00.000.000/0000-00" type="text"/>
 </div>
 <div class="col-md-6">
@@ -2377,6 +2385,32 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
     }
 
+    function atualizarTipoDocumentoDestinatario() {
+        const tpDoc = document.getElementById('dest_tpDoc');
+        const docInput = document.getElementById('dest_CNPJ_CPF');
+        const lblDoc = document.getElementById('lbl_dest_CNPJ_CPF');
+        if (!tpDoc || !docInput) return;
+
+        const val = tpDoc.value;
+        if (val === 'Estrangeiro') {
+            docInput.value = '';
+            docInput.disabled = true;
+            docInput.classList.add('bg-light');
+            docInput.placeholder = 'Exterior (Desabilitado)';
+            if (lblDoc) lblDoc.innerText = 'CNPJ / CPF / IdEstrangeiro (Desabilitado)';
+        } else {
+            docInput.disabled = false;
+            docInput.classList.remove('bg-light');
+            if (val === 'CPF') {
+                docInput.placeholder = '000.000.000-00';
+                if (lblDoc) lblDoc.innerText = 'CPF Destinatário';
+            } else {
+                docInput.placeholder = '00.000.000/0000-00';
+                if (lblDoc) lblDoc.innerText = 'CNPJ Destinatário';
+            }
+        }
+    }
+
     function verificarAvisoZeradoRateio(inputEl) {
         if (!inputEl) return;
         const val = parseNum(inputEl.value);
@@ -2732,6 +2766,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         carregarFeirasParaInfCpl();
         atualizarCamposIdentificacao('0', '3');
         atualizarEstadoInscricaoEstadual();
+        atualizarTipoDocumentoDestinatario();
         calcularChaveAcessoDinamica();
 
         // 2. Inicializar Câmbio PTAX e Parâmetros de Rateio
@@ -3490,7 +3525,22 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             
             // Destinatario
             setVal('dest_xNome', c.dest_xNome);
-            setVal('dest_CNPJ_CPF', c.dest_CNPJ_CPF);
+            let tpDocVal = c.dest_tpDoc;
+            if (!tpDocVal) {
+                const docLimpo = String(c.dest_CNPJ_CPF || '').replace(/\D/g, '');
+                if (c.dest_UF === 'EX' || (c.dest_cPais && c.dest_cPais !== '1058') || c.dest_idEstrangeiro || (!docLimpo && (c.idDest === '3' || c.dest_UF === 'EX'))) {
+                    tpDocVal = 'Estrangeiro';
+                } else if (docLimpo.length <= 11 && docLimpo.length > 0) {
+                    tpDocVal = 'CPF';
+                } else {
+                    tpDocVal = 'CNPJ';
+                }
+            }
+            setVal('dest_tpDoc', tpDocVal);
+            atualizarTipoDocumentoDestinatario();
+            if (tpDocVal !== 'Estrangeiro') {
+                setVal('dest_CNPJ_CPF', c.dest_CNPJ_CPF);
+            }
             setVal('dest_indIEDest', c.dest_indIEDest || '9');
             setVal('dest_IE', c.dest_IE || '');
             atualizarEstadoInscricaoEstadual();
@@ -3762,6 +3812,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 emit_CRT: getVal('emit_CRT') || (window.currentCabecalho && window.currentCabecalho.emit_CRT) || '1',
                 
                 dest_xNome: getVal('dest_xNome'),
+                dest_tpDoc: getVal('dest_tpDoc') || 'CNPJ',
                 dest_CNPJ_CPF: getVal('dest_CNPJ_CPF'),
                 dest_idEstrangeiro: getVal('dest_idEstrangeiro') || getVal('dest_CNPJ_CPF') || (window.currentCabecalho && window.currentCabecalho.dest_idEstrangeiro) || '',
                 dest_indIEDest: getVal('dest_indIEDest') || '9',
@@ -4059,7 +4110,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         const idsCabecalho = [
             'nNF', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
             'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
-            'dest_xNome', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
+            'dest_xNome', 'dest_tpDoc', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
             'import_nDI', 'import_dDI', 'import_cExportador', 'import_tpViaTransp', 'import_tpIntermedio', 'import_UFDesemb', 'import_xLocDesemb', 'import_dDesemb',
             'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
             'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
@@ -4414,6 +4465,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             window.idRascunhoAtual = rascunho.id;
             atualizarCamposIdentificacao(getVal('tpNF'), getVal('idDest'));
             atualizarEstadoInscricaoEstadual();
+            atualizarTipoDocumentoDestinatario();
             calcularChaveAcessoDinamica();
             atualizarBadgeRefNFe((getVal('refNFe') || '').length);
             atualizarBadgesRateioEItens();
@@ -4591,6 +4643,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             const elIE = document.getElementById('dest_IE');
             if (elIE) elIE.disabled = true;
             setVal('idDest', '3');
+            const elTpDoc = document.getElementById('dest_tpDoc');
+            if (elTpDoc && elTpDoc.value !== 'Estrangeiro') {
+                elTpDoc.value = 'Estrangeiro';
+                atualizarTipoDocumentoDestinatario();
+            }
         }
     }
 
@@ -4982,7 +5039,21 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             }
             else if(prefix === 'dest') {
                 document.getElementById('dest_xNome').value = emp.nome || '';
-                document.getElementById('dest_CNPJ_CPF').value = emp.cnpj_cpf || '';
+                const docLimpo = String(emp.cnpj_cpf || '').replace(/\D/g, '');
+                const tpDocEl = document.getElementById('dest_tpDoc');
+                if (tpDocEl) {
+                    if (emp.uf === 'EX' || (emp.cpais && emp.cpais !== '1058') || (!docLimpo && emp.tipo === 'Exportador')) {
+                        tpDocEl.value = 'Estrangeiro';
+                    } else if (docLimpo.length <= 11 && docLimpo.length > 0) {
+                        tpDocEl.value = 'CPF';
+                    } else {
+                        tpDocEl.value = 'CNPJ';
+                    }
+                    atualizarTipoDocumentoDestinatario();
+                }
+                if (!tpDocEl || tpDocEl.value !== 'Estrangeiro') {
+                    document.getElementById('dest_CNPJ_CPF').value = emp.cnpj_cpf || '';
+                }
                 document.getElementById('dest_IE').value = emp.ie || '';
                 document.getElementById('dest_xLgr').value = emp.logradouro || '';
                 document.getElementById('dest_nro').value = emp.numero || '';

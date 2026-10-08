@@ -2342,21 +2342,23 @@ def validar_dados_nfe(cabecalho, itens, rodape, referencia_interna=''):
                 "mensagem": "ID Estrangeiro não informado para cliente no exterior."
             })
     else:
-        dest_doc = re.sub(r'\D', '', str(cabecalho.get('dest_CNPJ_CPF') or ''))
-        if not dest_doc:
-            erros.append({
-                "categoria": "Destinatário",
-                "aba": "2. Destinatário",
-                "campo": "CNPJ / CPF Destinatário",
-                "mensagem": "CNPJ ou CPF do destinatário é obrigatório em operações nacionais."
-            })
-        elif len(dest_doc) not in (11, 14):
-            erros.append({
-                "categoria": "Destinatário",
-                "aba": "2. Destinatário",
-                "campo": "CNPJ / CPF Destinatário",
-                "mensagem": f"Documento do destinatário inválido (CPF deve ter 11 dígitos, CNPJ deve ter 14 dígitos, atual: {len(dest_doc)})."
-            })
+        dest_tp_doc = str(cabecalho.get('dest_tpDoc') or '').strip()
+        if dest_tp_doc != 'Estrangeiro':
+            dest_doc = re.sub(r'\D', '', str(cabecalho.get('dest_CNPJ_CPF') or ''))
+            if not dest_doc:
+                erros.append({
+                    "categoria": "Destinatário",
+                    "aba": "2. Destinatário",
+                    "campo": "CNPJ / CPF Destinatário",
+                    "mensagem": "CNPJ ou CPF do destinatário é obrigatório em operações nacionais."
+                })
+            elif len(dest_doc) not in (11, 14):
+                erros.append({
+                    "categoria": "Destinatário",
+                    "aba": "2. Destinatário",
+                    "campo": "CNPJ / CPF Destinatário",
+                    "mensagem": f"Documento do destinatário inválido (CPF deve ter 11 dígitos, CNPJ deve ter 14 dígitos, atual: {len(dest_doc)})."
+                })
 
     # 5. Informações de Exportação (exporta - MOC SEFAZ v4.00)
     exporta_data = rodape.get('exportacao') or cabecalho.get('exportacao') or {}
