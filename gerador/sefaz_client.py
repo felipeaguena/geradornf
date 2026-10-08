@@ -130,6 +130,8 @@ def enviar_nfe(xml_assinado, uf='SP', tpAmb=2):
         
         # Analisar o XML de retorno para pegar cStat e xMotivo
         ret_root = etree.fromstring(response.content)
+        inf_prot = ret_root.find('.//{http://www.portalfiscal.inf.br/nfe}infProt')
+        
         cstat_el = ret_root.find('.//{http://www.portalfiscal.inf.br/nfe}cStat')
         xmotivo_el = ret_root.find('.//{http://www.portalfiscal.inf.br/nfe}xMotivo')
         recibo_el = ret_root.find('.//{http://www.portalfiscal.inf.br/nfe}nRec')
@@ -139,6 +141,18 @@ def enviar_nfe(xml_assinado, uf='SP', tpAmb=2):
         xmotivo = xmotivo_el.text if xmotivo_el is not None else ''
         recibo = recibo_el.text if recibo_el is not None else ''
         protocolo = prot_el.text if prot_el is not None else ''
+        
+        # Se houver infProt com status específico da nota (ex: 100), prioriza
+        if inf_prot is not None:
+            cstat_prot = inf_prot.find('.//{http://www.portalfiscal.inf.br/nfe}cStat')
+            xmotivo_prot = inf_prot.find('.//{http://www.portalfiscal.inf.br/nfe}xMotivo')
+            prot_prot = inf_prot.find('.//{http://www.portalfiscal.inf.br/nfe}nProt')
+            if cstat_prot is not None and cstat_prot.text:
+                cstat = cstat_prot.text
+            if xmotivo_prot is not None and xmotivo_prot.text:
+                xmotivo = xmotivo_prot.text
+            if prot_prot is not None and prot_prot.text:
+                protocolo = prot_prot.text
         
         return {
             'status': 'success',

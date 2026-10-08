@@ -140,17 +140,56 @@ async function enviarNfeSefaz(ambiente = 2) {
     }
 }
 
+function renderArquivosIcons(chave, isAutorizado) {
+    if (!chave || chave === 'N/A' || chave === '-' || chave.trim() === '') {
+        return `<span class="text-muted" style="font-size: 11px;">-</span>`;
+    }
+    
+    const chaveLimpa = chave.trim();
+    if (isAutorizado) {
+        return `
+            <div class="d-inline-flex align-items-center justify-content-center gap-1">
+                <a href="/api/sefaz/download/pdf/${chaveLimpa}" target="_blank" download="${chaveLimpa}-danfe.pdf" class="btn btn-sm btn-outline-danger p-1 d-inline-flex align-items-center justify-content-center" title="Baixar DANFE (PDF)" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
+                    <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+                </a>
+                <a href="/api/sefaz/download/xml/${chaveLimpa}" target="_blank" download="${chaveLimpa}-nfe.xml" class="btn btn-sm btn-outline-primary p-1 d-inline-flex align-items-center justify-content-center" title="Baixar XML Autorizado" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
+                    <i data-lucide="file-code" style="width: 14px; height: 14px;"></i>
+                </a>
+                <a href="/api/sefaz/download/zip/${chaveLimpa}" target="_blank" download="${chaveLimpa}-arquivos.zip" class="btn btn-sm btn-outline-warning p-1 d-inline-flex align-items-center justify-content-center" title="Baixar Pacote Completo (ZIP)" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
+                    <i data-lucide="archive" style="width: 14px; height: 14px;"></i>
+                </a>
+            </div>
+        `;
+    } else {
+        return `
+            <div class="d-inline-flex align-items-center justify-content-center gap-1 opacity-50" title="Disponível após autorização da NF-e na SEFAZ">
+                <span class="btn btn-sm btn-outline-secondary p-1 d-inline-flex align-items-center justify-content-center disabled" style="width: 26px; height: 26px; border-radius: 4px; cursor: not-allowed; pointer-events: none;">
+                    <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+                </span>
+                <span class="btn btn-sm btn-outline-secondary p-1 d-inline-flex align-items-center justify-content-center disabled" style="width: 26px; height: 26px; border-radius: 4px; cursor: not-allowed; pointer-events: none;">
+                    <i data-lucide="file-code" style="width: 14px; height: 14px;"></i>
+                </span>
+                <span class="btn btn-sm btn-outline-secondary p-1 d-inline-flex align-items-center justify-content-center disabled" style="width: 26px; height: 26px; border-radius: 4px; cursor: not-allowed; pointer-events: none;">
+                    <i data-lucide="archive" style="width: 14px; height: 14px;"></i>
+                </span>
+            </div>
+        `;
+    }
+}
+window.renderArquivosIcons = renderArquivosIcons;
+
 function atualizarTabelaHistorico(retorno, chave, ambiente = 2) {
     const tbody = document.getElementById('tbody-historico-sefaz');
-    if(tbody.querySelector('td[colspan="6"]')) {
+    if(tbody.querySelector('td[colspan="6"]') || tbody.querySelector('td[colspan="7"]')) {
         tbody.innerHTML = '';
     }
 
     const tr = document.createElement('tr');
     
-    // Cor do cstat
+    // Cor do cstat e autorização
+    const isAutorizado = (retorno.cstat == '100' || retorno.cstat == '104' || retorno.autorizado === true);
     let cstatBadge = 'bg-secondary';
-    if(retorno.cstat == '100' || retorno.cstat == '104') cstatBadge = 'bg-success';
+    if(isAutorizado) cstatBadge = 'bg-success';
     else if(retorno.cstat) cstatBadge = 'bg-warning text-dark';
 
     const now = new Date().toLocaleString('pt-BR');
@@ -159,9 +198,10 @@ function atualizarTabelaHistorico(retorno, chave, ambiente = 2) {
     
     tr.innerHTML = `
         <td>${now}</td>
-        <td><span class="badge bg-info-subtle text-info fw-bold">${ambienteText}</span></td>
+        <td><span class="badge ${ambienteClass}">${ambienteText}</span></td>
+        <td class="text-center align-middle">${renderArquivosIcons(chave, isAutorizado)}</td>
         <td class="text-start" style="font-size: 11px;">${chave}</td>
-        <td><span class="badge bg-info-subtle text-info fw-bold">${retorno.cstat || 'ERRO'}</span></td>
+        <td><span class="badge ${cstatBadge}">${retorno.cstat || 'ERRO'}</span></td>
         <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${retorno.xmotivo || retorno.message || retorno.error || ''}">
             ${retorno.xmotivo || retorno.message || retorno.error || ''}
         </td>
@@ -172,6 +212,9 @@ function atualizarTabelaHistorico(retorno, chave, ambiente = 2) {
     `;
     
     tbody.prepend(tr);
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+    }
 
     // Salva o histórico de envios no rascunho ativo imediatamente
     if (typeof window.triggerAutoSave === 'function') {

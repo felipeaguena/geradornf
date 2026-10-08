@@ -24,8 +24,11 @@ import hashlib
 import base64
 import sefaz_client
 import zipfile
+import shutil
+from lxml import etree
 
-import sefaz_client
+DOWNLOADS_DIR = os.path.join(os.path.dirname(__file__), 'downloads')
+os.makedirs(DOWNLOADS_DIR, exist_ok=True)
 
 NFE_NS = "http://www.portalfiscal.inf.br/nfe"
 DS_NS = "http://www.w3.org/2000/09/xmldsig#"
@@ -3184,7 +3187,7 @@ def api_sefaz_enviar():
     try:
         data = request.json
         xml_string = data.get('xml')
-        chave = data.get('chave', 'N/A')
+        chave = (data.get('chave') or 'N/A').strip()
         tpAmb = int(data.get('tpAmb', 2))
         
         if not xml_string:
@@ -3193,6 +3196,48 @@ def api_sefaz_enviar():
         xml_assinado = sefaz_client.assinar_xml(xml_string)
         retorno = sefaz_client.enviar_nfe(xml_assinado, uf='SP', tpAmb=tpAmb)
         
+        cstat = str(retorno.get('cstat', ''))
+        xmotivo = str(retorno.get('xmotivo', ''))
+        is_autorizado = (cstat in ('100', '104') or (retorno.get('status') == 'success' and 'autoriz' in xmotivo.lower()))
+        retorno['autorizado'] = is_autorizado
+        
+        # Se autorizado, salva os 3 arquivos imediatamente na pasta de download
+        if chave and chave != 'N/A':
+            xml_final = xml_assinado
+            if is_autorizado and retorno.get('response_xml'):
+                try:
+                    ret_root = etree.fromstring(retorno['response_xml'].encode('utf-8'))
+                    prot_el = ret_root.find('.//{http://www.portalfiscal.inf.br/nfe}protNFe')
+                    if prot_el is not None:
+                        nfe_root = etree.fromstring(xml_assinado.encode('utf-8'))
+                        proc_el = etree.Element('{http://www.portalfiscal.inf.br/nfe}nfeProc', versao="4.00")
+                        proc_el.append(nfe_root)
+                        proc_el.append(prot_el)
+                        xml_final = etree.tostring(proc_el, encoding='utf-8', xml_declaration=True).decode('utf-8')
+                except Exception as e_xml:
+                    print(f"Aviso ao montar nfeProc: {e_xml}")
+                    xml_final = xml_assinado
+            
+            if is_autorizado:
+                try:
+                    xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
+                    with open(xml_path, 'w', encoding='utf-8') as f:
+                        f.write(xml_final)
+                        
+                    pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
+                    modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+                    if os.path.exists(modelo_pdf):
+                        shutil.copyfile(modelo_pdf, pdf_path)
+                        
+                    zip_path = os.path.join(DOWNLOADS_DIR, f"{chave}-arquivos.zip")
+                    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                        if os.path.exists(pdf_path):
+                            zf.write(pdf_path, f"{chave}-danfe.pdf")
+                        if os.path.exists(xml_path):
+                            zf.write(xml_path, f"{chave}-nfe.xml")
+                except Exception as e_save:
+                    print(f"Erro ao salvar arquivos em downloads: {e_save}")
+
         # Salvar no histórico
         conn = get_db_connection()
         c = conn.cursor()
@@ -3201,7 +3246,7 @@ def api_sefaz_enviar():
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             chave,
-            tpAmb, # changed from hardcoded 2
+            tpAmb,
             retorno.get('cstat', ''),
             retorno.get('xmotivo', ''),
             retorno.get('recibo', ''),
@@ -3218,14 +3263,24 @@ def api_sefaz_enviar():
 
 @app.route('/api/sefaz/download/pdf/<chave>', methods=['GET'])
 def download_pdf(chave):
-    # For now, return the template PDF
-    pdf_path = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+    chave = chave.strip()
+    pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
+    if not os.path.exists(pdf_path):
+        modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+        if os.path.exists(modelo_pdf):
+            shutil.copyfile(modelo_pdf, pdf_path)
+            
     if os.path.exists(pdf_path):
-        return send_file(pdf_path, as_attachment=True, download_name=f"{chave}-danfe.pdf")
+        return send_file(pdf_path, as_attachment=True, download_name=f"{chave}-danfe.pdf", mimetype='application/pdf')
     return "PDF não encontrado", 404
 
 @app.route('/api/sefaz/download/xml/<chave>', methods=['GET'])
 def download_xml(chave):
+    chave = chave.strip()
+    xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
+    if os.path.exists(xml_path):
+        return send_file(xml_path, as_attachment=True, download_name=f"{chave}-nfe.xml", mimetype='application/xml')
+        
     conn = get_db_connection()
     c = conn.cursor()
     c.execute("SELECT xml_envio, xml_retorno FROM historico_sefaz WHERE chave_nfe = ? ORDER BY id DESC LIMIT 1", (chave,))
@@ -3234,28 +3289,47 @@ def download_xml(chave):
     
     if row and row['xml_envio']:
         xml_data = row['xml_envio']
-        return send_file(io.BytesIO(xml_data.encode('utf-8')), as_attachment=True, download_name=f"{chave}-nfe.xml", mimetype='application/xml')
+        with open(xml_path, 'w', encoding='utf-8') as f:
+            f.write(xml_data)
+        return send_file(xml_path, as_attachment=True, download_name=f"{chave}-nfe.xml", mimetype='application/xml')
     return "XML não encontrado", 404
 
 @app.route('/api/sefaz/download/zip/<chave>', methods=['GET'])
 def download_zip(chave):
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("SELECT xml_envio FROM historico_sefaz WHERE chave_nfe = ? ORDER BY id DESC LIMIT 1", (chave,))
-    row = c.fetchone()
-    conn.close()
-    
-    memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
-        pdf_path = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+    chave = chave.strip()
+    zip_path = os.path.join(DOWNLOADS_DIR, f"{chave}-arquivos.zip")
+    if os.path.exists(zip_path):
+        return send_file(zip_path, as_attachment=True, download_name=f"{chave}-arquivos.zip", mimetype='application/zip')
+        
+    # Garante o PDF
+    pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
+    if not os.path.exists(pdf_path):
+        modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+        if os.path.exists(modelo_pdf):
+            shutil.copyfile(modelo_pdf, pdf_path)
+            
+    # Garante o XML
+    xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
+    if not os.path.exists(xml_path):
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("SELECT xml_envio FROM historico_sefaz WHERE chave_nfe = ? ORDER BY id DESC LIMIT 1", (chave,))
+        row = c.fetchone()
+        conn.close()
+        if row and row['xml_envio']:
+            with open(xml_path, 'w', encoding='utf-8') as f:
+                f.write(row['xml_envio'])
+                
+    # Monta o ZIP
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         if os.path.exists(pdf_path):
             zf.write(pdf_path, f"{chave}-danfe.pdf")
+        if os.path.exists(xml_path):
+            zf.write(xml_path, f"{chave}-nfe.xml")
             
-        if row and row['xml_envio']:
-            zf.writestr(f"{chave}-nfe.xml", row['xml_envio'])
-            
-    memory_file.seek(0)
-    return send_file(memory_file, as_attachment=True, download_name=f"{chave}-export.zip", mimetype='application/zip')
+    if os.path.exists(zip_path):
+        return send_file(zip_path, as_attachment=True, download_name=f"{chave}-arquivos.zip", mimetype='application/zip')
+    return "Arquivos não encontrados para gerar o ZIP", 404
 
 if __name__ == '__main__':
     get_db_connection().close()

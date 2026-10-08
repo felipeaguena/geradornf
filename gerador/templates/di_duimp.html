@@ -1045,6 +1045,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                         <tr>
                             <th>Data/Hora</th>
                             <th>Ambiente</th>
+                            <th>Arquivos</th>
                             <th>Chave da NF-e</th>
                             <th>cStat</th>
                             <th>Motivo</th>
@@ -1052,7 +1053,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                         </tr>
                     </thead>
                     <tbody id="tbody-historico-sefaz">
-                        <tr><td colspan="6" class="text-muted py-3">Nenhum envio realizado nesta sessão ainda.</td></tr>
+                        <tr><td colspan="7" class="text-muted py-3">Nenhum envio realizado nesta sessão ainda.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -4096,10 +4097,22 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         const rows = document.querySelectorAll('#tbody-historico-sefaz tr');
         rows.forEach(tr => {
             const cells = tr.querySelectorAll('td');
-            if (cells.length >= 6) {
+            if (cells.length >= 7) {
                 sefazHistory.push({
                     data: cells[0].innerHTML,
                     ambiente: cells[1].innerHTML,
+                    arquivos: cells[2].innerHTML,
+                    chave: cells[3].innerHTML,
+                    status: cells[4].innerHTML,
+                    motivo: cells[5].innerHTML,
+                    motivoTitle: cells[5].getAttribute('title') || '',
+                    protocolo: cells[6].innerHTML
+                });
+            } else if (cells.length === 6) {
+                sefazHistory.push({
+                    data: cells[0].innerHTML,
+                    ambiente: cells[1].innerHTML,
+                    arquivos: '',
                     chave: cells[2].innerHTML,
                     status: cells[3].innerHTML,
                     motivo: cells[4].innerHTML,
@@ -4427,9 +4440,16 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     tbody.innerHTML = '';
                     dados.sefaz_history.forEach(item => {
                         const tr = document.createElement('tr');
+                        let arquivosHtml = item.arquivos;
+                        if (!arquivosHtml && typeof window.renderArquivosIcons === 'function') {
+                            const rawChave = (item.chave || '').replace(/<[^>]*>?/gm, '').trim();
+                            const isAut = (item.status || '').includes('100') || (item.status || '').includes('104');
+                            arquivosHtml = window.renderArquivosIcons(rawChave, isAut);
+                        }
                         tr.innerHTML = `
                             <td>${item.data || ''}</td>
                             <td>${item.ambiente || ''}</td>
+                            <td class="text-center align-middle">${arquivosHtml || '-'}</td>
                             <td class="text-start" style="font-size: 11px;">${item.chave || ''}</td>
                             <td>${item.status || ''}</td>
                             <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.motivoTitle || ''}">
@@ -4439,6 +4459,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                         `;
                         tbody.appendChild(tr);
                     });
+                    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                        lucide.createIcons();
+                    }
                 }
             }
 

@@ -231,7 +231,7 @@ small.text-muted {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
   color: #11141A !important;
-  box-shadow: 0 2px 4px rgba(143, 253, 5, 0.25);
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.35);
 }
 
 .btn-primary:hover,
@@ -239,7 +239,7 @@ small.text-muted {
   background-color: var(--primary-hover) !important;
   border-color: var(--primary-hover) !important;
   color: #11141A !important;
-  box-shadow: 0 4px 10px rgba(143, 253, 5, 0.35);
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.35);
 }
 
 .btn-outline-primary {
@@ -503,7 +503,7 @@ textarea.form-control-sm {
 .tabulator .tabulator-row:hover .tabulator-cell,
 .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
 .tabulator .tabulator-row:hover .tabulator-cell:nth-child(-n+3) {
-  background-color: #fff1eb !important;
+  background-color: #F8F8F8 !important;
   color: var(--foreground) !important;
 }
 
@@ -565,7 +565,7 @@ textarea.form-control-sm {
 .dark #itens-table .tabulator-row:hover .text-primary,
 [data-theme="dark"] .tabulator .tabulator-row:hover .text-primary,
 [data-theme="dark"] #itens-table .tabulator-row:hover .text-primary {
-  color: #fa6c38 !important;
+  color: rgba(14, 165, 233, 0.35) !important;
 }
 
 /* Botão de Edição Rápida na Tabela de Itens (Clean / Sem borda) */
@@ -1353,7 +1353,7 @@ textarea.form-control-sm {
 }
 
 .portal-card-badge.badge-primary-accent {
-  border-color: rgba(237, 90, 36, 0.4);
+  border-color: rgba(14, 165, 233, 0.35) !important;
   color: #fff;
 }
 
@@ -1476,7 +1476,7 @@ textarea.form-control-sm {
 #itens-table .tabulator-row.tabulator-selected .tabulator-cell,
 #itens-table .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
 #itens-table .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3) {
-  background-color: #ffe6dc !important;
+  background-color: rgba(14, 165, 233, 0.35) !important;
   color: #161110 !important;
 }
 
@@ -1488,7 +1488,7 @@ textarea.form-control-sm {
 #itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell,
 #itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
 #itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3) {
-  background-color: #ffd8c7 !important;
+  background-color: rgba(14, 165, 233, 0.35) !important;
   color: #161110 !important;
 }
 
