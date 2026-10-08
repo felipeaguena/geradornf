@@ -203,15 +203,15 @@ body.sidebar-collapsed .nft-sidebar:hover {
 
 .nft-sidebar-btn:hover {
   background: var(--surface-secondary);
-  color: var(--heading);
-  border-color: var(--border);
+  color: var(--btn-nft-color);
+  border-color: var(--btn-nft-border);
 }
 
 .nft-sidebar-btn.active {
   background: var(--primary-subtle);
-  color: var(--primary);
+  color: var(--btn-nft-color);
   font-weight: 700;
-  border-color: var(--primary-border);
+  border-color: var(--btn-nft-border);
 }
 
 .nft-sidebar-btn .sidebar-icon {
@@ -314,18 +314,46 @@ body.sidebar-collapsed .nft-sidebar:hover {
   color: #bae6fd !important;
 }
 
+.sidebar-footer-btn-warning,
+.sidebar-footer-bg-warning,
 .sidebar-footer-btn-primary {
-  background: var(--primary);
-  color: #ffffff !important;
-  border-color: var(--primary);
+  background: #f59e0b !important;
+  color: #11141a !important;
+  border-color: #d97706 !important;
+  font-weight: 700;
   width: 100%;
 }
 
+.sidebar-footer-btn-warning:hover,
+.sidebar-footer-bg-warning:hover,
 .sidebar-footer-btn-primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
+  background: #d97706 !important;
+  border-color: #b45309 !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(237, 90, 36, 0.35);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+.dark .sidebar-footer-btn-warning,
+.dark .sidebar-footer-bg-warning,
+.dark .sidebar-footer-btn-primary,
+[data-theme="dark"] .sidebar-footer-btn-warning,
+[data-theme="dark"] .sidebar-footer-bg-warning,
+[data-theme="dark"] .sidebar-footer-btn-primary {
+  background: #f59e0b !important;
+  color: #11141a !important;
+  border-color: #f59e0b !important;
+}
+
+.dark .sidebar-footer-btn-warning:hover,
+.dark .sidebar-footer-bg-warning:hover,
+.dark .sidebar-footer-btn-primary:hover,
+[data-theme="dark"] .sidebar-footer-btn-warning:hover,
+[data-theme="dark"] .sidebar-footer-bg-warning:hover,
+[data-theme="dark"] .sidebar-footer-btn-primary:hover {
+  background: #fbbf24 !important;
+  border-color: #fbbf24 !important;
+  color: #11141a !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
 }
 
 .sidebar-footer-actions {

@@ -17,8 +17,8 @@ new_light = """.form-control:focus {
   outline: none !important;
 }
 .form-select:focus {
-  border-color: #8FFD05 !important;
-  box-shadow: 0 0 0 3px rgba(143, 253, 5, 0.2) !important;
+  border-color: #0ea5e9 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35) !important;;
   outline: none !important;
 }"""
 
@@ -45,9 +45,9 @@ new_dark = """.dark .form-control:focus,
 .dark .form-select:focus,
 [data-theme="dark"] .form-select:focus {
   background-color: #171b26 !important;
-  border-color: #8FFD05 !important;
+  border-color: #0ea5e9 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(143, 253, 5, 0.25) !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.35);;
 }"""
 
 content = content.replace(old_dark, new_dark)

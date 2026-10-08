@@ -120,7 +120,7 @@
 <span class="sidebar-icon"><i data-lucide="shield-check"></i></span>
 <span class="sidebar-footer-text">Analisar Rascunho</span>
 </button>
-<button class="sidebar-footer-btn sidebar-footer-btn-primary" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
+<button class="sidebar-footer-btn sidebar-footer-btn-warning" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
 <span class="sidebar-icon"><i data-lucide="download"></i></span>
 <span class="sidebar-footer-text">Gerar Novo XML</span>
 </button>
@@ -557,7 +557,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </select>
 </div>
 <div class="col-sm-6 mt-2 d-flex align-items-end">
-<button class="btn-nft fw-bold text-dark w-100 shadow-sm py-2 d-flex align-items-center justify-content-center gap-2" onclick="executarRateioGlobal()" type="button">
+<button class="btn-nft flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" onclick="executarRateioGlobal()" type="button">
 <i data-lucide="calculator"></i>
 <span>Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)</span>
 </button>
@@ -748,7 +748,7 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <span>Adicionar Dados da Feira nas Observações</span>
 </label>
 <div class="input-group input-group-sm">
-<span class="input-group-text bg-white"><i data-lucide="map-pin" style="width: 13px; height: 13px;"></i></span>
+
 <select class="form-select form-select-sm" id="select_feira_infcpl" onchange="aoSelecionarFeiraInfCpl(this)">
 <option value="">Selecione uma feira para adicionar em infCpl...</option>
 </select>
@@ -1208,7 +1208,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <i data-lucide="copy"></i>
 <span>Duplicar Item</span>
 </button>
-<button class="btn-nft fw-bold text-dark me-1 shadow-sm d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
+<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
 <i data-lucide="scale"></i>
 <span>Rateio &amp; PTAX</span>
 </button>
