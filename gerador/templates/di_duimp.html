@@ -24,6 +24,7 @@
 <script defer src="/static/js/nft-analise-rascunho.js?v=1.0"></script>
 <script defer src="/static/js/nft-exportacao.js?v=1.0"></script>
 <script defer src="/static/js/nft-regex-visual.js?v=1.0"></script>
+<script defer src="/static/js/nft-empresa-rapida.js?v=1.0"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -942,10 +943,31 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <i data-lucide="user" style="width: 15px; height: 15px;"></i>
 <span>Dados do Destinatário</span>
 </div>
+<div class="d-flex align-items-center gap-2">
+<button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="abrirModalNovaEmpresaRapido('dest')" style="font-size: 11px; height: 26px; min-height: 26px;" title="Adicionar Nova Empresa ao Cadastro e preencher na Nota" type="button">
+<i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
+<span>+ Adicionar Nova Empresa</span>
+</button>
 <span class="badge font-monospace bg-info-subtle text-info fw-bold" id="lbl-status-pais-dest">Nacional (Brasil)</span>
 </div>
+</div>
 <div class="card-body py-2">
-<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold mb-1">Preencher Dados do Destinatário a partir do Cadastro</label><select class="form-select form-select-sm" id="select_destinatario" onchange="preencherDadosDeCadastro(this, 'dest')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2">
+<div class="d-flex justify-content-between align-items-center mb-1">
+<label class="form-label small fw-bold mb-0">Preencher Dados do Destinatário a partir do Cadastro</label>
+<button class="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-bold d-inline-flex align-items-center gap-1" onclick="abrirModalNovaEmpresaRapido('dest')" style="font-size: 11.5px;" type="button">
+<i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
+<span>+ Adicionar Nova Empresa</span>
+</button>
+</div>
+<div class="input-group input-group-sm">
+<select class="form-select form-select-sm" id="select_destinatario" onchange="preencherDadosDeCadastro(this, 'dest')"><option value="">Selecione para preencher automaticamente...</option></select>
+<button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="abrirModalNovaEmpresaRapido('dest')" title="Cadastrar nova empresa e aplicar imediatamente à nota" type="button">
+<i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+<span>Nova</span>
+</button>
+</div>
+</div>
 <!-- PAÍS DO DESTINATÁRIO -->
 <div class="col-md-7">
 <label class="form-label small mb-1 fw-bold">País do Destinatário (Nome)</label>
@@ -1402,9 +1424,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="d-flex align-items-center flex-wrap gap-3">
 <div><span class="text-muted">Moeda:</span> <span class="badge bg-info-subtle text-info fw-bold" id="lbl-bar-ptax-moeda">USD</span></div>
 <div><span class="text-muted">Cotação PTAX:</span> <strong class="text-primary font-monospace" id="lbl-bar-ptax-taxa">R$ -</strong></div>
-<div class="border-start ps-3"><span class="text-muted">Marinha Mercante (AFRMM):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-afrmm">R$ 0,00</span></div>
-<div><span class="text-muted">Taxa Siscomex:</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-siscomex">R$ 0,00</span></div>
-<div><span class="text-muted">Outras Desp. (vOutro):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-outro">R$ 0,00</span></div>
+<div class="border-start ps-3"><span class="text-muted">Marinha Mercante (AFRMM):</span> <span class="fw-bold font-monospace text-heading" id="lbl-bar-rateio-afrmm">R$ 0,00</span></div>
+<div><span class="text-muted">Taxa Siscomex:</span> <span class="fw-bold font-monospace text-heading" id="lbl-bar-rateio-siscomex">R$ 0,00</span></div>
+<div><span class="text-muted">Outras Desp. (vOutro):</span> <span class="fw-bold font-monospace text-heading" id="lbl-bar-rateio-outro">R$ 0,00</span></div>
 </div>
 <div class="d-flex align-items-center gap-2">
 <button class="btn-nft fw-bold shadow-sm d-flex align-items-center gap-1" onclick="recalcularConversaoItens()" title="Recalcula a conversão de moeda dos itens com base na nova taxa PTAX" type="button">

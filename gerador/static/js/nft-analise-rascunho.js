@@ -286,7 +286,7 @@
                 <div class="col-6 col-md-3">
                     <div class="p-2 px-3 rounded-3 border bg-light text-center h-100">
                         <small class="text-muted d-block" style="font-size: 11px;">Itens na Nota</small>
-                        <strong class="fs-6 text-dark font-monospace">${resumo.total_itens || 0}</strong>
+                        <strong class="fs-6 text-heading font-monospace">${resumo.total_itens || 0}</strong>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
@@ -298,7 +298,7 @@
                 <div class="col-6 col-md-3">
                     <div class="p-2 px-3 rounded-3 border bg-light text-center h-100">
                         <small class="text-muted d-block" style="font-size: 11px;">NF-e / Série</small>
-                        <strong class="fs-6 text-dark font-monospace">${resumo.n_nf || '-'} / ${resumo.serie || '-'}</strong>
+                        <strong class="fs-6 text-heading font-monospace">${resumo.n_nf || '-'} / ${resumo.serie || '-'}</strong>
                     </div>
                 </div>
                 <div class="col-6 col-md-3">
@@ -320,7 +320,7 @@
                     <div class="ms-1 me-auto">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="badge bg-info-subtle text-info fw-bold" style="font-size: 10.5px;">${e.categoria || 'Erro'}</span>
-                            <strong class="text-dark" style="font-size: 13px;">${e.campo || ''}</strong>
+                            <strong class="text-heading" style="font-size: 13px;">${e.campo || ''}</strong>
                         </div>
                         <div class="text-secondary small">${e.mensagem || ''}</div>
                     </div>
@@ -353,11 +353,11 @@
                     <div class="ms-1 me-auto">
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="badge bg-info-subtle text-info fw-bold" style="font-size: 10.5px;">${a.categoria || 'Aviso'}</span>
-                            <strong class="text-dark" style="font-size: 13px;">${a.campo || ''}</strong>
+                            <strong class="text-heading" style="font-size: 13px;">${a.campo || ''}</strong>
                         </div>
                         <div class="text-secondary small">${a.mensagem || ''}</div>
                     </div>
-                    <button type="button" class="btn-nft text-dark py-0 px-2 mt-1 shadow-none" onclick="irParaAbaAnalise('${a.aba}')" title="Ir para a aba para revisar este campo" style="font-size: 11px; border-radius: 4px; white-space: nowrap;">
+                    <button type="button" class="btn-nft py-0 px-2 mt-1 shadow-none" onclick="irParaAbaAnalise('${a.aba}')" title="Ir para a aba para revisar este campo" style="font-size: 11px; border-radius: 4px; white-space: nowrap;">
                         Revisar na ${a.aba || 'Aba'} &rarr;
                     </button>
                 </li>

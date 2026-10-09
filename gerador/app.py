@@ -989,8 +989,11 @@ def api_empresas():
             data.get('apelido', ''), data.get('ind_ie', '')
         ))
         conn.commit()
+        new_id = c.lastrowid
+        c.execute('SELECT * FROM cadastros WHERE id = ?', (new_id,))
+        row = c.fetchone()
         conn.close()
-        return jsonify({"status": "success"})
+        return jsonify({"status": "success", "id": new_id, "empresa": dict(row) if row else {}})
     
     c.execute('SELECT * FROM cadastros')
     rows = c.fetchall()
@@ -1020,6 +1023,63 @@ def api_edit_delete_empresa(cid):
     conn.commit()
     conn.close()
     return jsonify({"status": "success"})
+
+@app.route('/api/empresas/consulta_cnpj/<cnpj>', methods=['GET'])
+def api_consulta_cnpj(cnpj):
+    cnpj_limpo = re.sub(r'\D', '', str(cnpj or ''))
+    if len(cnpj_limpo) != 14:
+        return jsonify({'error': 'CNPJ deve conter 14 dígitos numéricos.'}), 400
+    
+    # 1. Tentativa via BrasilAPI
+    try:
+        url = f"https://brasilapi.com.br/api/cnpj/v1/{cnpj_limpo}"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode('utf-8'))
+                return jsonify({
+                    'status': 'success',
+                    'nome': remover_acentos_nfe(data.get('razao_social') or data.get('nome_fantasia') or ''),
+                    'apelido': remover_acentos_nfe(data.get('nome_fantasia') or ''),
+                    'cnpj_cpf': cnpj_limpo,
+                    'cep': str(data.get('cep') or '').replace('.', ''),
+                    'logradouro': remover_acentos_nfe(data.get('logradouro') or ''),
+                    'numero': str(data.get('numero') or ''),
+                    'bairro': remover_acentos_nfe(data.get('bairro') or ''),
+                    'municipio': remover_acentos_nfe(data.get('municipio') or ''),
+                    'uf': data.get('uf') or '',
+                    'cmun': str(data.get('codigo_municipio_ibge') or ''),
+                    'fone': str(data.get('ddd_telefone_1') or '')
+                })
+    except Exception:
+        pass
+
+    # 2. Fallback via ReceitaWS
+    try:
+        url = f"https://receitaws.com.br/v1/cnpj/{cnpj_limpo}"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode('utf-8'))
+                if data.get('status') != 'ERROR':
+                    return jsonify({
+                        'status': 'success',
+                        'nome': remover_acentos_nfe(data.get('nome') or data.get('fantasia') or ''),
+                        'apelido': remover_acentos_nfe(data.get('fantasia') or ''),
+                        'cnpj_cpf': cnpj_limpo,
+                        'cep': str(data.get('cep') or '').replace('.', ''),
+                        'logradouro': remover_acentos_nfe(data.get('logradouro') or ''),
+                        'numero': str(data.get('numero') or ''),
+                        'bairro': remover_acentos_nfe(data.get('bairro') or ''),
+                        'municipio': remover_acentos_nfe(data.get('municipio') or ''),
+                        'uf': data.get('uf') or '',
+                        'cmun': str(data.get('ibge') or ''),
+                        'fone': str(data.get('telefone') or '')
+                    })
+    except Exception:
+        pass
+
+    return jsonify({'error': 'Não foi possível consultar os dados do CNPJ online automaticamente. Preencha os campos manualmente.'}), 404
 
 # === SERVIÇO & ROTAS: CÂMBIO PTAX
 

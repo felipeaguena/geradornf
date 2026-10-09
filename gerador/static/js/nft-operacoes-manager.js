@@ -306,7 +306,7 @@
                 </div>
 
                 <!-- ICMS & IPI -->
-                <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold text-secondary">Tributos Federais e Estaduais Padrão</h6></div>
+                <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold text-heading">Tributos Federais e Estaduais Padrão</h6></div>
                 <div class="col-md-4">
                     <label class="form-label small">CSOSN / CST ICMS</label>
                     <input type="text" class="form-control form-control-sm font-monospace" id="cfg_${prefix}_csosn" placeholder="Ex: 400, 900, 102">
@@ -552,7 +552,7 @@
                         ${!termoFiltro ? '<i data-lucide="grip-vertical" class="text-muted grip-handle cursor-grab flex-shrink-0" title="Arraste para reordenar" style="cursor: grab; width: 16px; height: 16px;"></i>' : ''}
                         <div class="text-truncate">
                             <span class="fw-bold font-monospace text-primary">(${op.cfop_padrao})</span>
-                            <span class="fw-bold text-dark ms-1">${op.nome_operacao}</span>
+                            <span class="fw-bold text-heading ms-1">${op.nome_operacao}</span>
                         </div>
                     </div>
                     <div class="flex-shrink-0 ms-2">
@@ -580,8 +580,8 @@
                     selecionarOperacaoParaEdicao(op);
                 }
                 // Destaque visual do selecionado
-                document.querySelectorAll('#lista-operacoes .op-drag-item').forEach(el => el.classList.remove('active', 'border-primary', 'bg-light'));
-                item.classList.add('border-primary', 'bg-light');
+                document.querySelectorAll('#lista-operacoes .op-drag-item').forEach(el => el.classList.remove('active', 'border-primary', 'active-op-item', 'bg-light'));
+                item.classList.add('border-primary', 'active-op-item');
             };
 
             // Eventos Drag and Drop (apenas quando não há filtro ativo)

@@ -162,7 +162,7 @@
                         </div>
                     </div>
                     <div class="col-md-6 text-md-end text-muted small">
-                        Total cadastrado: <span class="fw-bold text-dark font-monospace" id="lbl-total-feiras">0</span> feiras | <span class="fw-bold text-primary font-monospace" id="lbl-total-locais">0</span> locais de entrega disponíveis.
+                        Total cadastrado: <span class="fw-bold text-heading font-monospace" id="lbl-total-feiras">0</span> feiras | <span class="fw-bold text-primary font-monospace" id="lbl-total-locais">0</span> locais de entrega disponíveis.
                     </div>
                 </div>
 
@@ -399,7 +399,7 @@
             const endFmt = (l.endereco || '').replace(/[\r\n]+/g, ' - ').replace(/\s+/g, ' ').trim();
             return `
                 <tr>
-                    <td class="fw-semibold text-dark text-nowrap">${escapeHtml(l.nome)}</td>
+                    <td class="fw-semibold text-heading text-nowrap">${escapeHtml(l.nome)}</td>
                     <td class="small text-muted text-nowrap" style="white-space: nowrap;" title="${escapeHtml(endFmt)}">${escapeHtml(endFmt) || '<span class="text-muted">-</span>'}</td>
                     <td class="text-end text-nowrap">
                         <div class="d-flex justify-content-end gap-1">
@@ -567,7 +567,7 @@
                 <tr>
                     <td class="text-muted small font-monospace text-center">${idx + 1}</td>
                     <td>
-                        <strong class="text-dark d-block">${escapeHtml(f.nome)}</strong>
+                        <strong class="text-heading d-block">${escapeHtml(f.nome)}</strong>
                     </td>
                     <td class="small text-nowrap">
                         <i data-lucide="calendar" class="text-muted me-1" style="width: 13px; height: 13px; vertical-align: -2px;"></i>

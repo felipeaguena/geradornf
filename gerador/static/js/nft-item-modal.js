@@ -325,7 +325,7 @@
                                 <!-- IMPOSTO DE IMPORTAÇÃO (II) & IOF -->
                                 <div class="col-12">
                                     <div class="card border p-3 shadow-sm bg-body-tertiary">
-                                        <h6 class="fw-bold mb-2 text-dark border-bottom pb-1">Imposto de Importação (II) & Despesas Aduaneiras</h6>
+                                        <h6 class="fw-bold mb-2 text-heading border-bottom pb-1">Imposto de Importação (II) & Despesas Aduaneiras</h6>
                                         <div class="row g-2">
                                             <div class="col-md-3">
                                                 <label class="form-label small mb-1">Base II (R$)</label>
@@ -385,7 +385,7 @@
                                 <!-- DADOS DA DI / DUIMP -->
                                 <div class="col-12">
                                     <div class="card border p-3">
-                                        <h6 class="fw-bold mb-2 text-dark border-bottom pb-1">Declaração de Importação (DI / DUIMP) & Adição</h6>
+                                        <h6 class="fw-bold mb-2 text-heading border-bottom pb-1">Declaração de Importação (DI / DUIMP) & Adição</h6>
                                         <div class="row g-2">
                                             <div class="col-md-3">
                                                 <label class="form-label small mb-1">Número DI/DUIMP (nDI)</label>

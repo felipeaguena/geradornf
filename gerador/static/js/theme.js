@@ -8,14 +8,15 @@
 
     function applyTheme(theme) {
         const root = document.documentElement;
+        root.setAttribute('data-theme', theme);
+        root.setAttribute('data-bs-theme', theme);
         if (theme === 'dark') {
             root.classList.add('dark');
-            root.setAttribute('data-theme', 'dark');
         } else {
             root.classList.remove('dark');
-            root.setAttribute('data-theme', 'light');
         }
         updateToggleButtons(theme);
+        window.dispatchEvent(new CustomEvent('nft-theme-changed', { detail: { theme } }));
     }
 
     function updateToggleButtons(theme) {
