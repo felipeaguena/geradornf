@@ -112,10 +112,22 @@
         const rows = document.querySelectorAll('#tbody-historico-sefaz tr');
         rows.forEach(tr => {
             const cells = tr.querySelectorAll('td');
-            if (cells.length >= 6) {
+            if (cells.length >= 7) {
                 sefazHistory.push({
                     data: cells[0].innerHTML,
                     ambiente: cells[1].innerHTML,
+                    arquivos: cells[2].innerHTML,
+                    chave: cells[3].innerHTML,
+                    status: cells[4].innerHTML,
+                    motivo: cells[5].innerHTML,
+                    motivoTitle: cells[5].getAttribute('title') || '',
+                    protocolo: cells[6].innerHTML
+                });
+            } else if (cells.length === 6) {
+                sefazHistory.push({
+                    data: cells[0].innerHTML,
+                    ambiente: cells[1].innerHTML,
+                    arquivos: '',
                     chave: cells[2].innerHTML,
                     status: cells[3].innerHTML,
                     motivo: cells[4].innerHTML,
@@ -324,18 +336,40 @@
                     tbody.innerHTML = '';
                     sessionData.sefaz_history.forEach(item => {
                         const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td>${item.data}</td>
-                            <td>${item.ambiente}</td>
-                            <td class="text-start" style="font-size: 11px;">${item.chave}</td>
-                            <td>${item.status}</td>
-                            <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.motivoTitle || ''}">
-                                ${item.motivo}
-                            </td>
-                            <td>${item.protocolo}</td>
-                        `;
+                        const norm = typeof window.normalizarItemHistoricoSefaz === 'function'
+                            ? window.normalizarItemHistoricoSefaz(item)
+                            : null;
+                            
+                        if (norm) {
+                            tr.innerHTML = `
+                                <td class="align-middle">${norm.data}</td>
+                                <td class="align-middle">${norm.ambienteHtml}</td>
+                                <td class="text-center align-middle">${norm.arquivosHtml}</td>
+                                <td class="text-start align-middle font-monospace" style="font-size: 11px;">${norm.chave}</td>
+                                <td class="align-middle">${norm.cstatHtml}</td>
+                                <td class="text-start align-middle" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${norm.motivoTitle}">
+                                    ${norm.motivo}
+                                </td>
+                                <td class="align-middle" style="font-size: 11px;">${norm.protocolo}</td>
+                            `;
+                        } else {
+                            tr.innerHTML = `
+                                <td>${item.data || ''}</td>
+                                <td>${item.ambiente || ''}</td>
+                                <td class="text-center align-middle">${item.arquivos || '-'}</td>
+                                <td class="text-start" style="font-size: 11px;">${item.chave || ''}</td>
+                                <td>${item.status || ''}</td>
+                                <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.motivoTitle || ''}">
+                                    ${item.motivo || ''}
+                                </td>
+                                <td>${item.protocolo || ''}</td>
+                            `;
+                        }
                         tbody.appendChild(tr);
                     });
+                    if (typeof window.sanitizarTabelaHistoricoSefaz === 'function') {
+                        window.sanitizarTabelaHistoricoSefaz();
+                    }
                 }
             }
 
@@ -359,6 +393,9 @@
 
             if (window.lucide) {
                 window.lucide.createIcons();
+            }
+            if (window.validarCamposRegexVisual) {
+                window.validarCamposRegexVisual();
             }
 
         } finally {

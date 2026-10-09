@@ -153,21 +153,92 @@
 (function () {
     const STORAGE_KEY = 'nft_sidebar_collapsed';
 
-    // Inicializa Estado da Sidebar (Padrão: Aberto) com proteção contra document.body nulo
-    function initSidebarState() {
-        if (!document.body) return;
-        const isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
-        if (isCollapsed) {
-            document.body.classList.add('sidebar-collapsed');
+    // Cria e garante o backdrop para mobile
+    function ensureMobileBackdrop() {
+        let backdrop = document.querySelector('.nft-sidebar-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'nft-sidebar-backdrop';
+            backdrop.setAttribute('aria-hidden', 'true');
+            backdrop.onclick = window.closeMobileSidebar;
+            document.body.appendChild(backdrop);
         } else {
-            document.body.classList.remove('sidebar-collapsed');
+            backdrop.onclick = window.closeMobileSidebar;
         }
-        updateToggleButton(isCollapsed);
+
+        // Garante botão fechar (X) no topo da sidebar no mobile se não existir
+        const header = document.querySelector('.nft-sidebar-header');
+        if (header && !header.querySelector('.sidebar-mobile-close-btn')) {
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'sidebar-mobile-close-btn';
+            closeBtn.type = 'button';
+            closeBtn.title = 'Fechar Menu';
+            closeBtn.setAttribute('aria-label', 'Fechar Menu');
+            closeBtn.innerHTML = '<i data-lucide="x"></i>';
+            closeBtn.onclick = window.closeMobileSidebar;
+            header.appendChild(closeBtn);
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
+        }
     }
 
-    // Alterna Estado Aberto / Fechado
+    // Funções de Controle Mobile (Aparece temporariamente ao clicar)
+    window.openMobileSidebar = function() {
+        if (!document.body) return;
+        ensureMobileBackdrop();
+        document.body.classList.add('sidebar-mobile-open');
+    };
+
+    window.closeMobileSidebar = function() {
+        if (!document.body) return;
+        document.body.classList.remove('sidebar-mobile-open');
+    };
+
+    window.toggleMobileSidebar = function() {
+        if (!document.body) return;
+        if (document.body.classList.contains('sidebar-mobile-open')) {
+            window.closeMobileSidebar();
+        } else {
+            window.openMobileSidebar();
+        }
+    };
+
+    // Inicializa Estado da Sidebar:
+    // Mobile (< 992px): Sempre sem classes de recolhido; abre apenas temporariamente.
+    // Outros aparelhos / Desktop (>= 992px): Padrão EXPANDIDO por padrão.
+    // Recolhido apenas se o usuário tiver escolhido explicitamente.
+    function initSidebarState() {
+        if (!document.body) return;
+        ensureMobileBackdrop();
+
+        const isDesktop = window.innerWidth >= 992;
+        if (isDesktop) {
+            // Em desktop: expandido por padrão; se e somente se o usuário salvou 'true', recolhe
+            const isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+            if (isCollapsed) {
+                document.body.classList.add('sidebar-collapsed');
+            } else {
+                document.body.classList.remove('sidebar-collapsed');
+            }
+            updateToggleButton(isCollapsed);
+        } else {
+            // Em mobile: nunca fica recolhido em mini-ícones, fecha o drawer temporário
+            document.body.classList.remove('sidebar-collapsed');
+            document.body.classList.remove('sidebar-mobile-open');
+        }
+    }
+
+    // Alterna Estado Expandido / Recolhido (Somente quando acionado manualmente em Desktop)
     window.toggleSidebar = function () {
         if (!document.body) return;
+
+        // Se estiver em mobile, toggleSidebar apenas abre/fecha o menu móvel temporário
+        if (window.innerWidth < 992) {
+            window.toggleMobileSidebar();
+            return;
+        }
+
         const isCurrentlyCollapsed = document.body.classList.contains('sidebar-collapsed');
         const nextState = !isCurrentlyCollapsed;
 
@@ -195,15 +266,19 @@
         const btns = document.querySelectorAll('.sidebar-toggle-btn');
         btns.forEach(btn => {
             if (isCollapsed) {
-                btn.innerHTML = '▶';
+                btn.innerHTML = '<i data-lucide="chevron-right"></i>';
                 btn.title = 'Fixar Menu Lateral Aberto';
                 btn.setAttribute('aria-label', 'Expandir Menu');
             } else {
-                btn.innerHTML = '◀';
+                btn.innerHTML = '<i data-lucide="chevron-left"></i>';
                 btn.title = 'Recolher Menu Lateral';
                 btn.setAttribute('aria-label', 'Recolher Menu');
             }
         });
+
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
 
         const collapseTextEl = document.getElementById('sidebar-collapse-text');
         if (collapseTextEl) {
@@ -348,6 +423,32 @@
             const tabKey = target.replace('#', '');
             if (tabKey) setActiveSidebarItem(tabKey);
         }
+
+        // Garante fechamento do menu móvel ao clicar em itens ou links na sidebar
+        document.addEventListener('click', function (e) {
+            if (window.innerWidth < 992 && document.body.classList.contains('sidebar-mobile-open')) {
+                const btnOrLink = e.target.closest('.nft-sidebar-btn, .sidebar-footer-btn, .sidebar-brand-link');
+                if (btnOrLink) {
+                    window.closeMobileSidebar();
+                }
+            }
+        });
+
+        // Monitora redimensionamento de janela entre mobile e desktop
+        window.addEventListener('resize', function () {
+            if (window.innerWidth >= 992) {
+                document.body.classList.remove('sidebar-mobile-open');
+                const isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+                if (isCollapsed) {
+                    document.body.classList.add('sidebar-collapsed');
+                } else {
+                    document.body.classList.remove('sidebar-collapsed');
+                }
+                updateToggleButton(isCollapsed);
+            } else {
+                document.body.classList.remove('sidebar-collapsed');
+            }
+        });
 
         // Garante renderização dos ícones Lucide na sidebar
         if (window.lucide && typeof window.lucide.createIcons === 'function') {

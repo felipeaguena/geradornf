@@ -10,7 +10,7 @@
 <!-- Bootstrap 5 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <!-- NFT Logistics Theme (Light & Dark) -->
-<link href="/static/css/nft-theme.css" rel="stylesheet"/>
+<link href="/static/css/nft-theme.css?v=3.1" rel="stylesheet"/>
 <link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
 <script src="/static/js/theme.js"></script>
 <!-- Lucide Icons (Minimalist Line SVGs) -->
@@ -23,6 +23,7 @@
 <script defer src="/static/js/nft-item-modal.js?v=1.0"></script>
 <script defer src="/static/js/nft-analise-rascunho.js?v=1.0"></script>
 <script defer src="/static/js/nft-exportacao.js?v=1.0"></script>
+<script defer src="/static/js/nft-regex-visual.js?v=1.0"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -190,11 +191,6 @@
 <i data-lucide="save"></i>
 <span>Salvar</span>
 </button>
-<button class="btn-nft fw-bold d-flex align-items-center justify-content-center gap-2" onclick="abrirModalListaRascunhos()" title="Ver e carregar Rascunhos Salvos">
-<i data-lucide="folder-clock"></i>
-<span>Rascunhos</span>
-<span class="badge badge-counter-rascunhos bg-info-subtle text-info fw-bold" id="badge-total-rascunhos">0</span>
-</button>
 <button class="btn-nft fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco" type="button">
 <i data-lucide="rotate-ccw"></i>
 <span>Nova Nota</span>
@@ -263,6 +259,13 @@
 <label class="form-label small fw-bold">Número NF-e (nNF)</label>
 <input class="form-control form-control-sm" id="nNF" oninput="calcularChaveAcessoDinamica()" type="text"/>
 </div>
+<div class="col-md-2">
+<label class="form-label small fw-bold">Consumidor final</label>
+<select class="form-select form-select-sm" id="indFinal">
+<option value="0">0-Não</option>
+<option selected="" value="1">1-Sim</option>
+</select>
+</div>
 <div class="col-md-1">
 <label class="form-label small fw-bold">Série</label>
 <input class="form-control form-control-sm" id="serie" oninput="calcularChaveAcessoDinamica()" type="text"/>
@@ -280,7 +283,7 @@
 <input id="cfop_padrao" type="hidden"/>
 </div>
 <!-- CHAVE DE ACESSO DA NF-E (44 DÍGITOS - DINÂMICA SEFAZ) -->
-<div class="col-md-6">
+<div class="col-md-4">
 <div class="d-flex justify-content-between align-items-center mb-1">
 <label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1">
 <i data-lucide="key" style="width: 14px; height: 14px;"></i>
@@ -307,15 +310,67 @@
 <input id="cDV" type="hidden" value=""/>
 <input id="verProc" type="hidden" value="4.01_sebrae_b057"/>
 </div>
+
+<!-- CARD DE ENQUADRAMENTO FISCAL RÁPIDO & MEIO DE PAGAMENTO (SEFAZ YA04-10) -->
+<div class="col-12" id="card-regime-pagamento">
+    <div class="card border p-2 px-3 mb-0 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2 bg-body-tertiary">
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="small fw-bold text-secondary text-uppercase d-flex align-items-center gap-1" style="font-size: 11px;">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i>
+                <span>Regime Fiscal da Nota:</span>
+            </span>
+            <div class="btn-group btn-group-sm" role="group" id="btn-group-regime">
+                <button type="button" class="btn btn-outline-primary fw-semibold btn-regime active" id="btn-regime-suspensao" onclick="selecionarRegimeTributario('SUSPENSAO', true)" title="Suspensão de Tributos (Admissão Temporária / Feiras)">
+                    🛡️ Suspensão
+                </button>
+                <button type="button" class="btn btn-outline-warning text-dark fw-semibold btn-regime" id="btn-regime-isencao" onclick="selecionarRegimeTributario('ISENCAO', true)" title="Isenção Fiscal de Tributos (Benefício Legal)">
+                    🌱 Isenção
+                </button>
+                <button type="button" class="btn btn-outline-success fw-semibold btn-regime" id="btn-regime-recolhimento" onclick="selecionarRegimeTributario('RECOLHIMENTO', true)" title="Recolhimento Integral / Tributada Regularmente">
+                    💰 Recolhimento
+                </button>
+                <button type="button" class="btn btn-outline-info text-dark fw-semibold btn-regime" id="btn-regime-imunidade" onclick="selecionarRegimeTributario('IMUNIDADE', true)" title="Imunidade Tributária (CF Art. 155 - Reexportação / Exportação)">
+                    ✈️ Imunidade
+                </button>
+            </div>
+            <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle ms-1 fw-bold" id="badge-regime-ativo" style="font-size: 11px;">
+                Regime: Suspensão
+            </span>
+        </div>
+
+        <div class="d-flex align-items-center flex-wrap gap-2 ms-auto">
+            <label class="form-label small fw-bold mb-0 text-secondary d-flex align-items-center gap-1" for="tPag">
+                <i data-lucide="credit-card" style="width: 15px; height: 15px;"></i>
+                <span>Meio de Pagamento (tPag):</span>
+            </label>
+            <select class="form-select form-select-sm fw-semibold" id="tPag" onchange="aoMudarMeioPagamento(this.value)" style="min-width: 280px; max-width: 330px;">
+                <option value="90" selected>90 - Sem Pagamento (Remessa/Retorno/Admissão)</option>
+                <option value="99">99 - Outros (Câmbio / Internacional)</option>
+                <option value="01">01 - Dinheiro</option>
+                <option value="15">15 - Boleto Bancário</option>
+                <option value="16">16 - Depósito Bancário</option>
+                <option value="17">17 - Pagamento Instantâneo (PIX)</option>
+                <option value="03">03 - Cartão de Crédito</option>
+                <option value="04">04 - Cartão de Débito</option>
+            </select>
+        </div>
+    </div>
+</div>
+
 <!-- NOTA FISCAL REFERENCIADA (NFREF - CHAVE DE ACESSO DE 44 DÍGITOS) -->
 <div class="col-md-12">
-<div class="p-2 border rounded bg-light">
+<div class="p-2 border rounded bg-light" id="box-ref-nfe">
 <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+<div class="d-flex align-items-center gap-2 flex-wrap">
 <label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1" for="refNFe">
 <i data-lucide="file-check" style="width: 14px; height: 14px;"></i>
 <span>Nota Fiscal Referenciada (Chave de Acesso)</span>
 <span class="text-muted fw-normal" style="font-size: 11px;">(Tag SEFAZ: &lt;NFref&gt;&lt;refNFe&gt;)</span>
 </label>
+<span class="badge bg-warning text-dark fw-bold" id="refNFe_aviso_operacao" style="display: none; font-size: 11px;">
+<i data-lucide="alert-triangle" style="width: 11px; height: 11px;"></i> Requer NF-e Origem
+</span>
+</div>
 <div class="d-flex align-items-center gap-2">
 <span class="badge font-monospace bg-info-subtle text-info fw-bold" id="refNFe_badge" style="font-size: 11px;">0 / 44 dígitos</span>
 <button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="sincronizarRefNFeComInfCpl(true)" style="height: 24px; font-size: 11.5px;" title="Adicionar ou atualizar a nota referenciada nas Informações Complementares" type="button">
@@ -342,6 +397,8 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <div class="card border p-2 px-3 mb-0 d-flex flex-row justify-content-between align-items-center flex-wrap gap-2" id="card-resumo-heranca">
 <div class="d-flex align-items-center flex-wrap gap-3">
 <div><span class="text-muted">Operação:</span> <strong id="lbl-operacao-ativa">Nenhuma selecionada</strong></div>
+<div><span class="text-muted">Regime:</span> <span class="fw-bold text-primary" id="lbl-regime-ativo">Suspensão</span></div>
+<div><span class="text-muted">Pagto:</span> <span class="fw-semibold font-monospace" id="lbl-tpag-ativo">90 - Sem Pagamento</span></div>
 <div><span class="text-muted">Tipo NF:</span> <span class="fw-semibold" id="lbl-tp-nf-ativo">-</span></div>
 <div><span class="text-muted">Destino:</span> <span class="fw-semibold" id="lbl-id-dest-ativo">-</span></div>
 <div><span class="text-muted">CFOP:</span> <span class="fw-semibold" id="lbl-cfop-ativo">-</span></div>
@@ -976,7 +1033,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <label class="form-label small mb-1 fw-bold">Modalidade do Frete (modFrete)</label>
 <select class="form-select form-select-sm" id="transp_modFrete">
 <option value="0">0 - CIF (Por conta do Remetente)</option>
-<option value="1">1 - FOB (Por conta do Destinatário)</option>
+<option value="1" selected>1 - FOB (Por conta do Destinatário)</option>
 <option value="2">2 - Terceiros</option>
 <option value="3">3 - Próprio Remetente</option>
 <option value="4">4 - Próprio Destinatário</option>
@@ -1034,15 +1091,40 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
     <div class="row g-3">
         <div class="col-12 text-center py-4 border rounded bg-light">
-            <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow mb-2" id="btn-enviar-sefaz" onclick="enviarNfeSefaz(2)" type="button">
-                <i data-lucide="send"></i>
-                <span>Assinar e Enviar NF-e para SEFAZ (Homologação)</span>
-            </button>
-            <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow ms-md-3 mb-2" id="btn-enviar-sefaz-prod" onclick="enviarNfeSefaz(1)" type="button">
-                <i data-lucide="send"></i>
-                <span>Assinar e Enviar NF-e para SEFAZ (Produção)</span>
-            </button>
-            <div class="mt-2 text-muted small">Certifique-se de que o rascunho está salvo e não há erros de validação antes de enviar.</div>
+            <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mb-2">
+                <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-enviar-sefaz" onclick="enviarNfeSefaz(2)" type="button">
+                    <i data-lucide="send"></i>
+                    <span>Assinar e Enviar NF-e para SEFAZ (Homologação)</span>
+                </button>
+                <button class="btn-nft btn-nft-warning fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cce-sefaz-homolog" onclick="solicitarCartaCorrecaoHomolog()" title="Emitir Carta de Correção Eletrônica (CC-e) em Homologação" type="button">
+                    <i data-lucide="file-edit"></i>
+                    <span>Carta de Correção (Homologação)</span>
+                </button>
+                <button class="btn-nft btn-nft-danger fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cancelar-sefaz-homolog" onclick="solicitarCancelarNfeHomolog()" title="Cancelar NF-e em Homologação" type="button">
+                    <i data-lucide="x-circle"></i>
+                    <span>Cancelar NF (Homologação)</span>
+                </button>
+            </div>
+            <div class="d-flex align-items-center justify-content-center gap-2 my-2 text-muted small">
+                <span class="border-top flex-grow-1" style="max-width: 140px;"></span>
+                <span class="fw-bold text-uppercase font-monospace text-secondary" style="font-size: 10px; letter-spacing: 0.5px;">Operações em Produção</span>
+                <span class="border-top flex-grow-1" style="max-width: 140px;"></span>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mt-2">
+                <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-enviar-sefaz-prod" onclick="enviarNfeSefaz(1)" type="button">
+                    <i data-lucide="send"></i>
+                    <span>Assinar e Enviar NF-e para SEFAZ (Produção)</span>
+                </button>
+                <button class="btn-nft btn-nft-warning fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cce-sefaz-prod" onclick="solicitarCartaCorrecaoProd()" title="Emitir Carta de Correção Eletrônica (CC-e) em Produção" type="button">
+                    <i data-lucide="file-edit"></i>
+                    <span>Carta de Correção (Produção)</span>
+                </button>
+                <button class="btn-nft btn-nft-danger fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cancelar-sefaz-prod" onclick="solicitarCancelarNfeProd()" title="Cancelar NF-e Homologada em Produção" type="button">
+                    <i data-lucide="x-circle"></i>
+                    <span>Cancelar NF (Produção)</span>
+                </button>
+            </div>
+            <div class="mt-2 text-muted small">Certifique-se de que a nota e o certificado estão válidos antes de emitir ou cancelar eventos fiscais.</div>
         </div>
 
         <div class="col-12 mt-4">
@@ -1071,42 +1153,62 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
 <!-- ABA: CONFIGURACOES > TIPO DE NOTA (CONFIGURACAO DE TRIBUTOS PADRAO POR OPERACAO) -->
 <div class="tab-pane fade" id="tipo-nota" role="tabpanel">
-<div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+<div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom flex-wrap gap-2">
 <div class="d-flex align-items-center gap-2">
 <span class="badge px-2 py-1 d-inline-flex align-items-center gap-1 bg-info-subtle text-info fw-bold"><i data-lucide="settings" style="width: 12px; height: 12px;"></i> Configurações</span>
 <span class="text-muted">/</span>
 <h6 class="mb-0 fw-bold d-inline-flex align-items-center gap-1"><i data-lucide="tag" style="width: 15px; height: 15px;"></i> Tipo de Nota (Impostos &amp; Regras Padrão por Operação)</h6>
 </div>
-<small class="text-muted">Gerencie e padronize regras tributárias herdadas automaticamente pelos itens da NF-e.</small>
+<div class="d-flex align-items-center gap-2 flex-wrap">
+    <button type="button" class="btn-nft btn-nft-primary d-flex align-items-center gap-1 shadow-sm" onclick="abrirModalConfigRegimes()" title="Acessar e editar regras padrão de Suspensão, Isenção, Recolhimento e Imunidade">
+        <i data-lucide="sliders"></i>
+        <span>⚙️ Configurar Enquadramentos Fiscais</span>
+    </button>
 </div>
-<div class="row g-3 mt-3">
+</div>
+<div class="row g-3 mt-1">
 <div class="col-md-4">
-<div class="card h-100 border">
-<div class="card-header d-flex justify-content-between align-items-center py-2 text-secondary">
-<span>Operações Cadastradas</span>
-<button class="btn-nft d-inline-flex align-items-center gap-1" onclick="novaOperacao()"><i data-lucide="plus" style="width: 13px; height: 13px;"></i> Nova</button>
+<div class="card border shadow-sm" style="min-height: 720px; display: flex; flex-direction: column;">
+<div class="card-header d-flex justify-content-between align-items-center py-2 text-secondary bg-body-tertiary">
+    <div class="d-flex align-items-center gap-2">
+        <span class="fw-bold">Operações Cadastradas</span>
+        <span class="badge bg-secondary-subtle text-secondary" id="badge-total-operacoes" style="font-size: 11px;">0</span>
+    </div>
+    <button class="btn-nft d-inline-flex align-items-center gap-1" onclick="novaOperacao()"><i data-lucide="plus" style="width: 13px; height: 13px;"></i> Nova</button>
 </div>
-<div class="card-body p-2">
-<div class="list-group" id="lista-operacoes" style="max-height: 480px; overflow-y: auto;">
-<!-- Preenchido dinamicamente via JS -->
-</div>
+<div class="card-body p-2 d-flex flex-column" style="flex: 1 1 auto;">
+    <!-- Barra de busca e filtro em tempo real -->
+    <div class="mb-2">
+        <div class="input-group input-group-sm">
+            <span class="input-group-text bg-body-tertiary"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+            <input type="text" id="filtro-operacoes" class="form-control" placeholder="Buscar operação ou CFOP..." oninput="filtrarOperacoesCadastradas(this.value)">
+            <button class="btn btn-outline-secondary" type="button" onclick="limparFiltroOperacoes()" title="Limpar filtro"><i data-lucide="x" style="width: 14px; height: 14px;"></i></button>
+        </div>
+        <small class="text-muted d-block mt-1 ps-1" style="font-size: 11px;">
+            <i data-lucide="move" style="width: 11px; height: 11px;"></i> Arraste as operações para reorganizar a ordem de exibição
+        </small>
+    </div>
+    <!-- Lista ampliada na vertical -->
+    <div class="list-group flex-grow-1" id="lista-operacoes" style="min-height: 580px; max-height: 680px; overflow-y: auto;">
+        <!-- Preenchido dinamicamente via JS -->
+    </div>
 </div>
 </div>
 </div>
 <div class="col-md-8">
-<div class="card border">
-<div class="card-header d-flex justify-content-between align-items-center py-2 text-secondary">
+<div class="card border shadow-sm" style="min-height: 720px;">
+<div class="card-header d-flex justify-content-between align-items-center py-2 text-secondary bg-body-tertiary">
 <span id="titulo-form-op">Configuração da Operação:<br/> <strong id="lbl-op-nome">Nova Operação</strong></span>
-<div>
+<div class="d-flex align-items-center gap-1 flex-wrap">
 <button class="btn-nft me-2" onclick="capturarImpostosDoXmlAtual()">
 <i data-lucide="download" style="width: 13px; height: 13px;"></i> Puxar Impostos do XML Atual
-                                </button>
+</button>
 <button class="btn-nft me-2" id="btn-excluir-op" onclick="excluirOperacaoAtual()" style="display:none;">
 <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Excluir
-                                </button>
-<button class="btn-nft fw-bold" onclick="salvarOperacao()">
+</button>
+<button class="btn-nft fw-bold shadow-sm" onclick="salvarOperacao()">
 <i data-lucide="save" style="width: 13px; height: 13px;"></i> Salvar Configuração
-                                </button>
+</button>
 </div>
 </div>
 <div class="card-body py-3">
@@ -1135,6 +1237,40 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <option value="2">2 - Interestadual</option>
 <option selected="" value="3">3 - Com exterior</option>
 </select>
+</div>
+<div class="col-md-6">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <label class="form-label small fw-bold mb-0">Enquadramento / Regime Fiscal</label>
+        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-bold" onclick="abrirModalConfigRegimes()" title="Editar regras dos enquadramentos fiscais" style="font-size: 11px;">
+            ⚙️ Editar Regras
+        </button>
+    </div>
+    <select class="form-select form-select-sm fw-bold border-primary" id="op_regime" onchange="if(window.atualizarResumoRegimeForm) window.atualizarResumoRegimeForm(this.value)">
+        <option value="SUSPENSAO">🛡️ Suspensão (Admissão Temp. / Feiras)</option>
+        <option value="ISENCAO">🌱 Isenção (Benefício Fiscal Legal)</option>
+        <option value="RECOLHIMENTO">💰 Recolhimento (Tributada Regularmente)</option>
+        <option value="IMUNIDADE">✈️ Imunidade (Reexportação / Exportação)</option>
+    </select>
+    <div class="d-flex align-items-center justify-content-between mt-1 flex-wrap gap-1">
+        <small id="op_regime_info" class="text-muted fw-semibold" style="font-size: 11px;"></small>
+        <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 d-flex align-items-center gap-1" onclick="aplicarPresetDoRegimeAoFormOperacao()" title="Preencher automaticamente os campos de ICMS, IPI, PIS, COFINS e Pagamento com as regras padrão deste Enquadramento Fiscal" style="font-size: 11px;">
+            <i data-lucide="sparkles" style="width: 12px; height: 12px;"></i>
+            <span>⚡ Preencher Campos com Regras deste Regime</span>
+        </button>
+    </div>
+</div>
+<div class="col-md-6">
+    <label class="form-label small fw-bold">Meio de Pagamento Padrão (tPag)</label>
+    <select class="form-select form-select-sm fw-bold" id="op_t_pag">
+        <option value="90">90 - Sem Pagamento (Padrão Remessas, Retornos, Admissão, Reexp.)</option>
+        <option value="99">99 - Outros (Câmbio / Internacional)</option>
+        <option value="01">01 - Dinheiro</option>
+        <option value="15">15 - Boleto Bancário</option>
+        <option value="16">16 - Depósito Bancário</option>
+        <option value="17">17 - Pagamento Instantâneo (PIX)</option>
+        <option value="03">03 - Cartão de Crédito</option>
+        <option value="04">04 - Cartão de Débito</option>
+    </select>
 </div>
 <!-- ICMS -->
 <div class="col-12"><h6 class="border-bottom pb-1 mb-1 mt-2 fw-bold">1. ICMS</h6></div>
@@ -1209,11 +1345,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
 </div>
 <div class="d-flex align-items-center flex-wrap gap-1">
-<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="adicionarNovoItem()" title="Adicionar um novo item na nota" type="button">
+<button class="btn-nft btn-nft-success me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="adicionarNovoItem()" title="Adicionar um novo item na nota" type="button">
 <i data-lucide="plus-circle"></i>
 <span>+ Adicionar Item</span>
 </button>
-<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
+<button class="btn-nft btn-nft-danger me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
 <i data-lucide="trash-2"></i>
 <span>Excluir Item</span>
 </button>
@@ -1221,6 +1357,23 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <i data-lucide="copy"></i>
 <span>Duplicar Item</span>
 </button>
+<button class="btn-nft btn-nft-warning me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="zerarImpostosTodosItensComConfirmacao()" title="Zerar Base de Cálculo, Porcentagem e Valor de II, IPI, PIS e COFINS de todos os itens" type="button">
+<i data-lucide="percent"></i>
+<span>Zerar Impostos</span>
+</button>
+<div class="dropdown d-inline-block me-1">
+    <button class="btn-nft fw-bold d-flex align-items-center gap-1 dropdown-toggle" type="button" id="dropdownEnquadramentoItens" data-bs-toggle="dropdown" aria-expanded="false" title="Aplicar Enquadramento Fiscal a todos os itens">
+        <i data-lucide="shield-check"></i>
+        <span>Enquadramento Fiscal</span>
+    </button>
+    <ul class="dropdown-menu shadow" aria-labelledby="dropdownEnquadramentoItens" style="font-size: 13px;">
+        <li><h6 class="dropdown-header text-uppercase" style="font-size: 11px;">Aplicar Regime aos Itens</h6></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('SUSPENSAO')"><span>🛡️</span> <strong>Suspensão de Tributos</strong> <small class="text-muted ms-auto">CST 50 / 08</small></a></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('ISENCAO')"><span>🌱</span> <strong>Isenção de Tributos</strong> <small class="text-muted ms-auto">CST 40 / 07</small></a></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('RECOLHIMENTO')"><span>💰</span> <strong>Recolhimento Regular</strong> <small class="text-muted ms-auto">CST 00 / 01</small></a></li>
+        <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('IMUNIDADE')"><span>✈️</span> <strong>Imunidade / Reexportação</strong> <small class="text-muted ms-auto">CST 41 / 08</small></a></li>
+    </ul>
+</div>
 <button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
 <i data-lucide="scale"></i>
 <span>Rateio &amp; PTAX</span>
@@ -1254,15 +1407,18 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div><span class="text-muted">Outras Desp. (vOutro):</span> <span class="fw-bold font-monospace text-dark" id="lbl-bar-rateio-outro">R$ 0,00</span></div>
 </div>
 <div class="d-flex align-items-center gap-2">
-<button class="btn-nft py-0 px-2 fw-semibold text-dark shadow-sm" onclick="recalcularConversaoItens()" title="Recalcula a conversão de moeda dos itens com base na nova taxa PTAX" type="button">
-<i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i> Recalcular Conversão
+<button class="btn-nft fw-bold shadow-sm d-flex align-items-center gap-1" onclick="recalcularConversaoItens()" title="Recalcula a conversão de moeda dos itens com base na nova taxa PTAX" type="button">
+<i data-lucide="refresh-cw"></i>
+<span>Recalcular Conversão</span>
 </button>
-<button class="btn-nft py-0 px-2 fw-semibold" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex" type="button">
-<i data-lucide="globe" style="width: 12px; height: 12px;"></i> uTrib Exportação
-                    </button>
-<button class="btn-nft py-0 px-2 fw-semibold" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela" type="button">
-<i data-lucide="zap" style="width: 12px; height: 12px;"></i> Reaplicar Rateio
-                    </button>
+<button class="btn-nft fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Recalcula uTrib/qTrib de exportação com base no peso líquido e tabela Comex" type="button">
+<i data-lucide="globe"></i>
+<span>uTrib Exportação</span>
+</button>
+<button class="btn-nft fw-semibold d-flex align-items-center gap-1" onclick="reaplicarRateioItens()" title="Recalcula e reaplica as despesas de rateio aos itens da tabela" type="button">
+<i data-lucide="refresh-cw"></i>
+<span>Reaplicar Rateio</span>
+</button>
 </div>
 </div>
 <div id="itens-table"></div>
@@ -1304,6 +1460,35 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <input class="form-control form-control-sm font-monospace text-end fw-bold text-success border-success" id="tot_vNF" onchange="formatarInputVisualBR(this, 2, 2); setVal('vNF', this.value);" oninput="setVal('vNF', this.value)" type="text"/>
 <input id="vNF" type="hidden"/>
 </div>
+</div>
+<!-- Linha de Cobrança & Meio de Pagamento (SEFAZ YA04-10) -->
+<div class="row g-2 pb-3 mb-3 border-bottom align-items-center bg-light p-2 rounded">
+    <div class="col-md-5">
+        <label class="form-label small mb-1 fw-bold d-flex align-items-center gap-1 text-secondary">
+            <i data-lucide="credit-card" style="width: 14px; height: 14px;"></i>
+            <span>Meio de Pagamento SEFAZ (&lt;detPag&gt;&lt;tPag&gt;)</span>
+        </label>
+        <select class="form-select form-select-sm fw-semibold" id="tot_tPag" onchange="aoMudarMeioPagamento(this.value)">
+            <option value="90" selected>90 - Sem Pagamento (Remessas / Retornos / Admissão / Reexportação)</option>
+            <option value="99">99 - Outros (Câmbio / Internacional)</option>
+            <option value="01">01 - Dinheiro</option>
+            <option value="15">15 - Boleto Bancário</option>
+            <option value="16">16 - Depósito Bancário</option>
+            <option value="17">17 - Pagamento Instantâneo (PIX)</option>
+            <option value="03">03 - Cartão de Crédito</option>
+            <option value="04">04 - Cartão de Débito</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1 fw-bold text-secondary">Valor do Pagamento (vPag)</label>
+        <input class="form-control form-control-sm font-monospace text-end fw-bold" id="tot_vPag" value="0,00" readonly style="background-color: var(--surface-secondary);" type="text"/>
+    </div>
+    <div class="col-md-4">
+        <small class="text-muted d-block" id="msg-tpag-ajuda" style="font-size: 11px;">
+            <i data-lucide="info" style="width: 12px; height: 12px;"></i>
+            Regra YA04-10: Para <strong>tPag=90</strong>, o valor <strong>vPag é obrigatoriamente 0,00</strong> e o grupo de duplicatas &lt;cobr&gt; é omitido.
+        </small>
+    </div>
 </div>
 <!-- Linha de Impostos e Tributos -->
 <div class="row g-2">
@@ -2410,11 +2595,10 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
         const val = tpDoc.value;
         if (val === 'Estrangeiro') {
-            docInput.value = '';
-            docInput.disabled = true;
-            docInput.classList.add('bg-light');
-            docInput.placeholder = 'Exterior (Desabilitado)';
-            if (lblDoc) lblDoc.innerText = 'CNPJ / CPF / IdEstrangeiro (Desabilitado)';
+            docInput.disabled = false;
+            docInput.classList.remove('bg-light');
+            docInput.placeholder = 'Opcional (5 a 20 caracteres ou em branco)';
+            if (lblDoc) lblDoc.innerText = 'ID Estrangeiro (Opcional)';
         } else {
             docInput.disabled = false;
             docInput.classList.remove('bg-light');
@@ -2687,6 +2871,90 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
     }
 
+    // Zerar Impostos (II, IPI, PIS, COFINS) de todos os itens com confirmação de alteração de dados
+    async function zerarImpostosTodosItensComConfirmacao() {
+        const itens = (itensCache && Array.isArray(itensCache) && itensCache.length > 0)
+            ? itensCache
+            : ((typeof itensTable !== 'undefined' && itensTable) ? itensTable.getData() : (window.itensCache || []));
+
+        if (!itens || itens.length === 0) {
+            if (window.nftAlert) {
+                await window.nftAlert("Nenhum item carregado na grade para zerar impostos.", {
+                    type: "warning",
+                    title: "Nenhum Item Encontrado"
+                });
+            } else {
+                alert("Nenhum item carregado na grade para zerar impostos.");
+            }
+            return;
+        }
+
+        const qtd = itens.length;
+        const confirmMsg = `Atenção: Esta ação irá alterar os dados da nota fiscal, zerando a Base de Cálculo, Alíquota (%) e Valor dos seguintes impostos em ${qtd === 1 ? '1 item' : `todos os ${qtd} itens`}:\n\n• Imposto de Importação (II): Base de Cálculo e Valor\n• IPI: Base de Cálculo, % Alíquota e Valor\n• PIS: Base de Cálculo, % Alíquota e Valor\n• COFINS: Base de Cálculo, % Alíquota e Valor\n\nTodos os totais da nota fiscal e do rateio serão recalculados automaticamente.\n\nDeseja confirmar a alteração nos dados?`;
+
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(confirmMsg, {
+                title: 'Alerta de Alteração de Dados - Zerar Impostos',
+                type: 'warning',
+                confirmText: 'Confirmar',
+                cancelText: 'Cancelar',
+                icon: 'alert-triangle'
+            });
+        } else {
+            confirmado = confirm(confirmMsg);
+        }
+
+        if (!confirmado) return;
+
+        itens.forEach(it => {
+            // II (Imposto de Importação)
+            it.vBC_II = '0.00';
+            it.vII = '0.00';
+            if ('pII' in it || it.pII !== undefined) it.pII = '0.00';
+
+            // IPI
+            it.vBC_IPI = '0.00';
+            it.pIPI = '0.00';
+            it.vIPI = '0.00';
+
+            // PIS
+            it.vBC_PIS = '0.00';
+            it.pPIS = '0.00';
+            it.vPIS = '0.00';
+
+            // COFINS
+            it.vBC_COFINS = '0.00';
+            it.pCOFINS = '0.00';
+            it.vCOFINS = '0.00';
+        });
+
+        itensCache = itens;
+        window.itensCache = itens;
+
+        if (typeof itensTable !== 'undefined' && itensTable) {
+            itensTable.setData(itensCache);
+        }
+
+        if (typeof recalcularTotaisDosItens === 'function') {
+            recalcularTotaisDosItens(true);
+        }
+        if (typeof atualizarBadgesRateioEItens === 'function') {
+            atualizarBadgesRateioEItens();
+        }
+        if (typeof window.triggerAutoSave === 'function') {
+            window.triggerAutoSave();
+        }
+
+        if (window.nftAlert) {
+            await window.nftAlert(`Impostos (II, IPI, PIS e COFINS) zerados com sucesso em ${qtd === 1 ? '1 item' : `${qtd} itens`}!`, {
+                type: 'success',
+                title: 'Impostos Zerados'
+            });
+        }
+    }
+    window.zerarImpostosTodosItensComConfirmacao = zerarImpostosTodosItensComConfirmacao;
+
     function adicionarNovoItem() {
         if (window.abrirModalItemNovo) {
             window.abrirModalItemNovo();
@@ -2697,15 +2965,18 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
     const colunasItensDef = [
         {
             title: "",
-            headerTooltip: "Editar item",
+            titleFormatter: function() {
+                return '<span title="Editar item" style="display: inline-flex; align-items: center; justify-content: center; color: #0ea5e9; cursor: help;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></span>';
+            },
+            headerTooltip: "Editar item no formulário",
             field: "_acoes",
-            width: 38,
+            width: 44,
             frozen: true,
             hozAlign: "center",
             headerHozAlign: "center",
             headerSort: false,
             formatter: function() {
-                return '<button type="button" class="btn-nft btn-link p-0 text-primary border-0 bg-transparent shadow-none d-inline-flex align-items-center justify-content-center" title="Editar este item no pop-up dedicado" style="width: 24px; height: 24px; cursor: pointer; text-decoration: none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>';
+                return '<button type="button" class="btn-editar-item-grade" title="Editar este item no pop-up dedicado"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></button>';
             },
             cellClick: function(e, cell) {
                 e.stopPropagation();
@@ -2731,8 +3002,40 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         {title:"Item", field:"nItem", width:65, frozen:true, hozAlign:"center", headerHozAlign:"center", editor:"input"},
         {title:"Cód. Prod.", field:"cProd", width:130, frozen:true, editor:"input"},
         {title:"Descrição do Produto", field:"xProd", width:280, editor:"input"},
-        {title:"NCM", field:"NCM", width:100, editor:"input"},
-        {title:"CFOP", field:"CFOP", width:85, hozAlign:"center", headerHozAlign:"center", cssClass:"font-monospace"},
+        {
+            title: "NCM",
+            field: "NCM",
+            width: 105,
+            editor: "input",
+            hozAlign: "center",
+            headerHozAlign: "center",
+            formatter: function(cell) {
+                const val = String(cell.getValue() || '').trim();
+                if (!val) return '<span class="text-muted" style="font-size:11px;">8 dígitos</span>';
+                const limpo = val.replace(/\D/g, '');
+                if (limpo.length === 8) {
+                    return `<span class="text-success fw-semibold font-monospace" title="NCM válido (8 dígitos)">${val}</span>`;
+                }
+                return `<span class="text-warning fw-bold font-monospace" title="NCM deve ter 8 dígitos (atual: ${limpo.length})">${val} <small style="font-size:9.5px; opacity:0.85;">(${limpo.length}/8)</small></span>`;
+            }
+        },
+        {
+            title: "CFOP",
+            field: "CFOP",
+            width: 90,
+            hozAlign: "center",
+            headerHozAlign: "center",
+            cssClass: "font-monospace",
+            formatter: function(cell) {
+                const val = String(cell.getValue() || '').trim();
+                if (!val) return '<span class="text-muted" style="font-size:11px;">4 dígitos</span>';
+                const limpo = val.replace(/\D/g, '');
+                if (limpo.length === 4 && /^[123567]/.test(limpo)) {
+                    return `<span class="text-primary fw-semibold" title="CFOP válido (4 dígitos)">${val}</span>`;
+                }
+                return `<span class="text-warning fw-bold" title="CFOP deve ter 4 dígitos">${val} <small style="font-size:9.5px; opacity:0.85;">(${limpo.length}/4)</small></span>`;
+            }
+        },
         {title:"Un. Com.", field:"uCom", width:85, editor:"input"},
         {title:"Qtd. Com.", field:"qCom", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Com.", field:"vUnCom", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
@@ -2927,22 +3230,26 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 });
 
                 // 2. Atualiza Lista da Aba de Configurações (Tipo de Nota)
-                const lista = document.getElementById('lista-operacoes');
-                if (lista) {
-                    lista.innerHTML = '';
-                    operacoesCache.forEach(op => {
-                        const item = document.createElement('a');
-                        item.href = "#";
-                        item.className = "list-group-item list-group-item-action py-2";
-                        const tipoTxt = (op.tp_nf == '1') ? '1 - Saída' : '0 - Entrada';
-                        const destTxt = (op.id_dest == '1') ? 'Interna' : (op.id_dest == '2' ? 'Interestadual' : 'Exterior');
-                        item.innerHTML = `<strong>(${op.cfop_padrao}) ${op.nome_operacao}</strong><br><small class='text-muted'>${tipoTxt} | Destino: ${destTxt} | ICMS: ${op.csosn_icms} | IPI: ${op.cst_ipi}</small>`;
-                        item.onclick = (e) => {
-                            e.preventDefault();
-                            selecionarOperacaoParaEdicao(op);
-                        };
-                        lista.appendChild(item);
-                    });
+                if (typeof window.renderizarListaOperacoesCadastradas === 'function') {
+                    window.renderizarListaOperacoesCadastradas(operacoesCache);
+                } else {
+                    const lista = document.getElementById('lista-operacoes');
+                    if (lista) {
+                        lista.innerHTML = '';
+                        operacoesCache.forEach(op => {
+                            const item = document.createElement('a');
+                            item.href = "#";
+                            item.className = "list-group-item list-group-item-action py-2";
+                            const tipoTxt = (op.tp_nf == '1') ? '1 - Saída' : '0 - Entrada';
+                            const destTxt = (op.id_dest == '1') ? 'Interna' : (op.id_dest == '2' ? 'Interestadual' : 'Exterior');
+                            item.innerHTML = `<strong>(${op.cfop_padrao}) ${op.nome_operacao}</strong><br><small class='text-muted'>${tipoTxt} | Destino: ${destTxt} | ICMS: ${op.csosn_icms} | IPI: ${op.cst_ipi}</small>`;
+                            item.onclick = (e) => {
+                                e.preventDefault();
+                                selecionarOperacaoParaEdicao(op);
+                            };
+                            lista.appendChild(item);
+                        });
+                    }
                 }
 
                 // 3. Determina qual operação selecionar e aplicar
@@ -3226,6 +3533,17 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             // Herdar automaticamente tpNF (Entrada/Saída) e idDest (Destino da Operação)
             atualizarCamposIdentificacao(op.tp_nf, op.id_dest);
 
+            // Determinar e sincronizar o Regime Tributário da Operação
+            const regimeOp = op.regime_tributario || determinarRegimePorOperacao(op);
+            selecionarRegimeTributario(regimeOp, false);
+
+            // Sincronizar Meio de Pagamento (tPag) da Operação
+            const tPagOp = op.t_pag || '90';
+            aoMudarMeioPagamento(tPagOp);
+
+            // Alerta preventivo se a operação exigir Nota Referenciada de Origem (<NFref>)
+            verificarAvisoRefNFeOperacao(op);
+
             // Herdar automaticamente nos itens carregados!
             await aplicarRegrasAosItens(op, false);
         } else {
@@ -3235,6 +3553,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             document.getElementById('lbl-ipi-ativo').innerText = '-';
             document.getElementById('lbl-pis-ativo').innerText = '-';
             atualizarCamposIdentificacao(getVal('tpNF'), getVal('idDest'));
+            verificarAvisoRefNFeOperacao(null);
         }
 
         // Salva a decisão definitiva do usuário no banco de dados para continuar na próxima vez que abrir
@@ -3245,6 +3564,310 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 body: JSON.stringify({ modulo: 'di_duimp', nome_operacao: nomeOp || '' })
             }).catch(e => console.warn("Erro ao salvar ultima operacao:", e));
         }
+    }
+
+    function determinarRegimePorOperacao(op) {
+        if (!op) return 'SUSPENSAO';
+        if (op.regime_tributario) return op.regime_tributario.toUpperCase();
+        const nome = (op.nome_operacao || '').toUpperCase();
+        const cfop = String(op.cfop_padrao || '');
+        if (cfop.startsWith('7') || nome.includes('REEXPORT') || nome.includes('EXPORT')) return 'IMUNIDADE';
+        if (nome.includes('ISEN') || (op.csosn_icms === '400' && (op.c_enq_ipi === '301' || op.cst_ipi === '52'))) return 'ISENCAO';
+        if (nome.includes('RECOLH') || op.csosn_icms === '900' || op.csosn_icms === '00' || op.cst_pis === '01') return 'RECOLHIMENTO';
+        return 'SUSPENSAO';
+    }
+
+    function verificarAvisoRefNFeOperacao(op = null) {
+        if (!op) {
+            const nomeOpAtiva = getVal('select_operacao');
+            op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (nomeOpAtiva || '').toUpperCase());
+        }
+        const cfopStr = String(op?.cfop_padrao || getVal('cfop_padrao') || '').trim();
+        const nomeOp = String(op?.nome_operacao || getVal('select_operacao') || '').toUpperCase();
+        const cfopsOrigem = ['1914', '2914', '7930'];
+        const requerOrigem = cfopsOrigem.includes(cfopStr) || nomeOp.includes('RETORNO DE FEIRA') || nomeOp.includes('REEXPORTA');
+
+        const avisoEl = document.getElementById('refNFe_aviso_operacao');
+        const boxRefEl = document.getElementById('box-ref-nfe');
+        const refVal = (getVal('refNFe') || '').replace(/\D/g, '');
+
+        if (requerOrigem) {
+            if (avisoEl) {
+                avisoEl.style.display = 'inline-flex';
+                if (refVal.length === 44) {
+                    avisoEl.className = 'badge bg-success text-white fw-bold';
+                    avisoEl.innerHTML = '<i data-lucide="check" style="width: 11px; height: 11px;"></i> NF-e Origem Vinculada';
+                } else {
+                    avisoEl.className = 'badge bg-warning text-dark fw-bold';
+                    avisoEl.innerHTML = '<i data-lucide="alert-triangle" style="width: 11px; height: 11px;"></i> Requer Chave NF-e de Origem';
+                }
+            }
+            if (boxRefEl && refVal.length !== 44) {
+                boxRefEl.classList.add('border-warning');
+            } else if (boxRefEl) {
+                boxRefEl.classList.remove('border-warning');
+            }
+        } else {
+            if (avisoEl) avisoEl.style.display = 'none';
+            if (boxRefEl) boxRefEl.classList.remove('border-warning');
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function aoMudarMeioPagamento(tPagVal) {
+        tPagVal = String(tPagVal || '90').trim();
+        setVal('tPag', tPagVal);
+        setVal('tot_tPag', tPagVal);
+
+        const vNFVal = getVal('tot_vNF') || getVal('vNF') || '0,00';
+        const vPagEl = document.getElementById('tot_vPag');
+        const lblPagto = document.getElementById('lbl-tpag-ativo');
+        const msgAjuda = document.getElementById('msg-tpag-ajuda');
+
+        const mapNomesPagto = {
+            '90': '90 - Sem Pagamento',
+            '99': '99 - Outros (Câmbio)',
+            '01': '01 - Dinheiro',
+            '15': '15 - Boleto Bancário',
+            '16': '16 - Depósito Bancário',
+            '17': '17 - PIX',
+            '03': '03 - Cartão Crédito',
+            '04': '04 - Cartão Débito'
+        };
+
+        if (lblPagto) {
+            lblPagto.innerText = mapNomesPagto[tPagVal] || `${tPagVal} - Informado`;
+        }
+
+        if (tPagVal === '90') {
+            if (vPagEl) vPagEl.value = '0,00';
+            if (msgAjuda) {
+                msgAjuda.innerHTML = '<i data-lucide="info" style="width: 12px; height: 12px;"></i> Regra YA04-10: Para <strong>tPag=90</strong>, o valor <strong>vPag é obrigatoriamente 0,00</strong> e o grupo de duplicatas &lt;cobr&gt; é omitido.';
+            }
+        } else {
+            if (vPagEl) vPagEl.value = vNFVal;
+            if (msgAjuda) {
+                msgAjuda.innerHTML = `<i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Operação com Liquidação: Valor do pagamento vinculado ao total da nota (R$ ${vNFVal}).`;
+            }
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+
+    async function selecionarRegimeTributario(regime, aplicarItens = true) {
+        regime = (regime || 'SUSPENSAO').toUpperCase();
+        window._regimeTributarioAtivo = regime;
+
+        const btnMap = {
+            'SUSPENSAO': 'btn-regime-suspensao',
+            'ISENCAO': 'btn-regime-isencao',
+            'RECOLHIMENTO': 'btn-regime-recolhimento',
+            'IMUNIDADE': 'btn-regime-imunidade'
+        };
+
+        document.querySelectorAll('.btn-regime').forEach(btn => btn.classList.remove('active'));
+        const btnAtivo = document.getElementById(btnMap[regime]);
+        if (btnAtivo) btnAtivo.classList.add('active');
+
+        const badgeEl = document.getElementById('badge-regime-ativo');
+        const lblEl = document.getElementById('lbl-regime-ativo');
+        const regimeLabels = {
+            'SUSPENSAO': { text: 'Regime: Suspensão', cls: 'bg-primary-subtle text-primary border-primary-subtle' },
+            'ISENCAO': { text: 'Regime: Isenção', cls: 'bg-warning-subtle text-warning-emphasis border-warning-subtle' },
+            'RECOLHIMENTO': { text: 'Regime: Recolhimento', cls: 'bg-success-subtle text-success border-success-subtle' },
+            'IMUNIDADE': { text: 'Regime: Imunidade', cls: 'bg-info-subtle text-info border-info-subtle' }
+        };
+
+        const regCfg = regimeLabels[regime] || regimeLabels['SUSPENSAO'];
+        if (badgeEl) {
+            badgeEl.innerText = regCfg.text;
+            badgeEl.className = `badge rounded-pill border ms-1 fw-bold ${regCfg.cls}`;
+        }
+        if (lblEl) {
+            lblEl.innerText = regCfg.text.replace('Regime: ', '');
+        }
+
+        if (aplicarItens) {
+            await aplicarRegimeAosItensComConfirmacao(regime);
+        }
+    }
+
+    async function aplicarRegimeAosItensComConfirmacao(regime) {
+        const itens = (itensCache && Array.isArray(itensCache) && itensCache.length > 0)
+            ? itensCache
+            : ((typeof itensTable !== 'undefined' && itensTable) ? itensTable.getData() : (window.itensCache || []));
+
+        if (!itens || itens.length === 0) {
+            if (window.nftAlert) {
+                await window.nftAlert("Nenhum item carregado na grade para aplicar o enquadramento fiscal.", {
+                    type: "warning",
+                    title: "Grade Vazia"
+                });
+            } else {
+                alert("Nenhum item carregado na grade para aplicar o enquadramento fiscal.");
+            }
+            return;
+        }
+
+        const nomesRegime = {
+            'SUSPENSAO': 'Suspensão de Impostos (Admissão Temporária / Feiras)',
+            'ISENCAO': 'Isenção Fiscal de Impostos',
+            'RECOLHIMENTO': 'Recolhimento Integral (Tributada Regularmente)',
+            'IMUNIDADE': 'Imunidade Tributária (Reexportação / Exportação)'
+        };
+
+        const confirmMsg = `Deseja aplicar o enquadramento fiscal '${nomesRegime[regime] || regime}' a todos os ${itens.length} itens da nota fiscal?\n\n• Os CSTs, códigos de enquadramento (cEnq) e alíquotas de ICMS, IPI, PIS e COFINS serão ajustados automaticamente.\n• Os valores de impostos serão recalculados/zerados conforme a legislação do regime.`;
+
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(confirmMsg, {
+                title: 'Alteração Fiscal - Enquadramento de Impostos',
+                type: 'info',
+                confirmText: 'Confirmar Enquadramento',
+                cancelText: 'Cancelar',
+                icon: 'shield-check'
+            });
+        } else {
+            confirmado = confirm(confirmMsg);
+        }
+
+        if (!confirmado) return;
+
+        executarAplicacaoRegimeNosItens(regime, itens);
+
+        if (itensTable) {
+            itensTable.setData(itens);
+        }
+        itensCache = itens;
+        window.itensCache = itens;
+
+        recalcularTotaisDosItens(true);
+
+        if (regime === 'SUSPENSAO' || regime === 'ISENCAO' || regime === 'IMUNIDADE') {
+            aoMudarMeioPagamento('90');
+        }
+
+        if (window.nftAlert) {
+            await window.nftAlert(`Enquadramento '${nomesRegime[regime] || regime}' aplicado com sucesso a todos os ${itens.length} itens!`, {
+                type: "success",
+                title: "Enquadramento Atualizado"
+            });
+        } else {
+            alert(`Enquadramento '${nomesRegime[regime] || regime}' aplicado com sucesso a todos os ${itens.length} itens!`);
+        }
+    }
+
+    function executarAplicacaoRegimeNosItens(regime, itens) {
+        const cfopOp = String(getVal('cfop_padrao') || '').trim();
+        const tpNf = String(getVal('tpNF') || '0').trim();
+        const isEntrada = tpNf === '0';
+
+        itens.forEach(item => {
+            const cfopItem = String(item.CFOP || cfopOp || '').trim();
+            const isFeira = cfopItem.includes('914') || cfopItem === '5914' || cfopItem === '6914' || cfopItem === '1914' || cfopItem === '2914';
+
+            if (regime === 'SUSPENSAO') {
+                item.CSOSN = '400';
+                item.cEnq = isFeira ? '107' : '108';
+                item.CST_IPI = isEntrada ? '05' : '55';
+                item.pIPI = 0.00;
+                item.vIPI = '0.00';
+                item.vBC_IPI = '0.00';
+
+                item.CST_PIS = '08';
+                item.pPIS = 0.00;
+                item.vPIS = '0.00';
+                item.vBC_PIS = '0.00';
+
+                item.CST_COFINS = '08';
+                item.pCOFINS = 0.00;
+                item.vCOFINS = '0.00';
+                item.vBC_COFINS = '0.00';
+
+                item.aliquota_ii = 0.00;
+                item.vII = '0.00';
+                item.vBC_II = '0.00';
+                item.vBC = '0.00';
+                item.vICMS = '0.00';
+                item.pICMS = 0.00;
+            } else if (regime === 'ISENCAO') {
+                item.CSOSN = '400';
+                item.cEnq = '301';
+                item.CST_IPI = isEntrada ? '02' : '52';
+                item.pIPI = 0.00;
+                item.vIPI = '0.00';
+                item.vBC_IPI = '0.00';
+
+                item.CST_PIS = '07';
+                item.pPIS = 0.00;
+                item.vPIS = '0.00';
+                item.vBC_PIS = '0.00';
+
+                item.CST_COFINS = '07';
+                item.pCOFINS = 0.00;
+                item.vCOFINS = '0.00';
+                item.vBC_COFINS = '0.00';
+
+                item.aliquota_ii = 0.00;
+                item.vII = '0.00';
+                item.vBC_II = '0.00';
+                item.vBC = '0.00';
+                item.vICMS = '0.00';
+                item.pICMS = 0.00;
+            } else if (regime === 'RECOLHIMENTO') {
+                item.CSOSN = '900';
+                item.cEnq = '999';
+                item.CST_IPI = '49';
+                item.CST_PIS = '01';
+                item.pPIS = 1.65;
+                item.CST_COFINS = '01';
+                item.pCOFINS = 7.60;
+
+                const vp = parseNum(item.vProd);
+                const vf = parseNum(item.vFrete);
+                const vs = parseNum(item.vSeg);
+                const vo = parseNum(item.vOutro);
+                const baseCompleta = vp + vf + vs + vo;
+
+                item.vBC_PIS = baseCompleta.toFixed(2);
+                item.vPIS = (baseCompleta * 0.0165).toFixed(2);
+
+                item.vBC_COFINS = baseCompleta.toFixed(2);
+                item.vCOFINS = (baseCompleta * 0.0760).toFixed(2);
+
+                item.vBC = baseCompleta.toFixed(2);
+                if (parseNum(item.pICMS) === 0) item.pICMS = 18.00;
+                item.vICMS = (baseCompleta * (parseNum(item.pICMS) / 100)).toFixed(2);
+
+                if (parseNum(item.pIPI) > 0) {
+                    item.vBC_IPI = vp.toFixed(2);
+                    item.vIPI = (vp * (parseNum(item.pIPI) / 100)).toFixed(2);
+                }
+            } else if (regime === 'IMUNIDADE') {
+                item.CSOSN = '300';
+                item.cEnq = '999';
+                item.CST_IPI = '55';
+                item.pIPI = 0.00;
+                item.vIPI = '0.00';
+                item.vBC_IPI = '0.00';
+
+                item.CST_PIS = '08';
+                item.pPIS = 0.00;
+                item.vPIS = '0.00';
+                item.vBC_PIS = '0.00';
+
+                item.CST_COFINS = '08';
+                item.pCOFINS = 0.00;
+                item.vCOFINS = '0.00';
+                item.vBC_COFINS = '0.00';
+
+                item.aliquota_ii = 0.00;
+                item.vII = '0.00';
+                item.vBC_II = '0.00';
+                item.vBC = '0.00';
+                item.vICMS = '0.00';
+                item.pICMS = 0.00;
+            }
+        });
     }
 
     async function aplicarOperacaoSelecionadaAosItens() {
@@ -3322,6 +3945,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         setVal('op_cfop', '3930');
         setVal('op_tp_nf', '0');
         setVal('op_id_dest', '3');
+        setVal('op_regime', 'SUSPENSAO');
+        setVal('op_t_pag', '90');
         setVal('op_orig', '1');
         setVal('op_csosn', '102');
         setVal('op_c_enq', '102');
@@ -3336,6 +3961,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         
         document.getElementById('lbl-op-nome').innerText = "Nova Operação";
         document.getElementById('btn-excluir-op').style.display = "none";
+        if (typeof window.atualizarResumoRegimeForm === 'function') {
+            window.atualizarResumoRegimeForm('SUSPENSAO');
+        }
     }
 
     function selecionarOperacaoParaEdicao(op) {
@@ -3344,6 +3972,12 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         setVal('op_cfop', op.cfop_padrao);
         setVal('op_tp_nf', (op.tp_nf !== undefined && op.tp_nf !== null) ? op.tp_nf : '0');
         setVal('op_id_dest', (op.id_dest !== undefined && op.id_dest !== null) ? op.id_dest : '3');
+        const regOp = op.regime_tributario || determinarRegimePorOperacao(op);
+        setVal('op_regime', regOp);
+        if (typeof window.atualizarResumoRegimeForm === 'function') {
+            window.atualizarResumoRegimeForm(regOp);
+        }
+        setVal('op_t_pag', op.t_pag || '90');
         setVal('op_orig', op.orig_padrao || '1');
         setVal('op_csosn', op.csosn_icms);
         setVal('op_c_enq', op.c_enq_ipi);
@@ -3400,6 +4034,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             cfop_padrao: getVal('op_cfop'),
             tp_nf: getVal('op_tp_nf'),
             id_dest: getVal('op_id_dest'),
+            regime_tributario: getVal('op_regime') || 'SUSPENSAO',
+            t_pag: getVal('op_t_pag') || '90',
             orig_padrao: getVal('op_orig'),
             csosn_icms: getVal('op_csosn'),
             c_enq_ipi: getVal('op_c_enq'),
@@ -3471,6 +4107,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             // 1. Preenchimento Seguro do Cabecalho
             const c = data.cabecalho || {};
             setVal('nNF', c.nNF);
+            setVal('indFinal', (c.indFinal !== undefined && c.indFinal !== null && c.indFinal !== '') ? c.indFinal : '1');
             setVal('serie', c.serie);
             setVal('natOp', c.natOp);
             setVal('cfop_padrao', c.cfop_padrao);
@@ -3584,7 +4221,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
             // Transporte e Volumes
             const tr = r.transporte || {};
-            setVal('transp_modFrete', tr.modFrete || '0');
+            setVal('transp_modFrete', (tr.modFrete !== undefined && tr.modFrete !== null && tr.modFrete !== '') ? tr.modFrete : '1');
             setVal('transp_CNPJ_CPF', tr.CNPJ_CPF || '');
             setVal('transp_xNome', tr.xNome || '');
             setVal('transp_IE', tr.IE || '');
@@ -3797,6 +4434,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             xml_original: xmlOriginalData,
             cabecalho: {
                 nNF: getVal('nNF'),
+                indFinal: getVal('indFinal') || '1',
                 serie: getVal('serie'),
                 refNFe: (getVal('refNFe') || '').replace(/\D/g, '').slice(0, 44),
                 natOp: getVal('natOp') || getVal('select_operacao'),
@@ -3841,12 +4479,18 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 verProc: getVal('verProc') || '4.01_sebrae_b057',
                 exporta_UFSaidaPais: getVal('exporta_UFSaidaPais'),
                 exporta_xLocExporta: getVal('exporta_xLocExporta'),
-                exporta_xLocDespacho: getVal('exporta_xLocDespacho')
+                exporta_xLocDespacho: getVal('exporta_xLocDespacho'),
+                tPag: getVal('tPag') || getVal('tot_tPag') || '90',
+                regime_tributario: window._regimeTributarioAtivo || 'SUSPENSAO'
             },
             referencia_interna: (typeof obterReferenciaInterna === 'function' ? obterReferenciaInterna() : (getVal('referencia_interna') || getVal('referenciaInterna') || '')).trim(),
             itens: itensLimpos,
             rodape: {
                 infCpl: getVal('infCpl'),
+                pagamento: {
+                    tPag: getVal('tPag') || getVal('tot_tPag') || '90',
+                    vPag: (getVal('tPag') === '90' || getVal('tot_tPag') === '90') ? '0.00' : mutatorLimparNumero(getVal('tot_vPag') || getVal('tot_vNF') || getVal('vNF'))
+                },
                 transporte: {
                     modFrete: getVal('transp_modFrete'),
                     CNPJ_CPF: getVal('transp_CNPJ_CPF'),
@@ -4120,7 +4764,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
         // Coleta todos os campos do formulário
         const idsCabecalho = [
-            'nNF', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
+            'nNF', 'indFinal', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
             'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
             'dest_xNome', 'dest_tpDoc', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
             'import_nDI', 'import_dDI', 'import_cExportador', 'import_tpViaTransp', 'import_tpIntermedio', 'import_UFDesemb', 'import_xLocDesemb', 'import_dDesemb',
@@ -4128,13 +4772,16 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
             'rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vFrete', 'rateio_vSeg', 'rateio_vOutro', 'ptax_data', 'ptax_moeda', 'ptax_moeda_custom', 'ptax_cotacao_venda', 'criterio_rateio',
             'exporta_UFSaidaPais', 'exporta_xLocExporta', 'exporta_xLocDespacho',
-            'infCpl', 'select_operacao', 'referencia_interna', 'referenciaInterna'
+            'infCpl', 'select_operacao', 'referencia_interna', 'referenciaInterna',
+            'tPag', 'tot_tPag', 'tot_vPag', 'regime_tributario'
         ];
 
         const cabecalhoDados = {};
         idsCabecalho.forEach(id => {
             cabecalhoDados[id] = getVal(id);
         });
+        cabecalhoDados['transp_modFrete'] = getVal('transp_modFrete') || '1';
+        cabecalhoDados['modFrete'] = getVal('transp_modFrete') || '1';
 
         const itensDados = (itensTable ? itensTable.getData() : (itensCache || []));
         const qtdFinal = (window._rascunhoQtdItensCalc !== undefined) ? window._rascunhoQtdItensCalc : itensDados.length;
@@ -4429,6 +5076,14 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 Object.keys(dados.cabecalho).forEach(k => {
                     setVal(k, dados.cabecalho[k]);
                 });
+                if (dados.cabecalho.transp_modFrete !== undefined) {
+                    setVal('transp_modFrete', dados.cabecalho.transp_modFrete);
+                } else if (dados.cabecalho.modFrete !== undefined) {
+                    setVal('transp_modFrete', dados.cabecalho.modFrete);
+                }
+            }
+            if (dados.rodape && dados.rodape.transporte && dados.rodape.transporte.modFrete !== undefined) {
+                setVal('transp_modFrete', dados.rodape.transporte.modFrete);
             }
 
             // 2. Restaura Referência Interna
@@ -4451,6 +5106,19 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 } else {
                     setVal('select_operacao', opNome);
                     aoSelecionarOperacao(opNome, true);
+                }
+            }
+
+            // 3.1 Restaura Regime Tributário e Meio de Pagamento específicos salvos no rascunho
+            if (dados.cabecalho && dados.cabecalho.tPag) {
+                setVal('tPag', dados.cabecalho.tPag);
+                if (typeof aoMudarMeioPagamento === 'function') {
+                    aoMudarMeioPagamento(dados.cabecalho.tPag);
+                }
+            }
+            if (dados.cabecalho && dados.cabecalho.regime_tributario) {
+                if (typeof selecionarRegimeTributario === 'function') {
+                    selecionarRegimeTributario(dados.cabecalho.regime_tributario, false);
                 }
             }
 
@@ -4480,6 +5148,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             atualizarTipoDocumentoDestinatario();
             calcularChaveAcessoDinamica();
             atualizarBadgeRefNFe((getVal('refNFe') || '').length);
+            if (typeof verificarAvisoRefNFeOperacao === 'function') {
+                verificarAvisoRefNFeOperacao();
+            }
             atualizarBadgesRateioEItens();
             if (typeof verificarExibicaoSecaoExportacao === 'function') {
                 verificarExibicaoSecaoExportacao();
@@ -4492,26 +5163,39 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     tbody.innerHTML = '';
                     dados.sefaz_history.forEach(item => {
                         const tr = document.createElement('tr');
-                        let arquivosHtml = item.arquivos;
-                        if (!arquivosHtml && typeof window.renderArquivosIcons === 'function') {
-                            const rawChave = (item.chave || '').replace(/<[^>]*>?/gm, '').trim();
-                            const isAut = (item.status || '').includes('100') || (item.status || '').includes('104');
-                            arquivosHtml = window.renderArquivosIcons(rawChave, isAut);
+                        const norm = typeof window.normalizarItemHistoricoSefaz === 'function'
+                            ? window.normalizarItemHistoricoSefaz(item)
+                            : null;
+                        if (norm) {
+                            tr.innerHTML = `
+                                <td class="align-middle">${norm.data}</td>
+                                <td class="align-middle">${norm.ambienteHtml}</td>
+                                <td class="text-center align-middle">${norm.arquivosHtml}</td>
+                                <td class="text-start align-middle font-monospace" style="font-size: 11px;">${norm.chave}</td>
+                                <td class="align-middle">${norm.cstatHtml}</td>
+                                <td class="text-start align-middle" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${norm.motivoTitle}">
+                                    ${norm.motivo}
+                                </td>
+                                <td class="align-middle" style="font-size: 11px;">${norm.protocolo}</td>
+                            `;
+                        } else {
+                            tr.innerHTML = `
+                                <td>${item.data || ''}</td>
+                                <td>${item.ambiente || ''}</td>
+                                <td class="text-center align-middle">${item.arquivos || '-'}</td>
+                                <td class="text-start" style="font-size: 11px;">${item.chave || ''}</td>
+                                <td>${item.status || ''}</td>
+                                <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.motivoTitle || ''}">
+                                    ${item.motivo || ''}
+                                </td>
+                                <td>${item.protocolo || ''}</td>
+                            `;
                         }
-                        tr.innerHTML = `
-                            <td>${item.data || ''}</td>
-                            <td>${item.ambiente || ''}</td>
-                            <td class="text-center align-middle">${arquivosHtml || '-'}</td>
-                            <td class="text-start" style="font-size: 11px;">${item.chave || ''}</td>
-                            <td>${item.status || ''}</td>
-                            <td class="text-start" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.motivoTitle || ''}">
-                                ${item.motivo || ''}
-                            </td>
-                            <td>${item.protocolo || ''}</td>
-                        `;
                         tbody.appendChild(tr);
                     });
-                    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    if (typeof window.sanitizarTabelaHistoricoSefaz === 'function') {
+                        window.sanitizarTabelaHistoricoSefaz();
+                    } else if (typeof lucide !== 'undefined' && lucide.createIcons) {
                         lucide.createIcons();
                     }
                 }
@@ -4952,8 +5636,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 </div><!-- /container-fluid -->
 <!-- /nft-main-wrapper -->
-<script src="/static/js/nft-autosave.js"></script>
-<script src="/static/js/nft-sefaz.js"></script>
+<script src="/static/js/nft-autosave.js?v=2.9"></script>
+<script src="/static/js/nft-sefaz.js?v=2.9"></script>
+<script src="/static/js/nft-operacoes-manager.js?v=3.0"></script>
 <script>
         document.addEventListener('input', function (e) {
             if (e.target.classList.contains('mask-cnpj-cpf')) {
@@ -5095,6 +5780,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 document.getElementById('transp_xMun').value = emp.municipio || '';
                 document.getElementById('transp_UF').value = emp.uf || '';
             }
+            if (window.validarCamposRegexVisual) setTimeout(window.validarCamposRegexVisual, 10);
         }
     </script>
 </body>

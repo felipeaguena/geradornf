@@ -1,27 +1,35 @@
 @echo off
 cd /d "%~dp0"
 
-REM 1. Tenta usar o Python do venv local caso ele esteja funcional
-if exist "venv\Scripts\python.exe" (
-    "venv\Scripts\python.exe" -c "exit()" >nul 2>&1
-    if not errorlevel 1 (
-        "venv\Scripts\python.exe" app.py
-        exit /b %ERRORLEVEL%
-    )
+REM 1. Tenta usar o pythonw ou python do venv local
+if exist "venv\Scripts\pythonw.exe" (
+    start "" "venv\Scripts\pythonw.exe" app.py
+    exit /b 0
 )
 
-REM 2. Se o venv nao funcionar ou nao existir nesta maquina, usa o Python do sistema (PATH)
+if exist "venv\Scripts\python.exe" (
+    start "" /min "venv\Scripts\python.exe" app.py
+    exit /b 0
+)
+
+REM 2. Se o venv nao existir, usa o Python do sistema (PATH)
+where pythonw >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    start "" pythonw app.py
+    exit /b 0
+)
+
 where python >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    python app.py
-    exit /b %ERRORLEVEL%
+    start "" /min python app.py
+    exit /b 0
 )
 
 REM 3. Tenta o inicializador padrao do Windows (py launcher)
 where py >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    py app.py
-    exit /b %ERRORLEVEL%
+    start "" /min py app.py
+    exit /b 0
 )
 
 echo [ERRO] Nenhum interpretador Python funcional foi localizado nesta maquina.

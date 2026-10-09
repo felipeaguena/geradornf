@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Iniciando Sistema — NFT Logistics</title>
+  <link rel="icon" type="image/x-icon" href="app_icon.ico"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(18, 24, 38, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --accent: #06b6d4;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Fundo dinâmico com gradientes suaves e efeito futurista */
+    .bg-blobs {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.18;
+      animation: float 10s infinite alternate ease-in-out;
+    }
+
+    .blob-1 {
+      width: 450px;
+      height: 450px;
+      background: #2563eb;
+      top: -100px;
+      left: -100px;
+    }
+
+    .blob-2 {
+      width: 400px;
+      height: 400px;
+      background: #0891b2;
+      bottom: -100px;
+      right: -100px;
+      animation-delay: -5s;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(40px) scale(1.08); }
+    }
+
+    /* Container Central */
+    .splash-card {
+      position: relative;
+      z-index: 10;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 44px 38px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7),
+                  0 0 30px 0 rgba(59, 130, 246, 0.12);
+      text-align: center;
+      transition: all 0.4s ease;
+      animation: appear 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes appear {
+      0% { opacity: 0; transform: scale(0.95) translateY(12px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Logo & Ícone */
+    .logo-wrapper {
+      margin-bottom: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .logo-ring {
+      position: absolute;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: var(--primary);
+      border-right-color: var(--accent);
+      animation: spin 1.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .logo-box {
+      width: 70px;
+      height: 70px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.15));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px -5px var(--primary-glow);
+    }
+
+    .logo-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 30px;
+      letter-spacing: 0.01em;
+    }
+
+    /* Barra de Progresso */
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 15%;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      border-radius: 999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px var(--primary-glow);
+      position: relative;
+    }
+
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Mensagens de Status */
+    .status-area {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .status-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse-dot 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.7); opacity: 0.5; }
+    }
+
+    .status-percent {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    /* Informações de Conexão / Porta */
+    .footer-badge {
+      margin-top: 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 11px;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .footer-badge span {
+      color: #38bdf8;
+    }
+
+    /* Mensagem de Erro / Ajuda se demorar muito */
+    .error-box {
+      display: none;
+      margin-top: 22px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      font-size: 12px;
+      color: #fca5a5;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .error-box b {
+      color: #f87171;
+    }
+
+    .retry-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 16px;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    .retry-btn:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <main class="splash-card">
+    <div class="logo-wrapper">
+      <div class="logo-ring" id="logoRing"></div>
+      <div class="logo-box">
+        <img src="gerador/static/img/brand/NFT Logo (11).webp" 
+             onerror="this.onerror=null; this.src='app_icon.ico';" 
+             alt="NFT Logistics" 
+             class="logo-img"/>
+      </div>
+    </div>
+
+    <h1 class="title">NFT Logistics</h1>
+    <p class="subtitle">Emissor &amp; Gerenciador de NF-e</p>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+
+    <div class="status-area">
+      <div class="status-text">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusMessage">Iniciando o servidor...</span>
+      </div>
+      <span class="status-percent" id="statusPercent">15%</span>
+    </div>
+
+    <div class="footer-badge">
+      Porta Local: <span>127.0.0.1:1652</span>
+    </div>
+
+    <div class="error-box" id="errorBox">
+      <b>A inicialização está demorando mais do que o esperado.</b><br/>
+      O servidor Python pode estar instalando dependências ou inicializando o banco de dados.<br/>
+      <button class="retry-btn" onclick="retryConnection()">Tentar Novamente</button>
+    </div>
+  </main>
+
+  <script>
+    const TARGET_URL = "http://127.0.0.1:1652";
+    const PING_URL = `${TARGET_URL}/api/ping`;
+    const progressFill = document.getElementById("progressFill");
+    const statusMessage = document.getElementById("statusMessage");
+    const statusPercent = document.getElementById("statusPercent");
+    const errorBox = document.getElementById("errorBox");
+    const statusDot = document.getElementById("statusDot");
+    const logoRing = document.getElementById("logoRing");
+
+    let currentProgress = 15;
+    let attempts = 0;
+    const maxAttempts = 50; // ~25 a 30 segundos
+    let isConnected = false;
+
+    // Etapas com mensagens amigáveis enquanto avança
+    const statusSteps = [
+      { at: 20, text: "Carregando ambiente Python e bibliotecas..." },
+      { at: 40, text: "Conectando ao banco de dados SQLite..." },
+      { at: 65, text: "Configurando serviços fiscais e SEFAZ..." },
+      { at: 85, text: "Finalizando inicialização do servidor..." },
+      { at: 100, text: "Sistema pronto! Abrindo portal..." }
+    ];
+
+    function updateProgress(val, message = null) {
+      currentProgress = Math.min(val, 100);
+      progressFill.style.width = `${currentProgress}%`;
+      statusPercent.innerText = `${Math.floor(currentProgress)}%`;
+
+      if (message) {
+        statusMessage.innerText = message;
+      } else {
+        for (let i = statusSteps.length - 1; i >= 0; i--) {
+          if (currentProgress >= statusSteps[i].at) {
+            statusMessage.innerText = statusSteps[i].text;
+            break;
+          }
+        }
+      }
+    }
+
+    // Progresso simulado suave enquanto aguarda resposta real
+    const progressInterval = setInterval(() => {
+      if (!isConnected) {
+        if (currentProgress < 88) {
+          currentProgress += (88 - currentProgress) * 0.08;
+          updateProgress(currentProgress);
+        }
+      }
+    }, 400);
+
+    async function checkServer() {
+      if (isConnected) return;
+      attempts++;
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+        const response = await fetch(PING_URL, {
+          method: "GET",
+          signal: controller.signal,
+          cache: "no-store"
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          isConnected = true;
+          clearInterval(progressInterval);
+          
+          updateProgress(100, "Sistema pronto! Redirecionando...");
+          statusDot.style.background = "#10b981";
+          statusDot.style.boxShadow = "0 0 10px #10b981";
+          logoRing.style.borderTopColor = "#10b981";
+          logoRing.style.borderRightColor = "#10b981";
+
+          setTimeout(() => {
+            window.location.replace(TARGET_URL);
+          }, 350);
+          return;
+        }
+      } catch (e) {
+        // Servidor ainda não acordou, continua tentando
+      }
+
+      if (attempts >= maxAttempts && !isConnected) {
+        clearInterval(progressInterval);
+        errorBox.style.display = "block";
+        statusMessage.innerText = "Aguardando resposta do servidor...";
+        statusDot.style.background = "#f59e0b";
+      } else if (!isConnected) {
+        setTimeout(checkServer, 500);
+      }
+    }
+
+    function retryConnection() {
+      errorBox.style.display = "none";
+      attempts = 0;
+      currentProgress = 20;
+      updateProgress(20, "Reconectando ao servidor...");
+      checkServer();
+    }
+
+    // Inicia a verificação imediatamente
+    setTimeout(checkServer, 200);
+  </script>
+</body>
+</html>

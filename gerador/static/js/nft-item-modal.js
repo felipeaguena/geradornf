@@ -194,6 +194,25 @@
 
                         <!-- ABA 2: TRIBUTAÇÃO -->
                         <div class="tab-pane fade" id="tab-item-tributos" role="tabpanel">
+                            <!-- BARRA DE AJUSTE RÁPIDO DE REGIME FISCAL DO ITEM -->
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-2 mb-3 rounded border bg-body-tertiary">
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Enquadramento Rápido:</span>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('SUSPENSAO')" title="Aplicar Suspensão (CST 50, cEnq 108/107, PIS/COF 08)">🛡️ Suspensão</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('ISENCAO')" title="Aplicar Isenção (CST 40, cEnq 301, CST IPI 52, PIS/COF 07)">🌱 Isenção</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('RECOLHIMENTO')" title="Aplicar Recolhimento/Tributada (CST 00, cEnq 999, CST IPI 49, PIS 1.65%, COF 7.60%)">💰 Recolhimento</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('IMUNIDADE')" title="Aplicar Imunidade / Reexportação (CST 41, cEnq 999, CST IPI 55, PIS/COF 08)">✈️ Imunidade</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1" onclick="window.zerarImpostosItemModal()" title="Zerar todas as bases e alíquotas de tributos deste item">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                        <span>Zerar Impostos</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="row g-3">
                                 <!-- ICMS -->
                                 <div class="col-md-6">
@@ -846,6 +865,7 @@
         const modalEl = document.getElementById('modalItemDetalhe');
         const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
+        if (window.validarCamposRegexVisual) setTimeout(window.validarCamposRegexVisual, 50);
 
         setTimeout(() => {
             const xProd = document.getElementById('m_item_xProd');
@@ -962,6 +982,7 @@
         const modalEl = document.getElementById('modalItemDetalhe');
         const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
+        if (window.validarCamposRegexVisual) setTimeout(window.validarCamposRegexVisual, 50);
 
         setTimeout(() => {
             const xProd = document.getElementById('m_item_xProd');
@@ -1204,6 +1225,251 @@
                 exp.dataset.autoSynced = 'true';
             }
         }
+    };
+
+    // Função global de zerar impostos (II, IPI, PIS, COFINS) de todos os itens com confirmação
+    if (!window.zerarImpostosTodosItensComConfirmacao) {
+        window.zerarImpostosTodosItensComConfirmacao = async function () {
+            const lista = getListaItensAtual();
+            if (!lista || lista.length === 0) {
+                if (window.nftAlert) {
+                    await window.nftAlert("Nenhum item carregado na grade para zerar impostos.", {
+                        type: "warning",
+                        title: "Nenhum Item Encontrado"
+                    });
+                } else {
+                    alert("Nenhum item carregado na grade para zerar impostos.");
+                }
+                return;
+            }
+
+            const qtd = lista.length;
+            const confirmMsg = `Atenção: Esta ação irá alterar os dados da nota fiscal, zerando a Base de Cálculo, Alíquota (%) e Valor dos seguintes impostos em ${qtd === 1 ? '1 item' : `todos os ${qtd} itens`}:\n\n• Imposto de Importação (II): Base de Cálculo e Valor\n• IPI: Base de Cálculo, % Alíquota e Valor\n• PIS: Base de Cálculo, % Alíquota e Valor\n• COFINS: Base de Cálculo, % Alíquota e Valor\n\nTodos os totais da nota fiscal e do rateio serão recalculados automaticamente.\n\nDeseja confirmar a alteração nos dados?`;
+
+            let confirmado = false;
+            if (window.nftConfirm) {
+                confirmado = await window.nftConfirm(confirmMsg, {
+                    title: 'Alerta de Alteração de Dados - Zerar Impostos',
+                    type: 'warning',
+                    confirmText: 'Confirmar',
+                    cancelText: 'Cancelar',
+                    icon: 'alert-triangle'
+                });
+            } else {
+                confirmado = confirm(confirmMsg);
+            }
+
+            if (!confirmado) return;
+
+            lista.forEach(it => {
+                // II (Imposto de Importação)
+                it.vBC_II = '0.00';
+                it.vII = '0.00';
+                if ('pII' in it || it.pII !== undefined) it.pII = '0.00';
+
+                // IPI
+                it.vBC_IPI = '0.00';
+                it.pIPI = '0.00';
+                it.vIPI = '0.00';
+
+                // PIS
+                it.vBC_PIS = '0.00';
+                it.pPIS = '0.00';
+                it.vPIS = '0.00';
+
+                // COFINS
+                it.vBC_COFINS = '0.00';
+                it.pCOFINS = '0.00';
+                it.vCOFINS = '0.00';
+            });
+
+            aplicarListaItensAtual(lista);
+
+            if (typeof window.triggerAutoSave === 'function') {
+                window.triggerAutoSave();
+            }
+
+            if (window.nftAlert) {
+                await window.nftAlert(`Impostos (II, IPI, PIS e COFINS) zerados com sucesso em ${qtd === 1 ? '1 item' : `${qtd} itens`}!`, {
+                    type: 'success',
+                    title: 'Impostos Zerados'
+                });
+            }
+        };
+    }
+
+    // APLICA REGIME FISCAL ESPECÍFICO AOS CAMPOS DO ITEM NA MODAL
+    window.aplicarRegimeAoItemModal = function (regime) {
+        const cfop = (document.getElementById('m_item_CFOP')?.value || '').trim();
+        const vProd = parseNum(document.getElementById('m_item_vProd')?.value || 0);
+        const vFrete = parseNum(document.getElementById('m_item_vFrete')?.value || 0);
+        const vSeg = parseNum(document.getElementById('m_item_vSeg')?.value || 0);
+        const vOutro = parseNum(document.getElementById('m_item_vOutro')?.value || 0);
+        const baseCalculoCheia = (vProd + vFrete + vSeg + vOutro).toFixed(2);
+
+        if (regime === 'SUSPENSAO') {
+            const elCsosn = document.getElementById('m_item_CSOSN');
+            if (elCsosn) elCsosn.value = '50';
+            document.getElementById('m_item_pRedBC').value = '0.00';
+            document.getElementById('m_item_vBC_ICMS').value = '0.00';
+            document.getElementById('m_item_pICMS').value = '0.00';
+            document.getElementById('m_item_vICMS').value = '0.00';
+
+            const elIpi = document.getElementById('m_item_CST_IPI');
+            if (elIpi) {
+                elIpi.value = (cfop.startsWith('1') || cfop.startsWith('2')) ? '05' : '55';
+            }
+            document.getElementById('m_item_cEnq').value = (cfop === '3930') ? '108' : (['5914', '6914', '1914', '2914'].includes(cfop) ? '107' : '108');
+            document.getElementById('m_item_vBC_IPI').value = '0.00';
+            document.getElementById('m_item_pIPI').value = '0.00';
+            document.getElementById('m_item_vIPI').value = '0.00';
+
+            const elPis = document.getElementById('m_item_CST_PIS');
+            if (elPis) elPis.value = '08';
+            document.getElementById('m_item_vBC_PIS').value = '0.00';
+            document.getElementById('m_item_pPIS').value = '0.00';
+            document.getElementById('m_item_vPIS').value = '0.00';
+
+            const elCofins = document.getElementById('m_item_CST_COFINS');
+            if (elCofins) elCofins.value = '08';
+            document.getElementById('m_item_vBC_COFINS').value = '0.00';
+            document.getElementById('m_item_pCOFINS').value = '0.00';
+            document.getElementById('m_item_vCOFINS').value = '0.00';
+
+            document.getElementById('m_item_vBC_II').value = '0.00';
+            document.getElementById('m_item_vII').value = '0.00';
+            document.getElementById('m_item_vIOF').value = '0.00';
+            document.getElementById('m_item_vDespAdu').value = '0.00';
+        } else if (regime === 'ISENCAO') {
+            const elCsosn = document.getElementById('m_item_CSOSN');
+            if (elCsosn) elCsosn.value = '40';
+            document.getElementById('m_item_pRedBC').value = '0.00';
+            document.getElementById('m_item_vBC_ICMS').value = '0.00';
+            document.getElementById('m_item_pICMS').value = '0.00';
+            document.getElementById('m_item_vICMS').value = '0.00';
+
+            const elIpi = document.getElementById('m_item_CST_IPI');
+            if (elIpi) elIpi.value = '52';
+            document.getElementById('m_item_cEnq').value = '301';
+            document.getElementById('m_item_vBC_IPI').value = '0.00';
+            document.getElementById('m_item_pIPI').value = '0.00';
+            document.getElementById('m_item_vIPI').value = '0.00';
+
+            const elPis = document.getElementById('m_item_CST_PIS');
+            if (elPis) elPis.value = '07';
+            document.getElementById('m_item_vBC_PIS').value = '0.00';
+            document.getElementById('m_item_pPIS').value = '0.00';
+            document.getElementById('m_item_vPIS').value = '0.00';
+
+            const elCofins = document.getElementById('m_item_CST_COFINS');
+            if (elCofins) elCofins.value = '07';
+            document.getElementById('m_item_vBC_COFINS').value = '0.00';
+            document.getElementById('m_item_pCOFINS').value = '0.00';
+            document.getElementById('m_item_vCOFINS').value = '0.00';
+
+            document.getElementById('m_item_vBC_II').value = '0.00';
+            document.getElementById('m_item_vII').value = '0.00';
+            document.getElementById('m_item_vIOF').value = '0.00';
+            document.getElementById('m_item_vDespAdu').value = '0.00';
+        } else if (regime === 'IMUNIDADE') {
+            const elCsosn = document.getElementById('m_item_CSOSN');
+            if (elCsosn) elCsosn.value = '41';
+            document.getElementById('m_item_pRedBC').value = '0.00';
+            document.getElementById('m_item_vBC_ICMS').value = '0.00';
+            document.getElementById('m_item_pICMS').value = '0.00';
+            document.getElementById('m_item_vICMS').value = '0.00';
+
+            const elIpi = document.getElementById('m_item_CST_IPI');
+            if (elIpi) elIpi.value = '55';
+            document.getElementById('m_item_cEnq').value = '999';
+            document.getElementById('m_item_vBC_IPI').value = '0.00';
+            document.getElementById('m_item_pIPI').value = '0.00';
+            document.getElementById('m_item_vIPI').value = '0.00';
+
+            const elPis = document.getElementById('m_item_CST_PIS');
+            if (elPis) elPis.value = '08';
+            document.getElementById('m_item_vBC_PIS').value = '0.00';
+            document.getElementById('m_item_pPIS').value = '0.00';
+            document.getElementById('m_item_vPIS').value = '0.00';
+
+            const elCofins = document.getElementById('m_item_CST_COFINS');
+            if (elCofins) elCofins.value = '08';
+            document.getElementById('m_item_vBC_COFINS').value = '0.00';
+            document.getElementById('m_item_pCOFINS').value = '0.00';
+            document.getElementById('m_item_vCOFINS').value = '0.00';
+
+            document.getElementById('m_item_vBC_II').value = '0.00';
+            document.getElementById('m_item_vII').value = '0.00';
+            document.getElementById('m_item_vIOF').value = '0.00';
+            document.getElementById('m_item_vDespAdu').value = '0.00';
+        } else if (regime === 'RECOLHIMENTO') {
+            const elCsosn = document.getElementById('m_item_CSOSN');
+            if (elCsosn) elCsosn.value = '00';
+            document.getElementById('m_item_pRedBC').value = '0.00';
+            document.getElementById('m_item_vBC_ICMS').value = baseCalculoCheia;
+            if (parseNum(document.getElementById('m_item_pICMS').value) === 0) {
+                document.getElementById('m_item_pICMS').value = '18.00';
+            }
+            calcICMS();
+
+            const elIpi = document.getElementById('m_item_CST_IPI');
+            if (elIpi) elIpi.value = '49';
+            document.getElementById('m_item_cEnq').value = '999';
+            document.getElementById('m_item_vBC_IPI').value = vProd.toFixed(2);
+            calcIPI();
+
+            const elPis = document.getElementById('m_item_CST_PIS');
+            if (elPis) elPis.value = '01';
+            document.getElementById('m_item_vBC_PIS').value = baseCalculoCheia;
+            document.getElementById('m_item_pPIS').value = '1.65';
+            calcPIS();
+
+            const elCofins = document.getElementById('m_item_CST_COFINS');
+            if (elCofins) elCofins.value = '01';
+            document.getElementById('m_item_vBC_COFINS').value = baseCalculoCheia;
+            document.getElementById('m_item_pCOFINS').value = '7.60';
+            calcCOFINS();
+        }
+    };
+
+    // ZERA OS IMPOSTOS DO ITEM ABERTO NA MODAL COM POPUP DE CONFIRMAÇÃO
+    window.zerarImpostosItemModal = async function () {
+        const confirmMsg = "Atenção: Deseja zerar todas as bases de cálculo, alíquotas (%) e valores de impostos (II, IPI, PIS, COFINS e ICMS) deste item específico?";
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(confirmMsg, {
+                title: 'Zerar Impostos do Item',
+                type: 'warning',
+                confirmText: 'Zerar Impostos',
+                cancelText: 'Cancelar',
+                icon: 'alert-triangle'
+            });
+        } else {
+            confirmado = confirm(confirmMsg);
+        }
+        if (!confirmado) return;
+
+        document.getElementById('m_item_pRedBC').value = '0.00';
+        document.getElementById('m_item_vBC_ICMS').value = '0.00';
+        document.getElementById('m_item_pICMS').value = '0.00';
+        document.getElementById('m_item_vICMS').value = '0.00';
+
+        document.getElementById('m_item_vBC_IPI').value = '0.00';
+        document.getElementById('m_item_pIPI').value = '0.00';
+        document.getElementById('m_item_vIPI').value = '0.00';
+
+        document.getElementById('m_item_vBC_PIS').value = '0.00';
+        document.getElementById('m_item_pPIS').value = '0.00';
+        document.getElementById('m_item_vPIS').value = '0.00';
+
+        document.getElementById('m_item_vBC_COFINS').value = '0.00';
+        document.getElementById('m_item_pCOFINS').value = '0.00';
+        document.getElementById('m_item_vCOFINS').value = '0.00';
+
+        document.getElementById('m_item_vBC_II').value = '0.00';
+        document.getElementById('m_item_vII').value = '0.00';
+        document.getElementById('m_item_vIOF').value = '0.00';
+        document.getElementById('m_item_vDespAdu').value = '0.00';
     };
 
     // Inicialização ao carregar o DOM

@@ -79,7 +79,10 @@ def init_db():
             p_pis REAL,
             cst_cofins TEXT,
             p_cofins REAL,
-            inf_cpl_padrao TEXT
+            inf_cpl_padrao TEXT,
+            regime_tributario TEXT DEFAULT 'SUSPENSAO',
+            t_pag TEXT DEFAULT '90',
+            ordem INTEGER DEFAULT 0
         )
     ''')
 
@@ -98,24 +101,58 @@ def init_db():
 
     operacoes_iniciais = [
         (
-            'ADMISSAO TEMPORARIA',
-            '3930', '0', '3', '1', '102', '102', '05', 0.0, 0.0, '07', 0.0, '07', 0.0,
-            'ADMISSAO TEMPORARIA DE CARGAS. SUSPENSAO DE TRIBUTOS CONFORME LEGISLACAO ADUANEIRA.'
+            'ADMISSÃO TEMPORÁRIA',
+            '3930', '0', '3', '1', '400', '108', '55', 0.0, 0.0, '08', 0.0, '08', 0.0,
+            'ADMISSAO TEMPORARIA DE CARGAS AO AMPARO DA IN RFB 1600/2016. SUSPENSAO DE TRIBUTOS FEDERAIS E ESTADUAIS (ICMS, IPI, PIS E COFINS).',
+            'SUSPENSAO', '90'
         ),
         (
-            'REEXPORTAÇÃO FICTA',
-            '7930', '1', '3', '1', '300', '102', '05', 0.0, 0.0, '07', 0.0, '07', 0.0,
-            'REEXPORTAÇÃO FICTA DE CARGAS QUE PARTICIPARAM DE EVENTO NO BRASIL E RETORNARAO A ORIGEM.'
+            'OUTRAS ENTRADAS DE MERCADORIA (COM RECOLHIMENTO)',
+            '3949', '0', '3', '1', '900', '999', '49', 6.5, 0.0, '01', 1.65, '01', 7.60,
+            'ENTRADA DE IMPORTACAO COM TRIBUTACAO REGULAR E RECOLHIMENTO INTEGRAL DE TRIBUTOS (II, IPI, PIS, COFINS E ICMS).',
+            'RECOLHIMENTO', '90'
+        ),
+        (
+            'OUTRAS ENTRADAS DE MERCADORIA (COM ISENÇÃO)',
+            '3949', '0', '3', '1', '400', '301', '52', 0.0, 0.0, '07', 0.0, '07', 0.0,
+            'ENTRADA DE IMPORTACAO COM BENEFICIO FISCAL DE ISENCAO DE TRIBUTOS.',
+            'ISENCAO', '90'
         ),
         (
             'REMESSA PARA FEIRA',
-            '5914', '1', '1', '1', '102', '102', '05', 0.0, 0.0, '07', 0.0, '07', 0.0,
-            'REMESSA DE MERCADORIA OU BEM PARA EXPOSICAO OU FEIRA.'
+            '5914', '1', '1', '1', '400', '107', '55', 0.0, 0.0, '08', 0.0, '08', 0.0,
+            'REMESSA DE MERCADORIA OU BEM PARA EXPOSICAO OU FEIRA. SUSPENSAO DO ICMS NOS TERMOS DO ART. 319 DO RICMS/00 E CONVENIO ICMS 30/90. IPI SUSPENSO CONFORME ART. 43, INCISO II DO DECRETO 7.212/2010 (RIPI).',
+            'SUSPENSAO', '90'
         ),
         (
-            'OUTRAS ENTRADAS DE MERCADORIA',
-            '3930', '0', '3', '1', '102', '999', '00', 6.5, 0.0, '01', 2.10, '01', 9.65,
-            'ENTRADA DE IMPORTACAO COM TRIBUTACAO REGULAR.'
+            'REMESSA PARA FEIRAS INTERESTADUAIS',
+            '6914', '1', '2', '1', '400', '107', '55', 0.0, 0.0, '08', 0.0, '08', 0.0,
+            'REMESSA PARA FEIRAS INTERESTADUAIS. SUSPENSAO DO ICMS CONFORME CONVENIO ICMS 30/90. IPI SUSPENSO CONFORME ART. 43, INCISO II DO DECRETO 7.212/2010 (RIPI).',
+            'SUSPENSAO', '90'
+        ),
+        (
+            'RETORNO DE FEIRA',
+            '1914', '0', '1', '1', '400', '107', '05', 0.0, 0.0, '08', 0.0, '08', 0.0,
+            'RETORNO DE MERCADORIA OU BEM REMETIDO PARA EXPOSICAO OU FEIRA. SUSPENSAO DO ICMS CONFORME CONVENIO ICMS 30/90. IPI SUSPENSO CONFORME ART. 43 DO RIPI.',
+            'SUSPENSAO', '90'
+        ),
+        (
+            'RETORNO DE FEIRAS INTERESTADUAIS',
+            '2914', '0', '2', '1', '400', '107', '05', 0.0, 0.0, '08', 0.0, '08', 0.0,
+            'RETORNO DE MERCADORIA OU BEM REMETIDO PARA EXPOSICAO OU FEIRA INTERESTADUAL. SUSPENSAO DO ICMS CONFORME CONVENIO ICMS 30/90. IPI SUSPENSO CONFORME ART. 43 DO RIPI.',
+            'SUSPENSAO', '90'
+        ),
+        (
+            'REEXPORTAÇÃO DE ADMISSÃO TEMPORÁRIA',
+            '7930', '1', '3', '1', '300', '999', '55', 0.0, 0.0, '08', 0.0, '08', 0.0,
+            'REEXPORTACAO DE MERCADORIAS ADMITIDAS TEMPORARIAMENTE NO PAIS AO AMPARO DA IN RFB 1600/2016. EXTINCAO DO REGIME ADUANEIRO ESPECIAL. MERCADORIA IMUNE/NAO TRIBUTADA.',
+            'IMUNIDADE', '90'
+        ),
+        (
+            'OUTRAS REEXPORTAÇÕES',
+            '7949', '1', '3', '1', '300', '999', '55', 0.0, 0.0, '08', 0.0, '08', 0.0,
+            'OUTROS TIPOS DE REEXPORTACAO DE CARGAS AO EXTERIOR. MERCADORIA IMUNE/NAO TRIBUTADA.',
+            'IMUNIDADE', '90'
         )
     ]
 
@@ -128,8 +165,9 @@ def init_db():
                     c.execute('''
                         INSERT INTO tipos_operacao (
                             nome_operacao, cfop_padrao, tp_nf, id_dest, orig_padrao, csosn_icms, c_enq_ipi,
-                            cst_ipi, p_ipi, aliquota_ii, cst_pis, p_pis, cst_cofins, p_cofins, inf_cpl_padrao
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            cst_ipi, p_ipi, aliquota_ii, cst_pis, p_pis, cst_cofins, p_cofins, inf_cpl_padrao,
+                            regime_tributario, t_pag
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', op)
                 except sqlite3.IntegrityError:
                     pass

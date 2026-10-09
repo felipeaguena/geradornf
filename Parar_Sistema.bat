@@ -8,7 +8,7 @@ REM 1. Notifica o backend para desligamento e fechamento das janelas
 curl -s -X POST http://127.0.0.1:1652/api/shutdown >nul 2>&1
 
 REM 2. Forca o fechamento das janelas do sistema pelo titulo nativo
-powershell -Command "Get-Process | Where-Object { $_.MainWindowTitle -like '*NFT Logistics*' -or $_.MainWindowTitle -like '*Emissor NF-e*' } | ForEach-Object { $_.CloseMainWindow() }" >nul 2>&1
+powershell -Command "Get-Process | Where-Object { $_.MainWindowTitle -like '*NFT Logistics*' -or $_.MainWindowTitle -like '*Emissor NF-e*' -or $_.MainWindowTitle -like '*Iniciando Sistema*' } | ForEach-Object { $_.CloseMainWindow() }" >nul 2>&1
 
 REM 3. Finaliza qualquer processo ouvindo na porta 1652
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr /r ":1652[ ]" ^| findstr "LISTENING"') do (

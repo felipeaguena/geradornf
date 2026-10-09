@@ -1,6 +1,6 @@
 /* ==========================================================================
    NFT LOGISTICS - MENU LATERAL FIXO (SIDEBAR)
-   Suporta Modo Expandido, Recolhido (Apenas Ícones) e Abertura em Hover
+   Suporta modo expandido, recolhido (ícones) e hover automático
    ========================================================================== */
 
 :root {
@@ -9,12 +9,11 @@
   --sidebar-transition: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Corpo com Sidebar */
 body.has-sidebar {
   overflow-x: hidden;
 }
 
-/* Sidebar Fixa à Esquerda */
+/* 1. Estrutura Base */
 .nft-sidebar {
   position: fixed;
   top: 0;
@@ -33,11 +32,10 @@ body.has-sidebar {
 
 [data-theme="dark"] .nft-sidebar {
   background-color: #141720;
-  border-right-color: #313a4b;
+  border-right-color: var(--border);
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
 }
 
-/* Área Principal Deslocada */
 .nft-main-wrapper {
   margin-left: var(--sidebar-w);
   min-height: 100vh;
@@ -46,7 +44,7 @@ body.has-sidebar {
   flex-direction: column;
 }
 
-/* --- ESTADO RECOLHIDO (COLLAPSED) --- */
+/* 2. Estado Recolhido (Collapsed) */
 body.sidebar-collapsed .nft-sidebar {
   width: var(--sidebar-w-collapsed);
 }
@@ -55,13 +53,12 @@ body.sidebar-collapsed .nft-main-wrapper {
   margin-left: var(--sidebar-w-collapsed);
 }
 
-/* --- ABERTURA EM HOVER QUANDO ESTIVER FECHADO --- */
 body.sidebar-collapsed .nft-sidebar:hover {
   width: var(--sidebar-w);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--primary-border);
 }
 
-/* --- CABEÇALHO DA SIDEBAR --- */
+/* 3. Cabeçalho */
 .nft-sidebar-header {
   height: 64px;
   padding: 0 0.85rem;
@@ -115,11 +112,10 @@ body.sidebar-collapsed .nft-sidebar:hover {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--success);
   text-transform: uppercase;
 }
 
-/* Botão de Alternar/Recolher Sidebar */
 .sidebar-toggle-btn {
   width: 32px;
   height: 32px;
@@ -134,7 +130,6 @@ body.sidebar-collapsed .nft-sidebar:hover {
   transition: all 0.2s ease;
   flex-shrink: 0;
   padding: 0;
-  font-size: 0.85rem;
 }
 
 .sidebar-toggle-btn:hover {
@@ -143,7 +138,7 @@ body.sidebar-collapsed .nft-sidebar:hover {
   color: var(--primary);
 }
 
-/* --- CORPO DA SIDEBAR (ITENS E SEÇÕES) --- */
+/* 4. Corpo e Itens de Navegação */
 .nft-sidebar-body {
   flex: 1;
   overflow-y: auto;
@@ -151,10 +146,10 @@ body.sidebar-collapsed .nft-sidebar:hover {
   padding: 0.6rem 0;
 }
 
-/* Scrollbar refinada */
 .nft-sidebar-body::-webkit-scrollbar {
   width: 5px;
 }
+
 .nft-sidebar-body::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
@@ -203,15 +198,15 @@ body.sidebar-collapsed .nft-sidebar:hover {
 
 .nft-sidebar-btn:hover {
   background: var(--surface-secondary);
-  color: var(--btn-nft-color);
-  border-color: var(--btn-nft-border);
+  color: var(--primary);
+  border-color: var(--primary-border);
 }
 
 .nft-sidebar-btn.active {
   background: var(--primary-subtle);
-  color: var(--btn-nft-color);
+  color: var(--primary);
   font-weight: 700;
-  border-color: var(--btn-nft-border);
+  border-color: var(--primary-border);
 }
 
 .nft-sidebar-btn .sidebar-icon {
@@ -222,7 +217,6 @@ body.sidebar-collapsed .nft-sidebar:hover {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  text-align: center;
 }
 
 .sidebar-label {
@@ -239,9 +233,12 @@ body.sidebar-collapsed .nft-sidebar:hover {
   font-family: var(--font-mono);
   font-weight: 700;
   flex-shrink: 0;
+  background-color: var(--success-subtle);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.32);
 }
 
-/* --- RODAPÉ DA SIDEBAR --- */
+/* 5. Rodapé da Sidebar */
 .nft-sidebar-footer {
   padding: 0.65rem 0.6rem;
   border-top: 1px solid var(--border);
@@ -254,13 +251,12 @@ body.sidebar-collapsed .nft-sidebar:hover {
 
 [data-theme="dark"] .nft-sidebar-footer {
   background: #141720;
-  border-top-color: #313a4b;
+  border-top-color: var(--border);
 }
 
 .sidebar-footer-btn {
   height: 38px;
   min-height: 38px;
-  box-sizing: border-box;
   width: 100%;
   display: flex;
   align-items: center;
@@ -276,7 +272,6 @@ body.sidebar-collapsed .nft-sidebar:hover {
   transition: all 0.2s ease;
   text-align: left;
   text-decoration: none !important;
-  line-height: 1;
 }
 
 .sidebar-footer-btn:hover {
@@ -286,74 +281,28 @@ body.sidebar-collapsed .nft-sidebar:hover {
 }
 
 .sidebar-footer-btn-analisar {
-  background: var(--surface-secondary);
-  border-color: #0ea5e9;
-  color: #0284c7 !important;
+  border-color: var(--primary-border);
+  color: var(--primary) !important;
   font-weight: 700;
-  width: 100%;
 }
 
 .sidebar-footer-btn-analisar:hover {
-  background: rgba(14, 165, 233, 0.12);
-  border-color: #0284c7;
-  color: #0369a1 !important;
-  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.25);
+  background: var(--primary-subtle);
+  border-color: var(--primary);
+  color: var(--primary-hover) !important;
 }
 
-.dark .sidebar-footer-btn-analisar,
-[data-theme="dark"] .sidebar-footer-btn-analisar {
-  border-color: #38bdf8;
-  color: #38bdf8 !important;
-  background: #1e293b;
-}
-
-.dark .sidebar-footer-btn-analisar:hover,
-[data-theme="dark"] .sidebar-footer-btn-analisar:hover {
-  background: rgba(56, 189, 248, 0.2);
-  border-color: #7dd3fc;
-  color: #bae6fd !important;
-}
-
-.sidebar-footer-btn-warning,
-.sidebar-footer-bg-warning,
-.sidebar-footer-btn-primary {
-  background: #f59e0b !important;
+.sidebar-footer-btn-warning {
+  background: var(--warning) !important;
   color: #11141a !important;
-  border-color: #d97706 !important;
+  border-color: var(--warning) !important;
   font-weight: 700;
-  width: 100%;
 }
 
-.sidebar-footer-btn-warning:hover,
-.sidebar-footer-bg-warning:hover,
-.sidebar-footer-btn-primary:hover {
+.sidebar-footer-btn-warning:hover {
   background: #d97706 !important;
-  border-color: #b45309 !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
-}
-
-.dark .sidebar-footer-btn-warning,
-.dark .sidebar-footer-bg-warning,
-.dark .sidebar-footer-btn-primary,
-[data-theme="dark"] .sidebar-footer-btn-warning,
-[data-theme="dark"] .sidebar-footer-bg-warning,
-[data-theme="dark"] .sidebar-footer-btn-primary {
-  background: #f59e0b !important;
-  color: #11141a !important;
-  border-color: #f59e0b !important;
-}
-
-.dark .sidebar-footer-btn-warning:hover,
-.dark .sidebar-footer-bg-warning:hover,
-.dark .sidebar-footer-btn-primary:hover,
-[data-theme="dark"] .sidebar-footer-btn-warning:hover,
-[data-theme="dark"] .sidebar-footer-bg-warning:hover,
-[data-theme="dark"] .sidebar-footer-btn-primary:hover {
-  background: #fbbf24 !important;
-  border-color: #fbbf24 !important;
-  color: #11141a !important;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.45);
+  border-color: #b45309 !important;
 }
 
 .sidebar-footer-actions {
@@ -366,7 +315,6 @@ body.sidebar-collapsed .nft-sidebar:hover {
 .sidebar-footer-btn.theme-toggle-btn {
   width: 38px;
   min-width: 38px;
-  height: 38px;
   padding: 0;
   justify-content: center;
   flex-shrink: 0;
@@ -376,7 +324,6 @@ body.sidebar-collapsed .nft-sidebar:hover {
 .sidebar-footer-btn.theme-toggle-btn svg {
   width: 18px;
   height: 18px;
-  margin: 0;
 }
 
 .sidebar-footer-info {
@@ -389,23 +336,20 @@ body.sidebar-collapsed .nft-sidebar:hover {
   font-family: var(--font-mono);
 }
 
-/* --- CONTROLE DE VISIBILIDADE NO MODO RECOLHIDO --- */
+/* 6. Comportamento no Modo Recolhido */
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-label,
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-section-title,
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-badge,
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-brand-info,
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-text,
-body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-info {
+body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-info,
+body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-toggle-btn {
   display: none !important;
 }
 
 body.sidebar-collapsed .nft-sidebar:not(:hover) .nft-sidebar-header {
   justify-content: center;
   padding: 0;
-}
-
-body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-toggle-btn {
-  display: none;
 }
 
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-brand-link {
@@ -424,19 +368,129 @@ body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-btn .sidebar-ico
   margin: 0 auto;
 }
 
-/* Responsividade Mobile (< 992px) */
+/* 7. Responsividade Mobile (< 992px) */
+.nft-sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 991px) {
   .nft-sidebar {
     transform: translateX(-100%);
     width: var(--sidebar-w) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    box-shadow: none;
+    z-index: 1050;
+  }
+
+  /* Impede que regras de collapsed interfiram no mobile */
+  body.sidebar-collapsed .nft-sidebar {
+    width: var(--sidebar-w) !important;
+  }
+
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-label,
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-section-title,
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-badge,
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-brand-info,
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-text,
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-info {
+    display: flex !important;
+  }
+
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-section-title {
+    display: block !important;
+  }
+
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .nft-sidebar-btn,
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-btn {
+    padding: 0.55rem 0.75rem !important;
+    justify-content: flex-start !important;
+  }
+
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-brand-link {
+    justify-content: flex-start !important;
+  }
+
+  body.sidebar-collapsed .nft-sidebar:not(:hover) .nft-sidebar-header {
+    justify-content: space-between !important;
+    padding: 0 0.85rem !important;
+  }
+
+  body.sidebar-mobile-open {
+    overflow: hidden !important;
   }
 
   body.sidebar-mobile-open .nft-sidebar {
     transform: translateX(0);
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.6);
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Backdrop temporário escurecido para mobile */
+  .nft-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 1048;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  body.sidebar-mobile-open .nft-sidebar-backdrop {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .nft-main-wrapper {
     margin-left: 0 !important;
+  }
+
+  /* No mobile o botão de alternar estado fixo fica oculto na sidebar */
+  .sidebar-toggle-btn {
+    display: none !important;
+  }
+
+  /* Botão fechar específico no mobile dentro do header da sidebar (padrão NFT design system) */
+  .sidebar-mobile-close-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface-secondary);
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .sidebar-mobile-close-btn:hover,
+  .sidebar-mobile-close-btn:focus {
+    background: var(--danger-subtle);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: var(--danger);
+    outline: none;
+  }
+
+  .sidebar-mobile-close-btn i,
+  .sidebar-mobile-close-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.25;
+  }
+}
+
+@media (min-width: 992px) {
+  .sidebar-mobile-close-btn {
+    display: none !important;
   }
 }

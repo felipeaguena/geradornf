@@ -1,221 +1,254 @@
 /* ==========================================================================
-   NFT LOGISTICS - DESIGN SYSTEM THEME (Light & Dark Mode)
-   Sincronizado com: nftlogistics.com.br e docs.nftlogistics.com.br
+   NFT LOGISTICS - DESIGN SYSTEM (THEME LIGHT & DARK)
+   Estilo unificado, minimalista e de alta manutenibilidade
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
-/* --- 1. TOKENS DE CORES & VARIÁVEIS --- */
+/* ==========================================================================
+   1. TOKENS DE CORES & VARIÁVEIS DO SISTEMA
+   ========================================================================== */
 :root {
-  /* Marca NFT */
+  /* Identidade Visual NFT (Azul Tecnológico) */
   --primary: #0ea5e9;
   --primary-hover: #0284c7;
-  --primary-active: #0369a1;
   --primary-subtle: rgba(14, 165, 233, 0.12);
-  --primary-border: rgba(14, 165, 233, 0.35);
-  
-  /* Botoes NFT (Estilo Badges bg-info-subtle text-info) */
-  --btn-nft-bg: var(--info-subtle);
-  --btn-nft-color: var(--info);
-  --btn-nft-border: rgba(14, 165, 233, 0.3);
-  
-  --secondary: #818cab;
-  --secondary-hover: #6b7696;
-  
-  /* Superfícies & Fundo - Light */
-  --background: #f1f1f1;
-  --surface: #ffffff;
-  --surface-secondary: #F8F8F8;
-  --foreground: #21242a;
-  --heading: #161110;
-  --muted-foreground: #818cab;
-  --border: #e2e8f0;
-  --border-subtle: #edf2f7;
-  
-  /* Sombras */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  
-  /* Feedback */
-  --success: #10b981;
-  --success-subtle: rgba(16, 185, 129, 0.1);
-  --warning: #f59e0b;
-  --warning-subtle: rgba(245, 158, 11, 0.1);
-  --danger: #ef4444;
-  --danger-subtle: rgba(239, 68, 68, 0.1);
-  --info: #0ea5e9;
-  --info-subtle: rgba(14, 165, 233, 0.1);
-  --purple: #8b5cf6;
-  --purple-subtle: rgba(139, 92, 246, 0.1);
+  --primary-border: rgba(14, 165, 233, 0.32);
 
-  /* Dimensões & Raios */
+  /* Superfícies & Neutros (Modo Claro) */
+  --background: #f1f5f9;
+  --surface: #ffffff;
+  --surface-secondary: #f8fafc;
+  --surface-tertiary: #edf2f7;
+  --foreground: #1e293b;
+  --heading: #0f172a;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+
+  /* Estados e Feedback */
+  --success: #10b981;
+  --success-subtle: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-subtle: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-subtle: rgba(239, 68, 68, 0.12);
+  --info: var(--primary);
+  --info-subtle: var(--primary-subtle);
+
+  /* Botão Base NFT */
+  --btn-nft-bg: var(--primary-subtle);
+  --btn-nft-color: var(--primary);
+  --btn-nft-border: var(--primary-border);
+
+  /* Dimensões e Raios */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 18px;
-  --radius-full: 50px;
+  --radius-full: 999px;
 
-  /* Fontes */
+  /* Tipografia */
   --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-mono: 'JetBrains Mono', Consolas, monospace;
+
+  /* Sombras */
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
 
   color-scheme: light;
 }
 
-/* --- 2. DARK THEME (Mais Leve & Alto Contraste) --- */
-.dark,
-[data-theme="dark"] {
-  /* Marca NFT */
+/* Modo Escuro */
+[data-theme="dark"],
+.dark {
   --primary: #38bdf8;
   --primary-hover: #0ea5e9;
-  --primary-active: #0284c7;
-  --primary-subtle: rgba(56, 189, 248, 0.18);
+  --primary-subtle: rgba(56, 189, 248, 0.16);
   --primary-border: rgba(56, 189, 248, 0.35);
-  
-  /* Botoes NFT (Estilo Badges bg-info-subtle text-info) */
-  --btn-nft-bg: var(--info-subtle);
-  --btn-nft-color: var(--info);
-  --btn-nft-border: rgba(56, 189, 248, 0.35);
-  
-  --secondary: #94a3b8;
-  --secondary-hover: #cbd5e1;
-  
-  /* Superfícies & Fundo - Dark (Leve e Elegante com Alto Contraste) */
+
   --background: #11141a;
   --surface: #1a1e27;
   --surface-secondary: #222834;
   --surface-tertiary: #2b3242;
   --foreground: #e6ecf5;
   --heading: #ffffff;
-  --muted-foreground: #9db0c6;
-  --border: #353e50;
-  --border-subtle: #293140;
-  
-  /* Sombras */
-  --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 8px 16px -2px rgba(0, 0, 0, 0.25);
-  --card-shadow-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.45);
-  
-  /* Feedback */
+  --muted-foreground: #94a3b8;
+  --border: #313a4b;
+
   --success: #10b981;
   --success-subtle: rgba(16, 185, 129, 0.18);
   --warning: #f59e0b;
   --warning-subtle: rgba(245, 158, 11, 0.18);
   --danger: #ef4444;
   --danger-subtle: rgba(239, 68, 68, 0.18);
-  --info: #38bdf8;
-  --info-subtle: rgba(56, 189, 248, 0.18);
-  --purple: #a78bfa;
-  --purple-subtle: rgba(167, 139, 250, 0.18);
+  --info: var(--primary);
+  --info-subtle: var(--primary-subtle);
+
+  --btn-nft-bg: var(--primary-subtle);
+  --btn-nft-color: var(--primary);
+  --btn-nft-border: var(--primary-border);
+
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --card-shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.5);
 
   color-scheme: dark;
 }
 
-/* --- 3. REGRAS GERAIS & TIPOGRAFIA PADRONIZADA --- */
+/* ==========================================================================
+   2. REGRAS GERAIS & TIPOGRAFIA
+   ========================================================================== */
 body {
   background-color: var(--background) !important;
   color: var(--foreground) !important;
   font-family: var(--font-sans) !important;
   font-size: 14px;
   line-height: 1.5;
-  transition: background-color 0.25s ease, color 0.25s ease;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Todos os títulos compartilham estritamente a mesma cor padronizada */
-h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6,
-.card-title, .modal-title {
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   color: var(--heading) !important;
-  font-family: var(--font-sans) !important;
-  font-weight: 700 !important;
+  font-weight: 700;
   letter-spacing: -0.015em;
 }
 
-/* Sobrescrever utilitários de cor em títulos para garantir harmonia visual absoluta */
-h1[class*="text-"], h2[class*="text-"], h3[class*="text-"],
-h4[class*="text-"], h5[class*="text-"], h6[class*="text-"] {
-  color: var(--heading) !important;
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
-code, kbd, samp, pre, .font-monospace {
-  font-family: var(--font-mono) !important;
+a:hover {
+  color: var(--primary-hover);
 }
 
-.text-muted,
-small.text-muted {
+.text-muted {
   color: var(--muted-foreground) !important;
 }
 
-/* --- 4. BRAND LOGOS & THEME SWITCHING --- */
-.logo-theme-white {
-  display: none !important;
-}
-.logo-theme-black {
-  display: inline-block !important;
+.font-mono, .code-preview {
+  font-family: var(--font-mono) !important;
 }
 
-.dark .logo-theme-white,
-[data-theme="dark"] .logo-theme-white {
-  display: inline-block !important;
-}
-.dark .logo-theme-black,
-[data-theme="dark"] .logo-theme-black {
-  display: none !important;
-}
+/* Alternância de Logos (Light / Dark) */
+.logo-theme-white { display: none !important; }
+.logo-theme-black { display: inline-block !important; }
 
-/* --- 5. CARDS, SUPERFÍCIES E BORDAS --- */
+[data-theme="dark"] .logo-theme-white { display: inline-block !important; }
+[data-theme="dark"] .logo-theme-black { display: none !important; }
+
+/* ==========================================================================
+   3. CARDS E SUPERFÍCIES
+   ========================================================================== */
 .card, .bg-white {
   background-color: var(--surface) !important;
   color: var(--foreground) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: var(--card-shadow) !important;
-  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .card-header {
-  background-color: transparent !important;
   background: transparent !important;
   border-bottom: 1px solid var(--border) !important;
   color: var(--heading) !important;
   font-weight: 600;
   padding: 0.85rem 1.25rem !important;
-  border-top-left-radius: var(--radius-lg) !important;
-  border-top-right-radius: var(--radius-lg) !important;
 }
 
 .card-body {
   padding: 0.85rem 1.25rem !important;
 }
-.card-body.p-0 {
-  padding: 0 !important;
-}
 
 .card-footer {
   background-color: var(--surface) !important;
   border-top: 1px solid var(--border) !important;
-  border-bottom-left-radius: var(--radius-lg) !important;
-  border-bottom-right-radius: var(--radius-lg) !important;
+}
+
+.bg-light, .bg-body-tertiary {
+  background-color: var(--surface-secondary) !important;
+  color: var(--foreground) !important;
 }
 
 .border, .border-top, .border-bottom, .border-start, .border-end {
   border-color: var(--border) !important;
 }
 
-.bg-light {
-  background-color: var(--surface-secondary) !important;
+/* ==========================================================================
+   4. FORMULÁRIOS & CONTROLES
+   ========================================================================== */
+.form-control,
+.form-select,
+.input-group-text {
+  background-color: var(--surface) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  padding: 0.375rem 0.75rem !important;
+  line-height: 1.5 !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* --- 6. BOTÕES DO SISTEMA (NFT STYLE) --- */
+.form-control-sm,
+.form-select-sm,
+.input-group-sm > .form-control,
+.input-group-sm > .form-select,
+.input-group-sm > .input-group-text,
+.input-group-sm > .btn {
+  min-height: 36px !important;
+  height: 36px !important;
+  font-size: 0.875rem !important;
+  padding: 0.375rem 0.75rem !important;
+}
+
+textarea.form-control {
+  min-height: auto !important;
+  height: auto !important;
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground) !important;
+  opacity: 0.7;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--primary-subtle) !important;
+  outline: none !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+  background-color: #151821 !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+  background-color: #171b26 !important;
+  border-color: var(--primary) !important;
+}
+
+.input-group-text {
+  background-color: var(--surface-secondary) !important;
+  color: var(--muted-foreground) !important;
+}
+
+/* ==========================================================================
+   5. BOTÕES DO SISTEMA
+   ========================================================================== */
 .btn {
   font-family: var(--font-sans);
   font-weight: 600;
   border-radius: var(--radius-md);
   padding: 0.45rem 1rem;
   font-size: 0.875rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
+  transition: all 0.18s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -230,16 +263,14 @@ small.text-muted {
 .btn-primary {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
-  color: #11141A !important;
-  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.35);
+  color: #11141a !important;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
   background-color: var(--primary-hover) !important;
   border-color: var(--primary-hover) !important;
-  color: #11141A !important;
-  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.35);
+  color: #ffffff !important;
 }
 
 .btn-outline-primary {
@@ -257,7 +288,6 @@ small.text-muted {
   background-color: var(--success) !important;
   border-color: var(--success) !important;
   color: #ffffff !important;
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
 .btn-success:hover {
@@ -276,121 +306,90 @@ small.text-muted {
   border-color: var(--muted-foreground) !important;
 }
 
-/* --- 7. INPUTS, SELECTS E FORM CONTROLS (PADRONIZAÇÃO DE ALTURA E ALINHAMENTO) --- */
-.form-control,
-.form-select,
-.input-group-text {
-  background-color: var(--surface) !important;
-  color: var(--foreground) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem !important;
-  min-height: 36px !important;
-  height: 36px !important;
-  padding: 0.375rem 0.75rem !important;
-  line-height: 1.5 !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-.form-control-sm,
-.form-select-sm,
-.input-group-sm > .form-control,
-.input-group-sm > .form-select,
-.input-group-sm > .input-group-text,
-.input-group-sm > .btn {
-  min-height: 36px !important;
-  height: 36px !important;
-  font-size: 0.875rem !important;
-  padding: 0.375rem 0.75rem !important;
-  line-height: 1.5 !important;
-}
-
-textarea.form-control,
-textarea.form-control-sm {
-  min-height: auto !important;
-  height: auto !important;
-}
-
-.form-control::placeholder {
-  color: var(--muted-foreground) !important;
-  opacity: 0.7;
-}
-
-.form-control:focus {
-  border-color: #0ea5e9 !important;
-  box-shadow: 0 0 0 3px var(--primary-subtle) !important;
-  outline: none !important;
-}
-.form-select:focus {
-  border-color: #0ea5e9 !important;
-  box-shadow: 0 0 0 3px var(--primary-subtle) !important;
-  outline: none !important;
-}
-
-.input-group-text {
-  background-color: var(--surface-secondary) !important;
-  color: var(--muted-foreground) !important;
-}
-
-/* --- 8. ABAS (NAV TABS NFT STYLE) --- */
-.nav-tabs {
-  border-bottom: 2px solid var(--border) !important;
-  gap: 0.25rem;
-}
-
-.nav-tabs .nav-link {
+/* Botão Padrão NFT Pílula */
+.btn-nft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--muted-foreground) !important;
-  border: none !important;
-  border-bottom: 3px solid transparent !important;
-  padding: 0.65rem 1rem !important;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  transition: all 0.2s ease;
-  background-color: transparent !important;
+  border: 1px solid var(--btn-nft-border);
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  border-radius: var(--radius-full);
+  background-color: var(--btn-nft-bg);
+  color: var(--btn-nft-color);
+  text-decoration: none;
+  transition: all 0.15s ease-in-out;
 }
 
-.nav-tabs .nav-link:hover {
-  color: var(--primary) !important;
-  background-color: var(--primary-subtle) !important;
+.btn-nft:hover,
+.btn-nft:focus {
+  background-color: var(--primary);
+  color: #11141a;
+  border-color: var(--primary);
 }
 
-.nav-tabs .nav-link.active {
-  color: var(--primary) !important;
-  border-bottom: 3px solid var(--primary) !important;
-  background-color: var(--surface) !important;
+.btn-nft-success {
+  background-color: var(--success-subtle) !important;
+  color: var(--success) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
 }
 
-/* --- DROPDOWNS --- */
-.dropdown-menu {
-  background-color: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: var(--card-shadow-hover) !important;
-  border-radius: var(--radius-md) !important;
-  padding: 0.5rem !important;
-  z-index: 1050;
-}
-
-.dropdown-item {
-  color: var(--foreground) !important;
-  border-radius: var(--radius-sm) !important;
-  transition: all 0.15s ease;
-  font-size: 0.875rem;
-}
-
-.dropdown-item:hover,
-.dropdown-item:focus {
-  background-color: var(--primary-subtle) !important;
-  color: var(--primary) !important;
-}
-
-.dropdown-item.active,
-.dropdown-item:active {
-  background-color: var(--primary) !important;
+.btn-nft-success:hover,
+.btn-nft-success:focus {
+  background-color: var(--success) !important;
   color: #ffffff !important;
+  border-color: var(--success) !important;
 }
 
-/* --- 9. TABELAS (BOOTSTRAP, HANDSONTABLE & TABULATOR) --- */
+.btn-nft-danger {
+  background-color: var(--danger-subtle) !important;
+  color: var(--danger) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+.btn-nft-danger:hover,
+.btn-nft-danger:focus {
+  background-color: var(--danger) !important;
+  color: #ffffff !important;
+  border-color: var(--danger) !important;
+}
+
+.btn-nft-warning {
+  background-color: var(--warning-subtle) !important;
+  color: var(--warning) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+.btn-nft-warning:hover,
+.btn-nft-warning:focus {
+  background-color: var(--warning) !important;
+  color: #11141a !important;
+  border-color: var(--warning) !important;
+}
+
+.btn-icon-grow {
+  color: var(--primary);
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-icon-grow:hover {
+  transform: scale(1.15);
+  color: var(--primary-hover);
+}
+
+/* ==========================================================================
+   6. TABELAS (BOOTSTRAP & TABULATOR)
+   ========================================================================== */
 .table {
   color: var(--foreground) !important;
   border-color: var(--border) !important;
@@ -422,7 +421,7 @@ textarea.form-control-sm {
   background-color: var(--surface-secondary) !important;
 }
 
-/* Tabulator NFT Styling */
+/* Tabulator Estilização Unificada */
 .tabulator {
   font-family: var(--font-sans) !important;
   font-size: 13px !important;
@@ -450,149 +449,63 @@ textarea.form-control-sm {
   background-color: var(--primary-subtle) !important;
 }
 
-/* Cabeçalho - 3 Primeiras Colunas Fixas (Fundo Sólido e Opaco) */
 .tabulator .tabulator-header .tabulator-col.tabulator-frozen,
 .tabulator .tabulator-header .tabulator-col:nth-child(-n+3) {
-  background-color: #f8fafc !important;
+  background-color: var(--surface-secondary) !important;
   position: sticky !important;
   z-index: 12 !important;
 }
 
-.dark .tabulator .tabulator-header,
-.dark .tabulator .tabulator-header .tabulator-col,
-.dark .tabulator .tabulator-header .tabulator-col.tabulator-frozen,
-.dark .tabulator .tabulator-header .tabulator-col:nth-child(-n+3),
-[data-theme="dark"] .tabulator .tabulator-header,
-[data-theme="dark"] .tabulator .tabulator-header .tabulator-col,
-[data-theme="dark"] .tabulator .tabulator-header .tabulator-col.tabulator-frozen,
-[data-theme="dark"] .tabulator .tabulator-header .tabulator-col:nth-child(-n+3) {
-  background-color: #222834 !important;
-  color: #ffffff !important;
-  position: sticky !important;
-  z-index: 12 !important;
-}
-
-/* --- LIGHT THEME: LINHA NORMAL (ODD) --- */
 .tabulator .tabulator-row {
-  background-color: #ffffff !important;
+  background-color: var(--surface) !important;
   color: var(--foreground) !important;
   border-bottom: 1px solid var(--border) !important;
 }
 
-.tabulator .tabulator-row .tabulator-cell.tabulator-frozen,
-.tabulator .tabulator-row .tabulator-cell:nth-child(-n+3) {
-  background-color: #ffffff !important;
-  position: sticky !important;
-  z-index: 10 !important;
-}
-
-/* --- LIGHT THEME: LINHA PAR (EVEN) --- */
 .tabulator .tabulator-row.tabulator-row-even {
-  background-color: #f8fafc !important;
+  background-color: var(--surface-secondary) !important;
 }
 
-.tabulator .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen,
-.tabulator .tabulator-row.tabulator-row-even .tabulator-cell:nth-child(-n+3) {
-  background-color: #f8fafc !important;
-  position: sticky !important;
-  z-index: 10 !important;
-}
-
-/* --- LIGHT THEME: HOVER --- */
 .tabulator .tabulator-row:hover,
-.tabulator .tabulator-row:hover .tabulator-cell,
-.tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
-.tabulator .tabulator-row:hover .tabulator-cell:nth-child(-n+3) {
-  background-color: #F8F8F8 !important;
-  color: var(--foreground) !important;
-}
-
-/* --- DARK THEME: LINHA NORMAL (ODD) --- */
-.dark .tabulator .tabulator-row,
-[data-theme="dark"] .tabulator .tabulator-row {
-  background-color: #1a1e27 !important;
-  color: #e6ecf5 !important;
-}
-
-.dark .tabulator .tabulator-row .tabulator-cell.tabulator-frozen,
-.dark .tabulator .tabulator-row .tabulator-cell:nth-child(-n+3),
-[data-theme="dark"] .tabulator .tabulator-row .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] .tabulator .tabulator-row .tabulator-cell:nth-child(-n+3) {
-  background-color: #1a1e27 !important;
-  position: sticky !important;
-  z-index: 10 !important;
-}
-
-/* --- DARK THEME: LINHA PAR (EVEN) --- */
-.dark .tabulator .tabulator-row.tabulator-row-even,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-row-even {
-  background-color: #222834 !important;
-}
-
-.dark .tabulator .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen,
-.dark .tabulator .tabulator-row.tabulator-row-even .tabulator-cell:nth-child(-n+3),
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-row-even .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-row-even .tabulator-cell:nth-child(-n+3) {
-  background-color: #222834 !important;
-  position: sticky !important;
-  z-index: 10 !important;
-}
-
-/* --- DARK THEME: HOVER --- */
-.dark .tabulator .tabulator-row:hover,
-.dark .tabulator .tabulator-row:hover .tabulator-cell,
-.dark .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
-.dark .tabulator .tabulator-row:hover .tabulator-cell:nth-child(-n+3),
-.dark #itens .tabulator .tabulator-row:hover,
-.dark #itens .tabulator .tabulator-row:hover .tabulator-cell,
-.dark #itens-table .tabulator-row:hover,
-.dark #itens-table .tabulator-row:hover .tabulator-cell,
-.dark #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen,
-.dark #itens-table .tabulator-row:hover .tabulator-cell:nth-child(-n+3),
-[data-theme="dark"] .tabulator .tabulator-row:hover,
-[data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell,
-[data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] .tabulator .tabulator-row:hover .tabulator-cell:nth-child(-n+3),
-[data-theme="dark"] #itens-table .tabulator-row:hover,
-[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell,
-[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] #itens-table .tabulator-row:hover .tabulator-cell:nth-child(-n+3) {
-  background-color: #2c3545 !important;
-  color: #ffffff !important;
-}
-
-.dark .tabulator .tabulator-row:hover .text-primary,
-.dark #itens-table .tabulator-row:hover .text-primary,
-[data-theme="dark"] .tabulator .tabulator-row:hover .text-primary,
-[data-theme="dark"] #itens-table .tabulator-row:hover .text-primary {
-  color: rgba(14, 165, 233, 0.35) !important;
-}
-
-/* Botão de Edição Rápida na Tabela de Itens (Clean / Sem borda) */
-.btn-editar-item {
-  color: var(--primary, #0d6efd) !important;
-  opacity: 0.8;
-  border-radius: 4px;
-  transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
-}
-.btn-editar-item:hover {
-  opacity: 1;
-  background-color: rgba(13, 110, 253, 0.12) !important;
-  transform: scale(1.12);
-}
-.dark .btn-editar-item,
-[data-theme="dark"] .btn-editar-item {
-  color: #60a5fa !important;
-}
-.dark .btn-editar-item:hover,
-[data-theme="dark"] .btn-editar-item:hover {
-  background-color: rgba(255, 255, 255, 0.12) !important;
-  color: #93c5fd !important;
+.tabulator .tabulator-row:hover .tabulator-cell {
+  background-color: var(--surface-tertiary) !important;
 }
 
 .tabulator .tabulator-cell {
   border-right: 1px solid var(--border) !important;
   padding: 6px 8px !important;
+}
+
+/* Colunas fixas (Frozen) */
+.tabulator .tabulator-row .tabulator-cell.tabulator-frozen,
+.tabulator .tabulator-row .tabulator-cell:nth-child(-n+3) {
+  background-color: inherit !important;
+  position: sticky !important;
+  z-index: 10 !important;
+}
+
+/* Seleção de Linhas */
+.tabulator .tabulator-row.tabulator-selected,
+.tabulator .tabulator-row.tabulator-selected .tabulator-cell {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.tabulator .tabulator-row.tabulator-selected .tabulator-cell * {
+  color: #ffffff !important;
+}
+
+.tabulator .tabulator-row.tabulator-selected:hover,
+.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell {
+  background-color: var(--primary-hover) !important;
+  color: #ffffff !important;
+}
+
+.tabulator input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
 }
 
 .tabulator-footer {
@@ -614,102 +527,104 @@ textarea.form-control-sm {
   color: #ffffff !important;
 }
 
-/* Handsontable Dark Mode Adaptations */
-.dark .handsontable,
-[data-theme="dark"] .handsontable {
-  color: var(--foreground) !important;
+.btn-editar-item {
+  color: var(--primary) !important;
+  opacity: 0.85;
+  border-radius: 4px;
+  transition: all 0.15s ease;
 }
 
-.dark .handsontable th,
-[data-theme="dark"] .handsontable th {
-  background-color: #222834 !important;
-  color: #ffffff !important;
-  border-color: #353e50 !important;
+.btn-editar-item:hover {
+  opacity: 1;
+  background-color: var(--primary-subtle) !important;
+  transform: scale(1.12);
 }
 
-.dark .handsontable td,
-[data-theme="dark"] .handsontable td {
-  background-color: #1a1e27 !important;
-  color: #e6ecf5 !important;
-  border-color: #2c3444 !important;
-}
-
-.dark .handsontable .htDimmed,
-[data-theme="dark"] .handsontable .htDimmed {
-  color: #9db0c6 !important;
-}
-
-.dark .handsontable td.current,
-[data-theme="dark"] .handsontable td.current {
-  background-color: rgba(237, 90, 36, 0.22) !important;
-}
-
-/* --- 10. BADGES & PILLS --- */
+/* ==========================================================================
+/* ==========================================================================
+   7. BADGES & PILLS (PADRÃO UNIFICADO --SUCCESS)
+   ========================================================================== */
 .badge {
   font-weight: 600;
   padding: 0.35rem 0.6rem;
   border-radius: var(--radius-sm);
-}
-
-.badge.bg-primary {
-  background-color: var(--primary) !important;
-}
-
-.badge.bg-success {
-  background-color: var(--success) !important;
-}
-
-.badge.bg-warning {
-  background-color: var(--warning) !important;
-  color: #1f2937 !important;
-}
-
-.badge.bg-info-subtle {
-  background-color: var(--info-subtle) !important;
-  color: var(--info) !important;
-  border: 1px solid rgba(14, 165, 233, 0.3) !important;
-}
-
-.badge.bg-success-subtle {
   background-color: var(--success-subtle) !important;
   color: var(--success) !important;
-  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border: 1px solid rgba(16, 185, 129, 0.32) !important;
+  transition: all 0.15s ease;
 }
 
-.badge.bg-warning-subtle {
-  background-color: var(--warning-subtle) !important;
-  color: #d97706 !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+/* Badges preenchidos sólidos com --success */
+.badge.bg-success,
+.badge.bg-primary {
+  background-color: var(--success) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--success) !important;
 }
 
-/* --- 11. BOTAO FLUTUANTE DE TEMA (THEME TOGGLE) --- */
-.theme-toggle-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background-color: var(--surface);
-  color: var(--foreground);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* Badges sutis e variantes unificados com estilo --success */
+.badge.bg-info-subtle,
+.badge.bg-success-subtle,
+.badge.bg-warning-subtle,
+.badge.bg-secondary-subtle {
+  background-color: var(--success-subtle) !important;
+  color: var(--success) !important;
+  border: 1px solid rgba(16, 185, 129, 0.32) !important;
 }
 
-.theme-toggle-btn:hover {
-  background-color: var(--primary-subtle);
-  border-color: var(--primary);
-  color: var(--primary);
+/* Badges específicos de rascunhos e contadores */
+.badge-origem-rascunho,
+.badge-origem-di,
+.badge-origem-nova,
+.badge-origem-rasc,
+.badge-categoria-rascunho {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background-color: var(--success-subtle) !important;
+  border: 1px solid rgba(16, 185, 129, 0.32) !important;
+  color: var(--success) !important;
 }
 
-/* --- 12. ALERTA CALLOUT (ATTENTION NFT STYLE) --- */
+/* ==========================================================================
+   8. NAVEGAÇÃO, ABAS E ALERTAS
+   ========================================================================== */
+.nav-tabs {
+  border-bottom: 2px solid var(--border) !important;
+  gap: 0.25rem;
+}
+
+.nav-tabs .nav-link {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--muted-foreground) !important;
+  border: none !important;
+  border-bottom: 3px solid transparent !important;
+  padding: 0.65rem 1rem !important;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: all 0.18s ease;
+  background-color: transparent !important;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--primary) !important;
+  background-color: var(--primary-subtle) !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary) !important;
+  border-bottom: 3px solid var(--primary) !important;
+  background-color: var(--surface) !important;
+}
+
 .alert-attention {
   background-color: var(--primary-subtle);
   border-left: 4px solid var(--primary);
-  border-top: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-left-color: var(--primary);
   border-radius: var(--radius-md);
   padding: 0.9rem 1.25rem;
   color: var(--heading);
@@ -718,29 +633,11 @@ textarea.form-control-sm {
 .alert-attention h6 {
   color: var(--primary) !important;
   font-weight: 700;
-  margin-bottom: 0.25rem;
 }
 
-/* --- 13. PAGINAÇÃO --- */
-.page-link {
-  background-color: var(--surface) !important;
-  border-color: var(--border) !important;
-  color: var(--foreground) !important;
-}
-
-.page-item.active .page-link {
-  background-color: var(--primary) !important;
-  border-color: var(--primary) !important;
-  color: #ffffff !important;
-}
-
-.page-item.disabled .page-link {
-  background-color: var(--surface-secondary) !important;
-  color: var(--muted-foreground) !important;
-  border-color: var(--border) !important;
-}
-
-/* --- 14. ÍCONES EM LINHA MINIMALISTAS (LUCIDE / LINE-ICONS) --- */
+/* ==========================================================================
+   9. ÍCONES E UTILITÁRIOS
+   ========================================================================== */
 .lucide, svg.lucide {
   width: 1.15em;
   height: 1.15em;
@@ -752,106 +649,21 @@ textarea.form-control-sm {
   display: inline-block;
   fill: none;
   flex-shrink: 0;
-  transition: stroke 0.2s ease, transform 0.2s ease;
 }
 
-.lucide-sm, svg.lucide.lucide-sm {
-  width: 0.95em;
-  height: 0.95em;
-  stroke-width: 1.6;
-}
+.icon-xs { width: 12px !important; height: 12px !important; }
+.icon-sm { width: 14px !important; height: 14px !important; }
+.icon-md { width: 16px !important; height: 16px !important; }
+.icon-lg { width: 20px !important; height: 20px !important; }
+.icon-xl { width: 32px !important; height: 32px !important; }
 
-.lucide-lg, svg.lucide.lucide-lg {
-  width: 1.35em;
-  height: 1.35em;
-  stroke-width: 1.8;
-}
-
-.sidebar-icon .lucide,
-.sidebar-icon svg.lucide {
-  width: 18px;
-  height: 18px;
-  stroke: currentColor;
-  stroke-width: 1.75;
-  vertical-align: middle;
-}
-
-/* --- 15. COMPONENTES DE RASCUNHOS SALVOS --- */
-.badge-origem-rascunho {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.25rem 0.55rem;
-  border-radius: var(--radius-sm);
-  background-color: var(--surface-secondary);
-  border: 1px solid var(--border);
-  color: var(--muted-foreground);
-}
-
-.badge-origem-di {
-  background-color: rgba(14, 165, 233, 0.12);
-  border-color: rgba(14, 165, 233, 0.3);
-  color: #0284c7;
-}
-
-[data-theme="dark"] .badge-origem-di {
-  background-color: rgba(14, 165, 233, 0.2);
-  border-color: rgba(14, 165, 233, 0.4);
-  color: #38bdf8;
-}
-
-.badge-origem-rasc {
-  background-color: rgba(237, 90, 36, 0.12);
-  border-color: rgba(237, 90, 36, 0.3);
-  color: var(--primary);
-}
-
-.badge-origem-nova {
-  background-color: rgba(16, 185, 129, 0.12);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #059669;
-}
-
-[data-theme="dark"] .badge-origem-nova {
-  background-color: rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #34d399;
-}
-
-.badge-categoria-rascunho {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background-color: var(--surface-secondary);
-  border: 1px solid var(--border);
-  color: var(--foreground);
-}
-
-/* --- 16. MODAIS, POPUPS & BACKDROP BLUR --- */
+/* ==========================================================================
+   10. MODAIS E CAIXAS DE DIÁLOGO
+   ========================================================================== */
 .modal-backdrop {
-  --bs-backdrop-bg: #090c12 !important;
-  --bs-backdrop-opacity: 0.75 !important;
   background-color: rgba(9, 12, 18, 0.75) !important;
-  backdrop-filter: blur(8px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
-  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.modal-backdrop.show {
-  opacity: 1 !important;
-}
-
-.modal {
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
-.modal-dialog {
-  display: flex;
-  align-items: center;
-  min-height: calc(100% - 3.5rem);
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 .modal-content {
@@ -859,24 +671,11 @@ textarea.form-control-sm {
   color: var(--foreground) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-xl) !important;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--border) !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45) !important;
   overflow: hidden;
-  animation: nftModalZoomIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes nftModalZoomIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 .modal-header {
-  background-color: var(--surface) !important;
   border-bottom: 1px solid var(--border) !important;
   padding: 1.15rem 1.4rem !important;
 }
@@ -891,18 +690,11 @@ textarea.form-control-sm {
   padding: 1.4rem !important;
 }
 
-.btn-close {
-  filter: var(--btn-close-filter, none);
-  opacity: 0.6;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+[data-theme="dark"] .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
 }
 
-.btn-close:hover {
-  opacity: 1;
-  transform: scale(1.08);
-}
-
-/* --- 17. SISTEMA DE POPUPS MODERNOS (ALERT & CONFIRM) --- */
+/* Diálogos Globais (nft-dialogs) */
 .nft-dialog-overlay {
   position: fixed;
   inset: 0;
@@ -911,11 +703,11 @@ textarea.form-control-sm {
   align-items: center;
   justify-content: center;
   background-color: rgba(9, 12, 18, 0.75);
-  backdrop-filter: blur(10px) saturate(140%);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 1.25rem;
   opacity: 0;
-  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.22s ease;
 }
 
 .nft-dialog-overlay.active {
@@ -927,7 +719,7 @@ textarea.form-control-sm {
   color: var(--foreground);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
   max-width: 460px;
   width: 100%;
   padding: 1.6rem 1.75rem;
@@ -935,9 +727,8 @@ textarea.form-control-sm {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  transform: scale(0.94);
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+  transform: scale(0.95);
+  transition: transform 0.22s ease;
 }
 
 .nft-dialog-overlay.active .nft-dialog-box {
@@ -953,7 +744,6 @@ textarea.form-control-sm {
   justify-content: center;
   margin-bottom: 1.1rem;
   flex-shrink: 0;
-  transition: all 0.2s ease;
 }
 
 .nft-dialog-icon-wrap.type-info {
@@ -971,7 +761,7 @@ textarea.form-control-sm {
 .nft-dialog-icon-wrap.type-warning {
   background-color: var(--warning-subtle);
   border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .nft-dialog-icon-wrap.type-danger {
@@ -980,19 +770,11 @@ textarea.form-control-sm {
   color: var(--danger);
 }
 
-.nft-dialog-icon-wrap .lucide,
-.nft-dialog-icon-wrap svg {
-  width: 28px;
-  height: 28px;
-  stroke-width: 2;
-}
-
 .nft-dialog-title {
   color: var(--heading) !important;
   font-size: 1.15rem;
   font-weight: 700;
   margin-bottom: 0.65rem;
-  letter-spacing: -0.015em;
 }
 
 .nft-dialog-message {
@@ -1000,215 +782,21 @@ textarea.form-control-sm {
   font-size: 0.92rem;
   line-height: 1.55;
   margin-bottom: 1.4rem;
-  word-break: break-word;
-  max-height: 60vh;
-  overflow-y: auto;
-  text-align: center;
-}
-
-.nft-dialog-message p {
-  margin-bottom: 0.5rem;
-}
-
-.nft-dialog-message p:last-child {
-  margin-bottom: 0;
 }
 
 .nft-dialog-actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 0.75rem;
   width: 100%;
 }
 
 .nft-dialog-actions .btn {
   flex: 1;
-  min-height: 38px;
-  font-weight: 600;
-  border-radius: var(--radius-md);
-}
-
-/* --- 18. REGRAS EXTRAS DE ALTO CONTRASTE PARA O MODO ESCURO --- */
-.dark .text-dark,
-[data-theme="dark"] .text-dark {
-  color: var(--heading) !important;
-}
-
-.dark .text-muted,
-[data-theme="dark"] .text-muted {
-  color: var(--muted-foreground) !important;
-}
-
-.dark .text-secondary,
-[data-theme="dark"] .text-secondary {
-  color: #9db0c6 !important;
-}
-
-.dark .bg-light,
-[data-theme="dark"] .bg-light {
-  background-color: var(--surface-secondary) !important;
-  color: var(--foreground) !important;
-}
-
-.dark .bg-body-tertiary,
-[data-theme="dark"] .bg-body-tertiary {
-  background-color: var(--surface-secondary) !important;
-  color: var(--foreground) !important;
-}
-
-.dark .table-light,
-[data-theme="dark"] .table-light {
-  background-color: var(--surface-secondary) !important;
-  color: var(--heading) !important;
-  border-color: var(--border) !important;
-}
-
-.dark .table-light th,
-[data-theme="dark"] .table-light th {
-  background-color: var(--surface-secondary) !important;
-  color: var(--heading) !important;
-  border-color: var(--border) !important;
-}
-
-.dark .form-control,
-[data-theme="dark"] .form-control,
-.dark .form-select,
-[data-theme="dark"] .form-select {
-  background-color: #151821 !important;
-  border-color: var(--border) !important;
-  color: #f1f5f9 !important;
-}
-
-.dark .form-control:focus,
-[data-theme="dark"] .form-control:focus {
-  background-color: #171b26 !important;
-  border-color: #0ea5e9 !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 0 3px var(--primary-subtle) !important;
-}
-.dark .form-select:focus,
-[data-theme="dark"] .form-select:focus {
-  background-color: #171b26 !important;
-  border-color: #0ea5e9 !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 0 3px var(--primary-subtle) !important;
-}
-
-.dark .input-group-text,
-[data-theme="dark"] .input-group-text {
-  background-color: var(--surface-secondary) !important;
-  border-color: var(--border) !important;
-  color: var(--muted-foreground) !important;
-}
-
-.dark .btn-close,
-[data-theme="dark"] .btn-close {
-  filter: invert(1) grayscale(100%) brightness(200%) !important;
-}
-
-.dark .badge.bg-warning-subtle,
-[data-theme="dark"] .badge.bg-warning-subtle {
-  background-color: rgba(245, 158, 11, 0.2) !important;
-  color: #fbbf24 !important;
-  border: 1px solid rgba(245, 158, 11, 0.35) !important;
-}
-
-.dark .badge.bg-secondary-subtle,
-[data-theme="dark"] .badge.bg-secondary-subtle {
-  background-color: var(--surface-tertiary) !important;
-  color: var(--foreground) !important;
-  border: 1px solid var(--border) !important;
 }
 
 /* ==========================================================================
-   21. UTILITÁRIOS DE ÍCONES E DIMENSÕES PADRONIZADAS
+   11. PORTAL INICIAL (PORTAL.HTML)
    ========================================================================== */
-.icon-xs {
-  width: 12px !important;
-  height: 12px !important;
-}
-
-.icon-sm {
-  width: 14px !important;
-  height: 14px !important;
-}
-
-.icon-md {
-  width: 16px !important;
-  height: 16px !important;
-}
-
-.icon-lg {
-  width: 20px !important;
-  height: 20px !important;
-}
-
-.icon-xl {
-  width: 32px !important;
-  height: 32px !important;
-}
-
-.table-scroll-560 {
-  max-height: 560px;
-}
-
-.table-scroll-480 {
-  max-height: 480px;
-}
-
-/* ==========================================================================
-   22. BANCO NCM & ESTATÍSTICAS
-   ========================================================================== */
-.table-ncm {
-  font-size: 13px;
-}
-
-.badge-utrib {
-  font-size: 0.85rem;
-  padding: 4px 8px;
-  font-family: var(--font-mono);
-}
-
-.card-stat {
-  border-left: 4px solid var(--primary);
-}
-
-/* ==========================================================================
-   23. PORTAL INICIAL (PORTAL.HTML)
-   ========================================================================== */
-:root {
-  --portal-card-w: 460px;
-}
-
-.portal-navbar {
-  padding: 1.25rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 10;
-}
-
-.portal-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  text-decoration: none;
-}
-
-.portal-brand-badge {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--muted-foreground);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
 .portal-hero {
   flex: 1;
   display: flex;
@@ -1216,15 +804,12 @@ textarea.form-control-sm {
   justify-content: center;
   align-items: center;
   padding: 1.5rem 1.5rem 3rem 1.5rem;
-  position: relative;
 }
 
 .portal-hero-header {
   text-align: center;
   max-width: 680px;
   margin-bottom: 2.75rem;
-  position: relative;
-  z-index: 1;
 }
 
 .portal-tagline {
@@ -1239,9 +824,9 @@ textarea.form-control-sm {
   letter-spacing: 0.08em;
   margin-bottom: 0.75rem;
   padding: 0.3rem 0.85rem;
-  border-radius: 999px;
-  background: rgba(14, 165, 233, 0.12);
-  border: 1px solid rgba(14, 165, 233, 0.1)
+  border-radius: var(--radius-full);
+  background: var(--primary-subtle);
+  border: 1px solid var(--primary-border);
 }
 
 .portal-title {
@@ -1249,15 +834,12 @@ textarea.form-control-sm {
   font-weight: 800;
   color: var(--heading);
   letter-spacing: -0.03em;
-  line-height: 1.15;
   margin-bottom: 0.75rem;
 }
 
 .portal-subtitle {
   font-size: 1.05rem;
   color: var(--muted-foreground);
-  margin: 0;
-  line-height: 1.5;
 }
 
 .portal-cards-grid {
@@ -1267,21 +849,18 @@ textarea.form-control-sm {
   gap: 2.25rem;
   width: 100%;
   max-width: 1040px;
-  position: relative;
-  z-index: 1;
 }
 
 @media (max-width: 991px) {
   .portal-cards-grid {
     flex-direction: column;
     align-items: center;
-    gap: 1.75rem;
   }
 }
 
 .portal-card {
   flex: 1;
-  max-width: var(--portal-card-w);
+  max-width: 460px;
   width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1290,31 +869,18 @@ textarea.form-control-sm {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.35s ease;
-  position: relative;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   cursor: pointer;
 }
 
 .portal-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px);
   border-color: var(--primary) !important;
-  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.16), 0 0 0 1px var(--primary);
-}
-
-[data-theme="dark"] .portal-card:hover {
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--primary), 0 0 28px rgba(237, 90, 36, 0.2);
-}
-
-.portal-card:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 4px;
+  box-shadow: var(--card-shadow-hover), 0 0 0 1px var(--primary);
 }
 
 .portal-card-img-wrap {
-  position: relative;
   width: 100%;
   height: 230px;
   overflow: hidden;
@@ -1325,36 +891,11 @@ textarea.form-control-sm {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s ease;
 }
 
 .portal-card:hover .portal-card-img {
-  transform: scale(1.05);
-}
-
-.portal-card-badge {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-radius: var(--radius-sm);
-  background: rgba(17, 19, 23, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.portal-card-badge.badge-primary-accent {
-  border-color: rgba(14, 165, 233, 0.35) !important;
-  color: #fff;
+  transform: scale(1.04);
 }
 
 .portal-card-content {
@@ -1369,12 +910,7 @@ textarea.form-control-sm {
   font-size: 1.45rem;
   font-weight: 800;
   color: var(--heading);
-  margin: 0 0 0.65rem 0;
-  letter-spacing: -0.02em;
-  transition: color 0.25s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  margin-bottom: 0.65rem;
 }
 
 .portal-card:hover .portal-card-title {
@@ -1385,20 +921,7 @@ textarea.form-control-sm {
   font-size: 0.93rem;
   color: var(--muted-foreground);
   line-height: 1.55;
-  margin: 0 0 1.5rem 0;
-}
-
-.portal-card-cta {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.75rem;
-  padding-top: 1.15rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--primary);
-  transition: color 0.25s ease;
+  margin-bottom: 1.5rem;
 }
 
 .portal-card-cta-btn {
@@ -1407,232 +930,314 @@ textarea.form-control-sm {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: var(--font-sans);
   font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
   border: 1px solid var(--btn-nft-border);
   padding: 0.375rem 0.75rem !important;
   font-size: 0.875rem !important;
   min-height: 36px !important;
   height: 36px !important;
-  line-height: 1.5 !important;
   border-radius: var(--radius-full);
   background-color: var(--btn-nft-bg);
   color: var(--btn-nft-color);
-  text-decoration: none;
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition: all 0.15s ease-in-out;
 }
 
 .portal-card:hover .portal-card-cta-btn {
-  background-color: #38bdf8;
-  color: #11141A;
-  border-color: #38bdf8;
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
-}
-
-.portal-card-arrow {
-  transition: transform 0.25s ease;
-}
-
-.portal-card:hover .portal-card-arrow {
-  transform: translateX(4px);
-}
-
-.portal-footer {
-  padding: 1.25rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--muted-foreground);
-  border-top: 1px solid var(--border);
-  background: var(--surface);
-  z-index: 10;
-}
-
-.portal-footer a {
-  color: var(--muted-foreground);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.portal-footer a:hover {
-  color: var(--primary);
+  background-color: var(--primary);
+  color: #11141a;
+  border-color: var(--primary);
 }
 
 /* ==========================================================================
-   24. TABELAS: SELEÇÃO DE LINHAS (TABULATOR ROW SELECTION)
+   INDICADORES SEFAZ (CSTAT & AMBIENTE SEM CLASSE BADGE)
    ========================================================================== */
-/* Light Theme - Seleção de Linhas: Fundo Opaco da Mesma Cor em Todas as Células e Colunas Fixas */
-.tabulator .tabulator-row.tabulator-selected,
-.tabulator .tabulator-row.tabulator-selected .tabulator-cell,
-.tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
-.tabulator .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
-#itens-table .tabulator-row.tabulator-selected,
-#itens-table .tabulator-row.tabulator-selected .tabulator-cell,
-#itens-table .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
-#itens-table .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3) {
-  background-color: rgba(14, 165, 233, 0.35) !important;
-  color: #161110 !important;
+.sefaz-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.35rem !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  padding: 0.2rem 0.55rem !important;
+  border-radius: 4px !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0.2px !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
 }
 
-.tabulator .tabulator-row.tabulator-selected:hover,
-.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
-.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
-.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3),
-#itens-table .tabulator-row.tabulator-selected:hover,
-#itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell,
-#itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
-#itens-table .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3) {
-  background-color: rgba(14, 165, 233, 0.35) !important;
-  color: #161110 !important;
+/* Ambiente: Homologação em Cinza */
+.sefaz-amb-homologacao {
+  background-color: #e9ecef !important;
+  color: #495057 !important;
+  border: 1px solid #ced4da !important;
+}
+[data-bs-theme="dark"] .sefaz-amb-homologacao {
+  background-color: #343a40 !important;
+  color: #dee2e6 !important;
+  border: 1px solid #495057 !important;
 }
 
-/* Dark Theme - Seleção de Linhas: Fundo Opaco da Mesma Cor em Todas as Células e Colunas Fixas */
-.dark .tabulator .tabulator-row.tabulator-selected,
-.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
-.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
-.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
-.dark #itens .tabulator .tabulator-row.tabulator-selected,
-.dark #itens .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
-.dark #itens-table .tabulator-row.tabulator-selected,
-.dark #itens-table .tabulator-row.tabulator-selected .tabulator-cell,
-.dark #itens-table .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
-.dark #itens-table .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3),
-[data-theme="dark"] #itens .tabulator .tabulator-row.tabulator-selected,
-[data-theme="dark"] #itens .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
-[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected,
-[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell,
-[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] #itens-table .tabulator-row.tabulator-selected .tabulator-cell:nth-child(-n+3) {
-  background-color: var(--primary) !important;
+/* Ambiente: Produção em Verde */
+.sefaz-amb-producao {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  border: 1px solid #a3cfbb !important;
+}
+[data-bs-theme="dark"] .sefaz-amb-producao {
+  background-color: rgba(25, 135, 84, 0.25) !important;
+  color: #75b798 !important;
+  border: 1px solid #198754 !important;
+}
+
+/* CSTAT: Autorizado / Sucesso (Verde) */
+.sefaz-cstat-autorizado {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  border: 1px solid #a3cfbb !important;
+}
+[data-bs-theme="dark"] .sefaz-cstat-autorizado {
+  background-color: rgba(25, 135, 84, 0.25) !important;
+  color: #75b798 !important;
+  border: 1px solid #198754 !important;
+}
+
+/* CSTAT: Rejeição Fiscal (Vermelho) */
+.sefaz-cstat-rejeicao {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+  border: 1px solid #f5c2c7 !important;
+}
+[data-bs-theme="dark"] .sefaz-cstat-rejeicao {
+  background-color: rgba(220, 53, 69, 0.25) !important;
+  color: #ea868f !important;
+  border: 1px solid #dc3545 !important;
+}
+
+/* CSTAT: Erro / Falha de Comunicação (Vermelho) */
+.sefaz-cstat-erro {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+  border: 1px solid #f5c2c7 !important;
+}
+[data-bs-theme="dark"] .sefaz-cstat-erro {
+  background-color: rgba(220, 53, 69, 0.3) !important;
+  color: #f1aeb5 !important;
+  border: 1px solid #dc3545 !important;
+}
+
+/* CSTAT: Aguardando / Processamento (Amarelo) */
+.sefaz-cstat-aguardando {
+  background-color: #fff3cd !important;
+  color: #664d03 !important;
+  border: 1px solid #ffecb5 !important;
+}
+[data-bs-theme="dark"] .sefaz-cstat-aguardando {
+  background-color: rgba(255, 193, 7, 0.2) !important;
+  color: #ffda6a !important;
+  border: 1px solid #ffc107 !important;
+}
+
+/* CSTAT: Denegada (Laranja) */
+.sefaz-cstat-denegada {
+  background-color: #ffe5d0 !important;
+  color: #984c0c !important;
+  border: 1px solid #fecba1 !important;
+}
+[data-bs-theme="dark"] .sefaz-cstat-denegada {
+  background-color: rgba(253, 126, 20, 0.25) !important;
+  color: #feb272 !important;
+  border: 1px solid #fd7e14 !important;
+}
+
+/* Remove interferência de .badge dentro da tabela de histórico SEFAZ */
+#tbody-historico-sefaz .badge {
+  all: unset !important;
+  display: inline-flex !important;
+}
+
+/* ==========================================================================
+   BOTÃO DE EDIÇÃO DE ITEM NA GRADE TABULATOR (TAB 3 ITENS)
+   ========================================================================== */
+.tabulator .tabulator-cell[tabulator-field="_acoes"],
+.tabulator .tabulator-header .tabulator-col[tabulator-field="_acoes"] {
+  padding: 0 !important;
+  text-align: center !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.btn-editar-item-grade {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  max-height: 26px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  border: 1px solid rgba(14, 165, 233, 0.28) !important;
+  border-radius: 4px !important;
+  background-color: rgba(14, 165, 233, 0.08) !important;
+  color: #0ea5e9 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease-in-out !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-decoration: none !important;
+}
+
+.btn-editar-item-grade:hover {
+  background-color: #0ea5e9 !important;
   color: #ffffff !important;
+  border-color: #0ea5e9 !important;
+  transform: scale(1.08);
 }
 
-/* Ícone de editar branco com nitidez quando linha estiver selecionada no tema escuro */
-.dark .tabulator .tabulator-row.tabulator-selected .btn-editar-item,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .btn-editar-item {
-  color: #ffffff !important;
+.btn-editar-item-grade svg {
+  width: 14px !important;
+  height: 14px !important;
+  stroke: currentColor !important;
+  display: block !important;
+  pointer-events: none !important;
 }
 
-/* Garante texto branco com contraste nítido em todas as células, spans e números na linha selecionada */
-.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell *,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell * {
-  color: #ffffff !important;
+[data-bs-theme="dark"] .btn-editar-item-grade {
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  background-color: rgba(56, 189, 248, 0.12) !important;
+  color: #38bdf8 !important;
 }
 
-/* Linhas divisórias sutis na linha selecionada */
-.dark .tabulator .tabulator-row.tabulator-selected .tabulator-cell,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected .tabulator-cell {
-  border-right-color: rgba(255, 255, 255, 0.22) !important;
+[data-bs-theme="dark"] .btn-editar-item-grade:hover {
+  background-color: #38bdf8 !important;
+  color: #11141a !important;
 }
 
-/* Hover em linha selecionada */
-.dark .tabulator .tabulator-row.tabulator-selected:hover,
-.dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
-.dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
-.dark .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3),
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen,
-[data-theme="dark"] .tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell:nth-child(-n+3) {
-  background-color: var(--primary-hover) !important;
-  color: #ffffff !important;
+/* ==========================================================================
+   14. VALIDAÇÃO VISUAL REGEX & FORMATO SEFAZ
+   ========================================================================== */
+.nft-regex-field {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-.tabulator input[type="checkbox"] {
-  cursor: pointer;
-  accent-color: var(--primary);
-  width: 16px;
-  height: 16px;
+.nft-regex-valid {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15) !important;
 }
 
-
-
-/* --- CORRECAO TABULATOR COLUNAS CONGELADAS (ITENS DA NOTA) --- */
-.tabulator .tabulator-row .tabulator-cell.tabulator-frozen {
-    background-color: var(--surface) !important;
-}
-.tabulator .tabulator-row.tabulator-selectable:hover .tabulator-cell.tabulator-frozen {
-    background-color: var(--surface-secondary) !important;
-}
-.tabulator .tabulator-row.tabulator-selected .tabulator-cell.tabulator-frozen {
-    background-color: var(--primary-subtle) !important;
-}
-.tabulator .tabulator-row.tabulator-selected:hover .tabulator-cell.tabulator-frozen {
-    background-color: var(--primary-subtle) !important;
+.nft-regex-invalid {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15) !important;
 }
 
-/* --- BOTÕES DE AÇÃO COM ÍCONE (GROW) --- */
-.btn-icon-grow {
-  color: var(--primary);
-  background: transparent;
-  border: none;
-  padding: 4px;
-  transition: transform 0.2s ease, color 0.2s ease;
+.nft-regex-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+}
+
+.nft-regex-tag {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  text-decoration: none;
-}
-.btn-icon-grow:hover {
-  transform: scale(1.15);
-  color: var(--primary-hover);
-  background: transparent;
-}
-.btn-icon-grow.disabled,
-.btn-icon-grow:disabled {
-  color: var(--muted-foreground);
-  pointer-events: none;
-  transform: none;
-  opacity: 0.5;
-}
-
-
-/* --- BOTÃO PADRÃO (GLOBAL) --- */
-.btn-nft {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-family: var(--font-sans);
+  gap: 3px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: 11px;
   font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
+  padding: 1px 7px;
+  border-radius: 4px;
+  margin-left: 6px;
+  line-height: 1.4;
   vertical-align: middle;
-  cursor: pointer;
+  transition: all 0.2s ease;
   user-select: none;
-  border: 1px solid var(--btn-nft-border);
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  min-height: 36px !important;
-  height: 36px !important;
-  line-height: 1.5 !important;
-  border-radius: var(--radius-full);
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  
-  background-color: var(--btn-nft-bg);
-  color: var(--btn-nft-color);
-  text-decoration: none;
 }
-.btn-nft:hover,
-.btn-nft:active,
-.btn-nft:focus {
-  background-color: #38bdf8;
-  color: #11141A;
-  border-color: #38bdf8;
+
+.nft-regex-tag-neutral {
+  background-color: var(--surface-secondary, rgba(0, 0, 0, 0.05));
+  color: var(--muted-foreground, #6b7280);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
 }
-.btn-nft:disabled,
-.btn-nft.disabled {
-  opacity: 0.65;
-  pointer-events: none;
+
+.nft-regex-tag-warning {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
+
+.nft-regex-tag-success {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.nft-regex-tag-danger {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+/* Dark mode adjustments */
+[data-bs-theme="dark"] .nft-regex-tag-neutral,
+[data-theme="dark"] .nft-regex-tag-neutral {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .nft-regex-tag-warning,
+[data-theme="dark"] .nft-regex-tag-warning {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+[data-bs-theme="dark"] .nft-regex-tag-success,
+[data-theme="dark"] .nft-regex-tag-success {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+[data-bs-theme="dark"] .nft-regex-tag-danger,
+[data-theme="dark"] .nft-regex-tag-danger {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+/* Drag and Drop de Operações & Enquadramentos */
+.op-drag-item {
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.op-drag-item:hover {
+  background-color: var(--surface-secondary, #f8fafc);
+  border-color: var(--primary-border, #0ea5e9);
+}
+
+.op-drag-item.dragging {
+  opacity: 0.45 !important;
+  background-color: var(--primary-subtle, rgba(14, 165, 233, 0.15)) !important;
+  border: 2px dashed var(--primary, #0ea5e9) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.op-drag-item.op-drag-target-over {
+  border-top: 3px solid var(--primary, #0ea5e9) !important;
+  transform: translateY(2px);
+}
+
+.grip-handle {
+  cursor: grab;
+  touch-action: none;
+}
+
+.grip-handle:active {
+  cursor: grabbing;
+}
+
+
+

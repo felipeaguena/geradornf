@@ -14,7 +14,7 @@
 <!-- Bootstrap 5 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <!-- NFT Logistics Theme CSS & JS -->
-<link href="/static/css/nft-theme.css" rel="stylesheet"/>
+<link href="/static/css/nft-theme.css?v=3.0" rel="stylesheet"/>
 <link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
 <script src="/static/js/theme.js"></script>
 <!-- Lucide Icons (Minimalist Line SVGs) -->
@@ -102,36 +102,30 @@
 </div>
 <!-- 3. Rodapé da Sidebar -->
 <div class="nft-sidebar-footer">
-<div class="sidebar-footer-actions">
-<button class="sidebar-footer-btn sidebar-footer-btn-power" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
-<span class="sidebar-icon" style="color: #ef4444 !important;"><i data-lucide="power"></i></span>
-<span class="sidebar-footer-text" style="color: #ef4444 !important; font-weight: 700;">Desligar</span>
+<button class="sidebar-footer-btn sidebar-footer-btn-analisar" onclick="analisarRascunho()" title="Analisar e Verificar Rascunho do XML" type="button">
+<span class="sidebar-icon"><i data-lucide="shield-check"></i></span>
+<span class="sidebar-footer-text">Analisar Rascunho</span>
 </button>
-<button class="sidebar-footer-btn theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+<button class="sidebar-footer-btn sidebar-footer-btn-warning" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
+<span class="sidebar-icon"><i data-lucide="download"></i></span>
+<span class="sidebar-footer-text">Gerar Novo XML</span>
+</button>
+<div class="sidebar-footer-actions d-flex gap-2">
+<button class="sidebar-footer-btn justify-content-center p-0 flex-fill" onclick="encerrarServidor()" title="Desligar Servidor Local" type="button" style="color: #ef4444 !important; height: 38px;">
+<i data-lucide="power"></i>
+</button>
+<button class="sidebar-footer-btn justify-content-center p-0 flex-fill" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button" style="height: 38px;">
 <i data-lucide="moon"></i>
 </button>
 </div>
 <div class="sidebar-footer-info">
 <span>NFT Logistics</span>
-<span>v2.1</span>
+<span>v2.2</span>
 </div>
 </div>
 </aside>
 <!-- ÁREA PRINCIPAL DO PORTAL (DESLOCADA PELA SIDEBAR) -->
 <div class="nft-main-wrapper" style="min-height: 100vh; flex: 1; display: flex; flex-direction: column;">
-<!-- Top Navigation Bar Limpa -->
-<header class="portal-navbar">
-<div class="d-flex align-items-center gap-3">
-<button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
-<i data-lucide="menu" style="width: 16px; height: 16px;"></i>
-</button>
-<a class="portal-brand" href="/" title="NFT Logistics — Portal de Emissão NF-e">
-<img alt="NFT Logistics" class="logo-theme-black" src="/static/img/brand/NFT%20Logo%20(3).webp" style="height: 38px;"/>
-<img alt="NFT Logistics" class="logo-theme-white" src="/static/img/brand/NFT%20Logo%20(11).webp" style="height: 38px;"/>
-<span class="badge portal-brand-badge bg-info-subtle text-info fw-bold">Portal NF-e</span>
-</a>
-</div>
-</header>
 <!-- Main Full-Window Hero Content -->
 <main class="portal-hero">
 <div class="portal-hero-header">
@@ -221,19 +215,14 @@
 </a>
 </div>
 </main>
-<!-- Footer -->
-<footer class="portal-footer">
-<div>
-<strong class="text-heading">NFT Logistics</strong> © 2026 — Despacho Aduaneiro &amp; Logística Internacional
-        </div>
-<div class="d-flex align-items-center gap-3">
-<a href="/banco_ncm">Grande Tabela NCM</a>
-<span>•</span>
-<span class="badge font-monospace bg-info-subtle text-info fw-bold">v2.1</span>
-</div>
-</footer>
 </div><!-- /nft-main-wrapper -->
 <script>
+        function analisarRascunho() {
+            window.location.href = '/rascunho';
+        }
+        function generateXML() {
+            window.location.href = '/rascunho';
+        }
         document.addEventListener("DOMContentLoaded", function() {
             if (window.lucide) lucide.createIcons();
         });

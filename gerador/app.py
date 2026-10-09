@@ -77,6 +77,16 @@ def get_db_connection():
         if 'id_dest' not in cols:
             conn.execute("ALTER TABLE tipos_operacao ADD COLUMN id_dest TEXT DEFAULT '3'")
             conn.commit()
+        if 'regime_tributario' not in cols:
+            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN regime_tributario TEXT DEFAULT 'SUSPENSAO'")
+            conn.commit()
+        if 't_pag' not in cols:
+            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN t_pag TEXT DEFAULT '90'")
+            conn.commit()
+        if 'ordem' not in cols:
+            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN ordem INTEGER DEFAULT 0")
+            conn.execute("UPDATE tipos_operacao SET ordem = id WHERE ordem IS NULL OR ordem = 0")
+            conn.commit()
         
         tables = [t[0] for t in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
         if 'tabela_csts' not in tables or 'tabela_paises' not in tables or 'tabela_municipios' not in tables or 'tabela_feiras' not in tables or 'tabela_locais_entrega' not in tables:
@@ -425,7 +435,10 @@ def build_nfe_element(cabecalho, itens, rodape):
     tp_amb = str(cabecalho.get('tpAmb') or '2')
     ET.SubElement(ide, f'{{{NFE_NS}}}tpAmb').text = tp_amb
     ET.SubElement(ide, f'{{{NFE_NS}}}finNFe').text = '1'
-    ET.SubElement(ide, f'{{{NFE_NS}}}indFinal').text = '0'
+    ind_final = str(cabecalho.get('indFinal') if cabecalho.get('indFinal') is not None and str(cabecalho.get('indFinal')).strip() != '' else '1').strip()
+    if ind_final not in ('0', '1'):
+        ind_final = '1'
+    ET.SubElement(ide, f'{{{NFE_NS}}}indFinal').text = ind_final
     ET.SubElement(ide, f'{{{NFE_NS}}}indPres').text = '0'
     ET.SubElement(ide, f'{{{NFE_NS}}}procEmi').text = '0'
     ver_proc = str(cabecalho.get('verProc') or '4.01_sebrae_b057').strip()
@@ -491,8 +504,8 @@ def build_nfe_element(cabecalho, itens, rodape):
         cep_raw = re.sub(r'\D', '', str(cabecalho.get('dest_CEP') or ''))
         cep_dest_ext = cep_raw if (cep_raw and len(cep_raw) == 8) else '99999999'
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}CEP').text = cep_dest_ext
-        if not c_pais or c_pais == '1058':
-            c_pais = '160'
+        if not c_pais or c_pais in ('1058', '160', '16'):
+            c_pais = '1600'
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}cPais').text = c_pais
         x_pais = str(cabecalho.get('dest_xPais') or '').strip()
         if not x_pais or x_pais.upper() in ('BRASIL', 'BRAZIL'):
@@ -593,6 +606,14 @@ def build_nfe_element(cabecalho, itens, rodape):
         ET.SubElement(prod, f'{{{NFE_NS}}}qTrib').text = q_trib
         
         v_un_trib = format_dec(item.get('vUnTrib') or v_un_com, 4)
+        try:
+            f_prod = float(v_prod)
+            f_qtrib = float(q_trib)
+            f_vuntrib = float(v_un_trib)
+            if f_qtrib > 0 and abs(f_prod - round(f_qtrib * f_vuntrib, 2)) > 0.01:
+                v_un_trib = f"{f_prod / f_qtrib:.8f}".rstrip('0').rstrip('.')
+        except (ValueError, TypeError):
+            pass
         ET.SubElement(prod, f'{{{NFE_NS}}}vUnTrib').text = v_un_trib
         
         # Despesas em prod
@@ -875,12 +896,18 @@ def build_nfe_element(cabecalho, itens, rodape):
     # 7. pag (Mandatory in NF-e 4.00!)
     pag_el = ET.SubElement(inf_nfe, f'{{{NFE_NS}}}pag')
     det_pag = ET.SubElement(pag_el, f'{{{NFE_NS}}}detPag')
-    t_pag = str(rodape.get('tPag') or '90').strip()
+    pag_obj = rodape.get('pagamento') if isinstance(rodape.get('pagamento'), dict) else {}
+    t_pag = str(pag_obj.get('tPag') or rodape.get('tPag') or cabecalho.get('tPag') or '90').strip()
     ET.SubElement(det_pag, f'{{{NFE_NS}}}tPag').text = t_pag
     if t_pag == '90':
+        # Regra SEFAZ YA04-10: Se tPag=90 (Sem Pagamento), vPag deve ser obrigatoriamente 0.00
         ET.SubElement(det_pag, f'{{{NFE_NS}}}vPag').text = '0.00'
     else:
-        ET.SubElement(det_pag, f'{{{NFE_NS}}}vPag').text = format_dec(v_nf_tot, 2)
+        v_pag_custom = pag_obj.get('vPag') or rodape.get('vPag') or cabecalho.get('vPag')
+        if v_pag_custom is not None and not is_zero(v_pag_custom):
+            ET.SubElement(det_pag, f'{{{NFE_NS}}}vPag').text = format_dec(v_pag_custom, 2)
+        else:
+            ET.SubElement(det_pag, f'{{{NFE_NS}}}vPag').text = format_dec(v_nf_tot, 2)
 
     # 8. infAdic
     inf_cpl = str(rodape.get('infCpl') or '').strip()
@@ -1155,7 +1182,7 @@ def api_get_csts():
 @app.route('/tipos_operacao', methods=['GET'])
 def get_tipos_operacao():
     conn = get_db_connection()
-    ops = conn.execute('SELECT * FROM tipos_operacao ORDER BY nome_operacao ASC').fetchall()
+    ops = conn.execute('SELECT * FROM tipos_operacao ORDER BY ordem ASC, id ASC').fetchall()
     conn.close()
     return jsonify([dict(x) for x in ops])
 
@@ -1180,12 +1207,15 @@ def save_tipo_operacao():
     cst_pis = limpar_cst(data.get('cst_pis', '07'))
     cst_cofins = limpar_cst(data.get('cst_cofins', '07'))
 
+    regime_tributario = str(data.get('regime_tributario', 'SUSPENSAO')).strip().upper()
+    t_pag = str(data.get('t_pag', '90')).strip()
+
     if existente:
         c.execute('''
             UPDATE tipos_operacao SET
                 cfop_padrao = ?, tp_nf = ?, id_dest = ?, orig_padrao = ?, csosn_icms = ?, c_enq_ipi = ?,
                 cst_ipi = ?, p_ipi = ?, aliquota_ii = ?, cst_pis = ?, p_pis = ?,
-                cst_cofins = ?, p_cofins = ?, inf_cpl_padrao = ?
+                cst_cofins = ?, p_cofins = ?, inf_cpl_padrao = ?, regime_tributario = ?, t_pag = ?
             WHERE nome_operacao = ?
         ''', (
             data.get('cfop_padrao', ''),
@@ -1202,14 +1232,18 @@ def save_tipo_operacao():
             cst_cofins,
             float(data.get('p_cofins', 0) or 0),
             data.get('inf_cpl_padrao', ''),
+            regime_tributario,
+            t_pag,
             nome
         ))
     else:
+        max_ordem = c.execute("SELECT COALESCE(MAX(ordem), 0) + 1 FROM tipos_operacao").fetchone()[0]
         c.execute('''
             INSERT INTO tipos_operacao (
                 nome_operacao, cfop_padrao, tp_nf, id_dest, orig_padrao, csosn_icms, c_enq_ipi,
-                cst_ipi, p_ipi, aliquota_ii, cst_pis, p_pis, cst_cofins, p_cofins, inf_cpl_padrao
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                cst_ipi, p_ipi, aliquota_ii, cst_pis, p_pis, cst_cofins, p_cofins, inf_cpl_padrao,
+                regime_tributario, t_pag, ordem
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             nome,
             data.get('cfop_padrao', ''),
@@ -1225,12 +1259,168 @@ def save_tipo_operacao():
             float(data.get('p_pis', 0) or 0),
             cst_cofins,
             float(data.get('p_cofins', 0) or 0),
-            data.get('inf_cpl_padrao', '')
+            data.get('inf_cpl_padrao', ''),
+            regime_tributario,
+            t_pag,
+            max_ordem
         ))
 
     conn.commit()
     conn.close()
     return jsonify({"status": "success", "message": f"Operação '{nome}' salva com sucesso!"})
+
+@app.route('/api/operacoes/reordenar', methods=['POST'])
+def reordenar_operacoes():
+    data = request.json or {}
+    ordem_ids = data.get('ordem_ids', [])
+    if not isinstance(ordem_ids, list):
+        return jsonify({"status": "error", "message": "ordem_ids deve ser uma lista de IDs."}), 400
+
+    conn = get_db_connection()
+    c = conn.cursor()
+    for idx, op_id in enumerate(ordem_ids):
+        try:
+            c.execute('UPDATE tipos_operacao SET ordem = ? WHERE id = ?', (idx + 1, int(op_id)))
+        except (ValueError, TypeError):
+            pass
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success", "total_reordenados": len(ordem_ids)})
+
+REGIMES_TRIBUTARIOS_DEFAULT = {
+    "SUSPENSAO": {
+        "codigo": "SUSPENSAO",
+        "nome": "Suspensão de Impostos",
+        "icone": "🛡️",
+        "descricao": "Admissão Temporária de mercadorias e Remessas/Retornos de Feiras e Exposições.",
+        "cfop_padrao": "3930",
+        "tp_nf": "0",
+        "id_dest": "3",
+        "csosn_icms": "400",
+        "c_enq_ipi": "108",
+        "cst_ipi": "55",
+        "p_ipi": 0.00,
+        "aliquota_ii": 0.00,
+        "cst_pis": "08",
+        "p_pis": 0.00,
+        "cst_cofins": "08",
+        "p_cofins": 0.00,
+        "t_pag": "90",
+        "inf_cpl_padrao": "ADMISSAO TEMPORARIA DE CARGAS AO AMPARO DA IN RFB 1600/2016. SUSPENSAO DE TRIBUTOS FEDERAIS E ESTADUAIS (ICMS, IPI, PIS E COFINS). IPI SUSPENSO CONFORME ART. 43, INCISO I DO DECRETO 7.212/2010 (RIPI)."
+    },
+    "ISENCAO": {
+        "codigo": "ISENCAO",
+        "nome": "Isenção Fiscal",
+        "icone": "🌱",
+        "descricao": "Importação ou circulação de mercadorias com benefício de isenção legal de tributos.",
+        "cfop_padrao": "3949",
+        "tp_nf": "0",
+        "id_dest": "3",
+        "csosn_icms": "400",
+        "c_enq_ipi": "301",
+        "cst_ipi": "52",
+        "p_ipi": 0.00,
+        "aliquota_ii": 0.00,
+        "cst_pis": "07",
+        "p_pis": 0.00,
+        "cst_cofins": "07",
+        "p_cofins": 0.00,
+        "t_pag": "90",
+        "inf_cpl_padrao": "ENTRADA DE IMPORTACAO COM BENEFICIO FISCAL DE ISENCAO DE TRIBUTOS FEDERAIS E ESTADUAIS CONFORME LEGISLACAO VIGENTE."
+    },
+    "RECOLHIMENTO": {
+        "codigo": "RECOLHIMENTO",
+        "nome": "Recolhimento Integral",
+        "icone": "💰",
+        "descricao": "Operações tributadas regularmente com recolhimento integral (II, IPI, PIS, COFINS e ICMS).",
+        "cfop_padrao": "3949",
+        "tp_nf": "0",
+        "id_dest": "3",
+        "csosn_icms": "900",
+        "c_enq_ipi": "999",
+        "cst_ipi": "49",
+        "p_ipi": 0.00,
+        "aliquota_ii": 0.00,
+        "cst_pis": "01",
+        "p_pis": 1.65,
+        "cst_cofins": "01",
+        "p_cofins": 7.60,
+        "t_pag": "90",
+        "inf_cpl_padrao": "ENTRADA DE IMPORTACAO COM TRIBUTACAO REGULAR E RECOLHIMENTO INTEGRAL DE TRIBUTOS (II, IPI, PIS, COFINS E ICMS)."
+    },
+    "IMUNIDADE": {
+        "codigo": "IMUNIDADE",
+        "nome": "Imunidade Tributária",
+        "icone": "✈️",
+        "descricao": "Reexportação de admissão temporária e exportações com imunidade tributária constitucional.",
+        "cfop_padrao": "7930",
+        "tp_nf": "1",
+        "id_dest": "3",
+        "csosn_icms": "400",
+        "c_enq_ipi": "999",
+        "cst_ipi": "55",
+        "p_ipi": 0.00,
+        "aliquota_ii": 0.00,
+        "cst_pis": "08",
+        "p_pis": 0.00,
+        "cst_cofins": "08",
+        "p_cofins": 0.00,
+        "t_pag": "90",
+        "inf_cpl_padrao": "REEXPORTACAO DE MERCADORIA SOB REGIME ADUANEIRO ESPECIAL DE ADMISSAO TEMPORARIA. IMUNIDADE TRIBUTARIA CONSTITUCIONAL DE EXPORTACAO (ART. 153, PAR. 3, III DA CF/88)."
+    }
+}
+
+@app.route('/api/config/regimes_tributarios', methods=['GET'])
+def get_config_regimes_tributarios():
+    conn = get_db_connection()
+    row = conn.execute("SELECT valor FROM sistema_config WHERE chave = 'config_regimes_tributarios'").fetchone()
+    conn.close()
+    if row and row['valor']:
+        try:
+            dados = json.loads(row['valor'])
+            for reg, conf in REGIMES_TRIBUTARIOS_DEFAULT.items():
+                if reg not in dados:
+                    dados[reg] = conf
+                else:
+                    for k, v in conf.items():
+                        if k not in dados[reg]:
+                            dados[reg][k] = v
+            return jsonify({"status": "success", "regimes": dados})
+        except Exception:
+            pass
+    return jsonify({"status": "success", "regimes": REGIMES_TRIBUTARIOS_DEFAULT})
+
+@app.route('/api/config/regimes_tributarios', methods=['POST'])
+def save_config_regimes_tributarios():
+    data = request.json or {}
+    novos_regimes = data.get('regimes')
+    if not isinstance(novos_regimes, dict):
+        return jsonify({"status": "error", "message": "Dados de regimes inválidos"}), 400
+
+    merged = {}
+    for reg_key in ('SUSPENSAO', 'ISENCAO', 'RECOLHIMENTO', 'IMUNIDADE'):
+        base = dict(REGIMES_TRIBUTARIOS_DEFAULT[reg_key])
+        if reg_key in novos_regimes and isinstance(novos_regimes[reg_key], dict):
+            for k, v in novos_regimes[reg_key].items():
+                base[k] = v
+        merged[reg_key] = base
+
+    conn = get_db_connection()
+    conn.execute(
+        "INSERT OR REPLACE INTO sistema_config (chave, valor, data_atualizacao) VALUES ('config_regimes_tributarios', ?, CURRENT_TIMESTAMP)",
+        (json.dumps(merged, ensure_ascii=False),)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success", "regimes": merged})
+
+@app.route('/api/config/regimes_tributarios/reset', methods=['POST'])
+def reset_config_regimes_tributarios():
+    conn = get_db_connection()
+    conn.execute("DELETE FROM sistema_config WHERE chave = 'config_regimes_tributarios'")
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success", "regimes": REGIMES_TRIBUTARIOS_DEFAULT})
 
 @app.route('/tipos_operacao/<int:op_id>', methods=['DELETE'])
 def delete_tipo_operacao(op_id):
@@ -1654,7 +1844,7 @@ def process_di_xml(root):
     dh_emi_iso = f"{data_di}T12:00:00-03:00" if data_di else datetime.now().strftime("%Y-%m-%dT%H:%M:%S-03:00")
 
     cabecalho = {
-        "nNF": "", "serie": "1", "natOp": "IMPORTACAO", "tpNF": "0", "idDest": "3",
+        "nNF": "", "serie": "1", "indFinal": "1", "natOp": "IMPORTACAO", "tpNF": "0", "idDest": "3",
         "chaveAcesso": "", "cUF": "35", "cNF": "", "dhEmi": dh_emi_iso, "mod": "55",
         "tpEmis": "1", "cDV": "",
         "emit_xNome": imp_nome or "NFT LOGISTICS LTDA",
@@ -1680,7 +1870,7 @@ def process_di_xml(root):
         "dest_xMun": "EXTERIOR",
         "dest_UF": "EX",
         "dest_CEP": "00000000",
-        "dest_cPais": pais_codigo or "160",
+        "dest_cPais": "1600" if (not pais_codigo or pais_codigo in ("160", "16")) else pais_codigo,
         "dest_xPais": pais_nome or "CHINA, REPUBLICA POPULAR"
     }
 
@@ -1801,7 +1991,7 @@ def process_di_xml(root):
     rodape = {
         "vNF": "0.00", "infCpl": f"DI: {numero_di}",
         "transporte": {
-            "modFrete": "9", "CNPJ_CPF": "", "xNome": "", "IE": "", "xEnder": "",
+            "modFrete": "1", "CNPJ_CPF": "", "xNome": "", "IE": "", "xEnder": "",
             "xMun": "", "UF": "", "qVol": "", "esp": "", "marca": "", "nVol": "",
             "pesoL": f"{pesoL:.3f}", "pesoB": f"{pesoB:.3f}"
         },
@@ -1874,6 +2064,7 @@ def upload_xml():
 
         cabecalho = {
             "nNF": get_text(ide, 'nNF'),
+            "indFinal": get_text(ide, 'indFinal') or '1',
             "serie": get_text(ide, 'serie'),
             "refNFe": ref_nfe_val,
             "natOp": natOp_val,
@@ -1913,7 +2104,7 @@ def upload_xml():
             "dest_xMun": get_text(dest, 'xMun') or ('EXTERIOR' if idDest_val == '3' else ''),
             "dest_UF": get_text(dest, 'UF') or ('EX' if idDest_val == '3' else ''),
             "dest_CEP": get_text(dest, 'CEP') or ('00000000' if idDest_val == '3' else ''),
-            "dest_cPais": get_text(dest, 'cPais') or ('160' if idDest_val == '3' else '1058'),
+            "dest_cPais": '1600' if (get_text(dest, 'cPais') in ('160', '16') or (not get_text(dest, 'cPais') and idDest_val == '3')) else (get_text(dest, 'cPais') or ('1600' if idDest_val == '3' else '1058')),
             "dest_xPais": get_text(dest, 'xPais') or ('CHINA, REPUBLICA POPULAR' if idDest_val == '3' else 'Brasil')
         }
 
@@ -1951,7 +2142,7 @@ def upload_xml():
         vol = transp.find('.//{http://www.portalfiscal.inf.br/nfe}vol') if transp is not None else None
 
         transporte = {
-            "modFrete": get_text(transp, 'modFrete') if transp is not None else "0",
+            "modFrete": get_text(transp, 'modFrete') if (transp is not None and get_text(transp, 'modFrete')) else "1",
             "CNPJ_CPF": (get_text(transporta, 'CNPJ') or get_text(transporta, 'CPF')) if transporta is not None else "",
             "xNome": get_text(transporta, 'xNome') if transporta is not None else "",
             "IE": get_text(transporta, 'IE') if transporta is not None else "",
@@ -2239,6 +2430,15 @@ def validar_dados_nfe(cabecalho, itens, rodape, referencia_interna=''):
             "mensagem": "Série da nota fiscal deve conter apenas números."
         })
 
+    ind_final_val = str(cabecalho.get('indFinal') if cabecalho.get('indFinal') is not None and str(cabecalho.get('indFinal')).strip() != '' else '1').strip()
+    if ind_final_val not in ('0', '1'):
+        erros.append({
+            "categoria": "Identificação",
+            "aba": "1. Operação",
+            "campo": "Consumidor final (indFinal)",
+            "mensagem": "Campo Consumidor final deve ser '0' (Não) ou '1' (Sim)."
+        })
+
     nat_op = str(cabecalho.get('natOp') or cabecalho.get('select_operacao') or '').strip()
     if not nat_op:
         erros.append({
@@ -2276,6 +2476,18 @@ def validar_dados_nfe(cabecalho, itens, rodape, referencia_interna=''):
                 "aba": "1. Identificação",
                 "campo": "Chave Referenciada (refNFe)",
                 "mensagem": "Operações de Devolução (ou finNFe=4) exigem obrigatoriamente a Chave de Acesso da NF-e referenciada (tag <NFref>) conforme MOC da SEFAZ."
+            })
+
+        # Validação preventiva para Retorno de Feira e Reexportação
+        cfops_retorno_reexp = ('1914', '2914', '7930')
+        has_retorno_reexp_item = any(re.sub(r'\D', '', str(it.get('CFOP') or '')) in cfops_retorno_reexp for it in itens) if itens else False
+        is_retorno_reexp = (cfop_ref in cfops_retorno_reexp or has_retorno_reexp_item or 'RETORNO' in nat_op.upper() or 'REEXPORTA' in nat_op.upper())
+        if is_retorno_reexp:
+            alertas.append({
+                "categoria": "Identificação",
+                "aba": "1. Operação",
+                "campo": "Chave Referenciada (refNFe)",
+                "mensagem": "Operações de Retorno de Feira (CFOP 1914/2914) e Reexportação (CFOP 7930) recomendam/exigem informar a Chave de Acesso da NF-e referenciada de origem (<NFref>) para autorização na SEFAZ."
             })
 
     # 3. Emitente (emit)
@@ -2333,13 +2545,13 @@ def validar_dados_nfe(cabecalho, itens, rodape, referencia_interna=''):
                 "campo": "UF Destinatário",
                 "mensagem": "Operação para o exterior (idDest=3) deve ter UF do destinatário preenchida como 'EX'."
             })
-        id_estrangeiro = str(cabecalho.get('dest_idEstrangeiro') or '').strip()
-        if not id_estrangeiro:
+        id_estrangeiro = str(cabecalho.get('dest_idEstrangeiro') or cabecalho.get('dest_CNPJ_CPF') or '').strip()
+        if id_estrangeiro and (len(id_estrangeiro) < 5 or len(id_estrangeiro) > 20):
             alertas.append({
                 "categoria": "Destinatário",
                 "aba": "2. Destinatário",
                 "campo": "ID Estrangeiro",
-                "mensagem": "ID Estrangeiro não informado para cliente no exterior."
+                "mensagem": f"ID Estrangeiro informado ({id_estrangeiro}) deve ter entre 5 e 20 caracteres conforme padrão SEFAZ (ou ser deixado em branco)."
             })
     else:
         dest_tp_doc = str(cabecalho.get('dest_tpDoc') or '').strip()
@@ -3135,7 +3347,9 @@ def api_local_entrega_item(local_id):
 
 @app.route('/api/ping')
 def ping():
-    return jsonify({'status': 'ok', 'port': 1652})
+    resp = jsonify({'status': 'ok', 'port': 1652})
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 @app.route('/api/shutdown', methods=['POST', 'GET'])
 def shutdown_server():
@@ -3187,20 +3401,29 @@ def api_certificado_status():
 @app.route('/api/sefaz/enviar', methods=['POST'])
 def api_sefaz_enviar():
     try:
-        data = request.json
+        data = request.json or {}
         xml_string = data.get('xml')
-        chave = (data.get('chave') or 'N/A').strip()
+        chave_input = (data.get('chave') or 'N/A').strip()
         tpAmb = int(data.get('tpAmb', 2))
         
         if not xml_string:
             return jsonify({'error': 'XML não fornecido'}), 400
             
-        xml_assinado = sefaz_client.assinar_xml(xml_string)
+        # Sanitizar XML (garante regras 598 em homologação, cPais 1600, tolerância 630 e dhEmi/chave)
+        xml_sanitizado, chave_calculada = sefaz_client.sanitizar_xml_para_envio(xml_string, tpAmb=tpAmb)
+        chave = chave_calculada if chave_calculada else chave_input
+        
+        xml_assinado = sefaz_client.assinar_xml(xml_sanitizado)
         retorno = sefaz_client.enviar_nfe(xml_assinado, uf='SP', tpAmb=tpAmb)
         
-        cstat = str(retorno.get('cstat', ''))
-        xmotivo = str(retorno.get('xmotivo', ''))
-        is_autorizado = (cstat in ('100', '104') or (retorno.get('status') == 'success' and 'autoriz' in xmotivo.lower()))
+        if retorno.get('chave'):
+            chave = retorno['chave']
+        retorno['chave'] = chave
+        
+        cstat = str(retorno.get('cstat', '')).strip()
+        xmotivo = str(retorno.get('xmotivo', '')).strip()
+        # Apenas cStat 100 é Autorizado (cStat 104 é Lote Processado, podendo conter rejeição no infProt como 225)
+        is_autorizado = (cstat == '100' or (retorno.get('status') == 'success' and 'autoriz' in xmotivo.lower() and 'rejei' not in xmotivo.lower()))
         retorno['autorizado'] = is_autorizado
         
         # Se autorizado, salva os 3 arquivos imediatamente na pasta de download
@@ -3212,7 +3435,7 @@ def api_sefaz_enviar():
                     prot_el = ret_root.find('.//{http://www.portalfiscal.inf.br/nfe}protNFe')
                     if prot_el is not None:
                         nfe_root = etree.fromstring(xml_assinado.encode('utf-8'))
-                        proc_el = etree.Element('{http://www.portalfiscal.inf.br/nfe}nfeProc', versao="4.00")
+                        proc_el = etree.Element('{http://www.portalfiscal.inf.br/nfe}nfeProc', versao="4.00", nsmap={None: 'http://www.portalfiscal.inf.br/nfe'})
                         proc_el.append(nfe_root)
                         proc_el.append(prot_el)
                         xml_final = etree.tostring(proc_el, encoding='utf-8', xml_declaration=True).decode('utf-8')
@@ -3227,9 +3450,14 @@ def api_sefaz_enviar():
                         f.write(xml_final)
                         
                     pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
-                    modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
-                    if os.path.exists(modelo_pdf):
-                        shutil.copyfile(modelo_pdf, pdf_path)
+                    try:
+                        from danfe_generator import DanfeGenerator
+                        DanfeGenerator().render(xml_final, pdf_path)
+                    except Exception as e_pdf:
+                        print(f"Aviso ao renderizar DANFE dinâmico: {e_pdf}")
+                        modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+                        if os.path.exists(modelo_pdf):
+                            shutil.copyfile(modelo_pdf, pdf_path)
                         
                     zip_path = os.path.join(DOWNLOADS_DIR, f"{chave}-arquivos.zip")
                     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
@@ -3263,14 +3491,130 @@ def api_sefaz_enviar():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/sefaz/cancelar', methods=['POST'])
+def api_sefaz_cancelar():
+    try:
+        data = request.json or {}
+        chave = str(data.get('chave') or '').strip()
+        protocolo = str(data.get('protocolo') or '').strip()
+        justificativa = str(data.get('justificativa') or '').strip()
+        tpAmb = int(data.get('tpAmb', 1)) # Padrão Produção (1)
+        
+        if not chave or len(chave) != 44:
+            return jsonify({'error': 'Chave de acesso inválida ou não informada (deve ter 44 dígitos).'}), 400
+        if not protocolo:
+            return jsonify({'error': 'Número do protocolo de autorização é obrigatório para cancelamento.'}), 400
+        if len(justificativa) < 15:
+            return jsonify({'error': 'A justificativa de cancelamento deve ter no mínimo 15 caracteres (exigência SEFAZ).'}), 400
+            
+        retorno = sefaz_client.cancelar_nfe(
+            chave=chave,
+            protocolo_autorizacao=protocolo,
+            justificativa=justificativa,
+            tpAmb=tpAmb,
+            uf='SP'
+        )
+        
+        cstat = str(retorno.get('cstat', ''))
+        xmotivo = str(retorno.get('xmotivo', ''))
+        # 135: Evento registrado e vinculado a NF-e (Cancelamento homologado)
+        is_cancelado = (cstat in ('135', '136', '101') or 'cancelamento' in xmotivo.lower())
+        retorno['autorizado'] = is_cancelado
+        retorno['is_evento'] = True
+        retorno['tipo_evento'] = 'Cancelamento'
+        
+        # Salva no histórico SEFAZ
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO historico_sefaz (chave_nfe, tpAmb, cstat, xmotivo, recibo, protocolo, xml_envio, xml_retorno)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            chave,
+            tpAmb,
+            cstat or 'EVENTO',
+            f"[Cancelamento] {xmotivo}",
+            '',
+            retorno.get('protocolo', protocolo),
+            retorno.get('xml_evento_assinado', ''),
+            retorno.get('response_xml', '')
+        ))
+        conn.commit()
+        conn.close()
+        
+        return jsonify(retorno)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/sefaz/carta_correcao', methods=['POST'])
+def api_sefaz_carta_correcao():
+    try:
+        data = request.json or {}
+        chave = str(data.get('chave') or '').strip()
+        texto_correcao = str(data.get('texto_correcao') or '').strip()
+        nSeqEvento = int(data.get('nSeqEvento', 1))
+        tpAmb = int(data.get('tpAmb', 1)) # Padrão Produção (1)
+        
+        if not chave or len(chave) != 44:
+            return jsonify({'error': 'Chave de acesso inválida ou não informada (deve ter 44 dígitos).'}), 400
+        if len(texto_correcao) < 15:
+            return jsonify({'error': 'O texto da Carta de Correção deve ter no mínimo 15 caracteres (exigência SEFAZ).'}), 400
+            
+        retorno = sefaz_client.carta_correcao_nfe(
+            chave=chave,
+            texto_correcao=texto_correcao,
+            nSeqEvento=nSeqEvento,
+            tpAmb=tpAmb,
+            uf='SP'
+        )
+        
+        cstat = str(retorno.get('cstat', ''))
+        xmotivo = str(retorno.get('xmotivo', ''))
+        # 135: Evento registrado e vinculado a NF-e
+        is_homologado = (cstat in ('135', '136') or 'vinculado' in xmotivo.lower())
+        retorno['autorizado'] = is_homologado
+        retorno['is_evento'] = True
+        retorno['tipo_evento'] = 'Carta de Correção'
+        
+        # Salva no histórico SEFAZ
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO historico_sefaz (chave_nfe, tpAmb, cstat, xmotivo, recibo, protocolo, xml_envio, xml_retorno)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            chave,
+            tpAmb,
+            cstat or 'EVENTO',
+            f"[CC-e #{nSeqEvento}] {xmotivo}",
+            '',
+            retorno.get('protocolo', ''),
+            retorno.get('xml_evento_assinado', ''),
+            retorno.get('response_xml', '')
+        ))
+        conn.commit()
+        conn.close()
+        
+        return jsonify(retorno)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/sefaz/download/pdf/<chave>', methods=['GET'])
 def download_pdf(chave):
     chave = chave.strip()
     pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
     if not os.path.exists(pdf_path):
-        modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
-        if os.path.exists(modelo_pdf):
-            shutil.copyfile(modelo_pdf, pdf_path)
+        xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
+        if os.path.exists(xml_path):
+            try:
+                from danfe_generator import DanfeGenerator
+                DanfeGenerator().render(xml_path, pdf_path)
+            except Exception as e_pdf:
+                print(f"Aviso ao renderizar DANFE para download: {e_pdf}")
+        if not os.path.exists(pdf_path):
+            modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+            if os.path.exists(modelo_pdf):
+                shutil.copyfile(modelo_pdf, pdf_path)
             
     if os.path.exists(pdf_path):
         return send_file(pdf_path, as_attachment=True, download_name=f"{chave}-danfe.pdf", mimetype='application/pdf')
@@ -3306,9 +3650,17 @@ def download_zip(chave):
     # Garante o PDF
     pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
     if not os.path.exists(pdf_path):
-        modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
-        if os.path.exists(modelo_pdf):
-            shutil.copyfile(modelo_pdf, pdf_path)
+        xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
+        if os.path.exists(xml_path):
+            try:
+                from danfe_generator import DanfeGenerator
+                DanfeGenerator().render(xml_path, pdf_path)
+            except Exception as e_pdf:
+                print(f"Aviso ao renderizar DANFE para ZIP: {e_pdf}")
+        if not os.path.exists(pdf_path):
+            modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+            if os.path.exists(modelo_pdf):
+                shutil.copyfile(modelo_pdf, pdf_path)
             
     # Garante o XML
     xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
