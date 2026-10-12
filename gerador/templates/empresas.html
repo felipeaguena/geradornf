@@ -252,19 +252,23 @@
 <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
 <div class="row g-3">
 <div class="col-md-4">
-<label class="form-label small fw-bold">CEP</label>
+<label class="form-label small fw-bold" for="cad_cep">CEP</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="cad_cep" onblur="buscarCepCad()" placeholder="00000-000 ou 99999-999" type="text"/>
 <button class="btn-nft" onclick="buscarCepCad()" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
 </div>
 </div>
-<div class="col-md-6">
+<div class="col-md-5">
 <label class="form-label small fw-bold">Logradouro</label>
 <input class="form-control form-control-sm" id="cad_logradouro" type="text"/>
 </div>
 <div class="col-md-2">
 <label class="form-label small fw-bold">Número</label>
 <input class="form-control form-control-sm" id="cad_numero" type="text"/>
+</div>
+<div class="col-md-5">
+<label class="form-label small fw-bold">Complemento</label>
+<input class="form-control form-control-sm" id="cad_complemento" placeholder="Sala, Bloco, Galpão..." type="text"/>
 </div>
 <div class="col-md-4">
 <label class="form-label small fw-bold">Bairro</label>
@@ -385,8 +389,15 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        function deletarEmpresa(id) {
-            if(confirm('Deseja realmente excluir este cadastro?')) {
+        async function deletarEmpresa(id) {
+            const confirmar = await window.nftConfirm('Deseja realmente excluir este cadastro de empresa/parceiro?', {
+                title: 'Confirmar Exclusão',
+                type: 'danger',
+                confirmText: 'Sim, Excluir',
+                cancelText: 'Cancelar',
+                icon: 'trash-2'
+            });
+            if (confirmar) {
                 fetch('/api/empresas/' + id, {method: 'DELETE'})
                     .then(() => carregarEmpresas());
             }
@@ -407,6 +418,7 @@
             document.getElementById('edit_cep').value = emp.cep || '';
             document.getElementById('edit_logradouro').value = emp.logradouro || '';
             document.getElementById('edit_numero').value = emp.numero || '';
+            document.getElementById('edit_complemento').value = emp.complemento || '';
             document.getElementById('edit_bairro').value = emp.bairro || '';
             document.getElementById('edit_municipio').value = emp.municipio || '';
             document.getElementById('edit_uf').value = emp.uf || '';
@@ -435,6 +447,7 @@
                 cep: document.getElementById('edit_cep').value,
                 logradouro: document.getElementById('edit_logradouro').value,
                 numero: document.getElementById('edit_numero').value,
+                complemento: document.getElementById('edit_complemento').value,
                 bairro: document.getElementById('edit_bairro').value,
                 municipio: document.getElementById('edit_municipio').value,
                 cmun: document.getElementById('edit_cmun').value,
@@ -473,6 +486,7 @@
                 cep: document.getElementById('cad_cep').value,
                 logradouro: document.getElementById('cad_logradouro').value,
                 numero: document.getElementById('cad_numero').value,
+                complemento: document.getElementById('cad_complemento').value,
                 bairro: document.getElementById('cad_bairro').value,
                 municipio: document.getElementById('cad_municipio').value,
                 cmun: document.getElementById('cad_cmun').value,
@@ -801,19 +815,23 @@
 <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
 <div class="row g-3">
 <div class="col-md-4">
-<label class="form-label small fw-bold">CEP</label>
+<label class="form-label small fw-bold" for="edit_cep">CEP</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="edit_cep" onblur="buscarCepEdit()" placeholder="00000-000" type="text"/>
 <button class="btn-nft" onclick="buscarCepEdit()" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
 </div>
 </div>
-<div class="col-md-6">
+<div class="col-md-5">
 <label class="form-label small fw-bold">Logradouro</label>
 <input class="form-control form-control-sm" id="edit_logradouro" type="text"/>
 </div>
 <div class="col-md-2">
 <label class="form-label small fw-bold">Número</label>
 <input class="form-control form-control-sm" id="edit_numero" type="text"/>
+</div>
+<div class="col-md-5">
+<label class="form-label small fw-bold">Complemento</label>
+<input class="form-control form-control-sm" id="edit_complemento" placeholder="Sala, Bloco, Galpão..." type="text"/>
 </div>
 <div class="col-md-4">
 <label class="form-label small fw-bold">Bairro</label>

@@ -87,6 +87,12 @@ def get_db_connection():
             conn.execute("ALTER TABLE tipos_operacao ADD COLUMN ordem INTEGER DEFAULT 0")
             conn.execute("UPDATE tipos_operacao SET ordem = id WHERE ordem IS NULL OR ordem = 0")
             conn.commit()
+
+        # Garantir presenca da coluna complemento na tabela cadastros
+        cad_cols = [col[1] for col in conn.execute('PRAGMA table_info(cadastros)').fetchall()]
+        if 'complemento' not in cad_cols:
+            conn.execute("ALTER TABLE cadastros ADD COLUMN complemento TEXT DEFAULT ''")
+            conn.commit()
         
         tables = [t[0] for t in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
         if 'tabela_csts' not in tables or 'tabela_paises' not in tables or 'tabela_municipios' not in tables or 'tabela_feiras' not in tables or 'tabela_locais_entrega' not in tables:
@@ -460,7 +466,11 @@ def build_nfe_element(cabecalho, itens, rodape):
     ender_emit = ET.SubElement(emit, f'{{{NFE_NS}}}enderEmit')
     ET.SubElement(ender_emit, f'{{{NFE_NS}}}xLgr').text = remover_acentos_nfe(cabecalho.get('emit_xLgr') or 'AV. DR. GASTAO VIDIGAL')[:60]
     ET.SubElement(ender_emit, f'{{{NFE_NS}}}nro').text = remover_acentos_nfe(cabecalho.get('emit_nro') or '1132')[:60]
-    cpl_emit = remover_acentos_nfe(cabecalho.get('emit_xCpl') or 'SALA 910 TORRE B')[:60]
+    cpl_emit = cabecalho.get('emit_xCpl')
+    if cpl_emit is None:
+        # Se for o emitente padrao NFT LOGISTICS e nao especificado xCpl, usa SALA 910 TORRE B
+        cpl_emit = 'SALA 910 TORRE B' if 'NFT' in str(cabecalho.get('emit_xNome') or 'NFT') else ''
+    cpl_emit = remover_acentos_nfe(str(cpl_emit or '')).strip()[:60]
     if cpl_emit:
         ET.SubElement(ender_emit, f'{{{NFE_NS}}}xCpl').text = cpl_emit
     ET.SubElement(ender_emit, f'{{{NFE_NS}}}xBairro').text = remover_acentos_nfe(cabecalho.get('emit_xBairro') or 'VILA LEOPOLDINA')[:60]
@@ -497,6 +507,9 @@ def build_nfe_element(cabecalho, itens, rodape):
         ender_dest = ET.SubElement(dest, f'{{{NFE_NS}}}enderDest')
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}xLgr').text = str(cabecalho.get('dest_xLgr') or 'EXTERIOR')[:60]
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}nro').text = str(cabecalho.get('dest_nro') or 'SN')[:60]
+        dest_cpl_ext = remover_acentos_nfe(cabecalho.get('dest_xCpl') or '').strip()[:60]
+        if dest_cpl_ext:
+            ET.SubElement(ender_dest, f'{{{NFE_NS}}}xCpl').text = dest_cpl_ext
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}xBairro').text = str(cabecalho.get('dest_xBairro') or 'EXTERIOR')[:60]
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}cMun').text = '9999999'
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}xMun').text = 'EXTERIOR'
@@ -533,6 +546,9 @@ def build_nfe_element(cabecalho, itens, rodape):
         ender_dest = ET.SubElement(dest, f'{{{NFE_NS}}}enderDest')
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}xLgr').text = remover_acentos_nfe(cabecalho.get('dest_xLgr') or '')[:60]
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}nro').text = remover_acentos_nfe(cabecalho.get('dest_nro') or 'SN')[:60]
+        dest_cpl_dom = remover_acentos_nfe(cabecalho.get('dest_xCpl') or '').strip()[:60]
+        if dest_cpl_dom:
+            ET.SubElement(ender_dest, f'{{{NFE_NS}}}xCpl').text = dest_cpl_dom
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}xBairro').text = remover_acentos_nfe(cabecalho.get('dest_xBairro') or '')[:60]
         c_mun_dest = str(cabecalho.get('dest_cMun') or '').strip()
         ET.SubElement(ender_dest, f'{{{NFE_NS}}}cMun').text = c_mun_dest or '3550308'
@@ -979,11 +995,11 @@ def api_empresas():
     if request.method == 'POST':
         data = request.json
         c.execute('''
-            INSERT INTO cadastros (tipo, nome, cnpj_cpf, ie, logradouro, numero, bairro, municipio, uf, cep, cpais, xpais, cmun, fone, apelido, ind_ie)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO cadastros (tipo, nome, cnpj_cpf, ie, logradouro, numero, complemento, bairro, municipio, uf, cep, cpais, xpais, cmun, fone, apelido, ind_ie)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             data.get('tipo', ''), data.get('nome', ''), data.get('cnpj_cpf', ''), data.get('ie', ''),
-            data.get('logradouro', ''), data.get('numero', ''), data.get('bairro', ''),
+            data.get('logradouro', ''), data.get('numero', ''), data.get('complemento', ''), data.get('bairro', ''),
             data.get('municipio', ''), data.get('uf', ''), data.get('cep', ''),
             data.get('cpais', ''), data.get('xpais', ''), data.get('cmun', ''), data.get('fone', ''),
             data.get('apelido', ''), data.get('ind_ie', '')
@@ -1010,11 +1026,11 @@ def api_edit_delete_empresa(cid):
         data = request.json
         c.execute('''
             UPDATE cadastros
-            SET tipo=?, nome=?, cnpj_cpf=?, ie=?, logradouro=?, numero=?, bairro=?, municipio=?, uf=?, cep=?, cpais=?, xpais=?, cmun=?, fone=?, apelido=?, ind_ie=?
+            SET tipo=?, nome=?, cnpj_cpf=?, ie=?, logradouro=?, numero=?, complemento=?, bairro=?, municipio=?, uf=?, cep=?, cpais=?, xpais=?, cmun=?, fone=?, apelido=?, ind_ie=?
             WHERE id = ?
         ''', (
             data.get('tipo', ''), data.get('nome', ''), data.get('cnpj_cpf', ''), data.get('ie', ''),
-            data.get('logradouro', ''), data.get('numero', ''), data.get('bairro', ''),
+            data.get('logradouro', ''), data.get('numero', ''), data.get('complemento', ''), data.get('bairro', ''),
             data.get('municipio', ''), data.get('uf', ''), data.get('cep', ''),
             data.get('cpais', ''), data.get('xpais', ''), data.get('cmun', ''), data.get('fone', ''),
             data.get('apelido', ''), data.get('ind_ie', ''),
@@ -1045,6 +1061,7 @@ def api_consulta_cnpj(cnpj):
                     'cep': str(data.get('cep') or '').replace('.', ''),
                     'logradouro': remover_acentos_nfe(data.get('logradouro') or ''),
                     'numero': str(data.get('numero') or ''),
+                    'complemento': remover_acentos_nfe(data.get('complemento') or ''),
                     'bairro': remover_acentos_nfe(data.get('bairro') or ''),
                     'municipio': remover_acentos_nfe(data.get('municipio') or ''),
                     'uf': data.get('uf') or '',
@@ -1070,6 +1087,7 @@ def api_consulta_cnpj(cnpj):
                         'cep': str(data.get('cep') or '').replace('.', ''),
                         'logradouro': remover_acentos_nfe(data.get('logradouro') or ''),
                         'numero': str(data.get('numero') or ''),
+                        'complemento': remover_acentos_nfe(data.get('complemento') or ''),
                         'bairro': remover_acentos_nfe(data.get('bairro') or ''),
                         'municipio': remover_acentos_nfe(data.get('municipio') or ''),
                         'uf': data.get('uf') or '',
@@ -1911,6 +1929,7 @@ def process_di_xml(root):
         "emit_CNPJ": imp_cnpj or "47998441000198",
         "emit_xLgr": imp_logr or "AV. DR. GASTAO VIDIGAL",
         "emit_nro": imp_num or "1132",
+        "emit_xCpl": "SALA 910 TORRE B",
         "emit_xBairro": imp_bairro or "VILA LEOPOLDINA",
         "emit_cMun": "3550308",
         "emit_xMun": imp_mun or "SAO PAULO",
@@ -1925,7 +1944,8 @@ def process_di_xml(root):
         "dest_IE": "",
         "dest_xLgr": fornecedor_logr or "EXTERIOR",
         "dest_nro": fornecedor_num or "SN",
-        "dest_xBairro": fornecedor_compl or fornecedor_cidade or "EXTERIOR",
+        "dest_xCpl": fornecedor_compl or "",
+        "dest_xBairro": fornecedor_cidade or "EXTERIOR",
         "dest_cMun": "9999999",
         "dest_xMun": "EXTERIOR",
         "dest_UF": "EX",
@@ -2143,6 +2163,7 @@ def upload_xml():
             "emit_CNPJ": get_text(emit, 'CNPJ'),
             "emit_xLgr": get_text(emit, 'xLgr'),
             "emit_nro": get_text(emit, 'nro'),
+            "emit_xCpl": get_text(emit, 'xCpl'),
             "emit_xBairro": get_text(emit, 'xBairro'),
             "emit_cMun": get_text(emit, 'cMun') or '3550308',
             "emit_xMun": get_text(emit, 'xMun'),
@@ -2159,6 +2180,7 @@ def upload_xml():
             "dest_IE": get_text(dest, 'IE') or "",
             "dest_xLgr": get_text(dest, 'xLgr'),
             "dest_nro": get_text(dest, 'nro'),
+            "dest_xCpl": get_text(dest, 'xCpl'),
             "dest_xBairro": get_text(dest, 'xBairro'),
             "dest_cMun": get_text(dest, 'cMun') or ('9999999' if idDest_val == '3' else '3550308'),
             "dest_xMun": get_text(dest, 'xMun') or ('EXTERIOR' if idDest_val == '3' else ''),

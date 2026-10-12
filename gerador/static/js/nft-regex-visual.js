@@ -18,10 +18,10 @@
     const REGRAS_CAMPOS = {
         // --- 1. Identificação da NF ---
         'nNF': {
-            labelPadrao: '1 a 9 dígitos (> 0)',
+            labelPadrao: '... (> 0)',
             maxlength: 9,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '1 a 9 dígitos' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const limpo = String(val).replace(/\D/g, '');
                 if (!limpo || parseInt(limpo, 10) <= 0) return { estado: 'erro', msg: 'Deve ser > 0' };
                 if (limpo.length > 9) return { estado: 'erro', msg: `${limpo.length}/9 dígitos (excedeu)` };
@@ -29,10 +29,10 @@
             }
         },
         'serie': {
-            labelPadrao: '1 a 3 dígitos',
+            labelPadrao: '...',
             maxlength: 3,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '1 a 3 dígitos' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const limpo = String(val).replace(/\D/g, '');
                 if (!limpo) return { estado: 'erro', msg: 'Apenas números' };
                 if (limpo.length > 3) return { estado: 'erro', msg: `${limpo.length}/3 dígitos (excedeu)` };
@@ -73,10 +73,10 @@
             }
         },
         'op_cfop': {
-            labelPadrao: '4 dígitos (CFOP)',
+            labelPadrao: '...',
             maxlength: 4,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '4 dígitos (CFOP)' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const limpo = String(val).replace(/\D/g, '');
                 if (limpo.length === 4) {
                     if (/^[123567]/.test(limpo)) return { estado: 'valido', msg: `✓ CFOP ${limpo}` };
@@ -87,19 +87,19 @@
             }
         },
         'cfop_padrao': {
-            labelPadrao: '4 dígitos (CFOP)',
+            labelPadrao: '...',
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '4 dígitos (CFOP)' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const limpo = String(val).replace(/\D/g, '');
                 if (limpo.length === 4 && /^[123567]/.test(limpo)) return { estado: 'valido', msg: `✓ CFOP ${limpo}` };
                 return { estado: 'aviso', msg: `${limpo.length}/4 dígitos` };
             }
         },
         'op_c_enq': {
-            labelPadrao: '3 dígitos (cEnq)',
+            labelPadrao: '...',
             maxlength: 3,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '3 dígitos (cEnq)' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const limpo = String(val).replace(/\D/g, '');
                 if (limpo.length === 3) return { estado: 'valido', msg: `✓ cEnq ${limpo}` };
                 if (limpo.length < 3) return { estado: 'aviso', msg: `${limpo.length}/3 dígitos` };
@@ -123,11 +123,11 @@
             labelPadrao: '2 a 14 dígitos ou ISENTO',
             maxlength: 18,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '2-14 dígitos ou ISENTO' };
+                if (!val) return { estado: 'neutro', msg: '2-14' };
                 const vUpper = String(val).trim().toUpperCase();
                 if (vUpper === 'ISENTO') return { estado: 'valido', msg: '✓ ISENTO' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} dígitos (IE)` };
+                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} díg.` };
                 if (limpo.length < 2) return { estado: 'aviso', msg: `${limpo.length}/2 mín.` };
                 return { estado: 'erro', msg: `${limpo.length}/14 máx.` };
             }
@@ -161,7 +161,7 @@
             validar: function (val) {
                 if (!val) return { estado: 'neutro', msg: '8 dígitos (CEP)' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8 (CEP)' };
+                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8' };
                 if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos (faltam ${8 - limpo.length})` };
                 return { estado: 'erro', msg: `${limpo.length}/8 dígitos (excedeu)` };
             }
@@ -183,7 +183,7 @@
             labelPadrao: '11 (CPF), 14 (CNPJ) ou 5-20 (Estrangeiro)',
             maxlength: 20,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: 'CNPJ, CPF ou IdEstrang.' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const tpDocEl = document.getElementById('dest_tpDoc');
                 const isEstrangeiro = tpDocEl && tpDocEl.value === 'Estrangeiro';
                 const vTrim = String(val).trim();
@@ -204,11 +204,11 @@
             labelPadrao: '2 a 14 dígitos ou ISENTO',
             maxlength: 18,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '2-14 dígitos ou ISENTO' };
+                if (!val) return { estado: 'neutro', msg: '2-14' };
                 const vUpper = String(val).trim().toUpperCase();
                 if (vUpper === 'ISENTO') return { estado: 'valido', msg: '✓ ISENTO' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} dígitos (IE)` };
+                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} díg.` };
                 if (limpo.length < 2) return { estado: 'aviso', msg: `${limpo.length}/2 mín.` };
                 return { estado: 'erro', msg: `${limpo.length}/14 máx.` };
             }
@@ -242,7 +242,7 @@
             validar: function (val) {
                 if (!val) return { estado: 'neutro', msg: '8 dígitos (CEP)' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8 (CEP)' };
+                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8' };
                 if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos (faltam ${8 - limpo.length})` };
                 return { estado: 'erro', msg: `${limpo.length}/8 dígitos (excedeu)` };
             }
@@ -288,11 +288,11 @@
             labelPadrao: '2 a 14 dígitos ou ISENTO',
             maxlength: 18,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '2-14 dígitos ou ISENTO' };
+                if (!val) return { estado: 'neutro', msg: '2-14' };
                 const vUpper = String(val).trim().toUpperCase();
                 if (vUpper === 'ISENTO') return { estado: 'valido', msg: '✓ ISENTO' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} dígitos (IE)` };
+                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} díg.` };
                 if (limpo.length < 2) return { estado: 'aviso', msg: `${limpo.length}/2 mín.` };
                 return { estado: 'erro', msg: `${limpo.length}/14 máx.` };
             }
@@ -301,10 +301,10 @@
             labelPadrao: '8 dígitos (CEP)',
             maxlength: 9,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '8 dígitos' };
+                if (!val) return { estado: 'neutro', msg: '8 dígitos (CEP)' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8 (CEP)' };
-                if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos` };
+                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8' };
+                if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos (faltam ${8 - limpo.length})` };
                 return { estado: 'erro', msg: `${limpo.length}/8 dígitos (excedeu)` };
             }
         },
@@ -363,7 +363,7 @@
 
         // --- 6. Modal de Itens (m_item_*) ---
         'm_item_CFOP': {
-            labelPadrao: '4 dígitos (CFOP)',
+            labelPadrao: '...',
             maxlength: 4,
             validar: function (val) {
                 if (!val) return { estado: 'neutro', msg: '4 dígitos' };
@@ -464,20 +464,20 @@
             }
         },
         'm_item_nAdicao': {
-            labelPadrao: '1 a 3 dígitos',
+            labelPadrao: '...',
             maxlength: 3,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '1 a 3 dígitos' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const limpo = String(val).replace(/\D/g, '');
                 if (limpo.length >= 1 && limpo.length <= 3) return { estado: 'valido', msg: `✓ Nº ${limpo}` };
                 return { estado: 'erro', msg: `${limpo.length}/3 máx.` };
             }
         },
         'm_item_nSeqAdic': {
-            labelPadrao: '1 a 3 dígitos',
+            labelPadrao: '...',
             maxlength: 3,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '1 a 3 dígitos' };
+                if (!val) return { estado: 'neutro', msg: '...' };
                 const limpo = String(val).replace(/\D/g, '');
                 if (limpo.length >= 1 && limpo.length <= 3) return { estado: 'valido', msg: `✓ Nº ${limpo}` };
                 return { estado: 'erro', msg: `${limpo.length}/3 máx.` };
@@ -525,11 +525,11 @@
             labelPadrao: '2 a 14 dígitos ou ISENTO',
             maxlength: 18,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '2-14 dígitos ou ISENTO' };
+                if (!val) return { estado: 'neutro', msg: '2-14' };
                 const vUpper = String(val).trim().toUpperCase();
                 if (vUpper === 'ISENTO') return { estado: 'valido', msg: '✓ ISENTO' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} dígitos (IE)` };
+                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} díg.` };
                 return { estado: 'aviso', msg: `${limpo.length}/14 máx.` };
             }
         },
@@ -537,11 +537,11 @@
             labelPadrao: '2 a 14 dígitos ou ISENTO',
             maxlength: 18,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '2-14 dígitos ou ISENTO' };
+                if (!val) return { estado: 'neutro', msg: '2-14' };
                 const vUpper = String(val).trim().toUpperCase();
                 if (vUpper === 'ISENTO') return { estado: 'valido', msg: '✓ ISENTO' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} dígitos (IE)` };
+                if (limpo.length >= 2 && limpo.length <= 14) return { estado: 'valido', msg: `✓ ${limpo.length} díg.` };
                 return { estado: 'aviso', msg: `${limpo.length}/14 máx.` };
             }
         },
@@ -551,7 +551,7 @@
             validar: function (val) {
                 if (!val) return { estado: 'neutro', msg: '8 dígitos (CEP)' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8 (CEP)' };
+                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8' };
                 if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos (faltam ${8 - limpo.length})` };
                 return { estado: 'erro', msg: `${limpo.length}/8 dígitos (excedeu)` };
             }
@@ -562,7 +562,7 @@
             validar: function (val) {
                 if (!val) return { estado: 'neutro', msg: '8 dígitos (CEP)' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8 (CEP)' };
+                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8' };
                 if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos (faltam ${8 - limpo.length})` };
                 return { estado: 'erro', msg: `${limpo.length}/8 dígitos (excedeu)` };
             }
@@ -657,10 +657,10 @@
             labelPadrao: '8 dígitos (CEP)',
             maxlength: 9,
             validar: function (val) {
-                if (!val) return { estado: 'neutro', msg: '8 dígitos' };
+                if (!val) return { estado: 'neutro', msg: '8 dígitos (CEP)' };
                 const limpo = String(val).replace(/\D/g, '');
-                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8 (CEP)' };
-                if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos` };
+                if (limpo.length === 8) return { estado: 'valido', msg: '✓ 8/8' };
+                if (limpo.length < 8) return { estado: 'aviso', msg: `${limpo.length}/8 dígitos (faltam ${8 - limpo.length})` };
                 return { estado: 'erro', msg: `${limpo.length}/8 dígitos (excedeu)` };
             }
         }
@@ -672,16 +672,38 @@
             if (b) return b;
         }
 
-        let badge = document.querySelector(`.nft-regex-tag[data-field-id="${id}"]`);
-        if (badge) return badge;
-
         // Tenta achar o label associado
         let label = document.querySelector(`label[for="${id}"]`);
         if (!label) {
-            const parent = inputEl.closest('.col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-12, .col-12, .col-6, div');
-            if (parent) {
-                label = parent.querySelector('label');
+            // Se o input estiver dentro de um input-group ou coluna, busca a label na coluna ou container pai
+            const colParent = inputEl.closest('.col, [class*="col-"], .form-group, .mb-3');
+            if (colParent) {
+                label = colParent.querySelector('label');
             }
+        }
+        if (!label) {
+            // Busca no ancestral mais próximo que contenha um elemento label (ignorando .input-group)
+            let cur = inputEl.parentElement;
+            while (cur && cur !== document.body && cur !== document.documentElement) {
+                if (!cur.classList.contains('input-group')) {
+                    const l = cur.querySelector('label');
+                    if (l) {
+                        label = l;
+                        break;
+                    }
+                }
+                cur = cur.parentElement;
+            }
+        }
+
+        let badge = document.querySelector(`.nft-regex-tag[data-field-id="${id}"]`);
+        if (badge) {
+            // Se o badge já existe mas acabou sendo inserido erroneamente fora do label (ex: dentro de um input-group)
+            if (label && badge.parentElement !== label) {
+                label.classList.add('has-regex-tag');
+                label.appendChild(badge);
+            }
+            return badge;
         }
 
         badge = document.createElement('span');
@@ -690,7 +712,11 @@
         badge.innerText = regra.labelPadrao;
 
         if (label) {
+            label.classList.add('has-regex-tag');
             label.appendChild(badge);
+        } else if (inputEl.closest('.input-group')) {
+            const ig = inputEl.closest('.input-group');
+            ig.parentNode.insertBefore(badge, ig);
         } else if (inputEl.parentNode) {
             inputEl.parentNode.insertBefore(badge, inputEl.nextSibling);
         }

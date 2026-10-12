@@ -502,6 +502,33 @@ def init_db():
             VALUES (?, ?)
         ''', locais_iniciais)
 
+    # 8. Tabela de Cadastros (Empresas, Clientes, Transportadoras, Fornecedores)
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS cadastros (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo TEXT,
+            nome TEXT,
+            cnpj_cpf TEXT,
+            ie TEXT,
+            logradouro TEXT,
+            numero TEXT,
+            complemento TEXT,
+            bairro TEXT,
+            municipio TEXT,
+            uf TEXT,
+            cep TEXT,
+            cpais TEXT,
+            xpais TEXT,
+            cmun TEXT,
+            fone TEXT,
+            apelido TEXT,
+            ind_ie TEXT
+        )
+    ''')
+    cad_cols = [col[1] for col in c.execute('PRAGMA table_info(cadastros)').fetchall()]
+    if 'complemento' not in cad_cols:
+        c.execute("ALTER TABLE cadastros ADD COLUMN complemento TEXT DEFAULT ''")
+
     conn.commit()
     conn.close()
     print("Banco de dados inicializado com sucesso!")

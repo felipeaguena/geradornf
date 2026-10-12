@@ -496,7 +496,14 @@
     }
 
     async function excluirLocal(id, nome) {
-        if (!confirm(`Deseja realmente remover o local "${nome}"?`)) {
+        const confirmar = await window.nftConfirm(`Deseja realmente remover o local "${nome}"?`, {
+            title: 'Excluir Local de Entrega',
+            type: 'danger',
+            confirmText: 'Sim, Excluir',
+            cancelText: 'Cancelar',
+            icon: 'trash-2'
+        });
+        if (!confirmar) {
             return;
         }
         try {
@@ -687,7 +694,14 @@
     }
 
     async function excluirFeira(id, nome) {
-        if (!confirm(`Deseja realmente excluir a feira "${nome}"?`)) {
+        const confirmar = await window.nftConfirm(`Deseja realmente excluir a feira "${nome}"?`, {
+            title: 'Excluir Feira / Evento',
+            type: 'danger',
+            confirmText: 'Sim, Excluir',
+            cancelText: 'Cancelar',
+            icon: 'trash-2'
+        });
+        if (!confirmar) {
             return;
         }
         try {

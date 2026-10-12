@@ -15,7 +15,7 @@
         SUSPENSAO: {
             codigo: 'SUSPENSAO',
             nome: 'Suspensão de Impostos',
-            icone: '🛡️',
+            icone: '',
             descricao: 'Admissão Temporária de mercadorias e Remessas/Retornos de Feiras e Exposições.',
             cfop_padrao: '3930',
             tp_nf: '0',
@@ -35,7 +35,7 @@
         ISENCAO: {
             codigo: 'ISENCAO',
             nome: 'Isenção Fiscal',
-            icone: '🌱',
+            icone: '',
             descricao: 'Importação ou circulação de mercadorias com benefício de isenção legal de tributos.',
             cfop_padrao: '3949',
             tp_nf: '0',
@@ -55,7 +55,7 @@
         RECOLHIMENTO: {
             codigo: 'RECOLHIMENTO',
             nome: 'Recolhimento Integral',
-            icone: '💰',
+            icone: '',
             descricao: 'Operações tributadas regularmente com recolhimento integral (II, IPI, PIS, COFINS e ICMS).',
             cfop_padrao: '3949',
             tp_nf: '0',
@@ -75,7 +75,7 @@
         IMUNIDADE: {
             codigo: 'IMUNIDADE',
             nome: 'Imunidade Tributária',
-            icone: '✈️',
+            icone: '',
             descricao: 'Reexportação de admissão temporária e exportações com imunidade tributária constitucional.',
             cfop_padrao: '7930',
             tp_nf: '1',
@@ -214,32 +214,32 @@
                     <ul class="nav nav-pills nav-fill mb-3 p-1 bg-body-tertiary rounded border" id="pills-regimes-tab" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-bold py-2" id="pill-suspensao-tab" data-bs-toggle="pill" data-bs-target="#pill-suspensao" type="button" role="tab">
-                                🛡️ Suspensão
+                                Suspensão
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold py-2" id="pill-isencao-tab" data-bs-toggle="pill" data-bs-target="#pill-isencao" type="button" role="tab">
-                                🌱 Isenção
+                                Isenção
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold py-2" id="pill-recolhimento-tab" data-bs-toggle="pill" data-bs-target="#pill-recolhimento" type="button" role="tab">
-                                💰 Recolhimento
+                                Recolhimento
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold py-2" id="pill-imunidade-tab" data-bs-toggle="pill" data-bs-target="#pill-imunidade" type="button" role="tab">
-                                ✈️ Imunidade
+                                Imunidade
                             </button>
                         </li>
                     </ul>
 
                     <!-- Conteúdo das Abas dos Regimes -->
                     <div class="tab-content" id="pills-regimes-tabContent">
-                        ${renderizarFormRegimeHTML('SUSPENSAO', '🛡️ Suspensão de Impostos', 'Admissão Temporária (3930), Remessas/Retornos de Feira (5914, 6914, 1914, 2914)')}
-                        ${renderizarFormRegimeHTML('ISENCAO', '🌱 Isenção Fiscal', 'Outras Entradas de Mercadoria com Isenção Legal de Tributos (3949)')}
-                        ${renderizarFormRegimeHTML('RECOLHIMENTO', '💰 Recolhimento Integral', 'Entrada com Tributação Regular e Recolhimento Integral de Impostos (3949)')}
-                        ${renderizarFormRegimeHTML('IMUNIDADE', '✈️ Imunidade Tributária', 'Reexportação de Admissão Temporária ao Exterior (7930, 7949)')}
+                        ${renderizarFormRegimeHTML('SUSPENSAO', 'Suspensão de Impostos', 'Admissão Temporária (3930), Remessas/Retornos de Feira (5914, 6914, 1914, 2914)')}
+                        ${renderizarFormRegimeHTML('ISENCAO', 'Isenção Fiscal', 'Outras Entradas de Mercadoria com Isenção Legal de Tributos (3949)')}
+                        ${renderizarFormRegimeHTML('RECOLHIMENTO', 'Recolhimento Integral', 'Entrada com Tributação Regular e Recolhimento Integral de Impostos (3949)')}
+                        ${renderizarFormRegimeHTML('IMUNIDADE', 'Imunidade Tributária', 'Reexportação de Admissão Temporária ao Exterior (7930, 7949)')}
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-between py-2 bg-body-tertiary">
@@ -463,7 +463,16 @@
 
     // Restaura padrões fiscais
     window.restaurarConfigRegimesPadrao = async function () {
-        const confirmar = confirm('Deseja restaurar todas as regras dos Enquadramentos Fiscais para os padrões fiscais oficiais (RIPI Art. 43, IN 1600, etc.)?');
+        const confirmar = await window.nftConfirm(
+            'Deseja restaurar todas as regras dos Enquadramentos Fiscais para os padrões fiscais oficiais (RIPI Art. 43, IN 1600, etc.)?',
+            {
+                title: 'Restaurar Padrões Fiscais',
+                type: 'warning',
+                confirmText: 'Sim, Restaurar',
+                cancelText: 'Cancelar',
+                icon: 'rotate-ccw'
+            }
+        );
         if (!confirmar) return;
 
         try {
@@ -534,13 +543,13 @@
             let regimeBadge = '';
             const reg = (op.regime_tributario || '').toUpperCase();
             if (reg === 'SUSPENSAO') {
-                regimeBadge = '<span class="badge bg-secondary-subtle text-secondary" style="font-size: 10px;">🛡️ Suspensão</span>';
+                regimeBadge = '<span class="badge bg-secondary-subtle text-secondary" style="font-size: 10px;">Suspensão</span>';
             } else if (reg === 'ISENCAO') {
-                regimeBadge = '<span class="badge bg-success-subtle text-success" style="font-size: 10px;">🌱 Isenção</span>';
+                regimeBadge = '<span class="badge bg-success-subtle text-success" style="font-size: 10px;">Isenção</span>';
             } else if (reg === 'RECOLHIMENTO') {
-                regimeBadge = '<span class="badge bg-primary-subtle text-primary" style="font-size: 10px;">💰 Recolhimento</span>';
+                regimeBadge = '<span class="badge bg-primary-subtle text-primary" style="font-size: 10px;">Recolhimento</span>';
             } else if (reg === 'IMUNIDADE') {
-                regimeBadge = '<span class="badge bg-info-subtle text-info" style="font-size: 10px;">✈️ Imunidade</span>';
+                regimeBadge = '<span class="badge bg-info-subtle text-info" style="font-size: 10px;">Imunidade</span>';
             }
 
             const tipoTxt = (op.tp_nf == '1') ? '1-Saída' : '0-Entrada';

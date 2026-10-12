@@ -259,16 +259,16 @@
 <label class="form-label small fw-bold">Número NF-e (nNF)</label>
 <input class="form-control form-control-sm" id="nNF" oninput="calcularChaveAcessoDinamica()" type="text"/>
 </div>
+<div class="col-md-1">
+<label class="form-label small fw-bold">Série</label>
+<input class="form-control form-control-sm" id="serie" oninput="calcularChaveAcessoDinamica()" type="text"/>
+</div>
 <div class="col-md-2">
 <label class="form-label small fw-bold">Consumidor final</label>
 <select class="form-select form-select-sm" id="indFinal">
 <option value="0">0-Não</option>
 <option selected="" value="1">1-Sim</option>
 </select>
-</div>
-<div class="col-md-1">
-<label class="form-label small fw-bold">Série</label>
-<input class="form-control form-control-sm" id="serie" oninput="calcularChaveAcessoDinamica()" type="text"/>
 </div>
 <!-- SELECT DO TIPO DE OPERACAO: HERDA TUDO NOS ITENS -->
 <div class="col-md-3">
@@ -287,7 +287,7 @@
 <div class="d-flex justify-content-between align-items-center mb-1">
 <label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1">
 <i data-lucide="key"></i>
-<span>Chave de Acesso NF-e (44 dígitos)</span>
+<span>Chave de Acesso NF-e</span>
 </label>
 <small class="text-muted font-monospace" style="font-size: 11px;">MOC SEFAZ (Dinâmica)</small>
 </div>
@@ -312,50 +312,9 @@
 </div>
 
 <!-- TRATAMENTO FISCAL / REGIME TRIBUTÁRIO & MEIO DE PAGAMENTO -->
-<div class="col-12">
-    <div class="p-2 px-3 border rounded bg-white shadow-sm d-flex flex-wrap justify-content-between align-items-center gap-3" id="card-regime-pagamento">
-        <div class="d-flex align-items-center flex-wrap gap-2">
-            <span class="small fw-bold text-secondary d-flex align-items-center gap-1">
-                <i data-lucide="shield-check" style="width: 15px; height: 15px;"></i>
-                <span>Enquadramento Fiscal:</span>
-            </span>
-            <div class="btn-group btn-group-sm" role="group" id="btn-group-regime">
-                <button type="button" class="btn btn-outline-primary fw-semibold btn-regime active" id="btn-regime-suspensao" onclick="selecionarRegimeTributario('SUSPENSAO', true)" title="Suspensão de Tributos (Admissão Temporária / Feiras)">
-                    🛡️ Suspensão
-                </button>
-                <button type="button" class="btn btn-outline-warning text-dark fw-semibold btn-regime" id="btn-regime-isencao" onclick="selecionarRegimeTributario('ISENCAO', true)" title="Isenção Fiscal de Tributos (Benefício Legal)">
-                    🌱 Isenção
-                </button>
-                <button type="button" class="btn btn-outline-success fw-semibold btn-regime" id="btn-regime-recolhimento" onclick="selecionarRegimeTributario('RECOLHIMENTO', true)" title="Recolhimento Integral / Tributada Regularmente">
-                    💰 Recolhimento
-                </button>
-                <button type="button" class="btn btn-outline-info text-dark fw-semibold btn-regime" id="btn-regime-imunidade" onclick="selecionarRegimeTributario('IMUNIDADE', true)" title="Imunidade Tributária (CF Art. 155 - Reexportação / Exportação)">
-                    ✈️ Imunidade
-                </button>
-            </div>
-            <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle ms-1 fw-bold" id="badge-regime-ativo" style="font-size: 11px;">
-                Regime: Suspensão
-            </span>
-        </div>
-
-        <div class="d-flex align-items-center flex-wrap gap-2 ms-auto">
-            <label class="form-label small fw-bold mb-0 text-secondary d-flex align-items-center gap-1" for="tPag">
-                <i data-lucide="credit-card" style="width: 15px; height: 15px;"></i>
-                <span>Meio de Pagamento (tPag):</span>
-            </label>
-            <select class="form-select form-select-sm fw-semibold" id="tPag" onchange="aoMudarMeioPagamento(this.value)" style="min-width: 280px; max-width: 330px;">
-                <option value="90" selected>90 - Sem Pagamento (Remessa/Retorno/Admissão)</option>
-                <option value="99">99 - Outros (Câmbio / Internacional)</option>
-                <option value="01">01 - Dinheiro</option>
-                <option value="15">15 - Boleto Bancário</option>
-                <option value="16">16 - Depósito Bancário</option>
-                <option value="17">17 - Pagamento Instantâneo (PIX)</option>
-                <option value="03">03 - Cartão de Crédito</option>
-                <option value="04">04 - Cartão de Débito</option>
-            </select>
-        </div>
-    </div>
-</div>
+<!-- Inputs Ocultos de Apoio ao Meio de Pagamento & Regime Fiscal (configurados em Tipo de Nota e Totais) -->
+<input id="tPag" type="hidden" value="90"/>
+<input id="regime_tributario_ativo_hidden" type="hidden" value="SUSPENSAO"/>
 
 <!-- NOTA FISCAL REFERENCIADA (NFREF - CHAVE DE ACESSO DE 44 DÍGITOS) -->
 <div class="col-md-12">
@@ -901,36 +860,40 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <option value="4">4 - Simples Nacional - Microempreendedor Individual - MEI</option>
 </select>
 </div>
-<div class="col-md-9">
+<div class="col-md-5">
 <label class="form-label small mb-1">Logradouro (xLgr)</label>
 <input class="form-control form-control-sm" id="emit_xLgr" type="text"/>
 </div>
-<div class="col-md-3">
+<div class="col-md-2">
 <label class="form-label small mb-1">Número (nro)</label>
 <input class="form-control form-control-sm" id="emit_nro" type="text"/>
+</div>
+<div class="col-md-5">
+<label class="form-label small mb-1">Complemento (xCpl)</label>
+<input class="form-control form-control-sm" id="emit_xCpl" placeholder="Sala, Bloco, Edifício..." type="text"/>
 </div>
 <div class="col-md-5">
 <label class="form-label small mb-1">Bairro</label>
 <input class="form-control form-control-sm" id="emit_xBairro" type="text"/>
 </div>
-<div class="col-md-3">
-<label class="form-label small mb-1">Cód. Mun. IBGE</label>
-<input class="form-control form-control-sm" id="emit_cMun" oninput="calcularChaveAcessoDinamica()" type="text"/>
-</div>
-<div class="col-md-4">
+<div class="col-md-5">
 <label class="form-label small mb-1">Município (xMun)</label>
 <input class="form-control form-control-sm" id="emit_xMun" type="text"/>
 </div>
-<div class="col-md-4">
+<div class="col-md-2">
 <label class="form-label small mb-1">UF</label>
 <input class="form-control form-control-sm" id="emit_UF" oninput="calcularChaveAcessoDinamica()" type="text"/>
 </div>
-<div class="col-md-8">
-<label class="form-label small mb-1 fw-bold">CEP (Busca Automática)</label>
+<div class="col-md-6">
+<label class="form-label small mb-1 fw-bold" for="emit_CEP">CEP (Busca Automática)</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="emit_CEP" onblur="buscarCepAuto(this.value, 'emit')" placeholder="00000-000" type="text"/>
 <button class="btn-nft" onclick="buscarCepAuto(document.getElementById('emit_CEP').value, 'emit')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
 </div>
+</div>
+<div class="col-md-6">
+<label class="form-label small mb-1">Cód. Mun. IBGE</label>
+<input class="form-control form-control-sm" id="emit_cMun" oninput="calcularChaveAcessoDinamica()" type="text"/>
 </div>
 </div>
 </div>
@@ -962,7 +925,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="input-group input-group-sm">
 <select class="form-select form-select-sm" id="select_destinatario" onchange="preencherDadosDeCadastro(this, 'dest')"><option value="">Selecione para preencher automaticamente...</option></select>
 <button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="abrirModalNovaEmpresaRapido('dest')" title="Cadastrar nova empresa e aplicar imediatamente à nota" type="button">
-<i data-lucide="plus" style="width: 13px; height: 13px;"></i>
+<i data-lucide="plus" style="width: 14px; height: 14px;"></i>
 <span>Nova</span>
 </button>
 </div>
@@ -1008,36 +971,40 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <label class="form-label small mb-1">Inscrição Estadual (IE)</label>
 <input class="form-control form-control-sm bg-light" disabled="" id="dest_IE" placeholder="Apenas p/ Contribuinte ICMS" type="text"/>
 </div>
-<div class="col-md-9">
+<div class="col-md-5">
 <label class="form-label small mb-1">Logradouro (xLgr)</label>
 <input class="form-control form-control-sm" id="dest_xLgr" type="text"/>
 </div>
-<div class="col-md-3">
+<div class="col-md-2">
 <label class="form-label small mb-1">Número (nro)</label>
 <input class="form-control form-control-sm" id="dest_nro" type="text"/>
+</div>
+<div class="col-md-5">
+<label class="form-label small mb-1">Complemento (xCpl)</label>
+<input class="form-control form-control-sm" id="dest_xCpl" placeholder="Sala, Bloco, Galpão..." type="text"/>
 </div>
 <div class="col-md-5">
 <label class="form-label small mb-1">Bairro</label>
 <input class="form-control form-control-sm" id="dest_xBairro" type="text"/>
 </div>
-<div class="col-md-3">
-<label class="form-label small mb-1">Cód. Mun. IBGE</label>
-<input class="form-control form-control-sm font-monospace" id="dest_cMun" type="text"/>
-</div>
-<div class="col-md-4">
+<div class="col-md-5">
 <label class="form-label small mb-1">Município (xMun)</label>
 <input class="form-control form-control-sm" id="dest_xMun" type="text"/>
 </div>
-<div class="col-md-4">
+<div class="col-md-2">
 <label class="form-label small mb-1">UF</label>
 <input class="form-control form-control-sm text-uppercase font-monospace" id="dest_UF" maxlength="2" type="text"/>
 </div>
-<div class="col-md-8">
-<label class="form-label small mb-1 fw-bold">CEP (Busca Automática / 99999-999)</label>
+<div class="col-md-6">
+<label class="form-label small mb-1 fw-bold" for="dest_CEP">CEP (Busca Automática)</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="dest_CEP" onblur="buscarCepAuto(this.value, 'dest')" placeholder="00000-000 ou 99999-999" type="text"/>
 <button class="btn-nft" onclick="buscarCepAuto(document.getElementById('dest_CEP').value, 'dest')" title="Consultar CEP e preencher endereço" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
 </div>
+</div>
+<div class="col-md-6">
+<label class="form-label small mb-1">Cód. Mun. IBGE</label>
+<input class="form-control form-control-sm font-monospace" id="dest_cMun" type="text"/>
 </div>
 </div>
 </div>
@@ -1077,7 +1044,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <input class="form-control form-control-sm" id="transp_IE" type="text"/>
 </div>
 <div class="col-md-3">
-<label class="form-label small mb-1 fw-bold">CEP Transportadora</label>
+<label class="form-label small mb-1 fw-bold" for="transp_CEP">CEP Transportadora</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="transp_CEP" onblur="buscarCepAuto(this.value, 'transp')" placeholder="00000-000" type="text"/>
 <button class="btn-nft" onclick="buscarCepAuto(document.getElementById('transp_CEP').value, 'transp')" title="Buscar CEP da transportadora" type="button"><i data-lucide="search" style="width: 13px; height: 13px;"></i></button>
@@ -1274,16 +1241,16 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         </button>
     </div>
     <select class="form-select form-select-sm fw-bold border-primary" id="op_regime" onchange="if(window.atualizarResumoRegimeForm) window.atualizarResumoRegimeForm(this.value)">
-        <option value="SUSPENSAO">🛡️ Suspensão (Admissão Temp. / Feiras)</option>
-        <option value="ISENCAO">🌱 Isenção (Benefício Fiscal Legal)</option>
-        <option value="RECOLHIMENTO">💰 Recolhimento (Tributada Regularmente)</option>
-        <option value="IMUNIDADE">✈️ Imunidade (Reexportação / Exportação)</option>
+        <option value="SUSPENSAO">Suspensão (Admissão Temp. / Feiras)</option>
+        <option value="ISENCAO">Isenção (Benefício Fiscal Legal)</option>
+        <option value="RECOLHIMENTO">Recolhimento (Tributada Regularmente)</option>
+        <option value="IMUNIDADE">Imunidade (Reexportação / Exportação)</option>
     </select>
     <div class="d-flex align-items-center justify-content-between mt-1 flex-wrap gap-1">
         <small id="op_regime_info" class="text-muted fw-semibold" style="font-size: 11px;"></small>
         <button type="button" class="btn btn-outline-primary btn-sm py-0 px-2 d-flex align-items-center gap-1" onclick="aplicarPresetDoRegimeAoFormOperacao()" title="Preencher automaticamente os campos de ICMS, IPI, PIS, COFINS e Pagamento com as regras padrão deste Enquadramento Fiscal" style="font-size: 11px;">
             <i data-lucide="sparkles" style="width: 12px; height: 12px;"></i>
-            <span>⚡ Preencher Campos com Regras deste Regime</span>
+            <span>Preencher Campos com Regras deste Regime</span>
         </button>
     </div>
 </div>
@@ -1373,17 +1340,14 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <small class="text-muted">Clique em qualquer célula para editar diretamente. Use a barra de rolagem horizontal para ver todas as colunas.</small>
 </div>
 <div class="d-flex align-items-center flex-wrap gap-1">
-<button class="btn-nft btn-nft-success me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="adicionarNovoItem()" title="Adicionar um novo item na nota" type="button">
+<button class="btn-nft btn-nft-success me-1 fw-bold d-flex align-items-center justify-content-center shadow-sm" onclick="adicionarNovoItem()" title="Adicionar um novo item na nota" type="button">
 <i data-lucide="plus-circle"></i>
-<span>+ Adicionar Item</span>
 </button>
-<button class="btn-nft btn-nft-danger me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
+<button class="btn-nft btn-nft-danger me-1 fw-bold d-flex align-items-center justify-content-center shadow-sm" onclick="excluirItensSelecionados()" title="Excluir item(ns) selecionado(s) na grade" type="button">
 <i data-lucide="trash-2"></i>
-<span>Excluir Item</span>
 </button>
-<button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="duplicarItensSelecionados()" title="Duplicar item(ns) selecionado(s) na grade" type="button">
+<button class="btn-nft me-1 fw-bold d-flex align-items-center justify-content-center" onclick="duplicarItensSelecionados()" title="Duplicar item(ns) selecionado(s) na grade" type="button">
 <i data-lucide="copy"></i>
-<span>Duplicar Item</span>
 </button>
 <button class="btn-nft btn-nft-warning me-1 fw-bold d-flex align-items-center gap-1 shadow-sm" onclick="zerarImpostosTodosItensComConfirmacao()" title="Zerar Base de Cálculo, Porcentagem e Valor de II, IPI, PIS e COFINS de todos os itens" type="button">
 <i data-lucide="percent"></i>
@@ -1397,19 +1361,15 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
     <ul class="dropdown-menu shadow" aria-labelledby="dropdownEnquadramentoItens" style="font-size: 13px; min-width: 280px;">
         <li><h6 class="dropdown-header text-uppercase fw-bold" style="font-size: 11px;">Aplicar a Todos os Itens:</h6></li>
         <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('SUSPENSAO')">
-            <span class="badge bg-primary">🛡️</span>
             <div><strong>Suspensão de Impostos</strong><br><small class="text-muted">CST 50/400 | IPI 55/05 | PIS/COF 08 | Zerar</small></div>
         </a></li>
         <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('ISENCAO')">
-            <span class="badge bg-warning text-dark">🌱</span>
             <div><strong>Isenção Fiscal</strong><br><small class="text-muted">CST 40/400 | IPI 52/02 | PIS/COF 07 | Zerar</small></div>
         </a></li>
         <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('RECOLHIMENTO')">
-            <span class="badge bg-success">💰</span>
             <div><strong>Recolhimento Integral</strong><br><small class="text-muted">CST 00/900 | IPI 49 | PIS 1.65% | COF 7.60%</small></div>
         </a></li>
         <li><a class="dropdown-item d-flex align-items-center gap-2 py-2" href="javascript:void(0)" onclick="aplicarRegimeAosItensComConfirmacao('IMUNIDADE')">
-            <span class="badge bg-info text-dark">✈️</span>
             <div><strong>Imunidade (Reexportação)</strong><br><small class="text-muted">CST 41/300 | IPI 55/53 | PIS/COF 08 | Zerar</small></div>
         </a></li>
     </ul>
@@ -1417,10 +1377,6 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <button class="btn-nft me-1 fw-bold d-flex align-items-center gap-1" onclick="abrirPainelRateio()" title="Ir para Parâmetros de Rateio e Câmbio PTAX">
 <i data-lucide="scale"></i>
 <span>Rateio &amp; PTAX</span>
-</button>
-<button class="btn-nft me-1 fw-semibold d-flex align-items-center gap-1" onclick="aplicarUnidadesExportacaoManual()" title="Consulta NCMs na Receita Federal e atualiza uTrib, qTrib e vUnTrib para operações de exportação">
-<i data-lucide="globe"></i>
-<span>Unidades Exportação (uTrib)</span>
 </button>
 <button class="btn-nft me-1 d-flex align-items-center gap-1" onclick="recarregarTabelaItens()">
 <i data-lucide="refresh-cw"></i>
@@ -1721,10 +1677,18 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     }, 2000);
                 }
             }).catch(() => {
-                prompt("Copie a chave de acesso abaixo:", chave);
+                if (window.nftPrompt) {
+                    window.nftPrompt("Copie a chave de acesso abaixo:", chave, { title: "Chave de Acesso", icon: "key" });
+                } else {
+                    prompt("Copie a chave de acesso abaixo:", chave);
+                }
             });
         } else {
-            prompt("Copie a chave de acesso abaixo:", chave);
+            if (window.nftPrompt) {
+                window.nftPrompt("Copie a chave de acesso abaixo:", chave, { title: "Chave de Acesso", icon: "key" });
+            } else {
+                prompt("Copie a chave de acesso abaixo:", chave);
+            }
         }
     }
 
@@ -2257,9 +2221,16 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         if (!temTaxaGravada) {
             // Se os itens vieram de um XML sem taxa_conversao explícita gravada nos campos,
             // solicita ao usuário a taxa que foi utilizada originalmente no XML para servir de divisor base
-            const taxaInformada = prompt(
+            const taxaInformada = await window.nftPrompt(
                 `Os itens importados do XML ainda não possuem uma Taxa Cambial anterior gravada.\n\nInforme a Taxa de Câmbio anterior utilizada no XML para ${moeda} (ex: 5.5000):`,
-                getVal('ptax_cotacao_venda') || "5.0000"
+                getVal('ptax_cotacao_venda') || "5.0000",
+                {
+                    title: 'Taxa Cambial Anterior',
+                    type: 'info',
+                    icon: 'dollar-sign',
+                    confirmText: 'Prosseguir',
+                    cancelText: 'Cancelar'
+                }
             );
             if (!taxaInformada) return;
             taxaPadraoInicial = parseNum(taxaInformada);
@@ -4185,6 +4156,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             if (c.emit_CRT) setVal('emit_CRT', c.emit_CRT);
             setVal('emit_xLgr', c.emit_xLgr);
             setVal('emit_nro', c.emit_nro);
+            setVal('emit_xCpl', c.emit_xCpl || '');
             setVal('emit_xBairro', c.emit_xBairro);
             setVal('emit_cMun', c.emit_cMun);
             setVal('emit_xMun', c.emit_xMun);
@@ -4214,6 +4186,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             atualizarEstadoInscricaoEstadual();
             setVal('dest_xLgr', c.dest_xLgr);
             setVal('dest_nro', c.dest_nro);
+            setVal('dest_xCpl', c.dest_xCpl || '');
             setVal('dest_xBairro', c.dest_xBairro);
             setVal('dest_cMun', c.dest_cMun);
             setVal('dest_xMun', c.dest_xMun);
@@ -4472,6 +4445,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 emit_CNPJ: getVal('emit_CNPJ'),
                 emit_xLgr: getVal('emit_xLgr'),
                 emit_nro: getVal('emit_nro'),
+                emit_xCpl: getVal('emit_xCpl'),
                 emit_xBairro: getVal('emit_xBairro'),
                 emit_cMun: getVal('emit_cMun'),
                 emit_xMun: getVal('emit_xMun'),
@@ -4488,6 +4462,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 dest_IE: getVal('dest_IE') || '',
                 dest_xLgr: getVal('dest_xLgr'),
                 dest_nro: getVal('dest_nro'),
+                dest_xCpl: getVal('dest_xCpl'),
                 dest_xBairro: getVal('dest_xBairro'),
                 dest_cMun: getVal('dest_cMun'),
                 dest_xMun: getVal('dest_xMun'),
@@ -4782,8 +4757,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         // Coleta todos os campos do formulário
         const idsCabecalho = [
             'nNF', 'indFinal', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
-            'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
-            'dest_xNome', 'dest_tpDoc', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
+            'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xCpl', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
+            'dest_xNome', 'dest_tpDoc', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xCpl', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
             'import_nDI', 'import_dDI', 'import_cExportador', 'import_tpViaTransp', 'import_tpIntermedio', 'import_UFDesemb', 'import_xLocDesemb', 'import_dDesemb',
             'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
             'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
@@ -5739,6 +5714,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 document.getElementById('emit_IE').value = emp.ie || '';
                 document.getElementById('emit_xLgr').value = emp.logradouro || '';
                 document.getElementById('emit_nro').value = emp.numero || '';
+                if(document.getElementById('emit_xCpl')) document.getElementById('emit_xCpl').value = emp.complemento || '';
                 document.getElementById('emit_xBairro').value = emp.bairro || '';
                 document.getElementById('emit_cMun').value = emp.cmun || '';
                 document.getElementById('emit_xMun').value = emp.municipio || '';
@@ -5771,6 +5747,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 document.getElementById('dest_IE').value = emp.ie || '';
                 document.getElementById('dest_xLgr').value = emp.logradouro || '';
                 document.getElementById('dest_nro').value = emp.numero || '';
+                if(document.getElementById('dest_xCpl')) document.getElementById('dest_xCpl').value = emp.complemento || '';
                 document.getElementById('dest_xBairro').value = emp.bairro || '';
                 document.getElementById('dest_cMun').value = emp.cmun || '';
                 document.getElementById('dest_xMun').value = emp.municipio || '';
@@ -5795,7 +5772,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 document.getElementById('transp_xNome').value = emp.nome || '';
                 document.getElementById('transp_CNPJ_CPF').value = emp.cnpj_cpf || '';
                 document.getElementById('transp_IE').value = emp.ie || '';
-                document.getElementById('transp_xEnder').value = emp.logradouro ? `${emp.logradouro}, ${emp.numero}` : '';
+                const numEnd = emp.numero ? `, ${emp.numero}` : '';
+                const cplEnd = emp.complemento ? ` - ${emp.complemento}` : '';
+                document.getElementById('transp_xEnder').value = emp.logradouro ? `${emp.logradouro}${numEnd}${cplEnd}` : '';
                 document.getElementById('transp_xMun').value = emp.municipio || '';
                 document.getElementById('transp_UF').value = emp.uf || '';
             }

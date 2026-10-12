@@ -199,10 +199,10 @@
                                 <div class="d-flex align-items-center gap-2 flex-wrap">
                                     <span class="small fw-bold text-secondary text-uppercase" style="font-size: 11px;">Enquadramento Rápido:</span>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('SUSPENSAO')" title="Aplicar Suspensão (CST 50, cEnq 108/107, PIS/COF 08)">🛡️ Suspensão</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('ISENCAO')" title="Aplicar Isenção (CST 40, cEnq 301, CST IPI 52, PIS/COF 07)">🌱 Isenção</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('RECOLHIMENTO')" title="Aplicar Recolhimento/Tributada (CST 00, cEnq 999, CST IPI 49, PIS 1.65%, COF 7.60%)">💰 Recolhimento</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('IMUNIDADE')" title="Aplicar Imunidade / Reexportação (CST 41, cEnq 999, CST IPI 55, PIS/COF 08)">✈️ Imunidade</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('SUSPENSAO')" title="Aplicar Suspensão (CST 50, cEnq 108/107, PIS/COF 08)">Suspensão</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('ISENCAO')" title="Aplicar Isenção (CST 40, cEnq 301, CST IPI 52, PIS/COF 07)">Isenção</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('RECOLHIMENTO')" title="Aplicar Recolhimento/Tributada (CST 00, cEnq 999, CST IPI 49, PIS 1.65%, COF 7.60%)">Recolhimento</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.aplicarRegimeAoItemModal('IMUNIDADE')" title="Aplicar Imunidade / Reexportação (CST 41, cEnq 999, CST IPI 55, PIS/COF 08)">Imunidade</button>
                                     </div>
                                 </div>
                                 <div>

@@ -128,13 +128,17 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label small fw-bold">Logradouro (xLgr)</label>
                                 <input type="text" class="form-control form-control-sm" id="rap_logradouro" placeholder="Rua, Av, Alameda...">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label small fw-bold">Número (nro)</label>
                                 <input type="text" class="form-control form-control-sm font-monospace" id="rap_numero" placeholder="123 ou S/N">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label small fw-bold">Complemento (xCpl)</label>
+                                <input type="text" class="form-control form-control-sm" id="rap_complemento" placeholder="Sala, Bloco, Galpão...">
                             </div>
 
                             <div class="col-md-4">
@@ -291,6 +295,9 @@
                 }
                 if (data.numero && document.getElementById('rap_numero')) {
                     document.getElementById('rap_numero').value = data.numero;
+                }
+                if (data.complemento && document.getElementById('rap_complemento')) {
+                    document.getElementById('rap_complemento').value = data.complemento;
                 }
                 if (data.bairro && document.getElementById('rap_bairro')) {
                     document.getElementById('rap_bairro').value = data.bairro;
@@ -520,6 +527,7 @@
             cep: (document.getElementById('rap_cep')?.value || '').trim(),
             logradouro: (document.getElementById('rap_logradouro')?.value || '').trim(),
             numero: (document.getElementById('rap_numero')?.value || '').trim(),
+            complemento: (document.getElementById('rap_complemento')?.value || '').trim(),
             bairro: (document.getElementById('rap_bairro')?.value || '').trim(),
             municipio: (document.getElementById('rap_municipio')?.value || '').trim(),
             uf: (document.getElementById('rap_uf')?.value || '').trim().toUpperCase(),
@@ -659,6 +667,7 @@
         // Endereço
         if (document.getElementById('dest_xLgr')) document.getElementById('dest_xLgr').value = emp.logradouro || '';
         if (document.getElementById('dest_nro')) document.getElementById('dest_nro').value = emp.numero || '';
+        if (document.getElementById('dest_xCpl')) document.getElementById('dest_xCpl').value = emp.complemento || '';
         if (document.getElementById('dest_xBairro')) document.getElementById('dest_xBairro').value = emp.bairro || '';
         if (document.getElementById('dest_cMun')) document.getElementById('dest_cMun').value = emp.cmun || '';
         if (document.getElementById('dest_xMun')) document.getElementById('dest_xMun').value = emp.municipio || '';

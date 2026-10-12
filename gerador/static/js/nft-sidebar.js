@@ -79,8 +79,15 @@
         `;
     };
 
-    window.encerrarServidor = function() {
-        if (confirm("Deseja realmente desligar o servidor do Emissor NF-e?")) {
+    window.encerrarServidor = async function() {
+        const confirmar = await window.nftConfirm("Deseja realmente desligar o servidor do Emissor NF-e?", {
+            title: "Desligar Servidor",
+            type: "danger",
+            confirmText: "Sim, Desligar",
+            cancelText: "Cancelar",
+            icon: "power"
+        });
+        if (confirmar) {
             window._nftIsShuttingDown = true;
             window.onbeforeunload = null;
             isShuttingDown = true;

@@ -46,7 +46,7 @@ async function verificarStatusCertificado() {
         lucide.createIcons();
     } catch (e) {
         console.error('Erro na verificação do certificado:', e);
-        alert('Ocorreu um erro ao verificar o certificado digital.');
+        await window.nftAlert('Ocorreu um erro ao verificar o certificado digital.', { type: 'danger', title: 'Erro de Certificado' });
     }
 }
 
@@ -71,7 +71,7 @@ async function enviarNfeSefaz(ambiente = 2) {
 
             let xmlString = await window.obterXMLFinal();
             if (!xmlString) {
-                alert('Erro: Não foi possível obter o XML gerado.');
+                await window.nftAlert('Erro: Não foi possível obter o XML gerado.', { type: 'danger', title: 'XML Não Encontrado' });
                 return;
             }
 
@@ -137,17 +137,23 @@ async function enviarNfeSefaz(ambiente = 2) {
                         }
                     });
                 } else {
-                    alert(msg);
+                    await window.nftAlert(msg, {
+                        type: isAutorizado ? 'success' : 'warning',
+                        title: isAutorizado ? 'NF-e Autorizada com Sucesso!' : 'Retorno da SEFAZ'
+                    });
                 }
             } else {
-                alert(`Erro ao comunicar com a SEFAZ: ${retorno.message || retorno.error || 'Erro desconhecido'}`);
+                await window.nftAlert(`Erro ao comunicar com a SEFAZ: ${retorno.message || retorno.error || 'Erro desconhecido'}`, {
+                    type: 'danger',
+                    title: 'Falha na Comunicação SEFAZ'
+                });
             }
 
         } catch(e) {
             console.error('Erro no envio', e);
             const msg = e.message || 'Falha interna ao tentar enviar a nota para a SEFAZ.';
             atualizarTabelaHistorico({ cstat: 'ERRO', error: msg }, getVal('chaveAcesso') || '-', ambiente);
-            alert(msg);
+            await window.nftAlert(msg, { type: 'danger', title: 'Erro de Envio' });
         } finally {
             // Restaura o botao
             const btnH = document.getElementById('btn-enviar-sefaz');
@@ -165,7 +171,7 @@ async function enviarNfeSefaz(ambiente = 2) {
     } else {
         const msg = 'A função de geração de XML não está disponível ou a nota não está completa.';
         atualizarTabelaHistorico({ cstat: 'ERRO', error: msg }, getVal('chaveAcesso') || '-', ambiente);
-        alert(msg);
+        await window.nftAlert(msg, { type: 'warning', title: 'Nota Incompleta' });
     }
 }
 
@@ -398,24 +404,72 @@ async function solicitarCartaCorrecao(ambiente = 2) {
 
     let chave = (document.getElementById('chaveAcessoDisplay')?.value || getVal('chaveAcesso') || '').replace(/\D/g, '').trim();
     if (!chave || chave.length !== 44) {
-        chave = prompt(`Informe a Chave de Acesso (44 dígitos) da NF-e para emitir a Carta de Correção (${ambNome}):`, chave);
+        chave = await window.nftPrompt(
+            `Informe a Chave de Acesso (44 dígitos) da NF-e para emitir a Carta de Correção (${ambNome}):`,
+            chave,
+            {
+                title: `Chave de Acesso da NF-e (${ambNome})`,
+                icon: 'key',
+                type: 'primary',
+                maxlength: 44,
+                minlength: 44,
+                placeholder: 'Digite os 44 dígitos da chave de acesso da nota',
+                hint: 'A chave deve conter exatamente 44 dígitos numéricos.',
+                confirmText: 'Continuar'
+            }
+        );
         if (chave) chave = chave.replace(/\D/g, '').trim();
     }
     
     if (!chave || chave.length !== 44) {
-        alert('A Chave de Acesso válida (44 dígitos) é obrigatória para emitir a Carta de Correção.');
+        await window.nftAlert('A Chave de Acesso válida (44 dígitos numéricos) é obrigatória para emitir a Carta de Correção na SEFAZ.', {
+            type: 'warning',
+            title: 'Chave de Acesso Inválida'
+        });
         return;
     }
     
-    let textoCorrecao = prompt(`Digite o texto da Carta de Correção (${ambNome}) - mínimo 15 caracteres:\n\nObservação: Não é permitido alterar valores, alíquotas, dados cadastrais de remetente/destinatário ou datas.`);
+    const textoCorrecao = await window.nftPrompt(
+        `Digite o texto detalhado da Carta de Correção Eletrônica (CC-e) para a SEFAZ (${ambNome}):\n\n` +
+        `• Observação Fiscal: Conforme o Art. 7º do Convênio S/N de 1970, NÃO é permitido alterar valores fiscais, alíquotas, dados cadastrais de remetente/destinatário ou datas de emissão/saída.`,
+        '',
+        {
+            title: `Carta de Correção Eletrônica - CC-e (${ambNome})`,
+            icon: 'file-edit',
+            type: 'warning',
+            inputType: 'textarea',
+            rows: 6,
+            minlength: 15,
+            maxlength: 1000,
+            placeholder: 'Descreva aqui detalhadamente a retificação fiscal a ser registrada (mínimo 15 caracteres, até 1000 caracteres)...',
+            hint: 'Mínimo de 15 caracteres exigido pela SEFAZ. Pressione Ctrl+Enter para avançar.',
+            confirmText: 'Avançar com CC-e',
+            cancelText: 'Cancelar'
+        }
+    );
     if (!textoCorrecao) return;
-    textoCorrecao = textoCorrecao.trim();
-    if (textoCorrecao.length < 15) {
-        alert('O texto da correção deve conter no mínimo 15 caracteres (exigência SEFAZ).');
+    const textoLimpo = textoCorrecao.trim();
+    if (textoLimpo.length < 15) {
+        await window.nftAlert('O texto da correção deve conter no mínimo 15 caracteres conforme exigência estrita da SEFAZ.', {
+            type: 'warning',
+            title: 'Texto Insuficiente'
+        });
         return;
     }
     
-    const confirma = confirm(`Confirmar transmissão de CARTA DE CORREÇÃO em ${ambNome.toUpperCase()} na SEFAZ?\n\nChave: ${chave}\nTexto: "${textoCorrecao}"`);
+    const confirma = await window.nftConfirm(
+        `Confirmar a transmissão da CARTA DE CORREÇÃO em ${ambNome.toUpperCase()} na SEFAZ?\n\n` +
+        `• Chave da NF-e: ${chave}\n` +
+        `• Extensão do Texto: ${textoLimpo.length} caracteres\n` +
+        `• Texto:\n"${textoLimpo}"`,
+        {
+            title: `Confirmar Transmissão CC-e (${ambNome})`,
+            type: 'warning',
+            icon: 'send',
+            confirmText: 'Sim, Transmitir CC-e',
+            cancelText: 'Voltar e Revisar'
+        }
+    );
     if (!confirma) return;
     
     const btnCCe = document.getElementById(btnId);
@@ -431,7 +485,7 @@ async function solicitarCartaCorrecao(ambiente = 2) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chave: chave,
-                texto_correcao: textoCorrecao,
+                texto_correcao: textoLimpo,
                 nSeqEvento: 1,
                 tpAmb: ambiente
             })
@@ -454,14 +508,14 @@ async function solicitarCartaCorrecao(ambiente = 2) {
                     icon: isVinculado ? 'success' : 'warning'
                 });
             } else {
-                alert(msg);
+                await window.nftAlert(msg, { type: isVinculado ? 'success' : 'warning', title: isVinculado ? 'CC-e Registrada!' : 'Retorno SEFAZ' });
             }
         } else {
-            alert(`Erro SEFAZ: ${retorno.error || retorno.message || 'Falha ao registrar CC-e'}`);
+            await window.nftAlert(`Erro SEFAZ: ${retorno.error || retorno.message || 'Falha ao registrar CC-e'}`, { type: 'danger', title: 'Erro de Transmissão' });
         }
     } catch (e) {
         console.error('Erro ao enviar CC-e:', e);
-        alert('Erro ao comunicar evento de Carta de Correção: ' + e.message);
+        await window.nftAlert('Erro ao comunicar evento de Carta de Correção: ' + e.message, { type: 'danger', title: 'Falha de Comunicação' });
     } finally {
         if (btnCCe) {
             btnCCe.innerHTML = originalHtml;
@@ -490,12 +544,28 @@ async function solicitarCancelarNfe(ambiente = 2) {
 
     let chave = (document.getElementById('chaveAcessoDisplay')?.value || getVal('chaveAcesso') || '').replace(/\D/g, '').trim();
     if (!chave || chave.length !== 44) {
-        chave = prompt(`Informe a Chave de Acesso (44 dígitos) da NF-e que deseja cancelar (${ambNome}):`, chave);
+        chave = await window.nftPrompt(
+            `Informe a Chave de Acesso (44 dígitos) da NF-e que deseja cancelar (${ambNome}):`,
+            chave,
+            {
+                title: `Chave de Acesso da NF-e (${ambNome})`,
+                icon: 'key',
+                type: 'primary',
+                maxlength: 44,
+                minlength: 44,
+                placeholder: 'Digite os 44 dígitos da chave de acesso da nota',
+                hint: 'A chave deve conter exatamente 44 dígitos numéricos.',
+                confirmText: 'Continuar'
+            }
+        );
         if (chave) chave = chave.replace(/\D/g, '').trim();
     }
     
     if (!chave || chave.length !== 44) {
-        alert('A Chave de Acesso válida (44 dígitos) é obrigatória para cancelar a NF-e.');
+        await window.nftAlert('A Chave de Acesso válida (44 dígitos) é obrigatória para cancelar a NF-e.', {
+            type: 'warning',
+            title: 'Chave Obrigatória'
+        });
         return;
     }
     
@@ -507,23 +577,72 @@ async function solicitarCancelarNfe(ambiente = 2) {
         if (m) protocoloSugerido = m[1];
     });
     
-    let protocolo = prompt(`Informe o número do Protocolo de Autorização da NF-e (15 dígitos) em ${ambNome}:`, protocoloSugerido);
+    let protocolo = await window.nftPrompt(
+        `Informe o número do Protocolo de Autorização da NF-e (15 dígitos) em ${ambNome}:`,
+        protocoloSugerido,
+        {
+            title: `Protocolo de Autorização (${ambNome})`,
+            icon: 'file-text',
+            type: 'primary',
+            maxlength: 20,
+            minlength: 10,
+            placeholder: 'Ex: 135260009186901',
+            hint: 'Informe o número do protocolo retornado pela SEFAZ no momento da autorização.',
+            confirmText: 'Continuar'
+        }
+    );
     if (!protocolo) return;
     protocolo = protocolo.replace(/\D/g, '').trim();
     if (!protocolo) {
-        alert('O número de Protocolo de Autorização é obrigatório para cancelamento.');
+        await window.nftAlert('O número do Protocolo de Autorização é obrigatório para cancelamento perante o Fisco.', {
+            type: 'warning',
+            title: 'Protocolo Obrigatório'
+        });
         return;
     }
     
-    let justificativa = prompt(`Informe a justificativa do Cancelamento (${ambNome}) - mínimo 15 caracteres:`);
+    const justificativa = await window.nftPrompt(
+        `Informe a justificativa do CANCELAMENTO desta NF-e na SEFAZ (${ambNome}):\n\n` +
+        `• Atenção: A justificativa é gravada publicamente na SEFAZ e vinculada à nota fiscal.`,
+        '',
+        {
+            title: `Justificativa de Cancelamento (${ambNome})`,
+            icon: 'x-circle',
+            type: 'danger',
+            inputType: 'textarea',
+            rows: 6,
+            minlength: 15,
+            maxlength: 1000,
+            placeholder: 'Descreva detalhadamente o motivo do cancelamento (mínimo 15 caracteres, até 1000 caracteres)...',
+            hint: 'Mínimo de 15 caracteres exigido pelo Fisco. Pressione Ctrl+Enter para avançar.',
+            confirmText: 'Avançar para Cancelamento',
+            cancelText: 'Cancelar'
+        }
+    );
     if (!justificativa) return;
-    justificativa = justificativa.trim();
-    if (justificativa.length < 15) {
-        alert('A justificativa de cancelamento deve ter no mínimo 15 caracteres (exigência SEFAZ).');
+    const justificativaLimpa = justificativa.trim();
+    if (justificativaLimpa.length < 15) {
+        await window.nftAlert('A justificativa de cancelamento deve conter no mínimo 15 caracteres conforme exigência legal da SEFAZ.', {
+            type: 'warning',
+            title: 'Justificativa Insuficiente'
+        });
         return;
     }
     
-    const confirma = confirm(`ATENÇÃO: Deseja realmente CANCELAR a NF-e em ${ambNome.toUpperCase()}?\n\nChave: ${chave}\nProtocolo: ${protocolo}\nJustificativa: "${justificativa}"\n\nEsta operação é irreversível.`);
+    const confirma = await window.nftConfirm(
+        `ATENÇÃO: Deseja realmente CANCELAR a NF-e em ${ambNome.toUpperCase()} na SEFAZ?\n\n` +
+        `• Chave: ${chave}\n` +
+        `• Protocolo: ${protocolo}\n` +
+        `• Justificativa (${justificativaLimpa.length} caracteres):\n"${justificativaLimpa}"\n\n` +
+        `Esta operação é IRREVERSÍVEL. O cancelamento será homologado perante o Fisco.`,
+        {
+            title: `CONFIRMAR CANCELAMENTO DE NF-E (${ambNome.toUpperCase()})`,
+            type: 'danger',
+            icon: 'alert-triangle',
+            confirmText: 'Sim, Cancelar NF-e Definitivamente',
+            cancelText: 'Desistir e Manter Nota'
+        }
+    );
     if (!confirma) return;
     
     const btnCanc = document.getElementById(btnId);
@@ -540,7 +659,7 @@ async function solicitarCancelarNfe(ambiente = 2) {
             body: JSON.stringify({
                 chave: chave,
                 protocolo: protocolo,
-                justificativa: justificativa,
+                justificativa: justificativaLimpa,
                 tpAmb: ambiente
             })
         });
@@ -562,14 +681,14 @@ async function solicitarCancelarNfe(ambiente = 2) {
                     icon: isCancelado ? 'success' : 'warning'
                 });
             } else {
-                alert(msg);
+                await window.nftAlert(msg, { type: isCancelado ? 'success' : 'warning', title: isCancelado ? 'NF-e Cancelada!' : 'Retorno SEFAZ' });
             }
         } else {
-            alert(`Erro SEFAZ: ${retorno.error || retorno.message || 'Falha ao cancelar NF-e'}`);
+            await window.nftAlert(`Erro SEFAZ: ${retorno.error || retorno.message || 'Falha ao cancelar NF-e'}`, { type: 'danger', title: 'Erro de Cancelamento' });
         }
     } catch (e) {
         console.error('Erro ao cancelar NF-e:', e);
-        alert('Erro ao comunicar evento de Cancelamento: ' + e.message);
+        await window.nftAlert('Erro ao comunicar evento de Cancelamento: ' + e.message, { type: 'danger', title: 'Falha de Comunicação' });
     } finally {
         if (btnCanc) {
             btnCanc.innerHTML = originalHtml;
