@@ -156,6 +156,8 @@
 
     // === 3. SALVAR SESSÃO (DEBOUNCED & IMEDIATO) ===
     function salvarSessaoImediata() {
+        if (window._nftDesabilitarAutosave) return;
+        if (sessionStorage.getItem('nft_limpar_sessao_' + STORAGE_KEY)) return;
         const payload = coletarDadosSessao();
         if (!payload) return;
 
@@ -196,7 +198,8 @@
     }
 
     window.triggerAutoSave = function () {
-        if (_restaurandoSessao) return;
+        if (_restaurandoSessao || window._nftDesabilitarAutosave) return;
+        if (sessionStorage.getItem('nft_limpar_sessao_' + STORAGE_KEY)) return;
         clearTimeout(_debounceTimer);
         _debounceTimer = setTimeout(salvarSessaoImediata, 400);
     };
@@ -205,20 +208,39 @@
     async function tentarRestaurarSessao() {
         const urlParams = new URLSearchParams(window.location.search);
         
-        // Se a URL contém instrução para abrir um rascunho salvo, não usa autosave
-        if (urlParams.get('carregar_rascunho')) {
-            return;
-        }
-
-        // Se o usuário clicou explicitamente para abrir uma nova nota a partir do menu
-        if (urlParams.get('nova_nota')) {
+        // Se foi solicitado explicitamente iniciar uma nova nota limpa
+        const isNovaNota = urlParams.get('nova_nota') || sessionStorage.getItem('nft_limpar_sessao_' + STORAGE_KEY);
+        if (isNovaNota) {
+            sessionStorage.removeItem('nft_limpar_sessao_' + STORAGE_KEY);
             localStorage.removeItem(STORAGE_KEY);
             await idbDelete(STORAGE_KEY);
             
-            // Limpar a URL para que F5 depois recupere o autosave da nota em andamento
+            // Limpa a URL sem recarregar a página (remove ?nova_nota=1)
             if (window.history.replaceState) {
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
+
+            // Garante o status inicial limpo do documento e oculta alertas
+            const badgeUpload = document.getElementById('status-badge');
+            if (badgeUpload) {
+                badgeUpload.className = "badge py-1 px-2 bg-info-subtle text-info fw-bold";
+                badgeUpload.innerText = isNovaNF ? "Aguardando Dados" : "Aguardando XML";
+            }
+            const infoTag = document.getElementById('rascunho-info-tag');
+            if (infoTag) {
+                infoTag.innerText = '';
+                infoTag.classList.add('d-none');
+            }
+            const alertEl = document.getElementById('nft-autosave-alert');
+            if (alertEl) {
+                alertEl.classList.add('d-none');
+                alertEl.classList.remove('d-flex');
+            }
+            return;
+        }
+
+        // Se a URL contém instrução para abrir um rascunho salvo, não usa autosave
+        if (urlParams.get('carregar_rascunho')) {
             return;
         }
 
@@ -403,29 +425,106 @@
         }
     }
 
+    function limparTodosCamposDom() {
+        // 1. Limpa inputs, selects e textareas preservando apenas defaults estruturais
+        const inputs = document.querySelectorAll('input[id], select[id], textarea[id]');
+        inputs.forEach(el => {
+            const id = el.id;
+            if (!id || el.closest('.modal') || id.startsWith('filtro_')) return;
+            if (el.type === 'file') {
+                el.value = '';
+                return;
+            }
+            if (['cUF', 'mod', 'serie', 'tpEmis'].includes(id)) return;
+            if (id === 'dest_cPais') { el.value = '1058'; return; }
+            if (id === 'dest_xPais') { el.value = 'Brasil'; return; }
+            if (id === 'dest_tpDoc') { el.value = 'CNPJ'; return; }
+            if (id === 'dest_indIEDest') { el.value = '9'; return; }
+            if (id === 'tpNF') { el.value = isDI ? '0' : '1'; return; }
+            if (id === 'idDest') { el.value = isDI ? '3' : '1'; return; }
+            if (id.startsWith('tot_') || id.startsWith('rateio_')) {
+                el.value = '0,00';
+                return;
+            }
+            el.value = '';
+        });
+
+        // 2. Limpa tabela e cache de itens
+        if (window.itensTable && typeof window.itensTable.setData === 'function') {
+            window.itensTable.setData([]);
+        }
+        window.itensCache = [];
+        const badgeItens = document.getElementById('itens-badge');
+        if (badgeItens) badgeItens.innerText = '0';
+
+        // 3. Limpa badges de status do documento e tags de rascunho
+        const badgeUpload = document.getElementById('status-badge');
+        if (badgeUpload) {
+            badgeUpload.className = "badge py-1 px-2 bg-info-subtle text-info fw-bold";
+            badgeUpload.innerText = isNovaNF ? "Aguardando Dados" : "Aguardando XML";
+        }
+        const infoTag = document.getElementById('rascunho-info-tag');
+        if (infoTag) {
+            infoTag.innerText = '';
+            infoTag.classList.add('d-none');
+        }
+        const alertEl = document.getElementById('nft-autosave-alert');
+        if (alertEl) {
+            alertEl.classList.add('d-none');
+            alertEl.classList.remove('d-flex');
+        }
+        const origIndicator = document.getElementById('rascunho-origem-indicator');
+        if (origIndicator) {
+            const badgeClass = isNovaNF ? 'badge-origem-nova' : (isDI ? 'badge-origem-di' : 'badge-origem-rasc');
+            origIndicator.innerHTML = `Módulo Ativo: <span class="badge ${badgeClass} bg-info-subtle text-info fw-bold">${window.NOME_MODULO_ORIGEM || (isNovaNF ? 'Nova NF' : (isDI ? 'XML da DI ou DUIMP' : 'XML Rascunho'))}</span>`;
+        }
+
+        const tbodySefaz = document.getElementById('tbody-historico-sefaz');
+        if (tbodySefaz) tbodySefaz.innerHTML = '';
+    }
+
     // === 5. LIMPAR SESSÃO TEMPORÁRIA (NOVA NOTA) ===
     window.limparSessaoTemporariaComConfirmacao = async function () {
         let confirmado = false;
         if (typeof window.nftConfirm === 'function') {
             confirmado = await window.nftConfirm(
-                'Deseja limpar todos os dados temporários desta página e iniciar uma nota em branco?\n\n(Os rascunhos salvos formalmente na pasta Rascunhos não serão apagados).',
+                'Deseja limpar todos os dados preenchidos desta página e iniciar uma nova nota fiscal em branco?\n\n(Os rascunhos salvos formalmente na lista de rascunhos não serão apagados).',
                 {
-                    title: 'Iniciar Nova Nota',
+                    title: 'Iniciar Nova Nota Fiscal',
                     type: 'warning',
                     confirmText: 'Limpar e Começar do Zero',
-                    cancelText: 'Continuar com Esta Nota'
+                    cancelText: 'Cancelar'
                 }
             );
         } else {
-            confirmado = confirm('Deseja limpar todos os dados temporários desta página e iniciar uma nota em branco?');
+            confirmado = confirm('Deseja limpar todos os dados preenchidos desta página e iniciar uma nova nota fiscal em branco?');
         }
 
-        if (confirmado) {
-            localStorage.removeItem(STORAGE_KEY);
-            await idbDelete(STORAGE_KEY);
-            // Recarrega a página limpa
-            window.location.href = window.location.pathname;
-        }
+        if (!confirmado) return;
+
+        // 1. Desativa IMEDIATAMENTE o autosave para impedir qualquer gravação posterior
+        window._nftDesabilitarAutosave = true;
+        clearTimeout(_debounceTimer);
+
+        // 2. Apaga chaves de autosave do LocalStorage e do IndexedDB
+        localStorage.removeItem(STORAGE_KEY);
+        await idbDelete(STORAGE_KEY);
+
+        // 3. Registra flag na sessionStorage para impedir que após o reload a sessão seja reativada
+        sessionStorage.setItem('nft_limpar_sessao_' + STORAGE_KEY, 'true');
+
+        // 4. Limpa em memória todas as variáveis globais de rascunho e XML
+        window.idRascunhoAtual = null;
+        window.origemRascunhoAtual = null;
+        window.nomeArquivoOriginal = "";
+        window.xmlOriginalData = "";
+        window.itensCache = [];
+
+        // 5. Executa a limpeza física de todos os campos no DOM
+        limparTodosCamposDom();
+
+        // 6. Recarrega a página limpa com ?nova_nota=1
+        window.location.replace(window.location.pathname + '?nova_nota=1');
     };
 
     // Fechar banner de restauração
@@ -452,9 +551,12 @@
             }
         });
 
-        // Salva imediatamente ao sair da tela / fechar aba (a menos que seja desligamento do sistema)
+        // Salva imediatamente ao sair da tela / fechar aba (a menos que seja desligamento ou nova nota)
         window.addEventListener('beforeunload', function (e) {
-            if (window._nftIsShuttingDown) {
+            if (window._nftIsShuttingDown || window._nftDesabilitarAutosave) {
+                return;
+            }
+            if (sessionStorage.getItem('nft_limpar_sessao_' + STORAGE_KEY)) {
                 return;
             }
             salvarSessaoImediata();

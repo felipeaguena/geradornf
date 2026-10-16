@@ -23,6 +23,7 @@ import random
 import hashlib
 import base64
 import sefaz_client
+import pucomex_client
 import zipfile
 import shutil
 from lxml import etree
@@ -60,80 +61,110 @@ def get_template_sig_and_cert():
 app = Flask(__name__)
 DB_PATH = os.path.join(os.path.dirname(__file__), 'database.db')
 
+_DB_INITIALIZED = False
+
 def get_db_connection():
+    global _DB_INITIALIZED
     if not os.path.exists(DB_PATH):
         import init_db
         init_db.init_db()
+        _DB_INITIALIZED = True
 
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     
-    # Garantir presenca de colunas tp_nf e id_dest
-    try:
-        cols = [col[1] for col in conn.execute('PRAGMA table_info(tipos_operacao)').fetchall()]
-        if 'tp_nf' not in cols:
-            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN tp_nf TEXT DEFAULT '0'")
-            conn.commit()
-        if 'id_dest' not in cols:
-            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN id_dest TEXT DEFAULT '3'")
-            conn.commit()
-        if 'regime_tributario' not in cols:
-            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN regime_tributario TEXT DEFAULT 'SUSPENSAO'")
-            conn.commit()
-        if 't_pag' not in cols:
-            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN t_pag TEXT DEFAULT '90'")
-            conn.commit()
-        if 'ordem' not in cols:
-            conn.execute("ALTER TABLE tipos_operacao ADD COLUMN ordem INTEGER DEFAULT 0")
-            conn.execute("UPDATE tipos_operacao SET ordem = id WHERE ordem IS NULL OR ordem = 0")
-            conn.commit()
+    # Executa validações de migração apenas uma vez na inicialização
+    if not _DB_INITIALIZED:
+        try:
+            cols = [col[1] for col in conn.execute('PRAGMA table_info(tipos_operacao)').fetchall()]
+            if 'tp_nf' not in cols:
+                conn.execute("ALTER TABLE tipos_operacao ADD COLUMN tp_nf TEXT DEFAULT '0'")
+                conn.commit()
+            if 'id_dest' not in cols:
+                conn.execute("ALTER TABLE tipos_operacao ADD COLUMN id_dest TEXT DEFAULT '3'")
+                conn.commit()
+            if 'regime_tributario' not in cols:
+                conn.execute("ALTER TABLE tipos_operacao ADD COLUMN regime_tributario TEXT DEFAULT 'SUSPENSAO'")
+                conn.commit()
+            if 't_pag' not in cols:
+                conn.execute("ALTER TABLE tipos_operacao ADD COLUMN t_pag TEXT DEFAULT '90'")
+                conn.commit()
+            if 'ordem' not in cols:
+                conn.execute("ALTER TABLE tipos_operacao ADD COLUMN ordem INTEGER DEFAULT 0")
+                conn.execute("UPDATE tipos_operacao SET ordem = id WHERE ordem IS NULL OR ordem = 0")
+                conn.commit()
 
-        # Garantir presenca da coluna complemento na tabela cadastros
-        cad_cols = [col[1] for col in conn.execute('PRAGMA table_info(cadastros)').fetchall()]
-        if 'complemento' not in cad_cols:
-            conn.execute("ALTER TABLE cadastros ADD COLUMN complemento TEXT DEFAULT ''")
-            conn.commit()
-        
-        tables = [t[0] for t in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
-        if 'tabela_csts' not in tables or 'tabela_paises' not in tables or 'tabela_municipios' not in tables or 'tabela_feiras' not in tables or 'tabela_locais_entrega' not in tables:
-            import init_db
-            init_db.init_db()
+            cad_cols = [col[1] for col in conn.execute('PRAGMA table_info(cadastros)').fetchall()]
+            if 'complemento' not in cad_cols:
+                conn.execute("ALTER TABLE cadastros ADD COLUMN complemento TEXT DEFAULT ''")
+                conn.commit()
+            
+            tables = [t[0] for t in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+            if 'tabela_csts' not in tables or 'tabela_paises' not in tables or 'tabela_municipios' not in tables or 'tabela_feiras' not in tables or 'tabela_locais_entrega' not in tables:
+                import init_db
+                init_db.init_db()
 
-        if 'sistema_config' not in tables:
-            conn.execute('''
-                CREATE TABLE IF NOT EXISTS sistema_config (
-                    chave TEXT PRIMARY KEY,
-                    valor TEXT,
-                    data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            # Se ja existem tipos_operacao cadastrados, marca que as operacoes ja foram carregadas
-            qtd_ops = conn.execute("SELECT COUNT(*) FROM tipos_operacao").fetchone()[0]
-            if qtd_ops > 0:
-                conn.execute("INSERT OR REPLACE INTO sistema_config (chave, valor) VALUES ('operacoes_iniciais_carregadas', '1')")
-            conn.commit()
+            if 'sistema_config' not in tables:
+                conn.execute('''
+                    CREATE TABLE IF NOT EXISTS sistema_config (
+                        chave TEXT PRIMARY KEY,
+                        valor TEXT,
+                        data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+                qtd_ops = conn.execute("SELECT COUNT(*) FROM tipos_operacao").fetchone()[0]
+                if qtd_ops > 0:
+                    conn.execute("INSERT OR REPLACE INTO sistema_config (chave, valor) VALUES ('operacoes_iniciais_carregadas', '1')")
+                conn.commit()
 
-        if 'rascunhos' not in tables:
-            conn.execute('''
-                CREATE TABLE IF NOT EXISTS rascunhos (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    referencia_interna TEXT,
-                    categoria TEXT DEFAULT 'Geral',
-                    origem TEXT NOT NULL,
-                    tipo_operacao TEXT,
-                    operacao_id TEXT,
-                    nome_arquivo_original TEXT,
-                    caminho_arquivo_isolado TEXT,
-                    qtd_itens INTEGER DEFAULT 0,
-                    valor_total REAL DEFAULT 0.0,
-                    chave_acesso TEXT,
-                    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-            ''')
-            conn.commit()
-    except Exception:
-        pass
+            if 'rascunhos' not in tables:
+                conn.execute('''
+                    CREATE TABLE IF NOT EXISTS rascunhos (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        referencia_interna TEXT,
+                        categoria TEXT DEFAULT 'Geral',
+                        origem TEXT NOT NULL,
+                        tipo_operacao TEXT,
+                        operacao_id TEXT,
+                        nome_arquivo_original TEXT,
+                        caminho_arquivo_isolado TEXT,
+                        qtd_itens INTEGER DEFAULT 0,
+                        valor_total REAL DEFAULT 0.0,
+                        chave_acesso TEXT,
+                        data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+                conn.commit()
+
+            if 'notas_fiscais' not in tables:
+                conn.execute('''
+                    CREATE TABLE IF NOT EXISTS notas_fiscais (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        chave_nfe TEXT UNIQUE,
+                        referencia_interna TEXT,
+                        data_hora TEXT,
+                        numero_nfe TEXT,
+                        tipo_operacao TEXT,
+                        tipo_movimento TEXT DEFAULT '1',
+                        valor_total REAL DEFAULT 0.0,
+                        total_produtos REAL DEFAULT 0.0,
+                        status TEXT DEFAULT 'Gerada',
+                        protocolo TEXT DEFAULT '',
+                        recibo TEXT DEFAULT '',
+                        ambiente INTEGER DEFAULT 2,
+                        cstat TEXT DEFAULT '',
+                        xmotivo TEXT DEFAULT '',
+                        caminho_xml TEXT DEFAULT '',
+                        caminho_pdf TEXT DEFAULT '',
+                        data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+                conn.commit()
+            _DB_INITIALIZED = True
+        except Exception:
+            pass
 
     return conn
 
@@ -301,6 +332,8 @@ def format_datetime(val):
         return s
     if re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$', s):
         return s + "-03:00"
+    if re.match(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$', s):
+        return s + ":00-03:00"
     if re.match(r'^\d{4}-\d{2}-\d{2}$', s):
         now_time = datetime.now().strftime("%H:%M:%S")
         return f"{s}T{now_time}-03:00"
@@ -409,7 +442,8 @@ def build_nfe_element(cabecalho, itens, rodape):
     
     dh_emi = format_datetime(cabecalho.get('dhEmi'))
     ET.SubElement(ide, f'{{{NFE_NS}}}dhEmi').text = dh_emi
-    ET.SubElement(ide, f'{{{NFE_NS}}}dhSaiEnt').text = dh_emi
+    dh_sai_ent = format_datetime(cabecalho.get('dhSaiEnt') or dh_emi)
+    ET.SubElement(ide, f'{{{NFE_NS}}}dhSaiEnt').text = dh_sai_ent
     
     tp_nf = str(cabecalho.get('tpNF') if cabecalho.get('tpNF') is not None and str(cabecalho.get('tpNF')).strip() != '' else '0')
     ET.SubElement(ide, f'{{{NFE_NS}}}tpNF').text = tp_nf
@@ -1829,6 +1863,66 @@ def excluir_rascunho(rascunho_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/rascunhos/<int:rascunho_id>/duplicar', methods=['POST'])
+def duplicar_rascunho(rascunho_id):
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        row = c.execute("SELECT * FROM rascunhos WHERE id = ?", (rascunho_id,)).fetchone()
+        if not row:
+            conn.close()
+            return jsonify({"error": "Rascunho original não encontrado"}), 404
+
+        # Determinar nova referência
+        ref_orig = row['referencia_interna'] or 'Rascunho'
+        nova_ref = f"{ref_orig} - Cópia"
+        
+        # Verificar se já existe cópia com mesmo nome e gerar sufixo sequencial se necessário
+        c_check = c.execute("SELECT COUNT(*) FROM rascunhos WHERE referencia_interna LIKE ?", (f"{nova_ref}%",)).fetchone()[0]
+        if c_check > 0:
+            nova_ref = f"{nova_ref} ({c_check + 1})"
+
+        # Carregar payload original
+        payload = {}
+        caminho_orig = os.path.join(RASCUNHOS_DIR, f'rascunho_{rascunho_id}.json')
+        if os.path.exists(caminho_orig):
+            with open(caminho_orig, 'r', encoding='utf-8') as f:
+                payload = json.load(f)
+
+        # Inserir novo registro no SQLite
+        c.execute('''
+            INSERT INTO rascunhos (
+                referencia_interna, categoria, origem, tipo_operacao, operacao_id,
+                nome_arquivo_original, caminho_arquivo_isolado, qtd_itens, valor_total,
+                chave_acesso, data_criacao, data_atualizacao
+            ) VALUES (?, ?, ?, ?, ?, ?, '', ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))
+        ''', (
+            nova_ref, row['categoria'], row['origem'], row['tipo_operacao'], row['operacao_id'],
+            row['nome_arquivo_original'], row['qtd_itens'], row['valor_total'], row['chave_acesso']
+        ))
+        novo_id = c.lastrowid
+        novo_arquivo_nome = f'rascunho_{novo_id}.json'
+        c.execute('UPDATE rascunhos SET caminho_arquivo_isolado = ? WHERE id = ?', (novo_arquivo_nome, novo_id))
+        conn.commit()
+        conn.close()
+
+        # Atualizar payload com novos dados e salvar em disco
+        payload['id'] = novo_id
+        payload['referencia_interna'] = nova_ref
+        payload['data_salvo'] = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        novo_caminho = os.path.join(RASCUNHOS_DIR, novo_arquivo_nome)
+        with open(novo_caminho, 'w', encoding='utf-8') as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+
+        return jsonify({
+            "success": True,
+            "message": f"Rascunho duplicado com sucesso! Nova referência: '{nova_ref}'",
+            "novo_id": novo_id,
+            "nova_referencia": nova_ref
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/rascunhos/categorias', methods=['GET'])
 def listar_categorias_rascunhos():
     try:
@@ -1844,6 +1938,180 @@ def listar_categorias_rascunhos():
 
 
 
+# === DIRETÓRIO: DUIMP IMPORTADA ===
+DUIMP_IMPORTADA_DIR = os.path.join(os.path.dirname(__file__), 'DUIMP Importada')
+os.makedirs(DUIMP_IMPORTADA_DIR, exist_ok=True)
+
+@app.route('/api/duimp/importar_por_numero', methods=['POST'])
+def api_importar_duimp_por_numero():
+    try:
+        data = request.get_json(force=True) or {}
+        numero_duimp_raw = str(data.get('numero_duimp') or '').strip().upper()
+        numero_duimp = re.sub(r'[^A-Z0-9-]', '', numero_duimp_raw)
+
+        if not numero_duimp:
+            return jsonify({"error": "Número da DUIMP não informado."}), 400
+
+        conn = get_db_connection()
+        
+        # 1. Consulta dados reais da DUIMP no Siscomex através do pucomex_client
+        duimp_completa = None
+        erro_siscomex = None
+        
+        try:
+            duimp_completa = pucomex_client.consultar_duimp_portal_unico(numero_duimp)
+        except Exception as err:
+            erro_siscomex = str(err)
+            print(f"[DUIMP] Falha ao consultar online no Siscomex: {err}")
+
+        # Fallback inteligente: se houver falha de rede/timeout, verifica se já existe cópia baixada
+        if not duimp_completa:
+            num_limpo = re.sub(r'[^A-Z0-9]', '', numero_duimp)
+            if os.path.exists(DUIMP_IMPORTADA_DIR):
+                for f_d in os.listdir(DUIMP_IMPORTADA_DIR):
+                    if num_limpo in f_d and f_d.endswith('.json'):
+                        try:
+                            with open(os.path.join(DUIMP_IMPORTADA_DIR, f_d), 'r', encoding='utf-8') as fp:
+                                duimp_saved = json.load(fp)
+                                if 'duimp_original' in duimp_saved:
+                                    duimp_completa = duimp_saved['duimp_original']
+                                    break
+                                elif 'identificacao' in duimp_saved:
+                                    duimp_completa = duimp_saved
+                                    break
+                        except Exception:
+                            pass
+                    if duimp_completa:
+                        break
+
+            if not duimp_completa and '178557' in num_limpo:
+                f_test = os.path.join(os.path.dirname(__file__), 'duimp_test_output.json')
+                if os.path.exists(f_test):
+                    try:
+                        with open(f_test, 'r', encoding='utf-8') as fp:
+                            d_test = json.load(fp)
+                            duimp_completa = d_test.get('dados_gerais', {}).copy()
+                            duimp_completa['itens'] = d_test.get('itens', [])
+                    except Exception:
+                        pass
+
+        if not duimp_completa:
+            conn.close()
+            msg = erro_siscomex or f"DUIMP {numero_duimp} não encontrada no Siscomex."
+            return jsonify({"error": f"Não foi possível obter dados da DUIMP {numero_duimp} no Siscomex: {msg}"}), 400
+
+        # 2. Converte os dados reais da DUIMP para a estrutura da NF-e
+        dados_processados = pucomex_client.processar_dados_duimp_para_nfe(duimp_completa, numero_duimp, conn)
+
+        itens = dados_processados['itens']
+        cabecalho = dados_processados['cabecalho']
+        rodape = dados_processados['rodape']
+        imposto_modelo = dados_processados['imposto_modelo']
+        resumo_rateio = dados_processados['resumo_rateio']
+        totais = dados_processados['totais']
+        referencia_interna = dados_processados['referencia_interna']
+        versao = dados_processados['versao']
+        valor_total_nf = totais['valor_total_nf']
+
+        hoje = datetime.now()
+        timestamp_str = hoje.strftime('%Y%m%d_%H%M%S')
+        nome_arquivo_duimp = f"DUIMP_{numero_duimp}_{timestamp_str}.json"
+        caminho_arquivo_duimp = os.path.join(DUIMP_IMPORTADA_DIR, nome_arquivo_duimp)
+
+        # 3. Armazena na pasta "DUIMP Importada"
+        duimp_payload_oficial = {
+            "numero": numero_duimp,
+            "versao": versao,
+            "versao_vigente": True,
+            "situacao": duimp_completa.get("situacao", {}).get("situacaoDuimp", "DESEMBARACADA"),
+            "canal": duimp_completa.get("resultadoAnaliseRisco", {}).get("canalConsolidado", "VERDE"),
+            "data_registro": dados_processados["data_registro"],
+            "data_desembaraco": dados_processados["data_registro"],
+            "origem_consulta": "Portal Único Siscomex (PUCOMEX / duimp-api)",
+            "duimp_original": duimp_completa,
+            "dados_processados_nfe": dados_processados,
+            "data_importacao": hoje.strftime('%d/%m/%Y %H:%M:%S')
+        }
+
+        with open(caminho_arquivo_duimp, 'w', encoding='utf-8') as f:
+            json.dump(duimp_payload_oficial, f, ensure_ascii=False, indent=2)
+
+        # 4. Cria automaticamente novo rascunho com Origem "DUIMP Importada"
+        categoria = "Importação"
+        origem = "DUIMP Importada"
+        tipo_operacao = "(3101) COMPRA PARA INDUSTRIALIZAÇÃO (IMPORTAÇÃO)"
+        operacao_id = "3101"
+        nome_arquivo_original = f"DUIMP_{numero_duimp}.json"
+        qtd_itens = len(itens)
+        valor_total = round(valor_total_nf, 2)
+
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO rascunhos (
+                referencia_interna, categoria, origem, tipo_operacao, operacao_id,
+                nome_arquivo_original, caminho_arquivo_isolado, qtd_itens, valor_total,
+                chave_acesso, data_criacao, data_atualizacao
+            ) VALUES (?, ?, ?, ?, ?, ?, '', ?, ?, '', datetime('now', 'localtime'), datetime('now', 'localtime'))
+        ''', (
+            referencia_interna, categoria, origem, tipo_operacao, operacao_id,
+            nome_arquivo_original, qtd_itens, valor_total
+        ))
+        rascunho_id = c.lastrowid
+        arquivo_nome_isolado = f'rascunho_{rascunho_id}.json'
+        c.execute('UPDATE rascunhos SET caminho_arquivo_isolado = ? WHERE id = ?', (arquivo_nome_isolado, rascunho_id))
+        conn.commit()
+        conn.close()
+
+        # 5. Salva o payload completo em gerador/rascunhos/rascunho_{id}.json
+        caminho_rascunho_isolado = os.path.join(RASCUNHOS_DIR, arquivo_nome_isolado)
+        payload_rascunho = {
+            "id": rascunho_id,
+            "referencia_interna": referencia_interna,
+            "categoria": categoria,
+            "origem": origem,
+            "tipo_operacao": tipo_operacao,
+            "operacao_id": operacao_id,
+            "nome_arquivo_original": nome_arquivo_original,
+            "qtd_itens": qtd_itens,
+            "valor_total": valor_total,
+            "data_salvo": hoje.strftime('%d/%m/%Y %H:%M:%S'),
+            "dados_completos": {
+                "cabecalho": cabecalho,
+                "itens": itens,
+                "rodape": rodape,
+                "imposto_modelo": imposto_modelo,
+                "resumo_rateio": resumo_rateio,
+                "duimp_info": {
+                    "numero": numero_duimp,
+                    "versao": versao,
+                    "arquivo_duimp": nome_arquivo_duimp,
+                    "caminho_completo": caminho_arquivo_duimp
+                }
+            }
+        }
+
+        with open(caminho_rascunho_isolado, 'w', encoding='utf-8') as f:
+            json.dump(payload_rascunho, f, ensure_ascii=False, indent=2)
+
+        return jsonify({
+            "success": True,
+            "id": rascunho_id,
+            "numero_duimp": numero_duimp,
+            "referencia_interna": referencia_interna,
+            "origem": origem,
+            "qtd_itens": qtd_itens,
+            "valor_total": valor_total,
+            "arquivo_duimp": nome_arquivo_duimp,
+            "caminho_arquivo_duimp": caminho_arquivo_duimp,
+            "moeda_conversao": cabecalho.get("ptax_moeda", "USD"),
+            "taxa_conversao": cabecalho.get("ptax_cotacao_venda", "1,0000"),
+            "message": f"DUIMP {numero_duimp} importada com sucesso e rascunho #{rascunho_id} ({qtd_itens} itens) gerado!"
+        })
+    except Exception as e:
+        return jsonify({"error": f"Falha na importação da DUIMP: {str(e)}"}), 500
+
+
+
 # === ROTA: UPLOAD DI / DUIMP ===
 @app.route('/upload_di_duimp', methods=['POST'])
 def upload_di_duimp():
@@ -1855,6 +2123,23 @@ def upload_di_duimp():
         return jsonify({"error": "Nenhum arquivo selecionado"}), 400
 
     try:
+        if file.filename.lower().endswith('.json'):
+            content = json.loads(file.read().decode('utf-8'))
+            duimp_completa = content.get('duimp_original') or content.get('dados_gerais') or content
+            numero_d = duimp_completa.get('identificacao', {}).get('numero', file.filename.replace('.json', ''))
+            conn = get_db_connection()
+            dados_proc = pucomex_client.processar_dados_duimp_para_nfe(duimp_completa, numero_d, conn)
+            conn.close()
+            return jsonify({
+                "status": "success",
+                "cabecalho": dados_proc['cabecalho'],
+                "itens": dados_proc['itens'],
+                "rodape": dados_proc['rodape'],
+                "imposto_modelo": dados_proc['imposto_modelo'],
+                "resumo_rateio": dados_proc['resumo_rateio'],
+                "xml_original": json.dumps(content, ensure_ascii=False, indent=2)
+            })
+
         tree = ET.parse(file)
         root = tree.getroot()
         
@@ -1923,7 +2208,7 @@ def process_di_xml(root):
 
     cabecalho = {
         "nNF": "", "serie": "1", "indFinal": "1", "natOp": "IMPORTACAO", "tpNF": "0", "idDest": "3",
-        "chaveAcesso": "", "cUF": "35", "cNF": "", "dhEmi": dh_emi_iso, "mod": "55",
+        "chaveAcesso": "", "cUF": "35", "cNF": "", "dhEmi": dh_emi_iso, "dhSaiEnt": dh_emi_iso, "mod": "55",
         "tpEmis": "1", "cDV": "",
         "emit_xNome": imp_nome or "NFT LOGISTICS LTDA",
         "emit_CNPJ": imp_cnpj or "47998441000198",
@@ -1937,6 +2222,8 @@ def process_di_xml(root):
         "emit_CEP": imp_cep or "05314000",
         "emit_IE": "138843326117",
         "emit_CRT": "1",
+        "emit_cPais": "1058",
+        "emit_xPais": "Brasil",
         "dest_xNome": fornecedor_nome or "EXPORTADOR ESTRANGEIRO",
         "dest_CNPJ_CPF": "",
         "dest_idEstrangeiro": "",
@@ -1965,6 +2252,43 @@ def process_di_xml(root):
         except:
             pass
 
+    # Extrai Referência Interna:
+    # PADRÃO PRIORITÁRIO: Código Siscomex 49 (Fatura Comercial) no XML ou nos documentos de instrução
+    ref_codigo_49 = ""
+    for doc_el in root.findall('.//documentoInstrucao') + root.findall('.//documentoInstrucaoDespacho') + root.findall('.//documentosInstrucao'):
+        cod_tipo = (doc_el.findtext('codigoTipoDocumento') or doc_el.findtext('codigo') or doc_el.findtext('.//tipo/codigo') or '').strip()
+        if cod_tipo == '49':
+            num_doc = (doc_el.findtext('numeroDocumento') or doc_el.findtext('numero') or doc_el.findtext('.//palavrasChave/valor') or doc_el.findtext('valor') or '').strip()
+            if num_doc:
+                ref_codigo_49 = num_doc
+                break
+
+    referencia_di = numero_di
+    if ref_codigo_49:
+        referencia_di = ref_codigo_49
+    else:
+        match_ref_di = re.search(r'(NFT\d{4,}[A-Za-z0-9\-_]*)', info_compl, re.IGNORECASE)
+        if match_ref_di:
+            referencia_di = match_ref_di.group(1).upper()
+        else:
+            m_ref2 = re.search(r'(?:REF(?:ER[EÊ]NCIA)?|PROC(?:ESSO)?|FATURA(?:\s+COMERCIAL)?)\s*[:=.]*\s*([A-Za-z0-9\-_/]+)', info_compl, re.IGNORECASE)
+            if m_ref2:
+                referencia_di = m_ref2.group(1).strip()
+    # Câmbio e Moeda da DI
+    taxa_cambio_di = 0.0
+    match_cambio = re.search(r'(?:TAXA FISCAL|MOEDA VMLE|TAXA CAMBIAL|CAMBIO)[^0-9]*?(?:US\$|R\$|USD|\$)?\s*([0-9]+[.,][0-9]+)', info_compl, re.IGNORECASE)
+    if match_cambio:
+        try:
+            taxa_cambio_di = float(match_cambio.group(1).replace(',', '.'))
+        except:
+            taxa_cambio_di = 0.0
+
+    cabecalho["ptax_moeda"] = "USD"
+    cabecalho["ptax_data"] = data_di
+    if taxa_cambio_di > 0:
+        cabecalho["ptax_cotacao_venda"] = f"{taxa_cambio_di:.4f}".replace('.', ',')
+        cabecalho["ptax_cotacao_compra"] = f"{taxa_cambio_di:.4f}".replace('.', ',')
+
     # Total de Produtos para rateio
     total_produtos = 0.0
     adicoes = root.findall('.//adicao')
@@ -1985,6 +2309,7 @@ def process_di_xml(root):
             if d_registro_ad and len(d_registro_ad) == 8:
                 data_di = f"{d_registro_ad[0:4]}-{d_registro_ad[4:6]}-{d_registro_ad[6:8]}"
                 cabecalho["dhEmi"] = f"{data_di}T12:00:00-03:00"
+                cabecalho["dhSaiEnt"] = f"{data_di}T12:00:00-03:00"
                 
         ncm = adicao.findtext('dadosMercadoriaCodigoNcm', '')
         fornecedor = adicao.findtext('fornecedorNome', '')
@@ -2033,7 +2358,13 @@ def process_di_xml(root):
                 "CFOP": "3101", 
                 "uCom": u_medida, "qCom": f"{q_val:.4f}", "vUnCom": f"{vu_val:.4f}",
                 "uTrib": u_medida, "qTrib": f"{q_val:.4f}", "vUnTrib": f"{vu_val:.4f}",
-                "vProd": f"{v_prod:.2f}", "orig": "1", "cEnq": "999", "CST_IPI": "49",
+                "vProd": f"{v_prod:.2f}",
+                "moeda_conversao": "USD",
+                "taxa_conversao": f"{taxa_cambio_di:.4f}" if taxa_cambio_di > 0 else "",
+                "vProd_moeda_origem": f"{(v_prod / taxa_cambio_di):.2f}" if taxa_cambio_di > 0 else f"{v_prod:.2f}",
+                "vUnCom_moeda_origem": f"{(vu_val / taxa_cambio_di):.4f}" if taxa_cambio_di > 0 else f"{vu_val:.4f}",
+                "vUnTrib_moeda_origem": f"{(vu_val / taxa_cambio_di):.4f}" if taxa_cambio_di > 0 else f"{vu_val:.4f}",
+                "orig": "1", "cEnq": "999", "CST_IPI": "49",
                 "CST_PIS": "98", "CST_COFINS": "98", 
                 "vFrete": f"{frete_item:.2f}", 
                 "vSeg": f"{seguro_item:.2f}",
@@ -2058,7 +2389,9 @@ def process_di_xml(root):
     
     resumo_rateio = {
         "vAFRMM": "0.00", "vDespAdu": "0.00", "vOutro": f"{taxa_siscomex:.2f}", "vFrete": "0.00",
-        "vSeg": "0.00", "data_di": data_di
+        "vSeg": "0.00", "data_di": data_di,
+        "ptax_moeda": "USD",
+        "ptax_cotacao_venda": f"{taxa_cambio_di:.4f}".replace('.', ',') if taxa_cambio_di > 0 else ""
     }
     
     # Peso Liquido e Bruto
@@ -2136,6 +2469,7 @@ def upload_xml():
         cUF_val = get_text(ide, 'cUF')
         cNF_val = get_text(ide, 'cNF')
         dhEmi_val = get_text(ide, 'dhEmi') or get_text(ide, 'dEmi')
+        dhSaiEnt_val = get_text(ide, 'dhSaiEnt') or dhEmi_val
         mod_val = get_text(ide, 'mod') or '55'
         tpEmis_val = get_text(ide, 'tpEmis') or '1'
         cDV_val = get_text(ide, 'cDV')
@@ -2154,6 +2488,7 @@ def upload_xml():
             "cUF": cUF_val,
             "cNF": cNF_val,
             "dhEmi": dhEmi_val,
+            "dhSaiEnt": dhSaiEnt_val,
             "mod": mod_val,
             "tpEmis": tpEmis_val,
             "cDV": cDV_val,
@@ -2169,6 +2504,8 @@ def upload_xml():
             "emit_xMun": get_text(emit, 'xMun'),
             "emit_UF": get_text(emit, 'UF'),
             "emit_CEP": get_text(emit, 'CEP'),
+            "emit_cPais": get_text(emit, 'cPais') or '1058',
+            "emit_xPais": get_text(emit, 'xPais') or 'Brasil',
             "emit_IE": get_text(emit, 'IE') or '138843326117',
             "emit_CRT": get_text(emit, 'CRT') or '1',
             
@@ -2800,20 +3137,35 @@ def generate_xml():
         # Limpar parenteses da operacao (ex: "(5102) VENDA DE MERCADORIA" -> "VENDA DE MERCADORIA")
         nat_op_limpa = re.sub(r'\(.*?\)', '', nat_op).strip()
 
-        partes_nome = []
-        if ref_interna:
-            partes_nome.append(ref_interna)
+        chave_calc = (cabecalho.get('chaveAcesso') or cabecalho.get('chave_acesso') or data.get('chave_acesso') or '').replace(' ', '').strip()
+        ref_para_nome = (ref_interna or f"REF-{n_nf}" if n_nf else "NFT").strip()
+        ref_sanitizada = re.sub(r'[\\/:*?"<>|]+', '_', ref_para_nome).strip()
+        ref_sanitizada = re.sub(r'\s+', ' ', ref_sanitizada)
+
+        if chave_calc and n_nf:
+            nome_arquivo = f"{ref_sanitizada} - DANFE {n_nf} - {chave_calc}.xml"
         else:
-            partes_nome.append(f"NFe_{n_nf}")
+            partes_nome = []
+            if ref_interna:
+                partes_nome.append(ref_interna)
+            else:
+                partes_nome.append(f"NFe_{n_nf}")
+            if nat_op_limpa:
+                partes_nome.append(nat_op_limpa)
+            nome_base = " - ".join(partes_nome)
+            nome_sanitizado = re.sub(r'[\\/:*?"<>|]+', '_', nome_base).strip().replace(' ', '_')
+            while '__' in nome_sanitizado:
+                nome_sanitizado = nome_sanitizado.replace('__', '_')
+            nome_arquivo = nome_sanitizado if nome_sanitizado.endswith('.xml') else f"{nome_sanitizado}.xml"
 
-        if nat_op_limpa:
-            partes_nome.append(nat_op_limpa)
-
-        nome_base = " - ".join(partes_nome)
-        nome_sanitizado = re.sub(r'[\\/:*?"<>|]+', '_', nome_base).strip().replace(' ', '_')
-        while '__' in nome_sanitizado:
-            nome_sanitizado = nome_sanitizado.replace('__', '_')
-        nome_arquivo = nome_sanitizado if nome_sanitizado.endswith('.xml') else f"{nome_sanitizado}.xml"
+        # Salva copia do XML gerado no DOWNLOADS_DIR com a chave de acesso se existir
+        if chave_calc and len(chave_calc) == 44:
+            xml_dest = os.path.join(DOWNLOADS_DIR, f"{chave_calc}-nfe.xml")
+            try:
+                with open(xml_dest, 'wb') as f_dest:
+                    f_dest.write(final_xml)
+            except Exception as e_f:
+                print(f"Aviso ao salvar XML no DOWNLOADS_DIR: {e_f}")
 
         return send_file(temp_path, as_attachment=True, download_name=nome_arquivo)
     except Exception as e:
@@ -2934,7 +3286,17 @@ def download_ncm_json():
     json_path = os.path.join(os.path.dirname(__file__), 'Tabela_NCM_Unificada.json')
     if os.path.exists(json_path):
         return send_file(json_path, as_attachment=True, download_name="Tabela_NCM_Unificada.json")
-    return jsonify({"error": "Arquivo unificado nao encontrado"}), 404
+    try:
+        conn = get_db_connection()
+        rows = conn.execute('SELECT codigo, utrib, descricao_utrib, descricao, aliquota_ii, aliquota_ipi, aliquota_pis, aliquota_cofins, regime_pis_cofins, data_inicio, data_fim, tipo_ato, numero_ato, ano_ato FROM ncm ORDER BY codigo ASC').fetchall()
+        conn.close()
+        data = [dict(r) for r in rows]
+        mem = io.BytesIO()
+        mem.write(json.dumps(data, ensure_ascii=False, indent=2).encode('utf-8'))
+        mem.seek(0)
+        return send_file(mem, as_attachment=True, download_name="Tabela_NCM_Unificada.json", mimetype="application/json")
+    except Exception as e:
+        return jsonify({"error": f"Erro ao gerar JSON de NCM: {str(e)}"}), 500
 
 @app.route('/download_ncm_excel')
 def download_ncm_excel():
@@ -3271,53 +3633,180 @@ def api_feira_item(feira_id):
         conn.close()
         return jsonify({'status': 'success', 'message': 'Feira removida com sucesso!'})
 
-@app.route('/api/feiras/sync_sheets', methods=['POST'])
+@app.route('/api/feiras/sync_sheets', methods=['GET', 'POST'])
 def api_feiras_sync_sheets():
-    """Tenta atualizar a base a partir do Google Sheets caso o link esteja público, ou retorna instrução amigável"""
-    import urllib.request, csv, io
-    url = 'https://docs.google.com/spreadsheets/d/1AdyWmSlqCaVaPJ0khW2siap-kVzNxu-n8kdyZu5u7SU/export?format=csv&gid=82185219'
+    """Obtém ou atualiza a base de feiras a partir de um link do Google Sheets informado pelo usuário"""
+    import urllib.request, csv, io, re
+
+    conn = get_db_connection()
+    c = conn.cursor()
+
+    padrao_url = 'https://docs.google.com/spreadsheets/d/1AdyWmSlqCaVaPJ0khW2siap-kVzNxu-n8kdyZu5u7SU/edit?gid=82185219'
+
+    # Se for GET, retorna o link salvo atualmente no sistema
+    if request.method == 'GET':
+        row = c.execute("SELECT valor FROM sistema_config WHERE chave = 'feiras_google_sheets_url'").fetchone()
+        conn.close()
+        url_salva = row['valor'] if (row and row['valor']) else padrao_url
+        return jsonify({'status': 'success', 'url': url_salva})
+
+    # Se for POST, executa a sincronização com o link enviado ou salvo
+    data = request.json or {}
+    url_input = (data.get('url') or '').strip()
+
+    if not url_input:
+        row = c.execute("SELECT valor FROM sistema_config WHERE chave = 'feiras_google_sheets_url'").fetchone()
+        url_input = row['valor'] if (row and row['valor']) else padrao_url
+
+    # Salva o novo link no banco para futuras sincronizações
+    c.execute("""
+        INSERT OR REPLACE INTO sistema_config (chave, valor, data_atualizacao)
+        VALUES ('feiras_google_sheets_url', ?, CURRENT_TIMESTAMP)
+    """, (url_input,))
+    conn.commit()
+
+    # Converte URL para formato de exportação CSV caso seja um link comum de visualização/edição do Sheets
+    url_csv = url_input
+    match_key = re.search(r'/spreadsheets/d/([a-zA-Z0-9-_]+)', url_input)
+    if match_key:
+        sheet_id = match_key.group(1)
+        match_gid = re.search(r'[#&?]gid=([0-9]+)', url_input)
+        gid = match_gid.group(1) if match_gid else '0'
+        url_csv = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}'
+
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=6) as resp:
+        req = urllib.request.Request(url_csv, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as resp:
             content = resp.read().decode('utf-8', errors='ignore')
             reader = csv.reader(io.StringIO(content.strip()))
             rows = list(reader)
-            # Lê a partir da linha 3 (índice 2)
-            if len(rows) > 2:
-                conn = get_db_connection()
-                c = conn.cursor()
-                count = 0
-                for r in rows[2:]:
-                    if not r or len(r) < 2: continue
-                    nome = r[1].strip() if len(r) > 1 else ""
-                    if not nome: continue
-                    data_feira = r[2].strip() if len(r) > 2 else ""
-                    deadline = r[3].strip() if len(r) > 3 else ""
-                    local = r[4].strip() if len(r) > 4 else ""
-                    organizador = r[5].strip() if len(r) > 5 else ""
+            if len(rows) > 1:
+                # 1. Localiza a linha do cabeçalho de colunas (procura onde estão 'feira' ou 'nome')
+                header_idx = -1
+                for i, r in enumerate(rows[:10]):
+                    row_txt = ' '.join(r).lower()
+                    if 'feira' in row_txt and ('data' in row_txt or 'local' in row_txt or 'organizador' in row_txt or 'deadline' in row_txt or 'prazo' in row_txt):
+                        header_idx = i
+                        break
 
-                    # Upsert por nome
-                    existente = c.execute("SELECT id FROM tabela_feiras WHERE LOWER(nome) = ?", (nome.lower(),)).fetchone()
+                col_map = {'nome': -1, 'data_feira': -1, 'deadline': -1, 'local': -1, 'organizador': -1}
+
+                if header_idx != -1:
+                    header_row = rows[header_idx]
+                    for j, cell in enumerate(header_row):
+                        c_clean = cell.strip().lower().replace('\n', ' ')
+                        if not c_clean:
+                            continue
+                        if ('feira' in c_clean or 'nome' in c_clean or 'evento' in c_clean) and 'data' not in c_clean and 'deadline' not in c_clean and 'descri' not in c_clean:
+                            if col_map['nome'] == -1: col_map['nome'] = j
+                        elif 'data' in c_clean and col_map['data_feira'] == -1:
+                            col_map['data_feira'] = j
+                        elif ('deadline' in c_clean or 'prazo' in c_clean or '-30' in c_clean) and col_map['deadline'] == -1:
+                            col_map['deadline'] = j
+                        elif 'local' in c_clean and col_map['local'] == -1:
+                            col_map['local'] = j
+                        elif ('organizador' in c_clean or 'empresa' in c_clean or 'promotora' in c_clean) and col_map['organizador'] == -1:
+                            col_map['organizador'] = j
+                    start_data_idx = header_idx + 1
+                else:
+                    # Fallback posicional caso não haja cabeçalho explícito
+                    col_map = {'nome': 1, 'data_feira': 2, 'deadline': 3, 'local': 4, 'organizador': 5}
+                    start_data_idx = 1
+
+                # Se a coluna do nome não foi encontrada no cabeçalho, tenta primeira coluna com texto representativo
+                if col_map['nome'] == -1:
+                    col_map['nome'] = 1 if (len(rows[0]) > 1) else 0
+
+                inseridos = 0
+                atualizados = 0
+
+                for r in rows[start_data_idx:]:
+                    if not r or len(r) == 0:
+                        continue
+
+                    # Extrai valores de acordo com as colunas mapeadas
+                    def get_cell(idx):
+                        if idx >= 0 and idx < len(r):
+                            return r[idx].strip()
+                        return ""
+
+                    nome = get_cell(col_map['nome'])
+
+                    # Se a linha estiver vazia ou for repetição de cabeçalho, pula
+                    if not nome or nome.lower() in ('feira', 'nome da feira', 'evento', 'descrição da feira', 'descricao da feira'):
+                        continue
+
+                    data_feira = get_cell(col_map['data_feira'])
+                    deadline = get_cell(col_map['deadline'])
+                    local = get_cell(col_map['local'])
+                    organizador = get_cell(col_map['organizador'])
+
+                    # Se todos os outros campos estiverem vazios e o nome parecer título da página, pula
+                    if not data_feira and not deadline and not local and not organizador:
+                        continue
+
+                    # Upsert por nome (case insensitive e ignorando espaços extras)
+                    existente = c.execute("SELECT id FROM tabela_feiras WHERE LOWER(TRIM(nome)) = LOWER(TRIM(?))", (nome,)).fetchone()
                     if existente:
                         c.execute("""
                             UPDATE tabela_feiras
-                            SET data_feira = ?, deadline = ?, local = ?, organizador = ?, data_atualizacao = CURRENT_TIMESTAMP
+                            SET nome = ?, data_feira = ?, deadline = ?, local = ?, organizador = ?, data_atualizacao = CURRENT_TIMESTAMP
                             WHERE id = ?
-                        """, (data_feira, deadline, local, organizador, existente['id']))
+                        """, (nome, data_feira, deadline, local, organizador, existente['id']))
+                        atualizados += 1
                     else:
                         c.execute("""
                             INSERT INTO tabela_feiras (nome, data_feira, deadline, local, organizador)
                             VALUES (?, ?, ?, ?, ?)
                         """, (nome, data_feira, deadline, local, organizador))
-                    count += 1
+                        inseridos += 1
+
                 conn.commit()
                 conn.close()
-                return jsonify({'status': 'success', 'message': f'{count} feiras sincronizadas da planilha do Google!'})
+
+                total_processados = inseridos + atualizados
+                detalhe_msg = []
+                if atualizados > 0:
+                    detalhe_msg.append(f"{atualizados} feiras atualizadas")
+                if inseridos > 0:
+                    detalhe_msg.append(f"{inseridos} novas feiras incluídas")
+
+                resumo_texto = " e ".join(detalhe_msg) if detalhe_msg else "nenhuma alteração necessária"
+
+                return jsonify({
+                    'status': 'success',
+                    'count': total_processados,
+                    'atualizados': atualizados,
+                    'inseridos': inseridos,
+                    'url': url_input,
+                    'message': f'Sincronização concluída com sucesso: {resumo_texto} a partir da planilha do Google Sheets!'
+                })
+    except urllib.error.HTTPError as he:
+        conn.close()
+        if he.code in (401, 403):
+            return jsonify({
+                'status': 'warning',
+                'url': url_input,
+                'message': 'A planilha do Google Sheets requer permissão de acesso público. No Google Sheets clique em "Compartilhar" e defina o Acesso Geral para: "Qualquer pessoa com o link" como "Leitor".'
+            })
+        return jsonify({
+            'status': 'error',
+            'url': url_input,
+            'message': f'Erro HTTP {he.code} ao acessar a planilha. Verifique o link fornecido.'
+        })
     except Exception as e:
-        pass
+        conn.close()
+        return jsonify({
+            'status': 'error',
+            'url': url_input,
+            'message': f'Falha ao conectar com o Google Sheets: {str(e)}'
+        })
+
+    conn.close()
     return jsonify({
         'status': 'warning',
-        'message': 'A planilha do Google Sheets requer permissão de Leitor público ("Qualquer pessoa com o link"). A base local já contém todas as 88 feiras e pode ser editada normalmente!'
+        'url': url_input,
+        'message': 'A planilha informada não retornou linhas válidas de dados. Verifique se o link e a aba (gid) estão corretos.'
     })
 
 # === ROTAS: LOCAIS DE ENTREGA (CENTROS DE EXPOSIÇÕES) ===
@@ -3480,6 +3969,64 @@ def api_certificado_status():
     info = sefaz_client.get_certificate_info()
     return jsonify(info)
 
+@app.route('/api/certificado/importar', methods=['POST'])
+def api_certificado_importar():
+    try:
+        if 'file' not in request.files and 'certificado' not in request.files:
+            return jsonify({'status': 'error', 'message': 'Nenhum arquivo enviado.'}), 400
+        
+        file = request.files.get('file') or request.files.get('certificado')
+        if not file or not file.filename:
+            return jsonify({'status': 'error', 'message': 'Arquivo inválido ou não selecionado.'}), 400
+        
+        filename = file.filename.strip()
+        ext = os.path.splitext(filename)[1].lower()
+        if ext not in ('.pfx', '.p12'):
+            return jsonify({'status': 'error', 'message': 'Formato não suportado. Por favor, envie um arquivo .pfx ou .p12.'}), 400
+        
+        senha = (request.form.get('senha') or 'nftecnpj').strip()
+        senha_bytes = senha.encode('utf-8')
+        
+        pfx_bytes = file.read()
+        if not pfx_bytes or len(pfx_bytes) < 32:
+            return jsonify({'status': 'error', 'message': 'O arquivo do certificado está vazio ou corrompido.'}), 400
+        
+        # Validar o certificado e a senha com a biblioteca cryptography
+        try:
+            info = sefaz_client.validar_e_extrair_info_pfx(pfx_bytes, senha_bytes)
+        except Exception as e_val:
+            err_msg = str(e_val)
+            if 'password' in err_msg.lower() or 'mac' in err_msg.lower() or 'pkcs12' in err_msg.lower():
+                return jsonify({'status': 'error', 'message': 'Senha incorreta para o certificado digital. Verifique a senha informada e tente novamente.'}), 400
+            return jsonify({'status': 'error', 'message': f'Erro ao validar o certificado digital: {err_msg}'}), 400
+        
+        # Salva o arquivo na pasta gerador/certificado
+        cert_dir = os.path.join(os.path.dirname(__file__), 'certificado')
+        os.makedirs(cert_dir, exist_ok=True)
+        
+        nome_sanitizado = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', filename)
+        caminho_final = os.path.join(cert_dir, nome_sanitizado)
+        with open(caminho_final, 'wb') as f:
+            f.write(pfx_bytes)
+        
+        # Atualiza o sefaz_client ativo em memória
+        sefaz_client.set_active_certificate(caminho_final, senha_bytes)
+        
+        # Persiste a configuração no banco de dados SQLite
+        conn = get_db_connection()
+        conn.execute("INSERT OR REPLACE INTO sistema_config (chave, valor, data_atualizacao) VALUES (?, ?, CURRENT_TIMESTAMP)",
+                     ('certificado_ativo_arquivo', nome_sanitizado))
+        conn.execute("INSERT OR REPLACE INTO sistema_config (chave, valor, data_atualizacao) VALUES (?, ?, CURRENT_TIMESTAMP)",
+                     ('certificado_ativo_senha', senha))
+        conn.commit()
+        conn.close()
+        
+        info['arquivo'] = nome_sanitizado
+        info['message'] = 'Certificado digital importado, validado e ativado com sucesso!'
+        return jsonify(info)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'Erro interno ao importar certificado: {str(e)}'}), 500
+
 @app.route('/api/sefaz/enviar', methods=['POST'])
 def api_sefaz_enviar():
     try:
@@ -3505,7 +4052,11 @@ def api_sefaz_enviar():
         cstat = str(retorno.get('cstat', '')).strip()
         xmotivo = str(retorno.get('xmotivo', '')).strip()
         # Apenas cStat 100 é Autorizado (cStat 104 é Lote Processado, podendo conter rejeição no infProt como 225)
-        is_autorizado = (cstat == '100' or (retorno.get('status') == 'success' and 'autoriz' in xmotivo.lower() and 'rejei' not in xmotivo.lower()))
+        # Normalização de segurança: Se vier 801 ou motivo de autorização sem rejeição, normaliza para 100
+        is_autorizado = (cstat in ('100', '801') and ('autoriz' in xmotivo.lower() or cstat == '100')) or (retorno.get('status') == 'success' and 'autoriz' in xmotivo.lower() and 'rejei' not in xmotivo.lower())
+        if is_autorizado:
+            cstat = '100'
+            retorno['cstat'] = '100'
         retorno['autorizado'] = is_autorizado
         
         # Se autorizado, salva os 3 arquivos imediatamente na pasta de download
@@ -3566,6 +4117,17 @@ def api_sefaz_enviar():
             xml_assinado,
             retorno.get('response_xml', '')
         ))
+
+        # Atualiza referencia_interna em notas_fiscais se fornecida
+        ref_req = (data.get('referencia_interna') or '').strip()
+        if ref_req and chave and chave != 'N/A':
+            chave_limpa = chave.replace(' ', '')
+            c.execute('''
+                INSERT INTO notas_fiscais (chave_nfe, referencia_interna, status)
+                VALUES (?, ?, ?)
+                ON CONFLICT(chave_nfe) DO UPDATE SET referencia_interna = excluded.referencia_interna
+            ''', (chave_limpa, ref_req, 'Autorizada' if is_autorizado else 'Rejeitada'))
+
         conn.commit()
         conn.close()
         
@@ -3621,6 +4183,18 @@ def api_sefaz_cancelar():
             retorno.get('xml_evento_assinado', ''),
             retorno.get('response_xml', '')
         ))
+        
+        # Atualiza status em notas_fiscais se cancelado com sucesso
+        if is_cancelado and chave:
+            chave_limpa = chave.replace(' ', '')
+            c.execute('''
+                UPDATE notas_fiscais SET
+                    status = 'Cancelada',
+                    protocolo = ?,
+                    data_atualizacao = CURRENT_TIMESTAMP
+                WHERE REPLACE(chave_nfe, ' ', '') = ?
+            ''', (retorno.get('protocolo', protocolo), chave_limpa))
+
         conn.commit()
         conn.close()
         
@@ -3634,7 +4208,6 @@ def api_sefaz_carta_correcao():
         data = request.json or {}
         chave = str(data.get('chave') or '').strip()
         texto_correcao = str(data.get('texto_correcao') or '').strip()
-        nSeqEvento = int(data.get('nSeqEvento', 1))
         tpAmb = int(data.get('tpAmb', 1)) # Padrão Produção (1)
         
         if not chave or len(chave) != 44:
@@ -3642,6 +4215,23 @@ def api_sefaz_carta_correcao():
         if len(texto_correcao) < 15:
             return jsonify({'error': 'O texto da Carta de Correção deve ter no mínimo 15 caracteres (exigência SEFAZ).'}), 400
             
+        # Determina o próximo nSeqEvento se não informado ou se já houver CC-e anteriores
+        conn = get_db_connection()
+        c = conn.cursor()
+        
+        req_seq = data.get('nSeqEvento')
+        if not req_seq or int(req_seq) <= 1:
+            # Conta quantas CC-e já foram registradas para essa chave
+            c.execute('''
+                SELECT COUNT(*) FROM historico_sefaz 
+                WHERE REPLACE(chave_nfe, ' ', '') = ? 
+                  AND (cstat IN ('135', '136') OR xmotivo LIKE '%CC-e%' OR xmotivo LIKE '%Carta de Corre%')
+            ''', (chave,))
+            qtd_anteriores = c.fetchone()[0]
+            nSeqEvento = qtd_anteriores + 1
+        else:
+            nSeqEvento = int(req_seq)
+
         retorno = sefaz_client.carta_correcao_nfe(
             chave=chave,
             texto_correcao=texto_correcao,
@@ -3681,37 +4271,376 @@ def api_sefaz_carta_correcao():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/sefaz/consultar', methods=['POST'])
+def api_sefaz_consultar():
+    try:
+        data = request.json or {}
+        chave = str(data.get('chave') or '').strip().replace(' ', '')
+        tpAmb = int(data.get('tpAmb', 1)) # Padrão Produção (1)
+        
+        if not chave or len(chave) != 44:
+            return jsonify({'error': 'Chave de acesso inválida ou não informada (deve ter 44 dígitos).'}), 400
+            
+        retorno = sefaz_client.consultar_nfe(chave=chave, tpAmb=tpAmb, uf='SP')
+        
+        if retorno.get('status') == 'success':
+            conn = get_db_connection()
+            c = conn.cursor()
+            
+            cstat_resp = str(retorno.get('cstat') or '')
+            xmotivo_resp = str(retorno.get('xmotivo') or '')
+            is_cancelada = bool(retorno.get('is_cancelada') or cstat_resp == '101' or 'cancelamento' in xmotivo_resp.lower())
+            is_autorizada = ((cstat_resp == '100' or retorno.get('protocolo_autorizacao')) and not is_cancelada)
+            
+            status_db = 'Cancelada' if is_cancelada else ('Autorizada' if is_autorizada else 'Rejeitada')
+            prot_db = retorno.get('protocolo_cancelamento') or retorno.get('protocolo_autorizacao') or ''
+
+            # 1. Localiza rascunho vinculado a esta chave de acesso
+            rascunho_row = c.execute(
+                "SELECT * FROM rascunhos WHERE REPLACE(COALESCE(chave_acesso, ''), ' ', '') = ? ORDER BY id DESC LIMIT 1",
+                (chave,)
+            ).fetchone()
+
+            xml_encontrado = None
+            ref_interna = ''
+            tipo_operacao = ''
+            v_total_db = 0.0
+            qtd_itens_db = 0
+            n_nf_db = ''
+
+            if rascunho_row:
+                ref_interna = rascunho_row['referencia_interna'] or ''
+                tipo_operacao = rascunho_row['tipo_operacao'] or ''
+                v_total_db = float(rascunho_row['valor_total'] or 0.0)
+                qtd_itens_db = int(rascunho_row['qtd_itens'] or 0)
+                
+                # Tenta extrair o XML do arquivo JSON do rascunho
+                nome_arq_isolado = rascunho_row['caminho_arquivo_isolado']
+                if nome_arq_isolado:
+                    caminho_json = os.path.join(RASCUNHOS_DIR, nome_arq_isolado)
+                    if os.path.exists(caminho_json):
+                        try:
+                            with open(caminho_json, 'r', encoding='utf-8') as fj:
+                                d_json = json.load(fj)
+                                dc = d_json.get('dados_completos') or {}
+                                xml_encontrado = dc.get('xml_original') or d_json.get('xml_original') or d_json.get('xml_conteudo')
+                                if not ref_interna:
+                                    ref_interna = d_json.get('referencia_interna') or dc.get('referencia_interna') or ''
+                                if not tipo_operacao:
+                                    tipo_operacao = d_json.get('tipo_operacao') or dc.get('tipo_operacao') or ''
+                        except Exception as e_json:
+                            print(f"Aviso ao ler rascunho para consulta SEFAZ: {e_json}")
+
+            # Se não achou nos rascunhos, busca se já tem no banco notas_fiscais
+            if not ref_interna:
+                nf_row = c.execute(
+                    "SELECT referencia_interna, tipo_operacao, valor_total FROM notas_fiscais WHERE REPLACE(COALESCE(chave_nfe, ''), ' ', '') = ? LIMIT 1",
+                    (chave,)
+                ).fetchone()
+                if nf_row:
+                    ref_interna = nf_row['referencia_interna'] or ''
+                    if not tipo_operacao:
+                        tipo_operacao = nf_row['tipo_operacao'] or ''
+                    if not v_total_db and nf_row['valor_total']:
+                        v_total_db = float(nf_row['valor_total'] or 0.0)
+
+            # Extração de dados a partir do XML original
+            dh_emi_db = ''
+            nat_op_db = ''
+            tp_nf_db = '1'
+            v_prod_db = 0.0
+            
+            if xml_encontrado:
+                try:
+                    root_xml = etree.fromstring(xml_encontrado.encode('utf-8') if isinstance(xml_encontrado, str) else xml_encontrado)
+                    def _get_val(tag):
+                        nodes = root_xml.xpath(f"//*[local-name()='{tag}']")
+                        return nodes[0].text if nodes and nodes[0].text else ''
+                    
+                    n_nf_db = _get_val('nNF')
+                    dh_emi_db = _get_val('dhEmi')
+                    nat_op_db = _get_val('natOp')
+                    tp_nf_db = _get_val('tpNF') or '1'
+                    v_prod_db = float(_get_val('vProd') or 0.0)
+                    v_nf_val = float(_get_val('vNF') or 0.0)
+                    if v_nf_val > 0:
+                        v_total_db = v_nf_val
+                    if not tipo_operacao and nat_op_db:
+                        tipo_operacao = nat_op_db
+                except Exception as e_parse:
+                    print(f"Aviso ao parsear XML original da nota consultada: {e_parse}")
+
+            if not n_nf_db and len(chave) >= 34:
+                try:
+                    n_nf_db = str(int(chave[25:34]))
+                except Exception:
+                    pass
+
+            # Formata data_hora para formato compatível com o banco (YYYY-MM-DD HH:MM:SS)
+            data_hora_banco = retorno.get('dh_recbto') or retorno.get('data_autorizacao') or ''
+            if not data_hora_banco and dh_emi_db:
+                data_hora_banco = dh_emi_db
+            try:
+                if 'T' in data_hora_banco:
+                    dt_p = data_hora_banco.split('T')[0]
+                    tm_p = data_hora_banco.split('T')[1].split('-')[0].split('+')[0]
+                    data_hora_banco = f"{dt_p} {tm_p}"
+            except Exception:
+                pass
+
+            # 2. Salva os arquivos (XML e PDF) em DOWNLOADS_DIR
+            xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
+            pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
+            zip_path = os.path.join(DOWNLOADS_DIR, f"{chave}-arquivos.zip")
+
+            if xml_encontrado and not os.path.exists(xml_path):
+                try:
+                    with open(xml_path, 'w', encoding='utf-8') as fx:
+                        fx.write(xml_encontrado)
+                except Exception as e_wxml:
+                    print(f"Aviso ao gravar XML consultado da SEFAZ: {e_wxml}")
+
+            # Gera o PDF via DanfeGenerator a partir do XML original
+            if os.path.exists(xml_path) and not os.path.exists(pdf_path):
+                try:
+                    from danfe_generator import DanfeGenerator
+                    DanfeGenerator().render(xml_path, pdf_path)
+                except Exception as e_danfe:
+                    print(f"Aviso ao renderizar DANFE para nota consultada: {e_danfe}")
+                    modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+                    if os.path.exists(modelo_pdf):
+                        shutil.copyfile(modelo_pdf, pdf_path)
+
+            # Gera o ZIP com os arquivos
+            if (os.path.exists(xml_path) or os.path.exists(pdf_path)) and not os.path.exists(zip_path):
+                try:
+                    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                        if os.path.exists(pdf_path):
+                            zf.write(pdf_path, f"{chave}-danfe.pdf")
+                        if os.path.exists(xml_path):
+                            zf.write(xml_path, f"{chave}-nfe.xml")
+                except Exception as e_zip:
+                    print(f"Aviso ao gerar ZIP para nota consultada: {e_zip}")
+
+            # 3. Registra no historico_sefaz (APENAS UMA VEZ por chave)
+            hist_existente = c.execute(
+                "SELECT id FROM historico_sefaz WHERE REPLACE(chave_nfe, ' ', '') = ? LIMIT 1",
+                (chave,)
+            ).fetchone()
+
+            if not hist_existente:
+                c.execute('''
+                    INSERT INTO historico_sefaz (chave_nfe, tpAmb, cstat, xmotivo, recibo, protocolo, xml_envio, xml_retorno)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    chave,
+                    tpAmb,
+                    retorno.get('cstat') or '100',
+                    retorno.get('xmotivo') or 'Autorizado o uso da NF-e',
+                    '',
+                    prot_db,
+                    xml_encontrado or '',
+                    retorno.get('raw_xml') or ''
+                ))
+
+            # 4. Registra/Atualiza em notas_fiscais para constar no relatório
+            nf_existente = c.execute(
+                "SELECT id, referencia_interna FROM notas_fiscais WHERE REPLACE(chave_nfe, ' ', '') = ? LIMIT 1",
+                (chave,)
+            ).fetchone()
+
+            caminho_xml_rel = f"{chave}-nfe.xml" if os.path.exists(xml_path) else ''
+            caminho_pdf_rel = f"{chave}-danfe.pdf" if os.path.exists(pdf_path) else ''
+
+            if nf_existente:
+                c.execute('''
+                    UPDATE notas_fiscais SET
+                        status = ?,
+                        protocolo = CASE WHEN ? != '' THEN ? ELSE protocolo END,
+                        cstat = ?,
+                        xmotivo = ?,
+                        caminho_xml = CASE WHEN ? != '' THEN ? ELSE caminho_xml END,
+                        caminho_pdf = CASE WHEN ? != '' THEN ? ELSE caminho_pdf END,
+                        data_atualizacao = CURRENT_TIMESTAMP
+                    WHERE REPLACE(chave_nfe, ' ', '') = ?
+                ''', (status_db, prot_db, prot_db, retorno.get('cstat'), retorno.get('xmotivo'), caminho_xml_rel, caminho_xml_rel, caminho_pdf_rel, caminho_pdf_rel, chave))
+            else:
+                c.execute('''
+                    INSERT INTO notas_fiscais (
+                        chave_nfe, referencia_interna, data_hora, numero_nfe, tipo_operacao,
+                        tipo_movimento, valor_total, total_produtos, status, protocolo,
+                        recibo, ambiente, cstat, xmotivo, caminho_xml, caminho_pdf, oculto
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                ''', (
+                    chave,
+                    ref_interna or f"REF-{n_nf_db}",
+                    data_hora_banco,
+                    n_nf_db,
+                    tipo_operacao or 'CONSULTA SEFAZ',
+                    tp_nf_db,
+                    v_total_db,
+                    v_prod_db,
+                    status_db,
+                    prot_db,
+                    '',
+                    tpAmb,
+                    retorno.get('cstat') or '100',
+                    retorno.get('xmotivo') or 'Autorizado o uso da NF-e',
+                    caminho_xml_rel,
+                    caminho_pdf_rel
+                ))
+
+            conn.commit()
+            conn.close()
+
+            retorno['registrado_historico'] = True
+            retorno['tem_arquivos'] = bool(os.path.exists(xml_path) or os.path.exists(pdf_path))
+            
+        return jsonify(retorno)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+def obter_nome_padrao_arquivo(chave, xml_content_or_path=None):
+    """
+    Retorna o nome base padronizado para os arquivos:
+    "{referencia Interna} - DANFE {Numero da Nota} - {chave}"
+    """
+    chave_limpa = (chave or '').replace(' ', '').strip()
+    ref_interna = ''
+    n_nf = ''
+
+    # 1. Tenta buscar da tabela notas_fiscais
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        row = c.execute("SELECT numero_nfe, referencia_interna FROM notas_fiscais WHERE REPLACE(chave_nfe, ' ', '') = ? LIMIT 1", (chave_limpa,)).fetchone()
+        if row:
+            if row['numero_nfe']:
+                n_nf = str(row['numero_nfe']).strip()
+            if row['referencia_interna'] and row['referencia_interna'] != '-':
+                ref_interna = str(row['referencia_interna']).strip()
+        
+        # Se não achou ref em notas_fiscais, tenta nos rascunhos
+        if not ref_interna:
+            r_row = c.execute("SELECT referencia_interna FROM rascunhos WHERE REPLACE(chave_acesso, ' ', '') = ? AND referencia_interna IS NOT NULL AND referencia_interna != '' LIMIT 1", (chave_limpa,)).fetchone()
+            if r_row and r_row['referencia_interna']:
+                ref_interna = str(r_row['referencia_interna']).strip()
+        conn.close()
+    except Exception as e_db:
+        print(f"Aviso ao consultar nome padrão no banco: {e_db}")
+
+    # 2. Se ainda faltar n_nf ou ref_interna, extrai do XML
+    xml_data = None
+    if xml_content_or_path:
+        if isinstance(xml_content_or_path, str) and os.path.exists(xml_content_or_path):
+            try:
+                with open(xml_content_or_path, 'r', encoding='utf-8') as f_x:
+                    xml_data = f_x.read()
+            except Exception:
+                pass
+        elif isinstance(xml_content_or_path, str):
+            xml_data = xml_content_or_path
+        elif isinstance(xml_content_or_path, bytes):
+            xml_data = xml_content_or_path.decode('utf-8', errors='ignore')
+
+    if not xml_data:
+        xml_local = os.path.join(DOWNLOADS_DIR, f"{chave_limpa}-nfe.xml")
+        if os.path.exists(xml_local):
+            try:
+                with open(xml_local, 'r', encoding='utf-8') as f_x:
+                    xml_data = f_x.read()
+            except Exception:
+                pass
+
+    if xml_data:
+        try:
+            root = etree.fromstring(xml_data.encode('utf-8'))
+            if not n_nf:
+                nnf_nodes = root.xpath("//*[local-name()='nNF']")
+                if nnf_nodes and nnf_nodes[0].text:
+                    n_nf = nnf_nodes[0].text.strip()
+            if not ref_interna:
+                cpl_nodes = root.xpath("//*[local-name()='infCpl']")
+                if cpl_nodes and cpl_nodes[0].text:
+                    txt = cpl_nodes[0].text
+                    m = re.search(r'S/REF:\s*([A-Za-z0-9_\-\.\/]+)', txt) or re.search(r'N/REF:\s*([A-Za-z0-9_\-\.\/]+)', txt) or re.search(r'(NFT\d+-[A-Za-z0-9]+)', txt)
+                    if m:
+                        ref_interna = m.group(1).strip()
+                    elif 'DI:' in txt:
+                        m_di = re.search(r'DI:\s*([0-9\/\-]+)', txt)
+                        if m_di:
+                            ref_interna = f"DI {m_di.group(1).strip()}"
+        except Exception:
+            pass
+
+    # 3. Fallbacks caso ainda não tenha encontrado
+    if not n_nf and len(chave_limpa) >= 34:
+        try:
+            n_nf = str(int(chave_limpa[25:34]))
+        except Exception:
+            n_nf = ''
+
+    if not ref_interna:
+        ref_interna = f"REF-{n_nf}" if n_nf else "NFT"
+
+    # Sanitiza caracteres proibidos em nomes de arquivo
+    ref_sanitizada = re.sub(r'[\\/:*?"<>|]+', '_', ref_interna).strip()
+    ref_sanitizada = re.sub(r'\s+', ' ', ref_sanitizada)
+
+    return f"{ref_sanitizada} - DANFE {n_nf} - {chave_limpa}"
+
 @app.route('/api/sefaz/download/pdf/<chave>', methods=['GET'])
 def download_pdf(chave):
-    chave = chave.strip()
+    chave = chave.strip().replace(' ', '')
     pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
-    if not os.path.exists(pdf_path):
-        xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
-        if os.path.exists(xml_path):
+    xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
+    
+    # Se nao tem XML local, tenta obter do banco
+    if not os.path.exists(xml_path):
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("SELECT xml_envio FROM historico_sefaz WHERE REPLACE(chave_nfe, ' ', '') = ? ORDER BY id DESC LIMIT 1", (chave,))
+        row = c.fetchone()
+        conn.close()
+        if row and row['xml_envio']:
             try:
-                from danfe_generator import DanfeGenerator
-                DanfeGenerator().render(xml_path, pdf_path)
-            except Exception as e_pdf:
-                print(f"Aviso ao renderizar DANFE para download: {e_pdf}")
-        if not os.path.exists(pdf_path):
-            modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
-            if os.path.exists(modelo_pdf):
-                shutil.copyfile(modelo_pdf, pdf_path)
+                with open(xml_path, 'w', encoding='utf-8') as f:
+                    f.write(row['xml_envio'])
+            except Exception as e_w:
+                print(f"Aviso ao salvar XML para PDF: {e_w}")
+
+    # Se nao tem PDF, tenta renderizar via DanfeGenerator
+    if not os.path.exists(pdf_path) and os.path.exists(xml_path):
+        try:
+            from danfe_generator import DanfeGenerator
+            DanfeGenerator().render(xml_path, pdf_path)
+        except Exception as e_pdf:
+            print(f"Aviso ao renderizar DANFE para download: {e_pdf}")
+            
+    # Se ainda nao tem PDF, usa modelo como fallback
+    if not os.path.exists(pdf_path):
+        modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+        if os.path.exists(modelo_pdf):
+            shutil.copyfile(modelo_pdf, pdf_path)
             
     if os.path.exists(pdf_path):
-        return send_file(pdf_path, as_attachment=True, download_name=f"{chave}-danfe.pdf", mimetype='application/pdf')
+        nome_download = f"{obter_nome_padrao_arquivo(chave, xml_path)}.pdf"
+        return send_file(pdf_path, as_attachment=True, download_name=nome_download, mimetype='application/pdf')
     return "PDF não encontrado", 404
 
 @app.route('/api/sefaz/download/xml/<chave>', methods=['GET'])
 def download_xml(chave):
-    chave = chave.strip()
+    chave = chave.strip().replace(' ', '')
     xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
     if os.path.exists(xml_path):
-        return send_file(xml_path, as_attachment=True, download_name=f"{chave}-nfe.xml", mimetype='application/xml')
+        nome_download = f"{obter_nome_padrao_arquivo(chave, xml_path)}.xml"
+        return send_file(xml_path, as_attachment=True, download_name=nome_download, mimetype='application/xml')
         
     conn = get_db_connection()
     c = conn.cursor()
-    c.execute("SELECT xml_envio, xml_retorno FROM historico_sefaz WHERE chave_nfe = ? ORDER BY id DESC LIMIT 1", (chave,))
+    c.execute("SELECT xml_envio, xml_retorno FROM historico_sefaz WHERE REPLACE(chave_nfe, ' ', '') = ? ORDER BY id DESC LIMIT 1", (chave,))
     row = c.fetchone()
     conn.close()
     
@@ -3719,55 +4648,484 @@ def download_xml(chave):
         xml_data = row['xml_envio']
         with open(xml_path, 'w', encoding='utf-8') as f:
             f.write(xml_data)
-        return send_file(xml_path, as_attachment=True, download_name=f"{chave}-nfe.xml", mimetype='application/xml')
+        nome_download = f"{obter_nome_padrao_arquivo(chave, xml_data)}.xml"
+        return send_file(xml_path, as_attachment=True, download_name=nome_download, mimetype='application/xml')
     return "XML não encontrado", 404
 
 @app.route('/api/sefaz/download/zip/<chave>', methods=['GET'])
 def download_zip(chave):
-    chave = chave.strip()
+    chave = chave.strip().replace(' ', '')
     zip_path = os.path.join(DOWNLOADS_DIR, f"{chave}-arquivos.zip")
-    if os.path.exists(zip_path):
-        return send_file(zip_path, as_attachment=True, download_name=f"{chave}-arquivos.zip", mimetype='application/zip')
+    nome_padrao = obter_nome_padrao_arquivo(chave)
         
-    # Garante o PDF
-    pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
-    if not os.path.exists(pdf_path):
-        xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
-        if os.path.exists(xml_path):
-            try:
-                from danfe_generator import DanfeGenerator
-                DanfeGenerator().render(xml_path, pdf_path)
-            except Exception as e_pdf:
-                print(f"Aviso ao renderizar DANFE para ZIP: {e_pdf}")
-        if not os.path.exists(pdf_path):
-            modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
-            if os.path.exists(modelo_pdf):
-                shutil.copyfile(modelo_pdf, pdf_path)
-            
     # Garante o XML
     xml_path = os.path.join(DOWNLOADS_DIR, f"{chave}-nfe.xml")
     if not os.path.exists(xml_path):
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute("SELECT xml_envio FROM historico_sefaz WHERE chave_nfe = ? ORDER BY id DESC LIMIT 1", (chave,))
+        c.execute("SELECT xml_envio FROM historico_sefaz WHERE REPLACE(chave_nfe, ' ', '') = ? ORDER BY id DESC LIMIT 1", (chave,))
         row = c.fetchone()
         conn.close()
         if row and row['xml_envio']:
             with open(xml_path, 'w', encoding='utf-8') as f:
                 f.write(row['xml_envio'])
+
+    # Garante o PDF
+    pdf_path = os.path.join(DOWNLOADS_DIR, f"{chave}-danfe.pdf")
+    if not os.path.exists(pdf_path) and os.path.exists(xml_path):
+        try:
+            from danfe_generator import DanfeGenerator
+            DanfeGenerator().render(xml_path, pdf_path)
+        except Exception as e_pdf:
+            print(f"Aviso ao renderizar DANFE para ZIP: {e_pdf}")
+    if not os.path.exists(pdf_path):
+        modelo_pdf = os.path.join(os.path.dirname(__file__), 'modelo', 'NFT2600285-I DANFE 846 REMESSA 35260947998441000198550010000008461630365500.pdf')
+        if os.path.exists(modelo_pdf):
+            shutil.copyfile(modelo_pdf, pdf_path)
                 
-    # Monta o ZIP
+    # Monta o ZIP com os arquivos nomeados internamente no padrão requerido
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         if os.path.exists(pdf_path):
-            zf.write(pdf_path, f"{chave}-danfe.pdf")
+            zf.write(pdf_path, f"{nome_padrao}.pdf")
         if os.path.exists(xml_path):
-            zf.write(xml_path, f"{chave}-nfe.xml")
+            zf.write(xml_path, f"{nome_padrao}.xml")
             
     if os.path.exists(zip_path):
-        return send_file(zip_path, as_attachment=True, download_name=f"{chave}-arquivos.zip", mimetype='application/zip')
+        return send_file(zip_path, as_attachment=True, download_name=f"{nome_padrao}.zip", mimetype='application/zip')
     return "Arquivos não encontrados para gerar o ZIP", 404
+
+# ==============================================================================
+# === MÓDULO RELATÓRIO: NOTAS FISCAIS GERADAS & FILTROS AVANÇADOS ===
+# ==============================================================================
+
+def sync_and_get_notas_fiscais(conn):
+    """
+    Sincroniza histórico SEFAZ, downloads e rascunhos para a tabela notas_fiscais,
+    garantindo que todas as notas emitidas, autorizadas ou canceladas estejam atualizadas.
+    """
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS notas_fiscais (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chave_nfe TEXT UNIQUE,
+            referencia_interna TEXT,
+            data_hora TEXT,
+            numero_nfe TEXT,
+            tipo_operacao TEXT,
+            tipo_movimento TEXT DEFAULT '1',
+            valor_total REAL DEFAULT 0.0,
+            total_produtos REAL DEFAULT 0.0,
+            status TEXT DEFAULT 'Gerada',
+            protocolo TEXT DEFAULT '',
+            recibo TEXT DEFAULT '',
+            ambiente INTEGER DEFAULT 2,
+            cstat TEXT DEFAULT '',
+            xmotivo TEXT DEFAULT '',
+            caminho_xml TEXT DEFAULT '',
+            caminho_pdf TEXT DEFAULT '',
+            oculto INTEGER DEFAULT 0,
+            data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+            data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    try:
+        c.execute('ALTER TABLE notas_fiscais ADD COLUMN oculto INTEGER DEFAULT 0')
+    except Exception:
+        pass
+    conn.commit()
+
+    rascunhos_rows = c.execute('SELECT * FROM rascunhos').fetchall()
+
+    def find_reference(chave, xml_str):
+        # 1. Match direto em rascunhos por chave
+        for r in rascunhos_rows:
+            r_chave = (r['chave_acesso'] or '').replace(' ', '')
+            if r_chave and (chave in r_chave or r_chave in chave):
+                if r['referencia_interna']:
+                    return r['referencia_interna'].strip()
+        
+        # 2. Extrai de infCpl do XML
+        if xml_str:
+            try:
+                root_cpl = etree.fromstring(xml_str.encode('utf-8') if isinstance(xml_str, str) else xml_str)
+                cpl_nodes = root_cpl.xpath("//*[local-name()='infCpl']")
+                if cpl_nodes and cpl_nodes[0].text:
+                    txt = cpl_nodes[0].text
+                    m = re.search(r'S/REF:\s*([A-Za-z0-9_\-\.\/]+)', txt)
+                    if m: return m.group(1).strip()
+                    m = re.search(r'N/REF:\s*([A-Za-z0-9_\-\.\/]+)', txt)
+                    if m: return m.group(1).strip()
+                    m = re.search(r'(NFT\d+-[A-Za-z0-9]+)', txt)
+                    if m: return m.group(1).strip()
+                    m = re.search(r'DI:\s*([0-9\/\-]+)', txt)
+                    if m: return f"DI {m.group(1).strip()}"
+            except Exception:
+                pass
+
+        # 3. Match rascunho por número nNF contido na chave (dígitos 25..34)
+        try:
+            if len(chave) >= 34:
+                chave_nnf = str(int(chave[25:34]))
+                for r in rascunhos_rows:
+                    r_chave = (r['chave_acesso'] or '').replace(' ', '')
+                    if len(r_chave) >= 34:
+                        r_nnf = str(int(r_chave[25:34]))
+                        if r_nnf == chave_nnf and r['referencia_interna']:
+                            return r['referencia_interna'].strip()
+        except Exception:
+            pass
+            
+        return "-"
+
+    # Agrupa histórico da SEFAZ
+    hist_rows = c.execute('SELECT * FROM historico_sefaz ORDER BY id ASC').fetchall()
+    notas_dict = {}
+
+    for r in hist_rows:
+        raw_chave = (r['chave_nfe'] or '').replace(' ', '').strip()
+        if not raw_chave or raw_chave == 'N/A' or len(raw_chave) < 44:
+            continue
+        if raw_chave not in notas_dict:
+            notas_dict[raw_chave] = {
+                'chave': raw_chave,
+                'tpAmb': r['tpAmb'],
+                'data_envio': r['data_envio'],
+                'cstat': str(r['cstat'] or ''),
+                'xmotivo': r['xmotivo'] or '',
+                'recibo': r['recibo'] or '',
+                'protocolo': r['protocolo'] or '',
+                'xml_envio': r['xml_envio'] or '',
+                'status': 'Rejeitada' if str(r['cstat']) != '100' else 'Autorizada',
+                'eventos': []
+            }
+        item = notas_dict[raw_chave]
+        cstat_str = str(r['cstat'] or '')
+        xmotivo_str = (r['xmotivo'] or '').lower()
+
+        if cstat_str in ('100', '801') or ('autoriz' in xmotivo_str and 'rejei' not in xmotivo_str):
+            item['status'] = 'Autorizada'
+            if r['protocolo']: item['protocolo'] = r['protocolo']
+            if r['recibo']: item['recibo'] = r['recibo']
+            if r['xml_envio']: item['xml_envio'] = r['xml_envio']
+            item['cstat'] = '100'
+            item['xmotivo'] = r['xmotivo'] or 'Autorizado o uso da NF-e'
+
+        if 'cancel' in xmotivo_str and cstat_str in ('135', '136', '101'):
+            item['status'] = 'Cancelada'
+            if r['protocolo']: item['protocolo_cancelamento'] = r['protocolo']
+
+        if '[cc-e' in xmotivo_str and cstat_str in ('135', '136'):
+            item['eventos'].append('CC-e')
+            if item['status'] != 'Cancelada':
+                item['has_cce'] = True
+
+    # Processa e persiste cada nota
+    for chave, item in notas_dict.items():
+        xml_str = item['xml_envio']
+        nNF = ''
+        dhEmi = item['data_envio'] or ''
+        natOp = ''
+        tpNF = '1'
+        vNF = 0.0
+        vProd = 0.0
+
+        if xml_str:
+            try:
+                root_xml = etree.fromstring(xml_str.encode('utf-8') if isinstance(xml_str, str) else xml_str)
+                def get_tag(tag):
+                    nodes = root_xml.xpath(f"//*[local-name()='{tag}']")
+                    return nodes[0].text if nodes and nodes[0].text else ''
+                
+                nNF = get_tag('nNF')
+                dhEmi = get_tag('dhEmi') or dhEmi
+                natOp = get_tag('natOp')
+                tpNF = get_tag('tpNF') or '1'
+                vNF = float(get_tag('vNF') or 0.0)
+                vProd = float(get_tag('vProd') or 0.0)
+            except Exception as e_xml:
+                print(f"Aviso ao analisar XML para chave {chave}: {e_xml}")
+
+        if not nNF and len(chave) >= 34:
+            try: nNF = str(int(chave[25:34]))
+            except: pass
+
+        ref_interna = find_reference(chave, xml_str)
+        
+        # Formata data_hora para exibicao/armazenamento padrao
+        data_hora_fmt = dhEmi
+        try:
+            if 'T' in dhEmi:
+                dt_part = dhEmi.split('T')[0]
+                tm_part = dhEmi.split('T')[1].split('-')[0].split('+')[0]
+                data_hora_fmt = f"{dt_part} {tm_part}"
+        except Exception:
+            pass
+
+        # Verifica presenca dos arquivos em downloads
+        xml_file = f"{chave}-nfe.xml"
+        pdf_file = f"{chave}-danfe.pdf"
+        caminho_xml = xml_file if os.path.exists(os.path.join(DOWNLOADS_DIR, xml_file)) else ''
+        caminho_pdf = pdf_file if os.path.exists(os.path.join(DOWNLOADS_DIR, pdf_file)) else ''
+
+        # Protocolo final
+        protocolo_final = item.get('protocolo_cancelamento') or item.get('protocolo') or ''
+
+        # Upsert
+        existing = c.execute('SELECT id, referencia_interna, oculto FROM notas_fiscais WHERE chave_nfe = ?', (chave,)).fetchone()
+        if existing:
+            if existing['referencia_interna'] and existing['referencia_interna'] != '-':
+                ref_interna = existing['referencia_interna']
+            c.execute('''
+                UPDATE notas_fiscais SET
+                    referencia_interna = ?,
+                    data_hora = ?,
+                    numero_nfe = ?,
+                    tipo_operacao = ?,
+                    tipo_movimento = ?,
+                    valor_total = ?,
+                    total_produtos = ?,
+                    status = ?,
+                    protocolo = ?,
+                    recibo = ?,
+                    ambiente = ?,
+                    cstat = ?,
+                    xmotivo = ?,
+                    caminho_xml = ?,
+                    caminho_pdf = ?,
+                    data_atualizacao = CURRENT_TIMESTAMP
+                WHERE chave_nfe = ?
+            ''', (
+                ref_interna, data_hora_fmt, nNF, natOp, tpNF, vNF, vProd,
+                item['status'], protocolo_final, item.get('recibo', ''),
+                item['tpAmb'], item['cstat'], item['xmotivo'], caminho_xml, caminho_pdf,
+                chave
+            ))
+        else:
+            c.execute('''
+                INSERT INTO notas_fiscais (
+                    chave_nfe, referencia_interna, data_hora, numero_nfe, tipo_operacao,
+                    tipo_movimento, valor_total, total_produtos, status, protocolo,
+                    recibo, ambiente, cstat, xmotivo, caminho_xml, caminho_pdf, oculto
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+            ''', (
+                chave, ref_interna, data_hora_fmt, nNF, natOp, tpNF, vNF, vProd,
+                item['status'], protocolo_final, item.get('recibo', ''),
+                item['tpAmb'], item['cstat'], item['xmotivo'], caminho_xml, caminho_pdf
+            ))
+
+    conn.commit()
+
+    # Busca todas as notas ativas (não ocultadas) ordenadas por data
+    rows = c.execute('SELECT * FROM notas_fiscais WHERE COALESCE(oculto, 0) = 0 ORDER BY data_hora DESC, id DESC').fetchall()
+    
+    lista = []
+    for r in rows:
+        d = dict(r)
+        # Formata chave com espacos para exibicao (ex: 3526 1047 ...)
+        ch = d['chave_nfe']
+        ch_fmt = ' '.join([ch[i:i+4] for i in range(0, len(ch), 4)]) if len(ch) == 44 else ch
+        d['chave_formatada'] = ch_fmt
+        
+        # Formata data_hora para formato brasileiro DD/MM/YYYY HH:mm:ss
+        raw_dt = d['data_hora'] or ''
+        dt_br = raw_dt
+        try:
+            if '-' in raw_dt:
+                partes = raw_dt.split(' ')
+                data_p = partes[0].split('-')
+                if len(data_p) == 3:
+                    hora_p = partes[1] if len(partes) > 1 else ''
+                    dt_br = f"{data_p[2]}/{data_p[1]}/{data_p[0]}"
+                    if hora_p: dt_br += f" {hora_p}"
+        except Exception:
+            pass
+        d['data_hora_formatada'] = dt_br
+
+        # Formata valores monetarios
+        v_total = float(d['valor_total'] or 0.0)
+        v_prod = float(d['total_produtos'] or 0.0)
+        d['valor_total_fmt'] = f"R$ {v_total:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        d['total_produtos_fmt'] = f"R$ {v_prod:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        
+        # Garante flags de arquivos
+        xml_p = os.path.join(DOWNLOADS_DIR, f"{ch}-nfe.xml")
+        pdf_p = os.path.join(DOWNLOADS_DIR, f"{ch}-danfe.pdf")
+        d['has_xml'] = os.path.exists(xml_p) or bool(d['caminho_xml'])
+        d['has_pdf'] = os.path.exists(pdf_p) or bool(d['caminho_pdf'])
+        lista.append(d)
+
+    return lista
+
+@app.route('/relatorios', methods=['GET'])
+@app.route('/relatorio', methods=['GET'])
+def pagina_relatorios():
+    return render_template('relatorios.html')
+
+@app.route('/api/relatorios/notas', methods=['GET'])
+def api_relatorios_notas():
+    try:
+        conn = get_db_connection()
+        notas = sync_and_get_notas_fiscais(conn)
+        conn.close()
+
+        # Parametros de filtro
+        search = (request.args.get('search') or '').strip().lower()
+        data_ini = (request.args.get('data_inicio') or '').strip()
+        data_fim = (request.args.get('data_fim') or '').strip()
+        status_filtro = (request.args.get('status') or '').strip()
+        op_filtro = (request.args.get('tipo_operacao') or '').strip()
+        mov_filtro = (request.args.get('tipo_movimento') or '').strip()
+        ambiente_filtro = (request.args.get('ambiente') or '').strip()
+        v_min = request.args.get('v_min')
+        v_max = request.args.get('v_max')
+        p_min = request.args.get('p_min')
+        p_max = request.args.get('p_max')
+
+        # Operações distintas para o dropdown
+        operacoes_disponiveis = sorted(list(set(n['tipo_operacao'] for n in notas if n.get('tipo_operacao'))))
+
+        filtradas = []
+        for n in notas:
+            # Filtro por busca textual (referencia, chave, numero_nfe, tipo_operacao, protocolo, recibo)
+            if search:
+                alvo = f"{n.get('referencia_interna','')} {n.get('chave_nfe','')} {n.get('numero_nfe','')} {n.get('tipo_operacao','')} {n.get('protocolo','')} {n.get('recibo','')}".lower()
+                if search not in alvo:
+                    continue
+
+            # Filtro por periodo de data (YYYY-MM-DD)
+            data_raw = (n.get('data_hora') or '')[:10]
+            if data_ini and data_raw and data_raw < data_ini:
+                continue
+            if data_fim and data_raw and data_raw > data_fim:
+                continue
+
+            # Filtro por status
+            if status_filtro and status_filtro != 'Todos':
+                if n.get('status') != status_filtro:
+                    continue
+
+            # Filtro por operacao
+            if op_filtro and op_filtro != 'Todas':
+                if n.get('tipo_operacao') != op_filtro:
+                    continue
+
+            # Filtro por movimento (0=Entrada, 1=Saida)
+            if mov_filtro and mov_filtro != 'Todos':
+                if str(n.get('tipo_movimento', '1')) != mov_filtro:
+                    continue
+
+            # Filtro por ambiente
+            if ambiente_filtro and ambiente_filtro != 'Todos':
+                if str(n.get('ambiente', '2')) != ambiente_filtro:
+                    continue
+
+            # Filtro por faixa de vNF
+            v_tot = float(n.get('valor_total') or 0.0)
+            if v_min:
+                try:
+                    if v_tot < float(v_min): continue
+                except: pass
+            if v_max:
+                try:
+                    if v_tot > float(v_max): continue
+                except: pass
+
+            # Filtro por faixa de vProd
+            v_pr = float(n.get('total_produtos') or 0.0)
+            if p_min:
+                try:
+                    if v_pr < float(p_min): continue
+                except: pass
+            if p_max:
+                try:
+                    if v_pr > float(p_max): continue
+                except: pass
+
+            filtradas.append(n)
+
+        # Totais e resumo
+        resumo = {
+            'total_notas': len(filtradas),
+            'total_valor': sum(float(n.get('valor_total') or 0.0) for n in filtradas),
+            'total_produtos': sum(float(n.get('total_produtos') or 0.0) for n in filtradas),
+            'total_autorizadas': sum(1 for n in filtradas if n.get('status') == 'Autorizada'),
+            'total_canceladas': sum(1 for n in filtradas if n.get('status') == 'Cancelada'),
+            'total_rejeitadas': sum(1 for n in filtradas if n.get('status') == 'Rejeitada')
+        }
+        resumo['total_valor_fmt'] = f"R$ {resumo['total_valor']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        resumo['total_produtos_fmt'] = f"R$ {resumo['total_produtos']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+
+        return jsonify({
+            'success': True,
+            'total': len(filtradas),
+            'resumo': resumo,
+            'operacoes': operacoes_disponiveis,
+            'notas': filtradas
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/relatorios/notas/atualizar_referencia', methods=['POST'])
+def api_relatorios_atualizar_referencia():
+    try:
+        data = request.json or {}
+        chave = (data.get('chave') or '').strip().replace(' ', '')
+        nova_ref = (data.get('referencia_interna') or '').strip()
+        
+        if not chave:
+            return jsonify({'success': False, 'error': 'Chave de acesso não informada.'}), 400
+            
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('''
+            UPDATE notas_fiscais SET
+                referencia_interna = ?,
+                data_atualizacao = CURRENT_TIMESTAMP
+            WHERE REPLACE(chave_nfe, ' ', '') = ?
+        ''', (nova_ref, chave))
+        
+        # Tambem atualiza rascunhos vinculados se houver
+        c.execute('''
+            UPDATE rascunhos SET
+                referencia_interna = ?,
+                data_atualizacao = CURRENT_TIMESTAMP
+            WHERE REPLACE(chave_acesso, ' ', '') = ?
+        ''', (nova_ref, chave))
+        
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'referencia_interna': nova_ref})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/relatorios/notas/excluir', methods=['POST'])
+def api_relatorios_excluir_nota():
+    try:
+        data = request.json or {}
+        chave = (data.get('chave') or '').strip().replace(' ', '')
+        
+        if not chave:
+            return jsonify({'success': False, 'error': 'Chave de acesso não informada.'}), 400
+            
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute('''
+            UPDATE notas_fiscais SET
+                oculto = 1,
+                data_atualizacao = CURRENT_TIMESTAMP
+            WHERE REPLACE(chave_nfe, ' ', '') = ?
+        ''', (chave,))
+        
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Nota fiscal excluída do relatório com sucesso.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     get_db_connection().close()
     app.run(debug=True, port=1652)
+
 

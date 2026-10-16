@@ -10,7 +10,7 @@
 <!-- Bootstrap 5 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <!-- NFT Logistics Theme (Light & Dark) -->
-<link href="/static/css/nft-theme.css?v=3.1" rel="stylesheet"/>
+<link href="/static/css/nft-theme.css?v=3.2" rel="stylesheet"/>
 <link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
 <script src="/static/js/theme.js"></script>
 <!-- Lucide Icons (Minimalist Line SVGs) -->
@@ -82,6 +82,16 @@
 </button>
 </li>
 </ul>
+<!-- Grupo: Relatório -->
+<div class="sidebar-section-title">Relatório</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/relatorios" title="Relatório de Notas Fiscais Geradas">
+<span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
+<span class="sidebar-label">Relatório</span>
+</a>
+</li>
+</ul>
 <!-- Grupo: Configurações -->
 <div class="sidebar-section-title">Configurações</div>
 <ul class="nft-sidebar-nav">
@@ -119,33 +129,26 @@
 </div>
 <!-- 3. Rodapé da Sidebar -->
 <div class="nft-sidebar-footer">
-<button class="sidebar-footer-btn sidebar-footer-btn-analisar" onclick="analisarRascunho()" title="Analisar e Verificar Rascunho do XML" type="button">
-<span class="sidebar-icon"><i data-lucide="shield-check"></i></span>
-<span class="sidebar-footer-text">Analisar Rascunho</span>
-</button>
-<button class="sidebar-footer-btn sidebar-footer-btn-warning" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
-<span class="sidebar-icon"><i data-lucide="download"></i></span>
-<span class="sidebar-footer-text">Gerar Novo XML</span>
-</button>
-<div class="sidebar-footer-actions d-flex gap-2">
-<button class="sidebar-footer-btn justify-content-center p-0 flex-fill" onclick="encerrarServidor()" title="Desligar Servidor Local" type="button" style="color: #ef4444 !important; height: 38px;">
-<i data-lucide="power"></i>
-</button>
-<button class="sidebar-footer-btn justify-content-center p-0 flex-fill" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button" style="height: 38px;">
-<i data-lucide="moon"></i>
-</button>
-</div>
-<div class="sidebar-footer-info">
-<span>NFT Logistics</span>
-<span>v2.1</span>
-</div>
+    <div class="sidebar-footer-actions">
+        <button class="sidebar-footer-btn sidebar-footer-btn-power" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
+            <span class="sidebar-icon" style="color: #ef4444 !important;"><i data-lucide="power"></i></span>
+            <span class="sidebar-footer-text" style="color: #ef4444 !important; font-weight: 700;">Desligar</span>
+        </button>
+        <button class="sidebar-footer-btn theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+            <i data-lucide="moon"></i>
+        </button>
+    </div>
+    <div class="sidebar-footer-info">
+        <span>NFT Logistics</span>
+        <span>v2.2</span>
+    </div>
 </div>
 </aside>
 <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
 <div class="nft-main-wrapper">
 <div class="container-fluid px-4 py-3">
 <!-- Top Header Limpo Padronizado -->
-<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
 <div class="d-flex align-items-center gap-3">
 <button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
 <i data-lucide="menu"></i>
@@ -158,42 +161,62 @@
 <small class="text-muted">Importe a Declaração de Importação (DI) ou DUIMP, selecione o Tipo de Nota e salve rascunhos para continuar a edição</small>
 </div>
 </div>
+<div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+<button class="btn btn-sm btn-outline-primary fw-bold d-flex align-items-center gap-1 shadow-sm btn-analisar-rascunho" onclick="analisarRascunho()" title="Analisar e Verificar Rascunho do XML" type="button" style="height: 36px; padding: 0 14px;">
+<i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+<span>Analisar Rascunho</span>
+</button>
+<button class="btn btn-sm btn-warning text-dark fw-bold d-flex align-items-center gap-1 shadow-sm btn-gerar-xml" onclick="generateXML()" title="Gerar e Baixar Arquivo XML da NF-e" type="button" style="height: 36px; padding: 0 14px; background-color: #f59e0b; border-color: #d97706;">
+<i data-lucide="download" style="width: 16px; height: 16px;"></i>
+<span>Download do XML</span>
+</button>
+</div>
 </div>
 <!-- Upload & Rascunhos Card Padronizado (Idêntico ao XML Rascunho) -->
 <div class="card mb-3 shadow-sm border">
 <div class="card-body py-2 px-3">
 <div class="row align-items-end g-2">
 <!-- 1. Campo de Referência Interna -->
-<div class="col-xl-2 col-lg-2 col-md-3">
-<label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
-<i data-lucide="tag"></i>
+<div class="col-xl-2 col-lg-4 col-md-6 col-12">
+<label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1" for="referenciaInterna">
+<i data-lucide="tag" style="width: 14px; height: 14px;"></i>
 <span>Referência Interna:</span>
 </label>
-<input class="form-control form-control-sm font-monospace" id="referenciaInterna" oninput="atualizarReferenciaRascunho(this.value)" placeholder="Ex: REF-2026/001, PO-998" type="text"/>
+<input class="form-control form-control-sm font-monospace" id="referenciaInterna" oninput="atualizarReferenciaRascunho(this.value)" placeholder="Ex: REF-2026/001, PO-998" type="text" style="height: 36px; min-height: 36px; font-size: 0.875rem;"/>
 </div>
 <!-- 2. Arquivo XML ("Escolher ficheiro") -->
-<div class="col-xl-3 col-lg-3 col-md-4">
-<label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1">
-<i data-lucide="file-up"></i>
-<span>Arquivo Extrato Aduaneiro / XML da DI ou DUIMP:</span>
+<div class="col-xl-2 col-lg-4 col-md-6 col-12">
+<label class="form-label fw-bold mb-1 small text-muted d-flex align-items-center gap-1" for="xmlFileInput" title="Arquivo Extrato Aduaneiro / XML da DI ou DUIMP">
+<i data-lucide="file-up" style="width: 14px; height: 14px;"></i>
+<span class="text-truncate">Arquivo DI / DUIMP:</span>
 </label>
-<input accept=".xml" class="form-control form-control-sm" id="xmlFileInput" type="file"/>
+<input accept=".xml" class="form-control form-control-sm" id="xmlFileInput" type="file" style="height: 36px; min-height: 36px; font-size: 0.875rem;"/>
 </div>
 <!-- 3. Botão Carregar e Processar XML -->
-<div class="col-xl-2 col-lg-2 col-md-2">
-<button class="btn-nft w-100 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="uploadXML()">
-<i data-lucide="upload"></i>
+<div class="col-xl-2 col-lg-4 col-md-6 col-12">
+<button class="btn-nft w-100 fw-bold d-flex align-items-center justify-content-center gap-2 text-nowrap" onclick="uploadXML()" type="button" title="Processar arquivo XML de DI ou DUIMP do computador" style="height: 36px; min-height: 36px; font-size: 0.875rem;">
+<i data-lucide="upload" style="width: 15px; height: 15px;"></i>
 <span>Processar XML</span>
 </button>
 </div>
-<!-- 4. Botões de Ação de Rascunho -->
-<div class="col-xl-5 col-lg-5 col-md-12 d-flex align-items-center gap-2">
-<button class="btn-nft fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois">
-<i data-lucide="save"></i>
+<!-- 4. Novo Botão: Puxar DUIMP Online por Número (VERDE PADRÃO) -->
+<div class="col-xl-2 col-lg-4 col-md-6 col-12">
+<button class="btn-nft btn-nft-success-solid w-100 fw-bold d-flex align-items-center justify-content-center gap-2 text-nowrap" onclick="abrirModalImportarDuimp()" type="button" title="Puxar dados oficiais da DUIMP por número (Portal Único Siscomex)" style="height: 36px; min-height: 36px; font-size: 0.875rem;">
+<i data-lucide="cloud-download" style="width: 15px; height: 15px;"></i>
+<span>Puxar DUIMP</span>
+</button>
+</div>
+<!-- 5. Botão Salvar Rascunho -->
+<div class="col-xl-2 col-lg-4 col-md-6 col-12">
+<button class="btn-nft w-100 fw-bold d-flex align-items-center justify-content-center gap-2 text-nowrap" onclick="abrirModalSalvarRascunho()" title="Salvar Rascunho para continuar editando depois" type="button" style="height: 36px; min-height: 36px; font-size: 0.875rem;">
+<i data-lucide="save" style="width: 15px; height: 15px;"></i>
 <span>Salvar</span>
 </button>
-<button class="btn-nft fw-bold d-flex align-items-center justify-content-center gap-2 flex-grow-1" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco" type="button">
-<i data-lucide="rotate-ccw"></i>
+</div>
+<!-- 6. Botão Nova Nota -->
+<div class="col-xl-2 col-lg-4 col-md-6 col-12">
+<button class="btn-nft w-100 fw-bold d-flex align-items-center justify-content-center gap-2 text-nowrap" onclick="limparSessaoTemporariaComConfirmacao()" title="Limpar dados temporários desta página e iniciar uma nota em branco" type="button" style="height: 36px; min-height: 36px; font-size: 0.875rem;">
+<i data-lucide="rotate-ccw" style="width: 15px; height: 15px;"></i>
 <span>Nova Nota</span>
 </button>
 </div>
@@ -305,11 +328,44 @@
 <input id="idDest" type="hidden" value="3"/>
 <input id="cUF" type="hidden" value="35"/>
 <input id="cNF" type="hidden" value=""/>
-<input id="dhEmi" type="hidden" value=""/>
 <input id="mod" type="hidden" value="55"/>
 <input id="tpEmis" type="hidden" value="1"/>
 <input id="cDV" type="hidden" value=""/>
 <input id="verProc" type="hidden" value="4.01_sebrae_b057"/>
+</div>
+
+<!-- DATAS E HORAS DA NOTA (dhEmi e dhSaiEnt) -->
+<div class="col-md-6">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1" for="dhEmi">
+            <i data-lucide="calendar"></i>
+            <span>Data e Hora de Emissão (&lt;dhEmi&gt;)</span>
+        </label>
+        <button class="btn-nft py-0 px-2 text-primary border-primary-subtle" onclick="definirDataHoraAgora('dhEmi')" style="font-size: 11px; height: 22px;" title="Preencher com a data e hora atual" type="button">
+            <i data-lucide="clock" style="width: 12px; height: 12px;"></i> Agora
+        </button>
+    </div>
+    <input class="form-control form-control-sm font-monospace" id="dhEmi" onchange="aoAlterarDataEmissao()" type="datetime-local"/>
+    <small class="text-muted" style="font-size: 11px;">Gera a tag &lt;dhEmi&gt; no XML e atualiza o mês da Chave de Acesso.</small>
+</div>
+
+<div class="col-md-6">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+        <label class="form-label small fw-bold mb-0 d-flex align-items-center gap-1" for="dhSaiEnt">
+            <i data-lucide="truck"></i>
+            <span>Data e Hora Saída/Entrada (&lt;dhSaiEnt&gt;)</span>
+        </label>
+        <div class="d-flex gap-1">
+            <button class="btn-nft py-0 px-2 text-secondary border-secondary-subtle" onclick="copiarDataEmissaoParaSaida()" style="font-size: 11px; height: 22px;" title="Copiar mesma data/hora de emissão" type="button">
+                <i data-lucide="copy" style="width: 12px; height: 12px;"></i> Igual Emissão
+            </button>
+            <button class="btn-nft py-0 px-2 text-primary border-primary-subtle" onclick="definirDataHoraAgora('dhSaiEnt')" style="font-size: 11px; height: 22px;" title="Preencher com a data e hora atual" type="button">
+                <i data-lucide="clock" style="width: 12px; height: 12px;"></i> Agora
+            </button>
+        </div>
+    </div>
+    <input class="form-control form-control-sm font-monospace" id="dhSaiEnt" type="datetime-local"/>
+    <small class="text-muted" style="font-size: 11px;">Gera a tag &lt;dhSaiEnt&gt; no XML da NF-e.</small>
 </div>
 
 <!-- Inputs Ocultos de Apoio ao Meio de Pagamento & Regime Fiscal (configurados em Tipo de Nota e Totais) -->
@@ -391,8 +447,9 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <div class="card-body p-3">
 <div class="row g-3">
 <!-- PAINEL 1: MOEDA E CÂMBIO PTAX DO BANCO CENTRAL -->
-<div class="col-lg-5 col-md-12 border-end-lg">
-<div class="p-3 rounded bg-light border h-100">
+<div class="col-lg-6 col-md-12 border-end-lg">
+<div class="p-3 rounded bg-light border h-100 d-flex flex-column justify-content-between">
+<div>
 <div class="d-flex align-items-center justify-content-between mb-2">
 <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
 <i data-lucide="coins" style="width: 16px; height: 16px;"></i>
@@ -401,12 +458,22 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <span class="badge bg-info-subtle text-info fw-bold" id="badge-boletim-status">API Bacen Olinda</span>
 </div>
 <small class="text-muted d-block mb-3">
-                                                Selecione a moeda e puxe o boletim mais recente da taxa PTAX oficial do Banco Central para cotação aduaneira e registro na NF-e.
-                                            </small>
+Defina a moeda e a taxa PTAX utilizada na operação para fixar a base nos itens ou consulte o boletim mais recente do Banco Central.
+</small>
+
+<!-- SUB-BLOCO 1: CÂMBIO UTILIZADO NA OPERAÇÃO (BASE DOS ITENS) -->
+<div class="p-2 mb-2 rounded bg-white border shadow-sm">
+<div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
+<span class="small fw-bold text-primary d-inline-flex align-items-center gap-1">
+<i data-lucide="arrow-down-to-dot" style="width: 13px; height: 13px;"></i>
+<span>Câmbio Utilizado na Operação</span>
+</span>
+<span class="badge bg-primary-subtle text-primary fw-semibold" style="font-size: 10px;">Base dos Itens</span>
+</div>
 <div class="row g-2">
-<!-- Campo Moeda -->
-<div class="col-sm-7">
-<label class="form-label small fw-bold mb-1">Moeda da Operação</label>
+<!-- Campo Moeda da Operação -->
+<div class="col-sm-6">
+<label class="form-label small fw-bold mb-1" for="ptax_moeda">Moeda da Operação</label>
 <select class="form-select form-select-sm fw-bold border-primary" id="ptax_moeda" onchange="aoMudarMoedaPtax()">
 <option selected="" value="USD">USD - Dólar dos EUA</option>
 <option value="EUR">EUR - Euro</option>
@@ -422,31 +489,59 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </select>
 <input class="form-control form-control-sm mt-1 text-uppercase fw-bold font-monospace" id="ptax_moeda_custom" placeholder="Código (Ex: CNY, EUR)" style="display: none;" type="text"/>
 </div>
+<!-- Campo Taxa PTAX Venda Utilizada -->
+<div class="col-sm-6">
+<label class="form-label small fw-bold mb-1" for="ptax_taxa_utilizada">Taxa PTAX Venda Utilizada</label>
+<div class="input-group input-group-sm">
+<span class="input-group-text font-monospace fw-bold">R$</span>
+<input class="form-control form-control-sm font-monospace text-end fw-bold text-primary" id="ptax_taxa_utilizada" onchange="formatarInputVisualBR(this, 4, 4)" placeholder="0,0000" type="text" title="Taxa PTAX de Venda efetivamente utilizada no faturamento/conversão original dos itens"/>
+</div>
+</div>
+<!-- Botão para Incluir em Todos os Itens -->
+<div class="col-12 mt-2">
+<button class="btn-nft w-100 fw-bold d-inline-flex align-items-center justify-content-center gap-1 shadow-sm text-primary border-primary-subtle" id="btn-aplicar-moeda-taxa-itens" onclick="aplicarMoedaETaxaUtilizadaAosItens()" type="button" title="Inclui esta Moeda e Taxa Utilizada em todos os itens e calcula o valor da moeda (V. Prod ÷ Taxa) como base para recálculo">
+<i data-lucide="check-check" style="width: 15px; height: 15px;"></i>
+<span>Incluir Moeda e Câmbio Base em Todos os Itens</span>
+</button>
+</div>
+</div>
+</div>
+
+<!-- SUB-BLOCO 2: CONSULTA BACEN & RECÁLCULO CAMBIAL -->
+<div class="p-2 rounded bg-white border shadow-sm">
+<div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
+<span class="small fw-bold text-secondary d-inline-flex align-items-center gap-1">
+<i data-lucide="refresh-cw" style="width: 13px; height: 13px;"></i>
+<span>Cotação Bacen &amp; Recálculo</span>
+</span>
+<span class="badge bg-info-subtle text-info fw-semibold" style="font-size: 10px;">Atualização</span>
+</div>
+<div class="row g-2">
 <!-- Data da Cotação -->
-<div class="col-sm-5">
-<label class="form-label small fw-bold mb-1">Data Cotação</label>
+<div class="col-sm-6">
+<label class="form-label small fw-bold mb-1">Data Cotação PTAX</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm" id="ptax_data" type="date"/>
 <button class="btn-nft" onclick="definirDataPtaxHoje()" title="Definir data de hoje" type="button">Hoje</button>
 </div>
 </div>
 <!-- Botão de Consulta à API PTAX -->
-<div class="col-12 mt-2">
-<button class="btn-nft w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()" type="button">
+<div class="col-sm-6 d-flex align-items-end">
+<button class="btn-nft w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-1" id="btn-consultar-ptax" onclick="consultarCotacaoPtax()" type="button" style="height: 31px;">
 <span class="spinner-border spinner-border-sm d-none" id="spinner-ptax" role="status"></span>
-<i data-lucide="zap" style="width: 15px; height: 15px;"></i>
-<span>Puxar Taxa PTAX Atual (Boletim Bacen)</span>
+<i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+<span>Puxar Bacen</span>
 </button>
 </div>
 <!-- Valores de Câmbio Retornados -->
-<div class="col-sm-6 mt-2">
-<label class="form-label small fw-bold mb-1">Taxa PTAX Venda (R$)</label>
+<div class="col-sm-6 mt-1">
+<label class="form-label small fw-bold mb-1 text-primary" for="ptax_cotacao_venda">Nova Taxa PTAX Venda (R$)</label>
 <div class="input-group input-group-sm">
 <span class="input-group-text font-monospace fw-bold">R$</span>
-<input class="form-control form-control-sm font-monospace text-end fw-bold text-primary" id="ptax_cotacao_venda" onchange="formatarInputVisualBR(this, 4, 4)" placeholder="0,0000" type="text"/>
+<input class="form-control form-control-sm font-monospace text-end fw-bold text-primary border-primary" id="ptax_cotacao_venda" onchange="formatarInputVisualBR(this, 4, 4)" placeholder="0,0000" type="text" title="Informe a nova taxa PTAX para recálculo dos itens ou clique em Puxar Bacen"/>
 </div>
 </div>
-<div class="col-sm-6 mt-2">
+<div class="col-sm-6 mt-1">
 <label class="form-label small mb-1 text-muted">Taxa PTAX Compra (R$)</label>
 <div class="input-group input-group-sm">
 <span class="input-group-text font-monospace text-muted">R$</span>
@@ -463,16 +558,19 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <div class="text-muted mt-1"><span id="lbl-boletim-datahora">-</span></div>
 </div>
 </div>
+</div>
+</div>
+
 <!-- Ações de Câmbio -->
-<div class="col-12 mt-2">
+<div class="mt-2">
 <div class="form-check">
 <input checked="" class="form-check-input" id="chk_ptax_infcpl" type="checkbox"/>
 <label class="form-check-label small" for="chk_ptax_infcpl">
-                                                            Gravar taxa de câmbio nas Informações Complementares (<code>infCpl</code>)
-                                                        </label>
+Gravar taxa de câmbio nas Informações Complementares (<code>infCpl</code>)
+</label>
 </div>
 </div>
-<div class="col-12 d-flex flex-wrap gap-2">
+<div class="d-flex flex-wrap gap-2 mt-2">
 <button class="btn-nft flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" onclick="aplicarCotacaoNasObservacoes()" type="button">
 <i data-lucide="file-edit" style="width: 14px; height: 14px;"></i>
 <span>Registrar Câmbio em infCpl</span>
@@ -490,8 +588,9 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 </div>
 </div>
 <!-- PAINEL 2: RATEIO DE DESPESAS GLOBAIS ENTRE OS ITENS -->
-<div class="col-lg-7 col-md-12">
-<div class="p-3 rounded bg-light border h-100">
+<div class="col-lg-6 col-md-12">
+<div class="p-3 rounded bg-light border h-100 d-flex flex-column justify-content-between">
+<div>
 <div class="d-flex align-items-center justify-content-between mb-2">
 <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
 <i data-lucide="scale" style="width: 16px; height: 16px;"></i>
@@ -500,12 +599,22 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <span class="badge bg-info-subtle text-info fw-bold">Divisão Centavo-Exata</span>
 </div>
 <small class="text-muted d-block mb-3">
-                                                Informe o total das despesas da DI. O sistema distribuirá matematicamente os centavos entre os itens da nota.
-                                            </small>
+Informe o total das despesas da DI. O sistema distribuirá matematicamente os centavos entre os itens da nota.
+</small>
+
+<!-- SUB-BLOCO 1: DESPESAS ADUANEIRAS PRINCIPAIS (DI / DUIMP) -->
+<div class="p-2 mb-2 rounded bg-white border shadow-sm">
+<div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
+<span class="small fw-bold text-dark d-inline-flex align-items-center gap-1">
+<i data-lucide="file-spreadsheet" style="width: 13px; height: 13px;"></i>
+<span>Despesas Aduaneiras Principais da DI / DUIMP</span>
+</span>
+<span class="badge bg-info-subtle text-info fw-semibold" style="font-size: 10px;">Aduana / Siscomex</span>
+</div>
 <div class="row g-2">
 <!-- VALOR MARINHA MERCANTE (AFRMM) -->
 <div class="col-sm-6">
-<label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+<label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center" for="rateio_vAFRMM">
 <span class="d-inline-flex align-items-center gap-1"><i data-lucide="anchor" style="width: 13px; height: 13px;"></i> VALOR MARINHA MERCANTE</span>
 <span class="badge font-monospace bg-info-subtle text-info fw-bold" style="font-size: 10px;">vAFRMM (DI)</span>
 </label>
@@ -513,11 +622,11 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <span class="input-group-text font-monospace fw-bold">R$</span>
 <input class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vAFRMM" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
 </div>
-<small class="text-muted" style="font-size: 10.5px;">Adicional Marinha Mercante lançado na Declaração de Importação</small>
+<small class="text-muted d-block mt-0.5" style="font-size: 10.5px;">Adicional Marinha Mercante lançado na Declaração de Importação</small>
 </div>
 <!-- TAXA SISCOMEX -->
 <div class="col-sm-6">
-<label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center">
+<label class="form-label small fw-bold mb-1 d-flex justify-content-between align-items-center" for="rateio_vSiscomex">
 <span class="d-inline-flex align-items-center gap-1"><i data-lucide="landmark" style="width: 13px; height: 13px;"></i> TAXA SISCOMEX</span>
 <span class="badge font-monospace bg-info-subtle text-info fw-bold" style="font-size: 10px;">vDespAdu (II) / vOutro</span>
 </label>
@@ -525,76 +634,95 @@ Aceita exclusivamente números. Ao completar 44 dígitos, a chave é incluída n
 <span class="input-group-text font-monospace fw-bold">R$</span>
 <input class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vSiscomex" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
 </div>
-<small class="text-muted" style="font-size: 10.5px;">Taxa Siscomex da DI lançada em Desp. Aduaneiras e Outras Desp.</small>
+<small class="text-muted d-block mt-0.5" style="font-size: 10.5px;">Taxa Siscomex da DI lançada em Desp. Aduaneiras e Outras Desp.</small>
 </div>
 <!-- Opções de Lançamento da Taxa Siscomex -->
-<div class="col-12 py-1">
-<div class="d-flex flex-wrap gap-3">
-<div class="form-check">
+<div class="col-12 pt-2 border-top mt-1">
+<div class="d-flex flex-wrap gap-x-3 gap-y-1">
+<div class="form-check me-3">
 <input checked="" class="form-check-input" id="chk_siscomex_despadu" type="checkbox"/>
-<label class="form-check-label small" for="chk_siscomex_despadu">
-                                                                Ratear em Despesas Aduaneiras (<code>vDespAdu</code> no grupo II)
-                                                            </label>
+<label class="form-check-label small" for="chk_siscomex_despadu" style="font-size: 11px;">
+Ratear em Despesas Aduaneiras (<code>vDespAdu</code> no grupo II)
+</label>
 </div>
-<div class="form-check">
+<div class="form-check me-3">
 <input checked="" class="form-check-input" id="chk_siscomex_outro" type="checkbox"/>
-<label class="form-check-label small" for="chk_siscomex_outro">
-                                                                Somar em Outras Despesas (<code>vOutro</code>) para compor o Total da NF (<code>vNF</code>)
-                                                            </label>
+<label class="form-check-label small" for="chk_siscomex_outro" style="font-size: 11px;">
+Somar em Outras Despesas (<code>vOutro</code>) para compor Total da NF (<code>vNF</code>)
+</label>
 </div>
 <div class="form-check">
 <input checked="" class="form-check-input" id="chk_siscomex_infcpl" type="checkbox"/>
-<label class="form-check-label small" for="chk_siscomex_infcpl">
-                                                                Atualizar <code>TX SISCOMEX R$: ...</code> nas Observações (<code>infCpl</code>)
-                                                            </label>
+<label class="form-check-label small" for="chk_siscomex_infcpl" style="font-size: 11px;">
+Atualizar <code>TX SISCOMEX R$: ...</code> nas Observações (<code>infCpl</code>)
+</label>
 </div>
 </div>
 </div>
-<!-- Outras Despesas Acessórias de Rateio (Colapsável) -->
-<div class="col-12 mt-1">
-<details class="border rounded p-2 bg-white">
-<summary class="small fw-bold text-muted d-flex align-items-center gap-1" style="cursor: pointer;">
-<i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i>
-<span>Outros Rateios (Frete, Seguro e Outras Despesas Globais)</span>
-</summary>
-<div class="row g-2 mt-2">
+</div>
+</div>
+
+<!-- SUB-BLOCO 2: OUTROS RATEIOS GLOBAIS (FRETE, SEGURO E OUTRAS DESPESAS) - ABERTO -->
+<div class="p-2 mb-2 rounded bg-white border shadow-sm">
+<div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
+<span class="small fw-bold text-dark d-inline-flex align-items-center gap-1">
+<i data-lucide="truck" style="width: 13px; height: 13px;"></i>
+<span>Outros Rateios da Operação (Valores Globais da NF-e)</span>
+</span>
+<span class="badge bg-secondary-subtle text-secondary fw-semibold" style="font-size: 10px;">Aberto / Visível</span>
+</div>
+<div class="row g-2">
 <div class="col-sm-4">
-<label class="form-label small mb-1">Frete Total (vFrete)</label>
+<label class="form-label small fw-bold mb-1" for="rateio_vFrete">Frete Total (vFrete)</label>
 <div class="input-group input-group-sm">
-<span class="input-group-text font-monospace">R$</span>
-<input class="form-control form-control-sm font-monospace text-end" id="rateio_vFrete" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+<span class="input-group-text font-monospace fw-bold">R$</span>
+<input class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vFrete" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
 </div>
+<small class="text-muted d-block mt-0.5" style="font-size: 10px;">Frete internacional / nacional</small>
 </div>
 <div class="col-sm-4">
-<label class="form-label small mb-1">Seguro Total (vSeg)</label>
+<label class="form-label small fw-bold mb-1" for="rateio_vSeg">Seguro Total (vSeg)</label>
 <div class="input-group input-group-sm">
-<span class="input-group-text font-monospace">R$</span>
-<input class="form-control form-control-sm font-monospace text-end" id="rateio_vSeg" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+<span class="input-group-text font-monospace fw-bold">R$</span>
+<input class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vSeg" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
 </div>
+<small class="text-muted d-block mt-0.5" style="font-size: 10px;">Seguro de transporte internacional</small>
 </div>
 <div class="col-sm-4">
-<label class="form-label small mb-1">Outras Despesas (vOutro)</label>
+<label class="form-label small fw-bold mb-1" for="rateio_vOutro">Outras Desp. (vOutro)</label>
 <div class="input-group input-group-sm">
-<span class="input-group-text font-monospace">R$</span>
-<input class="form-control form-control-sm font-monospace text-end" id="rateio_vOutro" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+<span class="input-group-text font-monospace fw-bold">R$</span>
+<input class="form-control form-control-sm font-monospace text-end fw-bold" id="rateio_vOutro" onchange="formatarInputVisualBR(this, 2, 2); verificarAvisoZeradoRateio(this);" placeholder="0,00" type="text"/>
+</div>
+<small class="text-muted d-block mt-0.5" style="font-size: 10px;">Despesas acessórias complementares</small>
 </div>
 </div>
 </div>
-</details>
 </div>
-<!-- Critério de Rateio e Botão de Aplicação -->
-<div class="col-sm-6 mt-2">
-<label class="form-label small fw-bold mb-1">Critério de Proporcionalidade</label>
+
+<!-- SUB-BLOCO 3: CRITÉRIO DE RATEIO E BOTÃO DE APLICAÇÃO -->
+<div class="p-2 rounded bg-white border shadow-sm mt-auto">
+<div class="row g-2 align-items-end">
+<div class="col-sm-6">
+<label class="form-label small fw-bold mb-1" for="rateio_criterio">Critério de Proporcionalidade</label>
 <select class="form-select form-select-sm fw-bold border-secondary" id="rateio_criterio">
 <option selected="" value="vProd">Proporcional ao Valor dos Produtos (vProd)</option>
 <option value="qCom">Proporcional à Quantidade (qCom)</option>
 <option value="igual">Dividir Igualmente entre os Itens</option>
 </select>
 </div>
-<div class="col-sm-6 mt-2 d-flex align-items-end">
-<button class="btn-nft flex-grow-1 d-inline-flex align-items-center justify-content-center gap-1" onclick="executarRateioGlobal()" type="button">
-<i data-lucide="zap" style="width: 14px; height: 14px;"></i> Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)
-                                                    </button>
+<div class="col-sm-6">
+<button class="btn-nft w-100 fw-bold d-inline-flex align-items-center justify-content-center gap-1 shadow-sm" onclick="executarRateioGlobal()" type="button" style="height: 31px;">
+<i data-lucide="zap" style="width: 14px; height: 14px;"></i>
+<span>Executar Rateio nos Itens (<span id="lbl-qtd-itens-rateio">0</span>)</span>
+</button>
+</div>
+<div class="col-12 mt-2 pt-2 border-top">
+<button class="btn-nft w-100 fw-bold d-inline-flex align-items-center justify-content-center gap-2 shadow-sm text-primary border-primary-subtle" id="btn-converter-item-fob" onclick="converterValorItensEmFOB()" type="button" title="Subtrai o valor do frete rateado dos itens no campo V. Unit. Com. para considerar como FOB, zera o frete dos itens e exclui o Frete Total (vFrete) da aba 1. Operação">
+<i data-lucide="package-minus" style="width: 15px; height: 15px;"></i>
+<span>Converter valor do item em FOB</span>
+</button>
+</div>
 </div>
 </div>
 </div>
@@ -808,9 +936,14 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             <span class="fw-bold text-success d-flex align-items-center gap-1">
                 <i data-lucide="shield-check"></i> Certificado Digital (A1)
             </span>
-            <button type="button" class="btn-nft py-0 px-2 d-flex align-items-center gap-1" onclick="verificarStatusCertificado()">
-                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Verificar
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn-nft py-0 px-2 d-flex align-items-center gap-1" onclick="abrirModalImportarCertificado()" title="Importar e instalar certificado digital A1 (.pfx / .p12)">
+                    <i data-lucide="file-key" style="width: 14px; height: 14px;"></i> Importar
+                </button>
+                <button type="button" class="btn-nft py-0 px-2 d-flex align-items-center gap-1" onclick="verificarStatusCertificado()" title="Verificar status e validade do certificado ativo">
+                    <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Verificar
+                </button>
+            </div>
         </div>
         <div class="card-body py-2">
             <div class="row g-2" id="cert-info-container">
@@ -826,13 +959,20 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="card h-100 border mb-3">
 <div class="card-header py-2 d-flex align-items-center gap-2 fw-bold text-secondary"><i data-lucide="building-2" style="width: 15px; height: 15px;"></i> Dados do Emitente</div>
 <div class="card-body py-2">
-<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2"><label class="form-label small fw-bold mb-1">Preencher Dados do Emitente a partir do Cadastro de Empresas</label><select class="form-select form-select-sm" id="select_emitente" onchange="preencherDadosDeCadastro(this, 'emit')"><option value="">Selecione para preencher automaticamente...</option></select></div>
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2 position-relative">
+<label class="form-label small fw-bold mb-1">Preencher Dados do Emitente a partir do Cadastro de Empresas</label>
+<div class="position-relative">
+<input autocomplete="off" class="form-control form-control-sm" id="input_busca_emitente" onblur="aoPerderFocoEmpresa('emit')" onfocus="aoDigitarEmpresaAutocomplete('emit')" oninput="aoDigitarEmpresaAutocomplete('emit')" placeholder="Digite nome, apelido ou CNPJ/CPF para buscar e selecionar..." type="text"/>
+<div class="dropdown-menu shadow w-100 overflow-auto p-1" id="dropdown_menu_busca_emitente" style="max-height: 250px; display: none; position: absolute; z-index: 1060; top: 100%; left: 0;"></div>
+</div>
+<select id="select_emitente" style="display: none;"><option value="">Selecione...</option></select>
+</div>
 <!-- PAÍS DO EMITENTE -->
-<div class="col-md-7">
+<div class="col-md-7 position-relative">
 <label class="form-label small mb-1 fw-bold">País do Emitente (Nome)</label>
-<div class="input-group input-group-sm">
-<input class="form-control form-control-sm fw-bold" id="emit_xPais" list="datalist-paises" onchange="aoMudarPaisEmitente()" oninput="aoDigitarPaisEmitente()" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
-<button class="btn-nft" onclick="resetarPaisParaBrasil('emit')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+<div class="position-relative">
+<input autocomplete="off" class="form-control form-control-sm fw-bold" id="emit_xPais" onblur="aoPerderFocoPais('emit')" onfocus="aoDigitarPaisAutocomplete('emit')" oninput="aoDigitarPaisAutocomplete('emit')" placeholder="Digite para filtrar e selecionar o País..." type="text" value="Brasil"/>
+<div class="dropdown-menu shadow w-100 overflow-auto p-1" id="dropdown_menu_emit_xPais" style="max-height: 250px; display: none; position: absolute; z-index: 1060; top: 100%; left: 0;"></div>
 </div>
 </div>
 <div class="col-md-5">
@@ -906,37 +1046,28 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <span>Dados do Destinatário</span>
 </div>
 <div class="d-flex align-items-center gap-2">
-<button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="abrirModalNovaEmpresaRapido('dest')" style="font-size: 11px; height: 26px; min-height: 26px;" title="Adicionar Nova Empresa ao Cadastro e preencher na Nota" type="button">
-<i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
-<span>+ Adicionar Nova Empresa</span>
-</button>
 <span class="badge font-monospace bg-info-subtle text-info fw-bold" id="lbl-status-pais-dest">Nacional (Brasil)</span>
 </div>
 </div>
 <div class="card-body py-2">
-<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2">
-<div class="d-flex justify-content-between align-items-center mb-1">
-<label class="form-label small fw-bold mb-0">Preencher Dados do Destinatário a partir do Cadastro</label>
-<button class="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-bold d-inline-flex align-items-center gap-1" onclick="abrirModalNovaEmpresaRapido('dest')" style="font-size: 11.5px;" type="button">
-<i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
-<span>+ Adicionar Nova Empresa</span>
-</button>
-</div>
+<div class="row g-2"><div class="col-12 mb-3 border-bottom pb-2 position-relative">
+<label class="form-label small fw-bold mb-1">Preencher Dados do Destinatário a partir do Cadastro</label>
 <div class="input-group input-group-sm">
-<select class="form-select form-select-sm" id="select_destinatario" onchange="preencherDadosDeCadastro(this, 'dest')"><option value="">Selecione para preencher automaticamente...</option></select>
+<input autocomplete="off" class="form-control form-control-sm" id="input_busca_destinatario" onblur="aoPerderFocoEmpresa('dest')" onfocus="aoDigitarEmpresaAutocomplete('dest')" oninput="aoDigitarEmpresaAutocomplete('dest')" placeholder="Digite nome, apelido ou CNPJ/CPF para buscar e selecionar..." type="text"/>
 <button class="btn-nft py-0 px-2 d-inline-flex align-items-center gap-1" onclick="abrirModalNovaEmpresaRapido('dest')" title="Cadastrar nova empresa e aplicar imediatamente à nota" type="button">
 <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
 <span>Nova</span>
 </button>
 </div>
+<div class="dropdown-menu shadow w-100 overflow-auto p-1" id="dropdown_menu_busca_destinatario" style="max-height: 250px; display: none; position: absolute; z-index: 1060; top: 100%; left: 0;"></div>
+<select id="select_destinatario" style="display: none;"><option value="">Selecione...</option></select>
 </div>
 <!-- PAÍS DO DESTINATÁRIO -->
-<div class="col-md-7">
+<div class="col-md-7 position-relative">
 <label class="form-label small mb-1 fw-bold">País do Destinatário (Nome)</label>
-<div class="input-group input-group-sm">
-<input class="form-control form-control-sm fw-bold" id="dest_xPais" list="datalist-paises" onchange="aoMudarPaisDestinatario()" oninput="aoDigitarPaisDestinatario()" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
-<datalist id="datalist-paises"></datalist>
-<button class="btn-nft" onclick="resetarPaisParaBrasil()" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+<div class="position-relative">
+<input autocomplete="off" class="form-control form-control-sm fw-bold" id="dest_xPais" onblur="aoPerderFocoPais('dest')" onfocus="aoDigitarPaisAutocomplete('dest')" oninput="aoDigitarPaisAutocomplete('dest')" placeholder="Digite para filtrar e selecionar o País..." type="text" value="Brasil"/>
+<div class="dropdown-menu shadow w-100 overflow-auto p-1" id="dropdown_menu_dest_xPais" style="max-height: 250px; display: none; position: absolute; z-index: 1060; top: 100%; left: 0;"></div>
 </div>
 </div>
 <div class="col-md-5">
@@ -1070,46 +1201,36 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <div class="tab-pane fade" id="historico-sefaz" role="tabpanel">
     <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
         <div class="d-flex align-items-center gap-2">
-            <span class="badge px-2 py-1 d-flex align-items-center gap-1 bg-info-subtle text-info fw-bold"><i data-lucide="activity"></i> SEFAZ</span>
+            <span class="badge px-2 py-1 d-flex align-items-center gap-1 bg-success-subtle text-success fw-bold"><i data-lucide="activity"></i> SEFAZ</span>
             <span class="text-muted">/</span>
-            <h6 class="mb-0 fw-bold d-flex align-items-center gap-2"><i data-lucide="send"></i> Emissão &amp; Histórico (Homologação)</h6>
+            <h6 class="mb-0 fw-bold d-flex align-items-center gap-2"><i data-lucide="send"></i> Emissão &amp; Histórico</h6>
         </div>
-        <small class="text-muted">Ambiente de Testes (Homologação). Notas emitidas aqui não possuem valor fiscal.</small>
+        <div class="d-flex align-items-center gap-2">
+            <small class="text-muted d-none d-md-inline">Ambiente Oficial de Emissão SEFAZ. Documentos com validade fiscal.</small>
+            <button class="btn btn-dark d-inline-flex align-items-center justify-content-center p-2 rounded shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#modalFerramentasHomologacao" id="btn-ferramentas-homologacao" title="Ferramentas para sistema de homologação" type="button" style="background-color: #111827; width: 34px; height: 34px;">
+                <i data-lucide="file" style="width: 16px; height: 16px; color: #ffffff;"></i>
+            </button>
+        </div>
     </div>
 
     <div class="row g-3">
         <div class="col-12 text-center py-4 border rounded bg-light">
             <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mb-2">
-                <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-enviar-sefaz" onclick="enviarNfeSefaz(2)" type="button">
-                    <i data-lucide="send"></i>
-                    <span>Assinar e Enviar NF-e para SEFAZ (Homologação)</span>
-                </button>
-                <button class="btn-nft btn-nft-warning fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cce-sefaz-homolog" onclick="solicitarCartaCorrecaoHomolog()" title="Emitir Carta de Correção Eletrônica (CC-e) em Homologação" type="button">
-                    <i data-lucide="file-edit"></i>
-                    <span>Carta de Correção (Homologação)</span>
-                </button>
-                <button class="btn-nft btn-nft-danger fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cancelar-sefaz-homolog" onclick="solicitarCancelarNfeHomolog()" title="Cancelar NF-e em Homologação" type="button">
-                    <i data-lucide="x-circle"></i>
-                    <span>Cancelar NF (Homologação)</span>
-                </button>
-            </div>
-            <div class="d-flex align-items-center justify-content-center gap-2 my-2 text-muted small">
-                <span class="border-top flex-grow-1" style="max-width: 140px;"></span>
-                <span class="fw-bold text-uppercase font-monospace text-secondary" style="font-size: 10px; letter-spacing: 0.5px;">Operações em Produção</span>
-                <span class="border-top flex-grow-1" style="max-width: 140px;"></span>
-            </div>
-            <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mt-2">
                 <button class="btn-nft fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-enviar-sefaz-prod" onclick="enviarNfeSefaz(1)" type="button">
                     <i data-lucide="send"></i>
-                    <span>Assinar e Enviar NF-e para SEFAZ (Produção)</span>
+                    <span>Assinar e Enviar NF-e para SEFAZ</span>
                 </button>
-                <button class="btn-nft btn-nft-warning fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cce-sefaz-prod" onclick="solicitarCartaCorrecaoProd()" title="Emitir Carta de Correção Eletrônica (CC-e) em Produção" type="button">
+                <button class="btn-nft btn-nft-info fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-consultar-sefaz-prod" onclick="consultarSituacaoNfeSefazProd()" title="Consultar Situação da NF-e na SEFAZ" type="button">
+                    <i data-lucide="search"></i>
+                    <span>Consultar SEFAZ</span>
+                </button>
+                <button class="btn-nft btn-nft-warning fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cce-sefaz-prod" onclick="solicitarCartaCorrecaoProd()" title="Emitir Carta de Correção Eletrônica (CC-e)" type="button">
                     <i data-lucide="file-edit"></i>
-                    <span>Carta de Correção (Produção)</span>
+                    <span>Carta de Correção</span>
                 </button>
-                <button class="btn-nft btn-nft-danger fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cancelar-sefaz-prod" onclick="solicitarCancelarNfeProd()" title="Cancelar NF-e Homologada em Produção" type="button">
+                <button class="btn-nft btn-nft-danger fw-bold d-inline-flex align-items-center gap-2 shadow" id="btn-cancelar-sefaz-prod" onclick="solicitarCancelarNfeProd()" title="Cancelar NF-e Homologada" type="button">
                     <i data-lucide="x-circle"></i>
-                    <span>Cancelar NF (Produção)</span>
+                    <span>Cancelar NF</span>
                 </button>
             </div>
             <div class="mt-2 text-muted small">Certifique-se de que a nota e o certificado estão válidos antes de emitir ou cancelar eventos fiscais.</div>
@@ -1134,6 +1255,49 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                         <tr><td colspan="7" class="text-muted py-3">Nenhum envio realizado nesta sessão ainda.</td></tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: FERRAMENTAS PARA SISTEMA DE HOMOLOGAÇÃO -->
+<div aria-hidden="true" aria-labelledby="modalFerramentasHomologacaoLabel" class="modal fade" id="modalFerramentasHomologacao" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-dark text-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i data-lucide="file" style="width: 18px; height: 18px;"></i>
+                    <h5 class="modal-title fw-bold mb-0" id="modalFerramentasHomologacaoLabel" style="font-size: 1rem;">
+                        Ferramentas para sistema de homologação
+                    </h5>
+                </div>
+                <button aria-label="Fechar" class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body p-4 text-center bg-light">
+                <p class="small text-muted mb-3">
+                    Ambiente de testes (Homologação). As operações disparadas abaixo não possuem valor fiscal e servem exclusivamente para testes de comunicação e validação de schema.
+                </p>
+                <div class="d-grid gap-2">
+                    <button class="btn-nft fw-bold d-inline-flex align-items-center justify-content-center gap-2 shadow py-2" id="btn-enviar-sefaz" onclick="enviarNfeSefaz(2)" type="button" data-bs-dismiss="modal">
+                        <i data-lucide="send"></i>
+                        <span>Assinar e Enviar NF-e para SEFAZ (Homologação)</span>
+                    </button>
+                    <button class="btn-nft btn-nft-info fw-bold d-inline-flex align-items-center justify-content-center gap-2 shadow py-2" id="btn-consultar-sefaz-homolog" onclick="consultarSituacaoNfeSefazHomolog()" title="Consultar Situação da NF-e na SEFAZ (Homologação)" type="button" data-bs-dismiss="modal">
+                        <i data-lucide="search"></i>
+                        <span>Consultar SEFAZ (Homologação)</span>
+                    </button>
+                    <button class="btn-nft btn-nft-warning fw-bold d-inline-flex align-items-center justify-content-center gap-2 shadow py-2" id="btn-cce-sefaz-homolog" onclick="solicitarCartaCorrecaoHomolog()" title="Emitir Carta de Correção Eletrônica (CC-e) em Homologação" type="button" data-bs-dismiss="modal">
+                        <i data-lucide="file-edit"></i>
+                        <span>Carta de Correção (Homologação)</span>
+                    </button>
+                    <button class="btn-nft btn-nft-danger fw-bold d-inline-flex align-items-center justify-content-center gap-2 shadow py-2" id="btn-cancelar-sefaz-homolog" onclick="solicitarCancelarNfeHomolog()" title="Cancelar NF-e em Homologação" type="button" data-bs-dismiss="modal">
+                        <i data-lucide="x-circle"></i>
+                        <span>Cancelar NF (Homologação)</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer bg-white py-2">
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal" type="button">Fechar</button>
             </div>
         </div>
     </div>
@@ -1673,6 +1837,53 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
     }
 
+    // === MANIPULAÇÃO DE DATA E HORA DA NOTA (dhEmi e dhSaiEnt) ===
+    function converterParaInputDatetime(val) {
+        if (!val) return '';
+        const str = String(val).trim();
+        if (str.length >= 16 && str.includes('T')) {
+            return str.substring(0, 16);
+        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            return `${str}T${h}:${m}`;
+        }
+        return '';
+    }
+
+    function definirDataHoraAgora(fieldId) {
+        const now = new Date();
+        const ano = now.getFullYear();
+        const mes = String(now.getMonth() + 1).padStart(2, '0');
+        const dia = String(now.getDate()).padStart(2, '0');
+        const horas = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const fmt = `${ano}-${mes}-${dia}T${horas}:${min}`;
+        setVal(fieldId, fmt);
+        if (fieldId === 'dhEmi') {
+            aoAlterarDataEmissao();
+        }
+    }
+
+    function copiarDataEmissaoParaSaida() {
+        const dhEmiVal = getVal('dhEmi');
+        if (!dhEmiVal) {
+            definirDataHoraAgora('dhEmi');
+        }
+        setVal('dhSaiEnt', getVal('dhEmi'));
+    }
+
+    function aoAlterarDataEmissao() {
+        // Se a data de saida/entrada estiver vazia, sincroniza automaticamente
+        if (!getVal('dhSaiEnt')) {
+            setVal('dhSaiEnt', getVal('dhEmi'));
+        }
+        // Recalcula o AAMM na chave de acesso SEFAZ
+        calcularChaveAcessoDinamica();
+    }
+
     // === FORMATADORES VISUAIS BR (APENAS PARA LEITURA NO FRONT-END) ===
     function formatarNumeroVisualBR(valor, minDec = 2, maxDec = 2) {
         if (valor === undefined || valor === null || valor === '') return '';
@@ -1721,6 +1932,38 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             }
         }
         return formatarNumeroVisualBR(val, decs, decs);
+    }
+
+    function formatarQTribVisualBR(cell) {
+        const rowData = cell.getRow().getData();
+        const cellEl = cell.getElement();
+        const valVisual = formatarQtdVisualBR(cell);
+
+        const isManual = (rowData.qTrib_manual === true || rowData.qTrib_manual === 'true' || rowData.qTrib_manual === 1);
+        if (isManual) {
+            if (cellEl) {
+                cellEl.classList.add('cell-qtrib-manual');
+                cellEl.title = "Quantidade Tributável editada manualmente (fixada e protegida contra recálculo automático)";
+            }
+            return `<span class="d-inline-flex align-items-center justify-content-end w-100 gap-1"><span>${valVisual}</span><span class="badge-manual-qtrib" title="Editada manualmente"><i data-lucide="edit-3" style="width: 9px; height: 9px;"></i> manual</span></span>`;
+        } else {
+            if (cellEl) {
+                cellEl.classList.remove('cell-qtrib-manual');
+                cellEl.removeAttribute('title');
+            }
+            return valVisual;
+        }
+    }
+
+    function isOperacaoReexportacao() {
+        const nomeOp = String(getVal('select_operacao') || getVal('natOp') || '').toUpperCase();
+        const cfopStr = String(getVal('cfop_padrao') || '').trim();
+        const regime = String(getVal('select_regime_padrao') || '').toUpperCase();
+        return nomeOp.includes('REEXPORTA') || 
+               nomeOp.includes('RETORNO DE FEIRA') || 
+               cfopStr === '7930' || 
+               cfopStr === '7949' || 
+               regime === 'IMUNIDADE';
     }
 
     function formatarUnitarioVisualBR(cell) {
@@ -1890,6 +2133,26 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         return (sel ? sel.value : 'USD') || 'USD';
     }
 
+    function definirMoedaSelecionada(moedaCod) {
+        if (!moedaCod) return;
+        const cod = String(moedaCod).trim().toUpperCase();
+        const sel = document.getElementById('ptax_moeda');
+        const customInput = document.getElementById('ptax_moeda_custom');
+        if (!sel) return;
+        let optExiste = Array.from(sel.options).some(o => o.value === cod);
+        if (optExiste) {
+            sel.value = cod;
+            if (customInput) customInput.style.display = 'none';
+        } else {
+            sel.value = 'OUTRA';
+            if (customInput) {
+                customInput.style.display = 'block';
+                customInput.value = cod;
+            }
+        }
+        aoMudarMoedaPtax();
+    }
+
     function definirDataPtaxHoje() {
         const inputData = document.getElementById('ptax_data');
         if (inputData) {
@@ -1932,6 +2195,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 const compraFmt = formatarNumeroVisualBR(data.cotacao_compra, 4, 4);
                 setVal('ptax_cotacao_venda', vendaFmt);
                 setVal('ptax_cotacao_compra', compraFmt);
+                if (!getVal('ptax_taxa_utilizada')) {
+                    setVal('ptax_taxa_utilizada', vendaFmt);
+                }
 
                 // Atualiza badge de boletim
                 const boxInfo = document.getElementById('box-info-boletim');
@@ -1984,16 +2250,16 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
     }
 
-    function aplicarCotacaoNasObservacoes() {
-        const taxa = getVal('ptax_cotacao_venda');
+    function aplicarCotacaoNasObservacoes(alertar = true) {
+        const taxa = getVal('ptax_cotacao_venda') || getVal('ptax_taxa_utilizada');
         if (!taxa || parseNum(taxa) <= 0) {
-            alert("Puxe ou informe a Taxa PTAX antes de gravar nas observações.");
+            if (alertar) alert("Puxe ou informe a Taxa PTAX antes de gravar nas observações.");
             return;
         }
         const moeda = obterMoedaSelecionada();
         const tipoBoletim = (cotacaoPtaxCache && cotacaoPtaxCache.tipo_boletim) ? cotacaoPtaxCache.tipo_boletim : 'PTAX';
         const dataCotacao = (cotacaoPtaxCache && cotacaoPtaxCache.data_cotacao) ? cotacaoPtaxCache.data_cotacao : (getVal('ptax_data') || '');
-        gravarPtaxEmInfCpl(moeda, taxa, tipoBoletim, dataCotacao, true);
+        gravarPtaxEmInfCpl(moeda, taxa, tipoBoletim, dataCotacao, alertar);
     }
 
     // Funções de manipulação e sincronização da Nota Fiscal Referenciada (refNFe)
@@ -2171,124 +2437,350 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
     }
 
-    async function converterItensComTaxaPtax() {
-        const taxa = parseNum(getVal('ptax_cotacao_venda'));
-        if (taxa <= 0) {
-            alert("Informe ou consulte uma Taxa PTAX válida antes de converter os itens.");
-            return;
-        }
-
-        const itens = (itensTable) ? itensTable.getData() : itensCache;
+    async function executarConversaoCambialItens(modo = 'recalcular') {
+        const itens = (itensTable) ? itensTable.getData() : (itensCache || []);
         if (!itens || itens.length === 0) {
-            alert("Nenhum item carregado para converter.");
+            const avisoItens = "Nenhum item carregado na grade para recalcular a conversão.";
+            if (window.nftAlert) {
+                await window.nftAlert(avisoItens, { title: "Sem Itens", type: "warning" });
+            } else {
+                alert(avisoItens);
+            }
             return;
         }
 
-        // Verifica se algum item já foi convertido anteriormente
-        const itensJaConvertidos = itens.filter(it => parseNum(it.taxa_conversao) > 0);
-        if (itensJaConvertidos.length > 0) {
-            alert(`Atenção: ${itensJaConvertidos.length} item(ns) já possuem conversão de moeda registrada.\n\nPara ajustar com uma nova taxa de câmbio, utilize a opção "Recalcular Conversão". A conversão inicial só pode ser executada 1 única vez.`);
+        // Obtém o PTAX Novo do campo ptax_cotacao_venda (Nova Taxa PTAX Venda)
+        let ptaxNovo = parseNum(getVal('ptax_cotacao_venda'));
+        const taxaCabecalhoUtilizada = parseNum(getVal('ptax_taxa_utilizada'));
+
+        // Se ptax_cotacao_venda estiver zerado, tenta obter de ptax_taxa_utilizada
+        if (ptaxNovo <= 0) {
+            ptaxNovo = taxaCabecalhoUtilizada;
+        }
+
+        if (ptaxNovo <= 0) {
+            const avisoTaxa = "Informe a nova Taxa PTAX no campo 'Nova Taxa PTAX Venda (R$)' ou clique em 'Puxar Bacen' antes de recalcular a conversão.";
+            if (window.nftAlert) {
+                await window.nftAlert(avisoTaxa, { title: "Nova Taxa PTAX Necessária", type: "warning" });
+            } else {
+                alert(avisoTaxa);
+            }
+            const el = document.getElementById('ptax_cotacao_venda') || document.getElementById('ptax_taxa_utilizada');
+            if (el) el.focus();
             return;
         }
 
-        const moeda = obterMoedaSelecionada();
-        const conf = await window.nftConfirm(`Deseja converter os itens usando a Taxa PTAX de R$ ${formatarNumeroVisualBR(taxa, 4, 4)} por ${moeda}?\n\nEsta conversão inicial multiplica os valores unitários (vUnCom/vUnTrib) e total (vProd) dos ${itens.length} itens pela taxa de câmbio.\n(Para trocas posteriores de taxa, utilize o botão "Recalcular Conversão").`, {
-            title: 'Converter Valores com PTAX',
-            type: 'info',
-            confirmText: 'Converter Itens'
-        });
-        if (!conf) {
+        // Verifica se há câmbio utilizado registrado nos itens ou no cabeçalho
+        const temCambioUtilizado = itens.some(it => parseNum(it.taxa_conversao) > 0 || taxaCabecalhoUtilizada > 0 || parseNum(it.vUnCom_moeda_origem) > 0);
+        if (!temCambioUtilizado) {
+            const msgAviso = "Para recalcular a conversão, é necessário informar o 'Câmbio Utilizado' (na coluna do item ou no campo 'Taxa PTAX Venda Utilizada').\n\nInforme a taxa utilizada original para que o sistema possa desconverter o valor dos itens.";
+            if (window.nftAlert) {
+                await window.nftAlert(msgAviso, { title: "Câmbio Utilizado Necessário", type: "warning" });
+            } else {
+                alert(msgAviso);
+            }
+            const elUtilizada = document.getElementById('ptax_taxa_utilizada');
+            if (elUtilizada) elUtilizada.focus();
             return;
         }
 
-        itens.forEach(it => {
-            const vUnComNum = parseNum(it.vUnCom);
-            const qComNum = parseNum(it.qCom) || 1;
-            
-            const novoUnit = vUnComNum * taxa;
-            const novoProd = novoUnit * qComNum;
+        const moeda = (typeof obterMoedaSelecionada === 'function') ? obterMoedaSelecionada() : (getVal('ptax_moeda') || 'USD');
+        const dataPtax = getVal('ptax_data');
+        const dataFmt = dataPtax ? dataPtax.split('-').reverse().join('/') : new Date().toLocaleDateString('pt-BR');
+        const ptaxNovoFmt = formatarNumeroVisualBR(ptaxNovo, 4, 4);
 
-            it.vUnCom = novoUnit.toFixed(4);
-            it.vUnTrib = novoUnit.toFixed(4);
-            it.vProd = novoProd.toFixed(2);
-            it.moeda_conversao = moeda;
-            it.taxa_conversao = taxa.toFixed(4);
+        // Identifica câmbio anterior representativo
+        const itemComTaxa = itens.find(it => parseNum(it.taxa_conversao) > 0);
+        const cambioAnteriorExemplo = itemComTaxa ? parseNum(itemComTaxa.taxa_conversao) : (taxaCabecalhoUtilizada > 0 ? taxaCabecalhoUtilizada : 0);
+        const cambioAnteriorFmt = cambioAnteriorExemplo > 0 ? formatarNumeroVisualBR(cambioAnteriorExemplo, 4, 4) : null;
 
-            // Atualiza Base de Cálculo do II se aplicável
-            const vFrete = parseNum(it.vFrete);
-            const vSeg = parseNum(it.vSeg);
-            it.vBC_II = (novoProd + vFrete + vSeg).toFixed(2);
-        });
-
-        itensCache = itens;
-        if (itensTable) {
-            itensTable.setData(itensCache);
-        }
-        recalcularTotaisDosItens(true);
-        alert(`Conversão com Taxa PTAX (R$ ${formatarNumeroVisualBR(taxa, 4, 4)} / ${moeda}) concluída com sucesso para os ${itens.length} itens!`);
-    }
-
-    async function recalcularConversaoItens() {
-        const novaTaxa = parseNum(getVal('ptax_cotacao_venda'));
-        if (novaTaxa <= 0) {
-            alert("Informe ou consulte a nova Taxa PTAX válida antes de recalcular a conversão.");
-            return;
-        }
-
-        const itens = (itensTable) ? itensTable.getData() : itensCache;
-        if (!itens || itens.length === 0) {
-            alert("Nenhum item carregado para recalcular.");
-            return;
+        // Se a taxa nova for exatamente igual ao câmbio utilizado
+        if (cambioAnteriorExemplo > 0 && Math.abs(ptaxNovo - cambioAnteriorExemplo) < 0.00001) {
+            const msgMesmaTaxa = 
+                `A nova taxa PTAX informada (R$ ${ptaxNovoFmt}) é idêntica ao Câmbio Utilizado atual (R$ ${cambioAnteriorFmt}).\n\n` +
+                `Para recalcular a conversão com uma variação cambial, informe uma taxa diferente no campo "Nova Taxa PTAX Venda (R$)" ou clique em "Puxar Bacen".\n\n` +
+                `Deseja mesmo assim reprocessar a base desconvertida de todos os itens?`;
+            let prosseguir = false;
+            if (window.nftConfirm) {
+                prosseguir = await window.nftConfirm(msgMesmaTaxa, {
+                    title: "Taxa Idêntica ao Câmbio Atual",
+                    type: "warning",
+                    icon: "help-circle",
+                    confirmText: "Sim, Reprocessar",
+                    cancelText: "Ajustar Taxa"
+                });
+            } else {
+                prosseguir = confirm(msgMesmaTaxa.replace(/<[^>]+>/g, ''));
+            }
+            if (!prosseguir) {
+                const elNova = document.getElementById('ptax_cotacao_venda');
+                if (elNova) elNova.focus();
+                return;
+            }
         }
 
-        const moeda = obterMoedaSelecionada();
+        const tituloModal = 'Recalcular Conversão Cambial PTAX';
+        const mensagemAlerta = 
+            `⚠️ <strong>Recálculo de Conversão Cambial PTAX</strong>\n\n` +
+            `Esta ação irá <strong>recalcular todos os itens</strong> da nota fiscal:\n` +
+            `1. Dividirá o <strong>V. Unit. Com.</strong> pelo <strong>Câmbio Utilizado</strong> para apurar o valor desconvertido (moeda de origem);\n` +
+            `2. Multiplicará o valor desconvertido pelo <strong>Novo PTAX (R$ ${ptaxNovoFmt})</strong> gerando o novo V. Unitário e V. Total.\n\n` +
+            `📋 <strong>Parâmetros do Recálculo:</strong>\n` +
+            `• <strong>Moeda:</strong> ${moeda}\n` +
+            (cambioAnteriorFmt ? `• <strong>Câmbio Utilizado Anterior:</strong> R$ ${cambioAnteriorFmt}\n` : '') +
+            `• <strong>Novo Câmbio PTAX:</strong> R$ ${ptaxNovoFmt}\n` +
+            `• <strong>Data da Cotação:</strong> ${dataFmt}\n` +
+            `• <strong>Itens Afetados:</strong> ${itens.length} item(ns)\n\n` +
+            `Deseja confirmar o recálculo dos valores?`;
 
-        // Identifica itens que já têm taxa de conversão registrada
-        const itensConvertidos = itens.filter(it => parseNum(it.taxa_conversao) > 0);
-        if (itensConvertidos.length === 0) {
-            alert("Nenhum item possui taxa de conversão anterior gravada.\n\nExecute primeiro o botão 'Converter Itens' para registrar a moeda e a taxa inicial.");
-            return;
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(mensagemAlerta, {
+                title: tituloModal,
+                type: 'warning',
+                icon: 'refresh-cw',
+                confirmText: 'Sim, Recalcular Conversão',
+                cancelText: 'Cancelar'
+            });
+        } else {
+            confirmado = confirm(mensagemAlerta.replace(/<[^>]+>/g, ''));
         }
 
-        const conf = await window.nftConfirm(`Deseja RECALCULAR a conversão dos ${itens.length} itens para a nova taxa de R$ ${formatarNumeroVisualBR(novaTaxa, 4, 4)} por ${moeda}?\n\nRegra: O valor atual de cada item será dividido pela taxa anterior e multiplicado pela nova taxa do dia.`, {
-            title: 'Recalcular Conversão de Câmbio',
-            type: 'warning',
-            confirmText: 'Recalcular Conversão'
-        });
-        if (!conf) {
+        if (!confirmado) {
             return;
         }
 
         let afetados = 0;
         itens.forEach(it => {
-            const taxaAnterior = parseNum(it.taxa_conversao);
-            if (taxaAnterior > 0) {
-                const vUnComAtual = parseNum(it.vUnCom);
-                const qComNum = parseNum(it.qCom) || 1;
+            const vUnComAtual = parseNum(it.vUnCom);
+            const qComNum = parseNum(it.qCom) || 1;
 
-                // Divide pela taxa anterior para voltar ao valor na moeda estrangeira e multiplica pela nova taxa
-                const novoUnit = (vUnComAtual / taxaAnterior) * novaTaxa;
-                const novoProd = novoUnit * qComNum;
-
-                it.vUnCom = novoUnit.toFixed(4);
-                it.vUnTrib = novoUnit.toFixed(4);
-                it.vProd = novoProd.toFixed(2);
-                it.moeda_conversao = moeda;
-                it.taxa_conversao = novaTaxa.toFixed(4);
-
-                const vFrete = parseNum(it.vFrete);
-                const vSeg = parseNum(it.vSeg);
-                it.vBC_II = (novoProd + vFrete + vSeg).toFixed(2);
-                afetados++;
+            // Obtém o câmbio utilizado do item ou cabeçalho
+            let cambioUtilizado = parseNum(it.taxa_conversao);
+            if (cambioUtilizado <= 0) {
+                cambioUtilizado = taxaCabecalhoUtilizada;
             }
+
+            // Calcula o valor desconvertido na moeda de origem (V. Unit. Moeda)
+            let valorDesconvertidoUnit = 0;
+            if (cambioUtilizado > 0 && vUnComAtual > 0) {
+                // Cálculo solicitado: V. Unit. Com. dividido pelo Câmbio Utilizado
+                valorDesconvertidoUnit = vUnComAtual / cambioUtilizado;
+            } else if (parseNum(it.vUnCom_moeda_origem) > 0) {
+                valorDesconvertidoUnit = parseNum(it.vUnCom_moeda_origem);
+            } else if (cambioUtilizado > 0 && parseNum(it.vProd) > 0) {
+                valorDesconvertidoUnit = (parseNum(it.vProd) / cambioUtilizado) / qComNum;
+            } else {
+                valorDesconvertidoUnit = vUnComAtual;
+            }
+
+            const valorDesconvertidoTotal = valorDesconvertidoUnit * qComNum;
+
+            // Grava a base desconvertida nos itens
+            it.vUnCom_moeda_origem = valorDesconvertidoUnit.toFixed(4);
+            it.vUnTrib_moeda_origem = it.vUnCom_moeda_origem;
+            it.vProd_moeda_origem = valorDesconvertidoTotal.toFixed(2);
+
+            // Multiplica pelo valor do PTAX novo
+            const novoVUnCom = valorDesconvertidoUnit * ptaxNovo;
+            const novoVProd = novoVUnCom * qComNum;
+
+            it.vUnCom = novoVUnCom.toFixed(4);
+            it.vProd = novoVProd.toFixed(2);
+            it.moeda_conversao = moeda;
+            it.taxa_conversao = ptaxNovo.toFixed(4);
+
+            // Preserva Quantidade Tributável (qTrib) se editada manualmente
+            const isManualTrib = (it.qTrib_manual === true || it.qTrib_manual === 'true' || it.qTrib_manual === 1);
+            const qTribNum = parseNum(it.qTrib);
+            if (isManualTrib && qTribNum > 0) {
+                // Mantém qTrib inalterado e apenas recalcula vUnTrib = vProd / qTrib
+                it.vUnTrib = (novoVProd / qTribNum).toFixed(4);
+            } else {
+                it.vUnTrib = novoVUnCom.toFixed(4);
+            }
+
+            // Atualiza Base de Cálculo do II
+            const vFrete = parseNum(it.vFrete);
+            const vSeg = parseNum(it.vSeg);
+            it.vBC_II = (novoVProd + vFrete + vSeg).toFixed(2);
+            afetados++;
         });
 
-        itensCache = itens;
+        // Atualiza a taxa utilizada no cabeçalho para refletir o novo câmbio dos itens
+        setVal('ptax_taxa_utilizada', ptaxNovoFmt);
+
+        // Atualiza grade Tabulator criando nova referência de array e forçando redesenho
+        itensCache = itens.map(it => ({ ...it }));
         if (itensTable) {
-            itensTable.setData(itensCache);
+            itensTable.replaceData(itensCache).then(() => {
+                itensTable.redraw(true);
+            }).catch(() => {
+                itensTable.setData(itensCache);
+                itensTable.redraw(true);
+            });
         }
-        recalcularTotaisDosItens(true);
-        alert(`Recálculo de conversão concluído com sucesso para ${afetados} item(ns)!\nNova Taxa: R$ ${formatarNumeroVisualBR(novaTaxa, 4, 4)} (${moeda}).`);
+        if (typeof recalcularTotaisDosItens === 'function') {
+            recalcularTotaisDosItens(true);
+        }
+        if (typeof atualizarBadgesRateioEItens === 'function') {
+            atualizarBadgesRateioEItens();
+        }
+        if (document.getElementById('chk_ptax_infcpl')?.checked && typeof aplicarCotacaoNasObservacoes === 'function') {
+            aplicarCotacaoNasObservacoes(false);
+        }
+        if (typeof window.nftRegistrarSnapshot === 'function') {
+            window.nftRegistrarSnapshot('Recálculo de Câmbio PTAX');
+        }
+        if (typeof window.triggerAutoSave === 'function') {
+            window.triggerAutoSave();
+        }
+
+        const msgSucesso = `Conversão cambial recalculada com sucesso para os ${afetados} item(ns)!\n\n• Moeda: ${moeda}\n• Novo Câmbio PTAX: R$ ${ptaxNovoFmt}\n• Câmbio Utilizado Atualizado nos Itens: R$ ${ptaxNovoFmt}`;
+        if (window.nftAlert) {
+            await window.nftAlert(msgSucesso, {
+                title: 'Recálculo Concluído com Sucesso',
+                type: 'success',
+                icon: 'check-circle-2'
+            });
+        } else {
+            alert(msgSucesso);
+        }
+    }
+
+    async function aplicarMoedaETaxaUtilizadaAosItens() {
+        const moeda = (typeof obterMoedaSelecionada === 'function') ? obterMoedaSelecionada() : (getVal('ptax_moeda') || 'USD');
+        let taxa = parseNum(getVal('ptax_taxa_utilizada'));
+        if (taxa <= 0) {
+            taxa = parseNum(getVal('ptax_cotacao_venda'));
+            if (taxa > 0) {
+                setVal('ptax_taxa_utilizada', formatarNumeroVisualBR(taxa, 4, 4));
+            }
+        }
+
+        if (taxa <= 0) {
+            const msgAviso = "Informe uma 'Taxa PTAX Venda Utilizada' válida (maior que zero) antes de incluir nos itens.";
+            if (window.nftAlert) {
+                await window.nftAlert(msgAviso, { title: "Taxa PTAX Necessária", type: "warning" });
+            } else {
+                alert(msgAviso);
+            }
+            const el = document.getElementById('ptax_taxa_utilizada') || document.getElementById('ptax_cotacao_venda');
+            if (el) el.focus();
+            return;
+        }
+
+        const itens = (itensTable) ? itensTable.getData() : (itensCache || []);
+        if (!itens || itens.length === 0) {
+            const msgSemItens = "Nenhum item carregado na grade para aplicar a moeda e taxa.";
+            if (window.nftAlert) {
+                await window.nftAlert(msgSemItens, { title: "Sem Itens", type: "warning" });
+            } else {
+                alert(msgSemItens);
+            }
+            return;
+        }
+
+        const taxaFmt = formatarNumeroVisualBR(taxa, 4, 4);
+        const msgConfirm = 
+            `⚠️ <strong>Fixar Moeda e Câmbio de Base nos Itens</strong>\n\n` +
+            `Deseja incluir a moeda <strong>${moeda}</strong> e a taxa PTAX utilizada de <strong>R$ ${taxaFmt}</strong> em todos os <strong>${itens.length}</strong> item(ns)?\n\n` +
+            `⚙️ <strong>Impacto nos Itens:</strong>\n` +
+            `• <strong>Moeda Conv.:</strong> gravada como <em>${moeda}</em>;\n` +
+            `• <strong>Câmbio Utilizado:</strong> gravado como <em>R$ ${taxaFmt}</em>;\n` +
+            `• <strong>Valor da Moeda (Base de Recálculo):</strong> calculado dividindo o valor em Reais pela taxa utilizada (<em>V. Prod ÷ Taxa</em> e <em>V. Unit ÷ Taxa</em>), permitindo futuros recálculos de câmbio exatos e seguros.`;
+
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(msgConfirm, {
+                title: 'Confirmar Aplicação nos Itens',
+                type: 'info',
+                icon: 'coins',
+                confirmText: 'Sim, Incluir nos Itens',
+                cancelText: 'Cancelar'
+            });
+        } else {
+            confirmado = confirm(msgConfirm.replace(/<[^>]+>/g, ''));
+        }
+
+        if (!confirmado) return;
+
+        if (window.nftRegistrarSnapshot) {
+            window.nftRegistrarSnapshot('Inclusão de Moeda e Taxa PTAX Base nos Itens');
+        }
+
+        let afetados = 0;
+        itens.forEach(it => {
+            const qCom = parseNum(it.qCom) || 1;
+            const vProdBRL = parseNum(it.vProd);
+            const vUnComBRL = parseNum(it.vUnCom);
+            const vUnTribBRL = parseNum(it.vUnTrib || it.vUnCom);
+
+            let vProdMoeda = 0;
+            let vUnComMoeda = 0;
+            let vUnTribMoeda = 0;
+
+            if (vProdBRL > 0) {
+                vProdMoeda = vProdBRL / taxa;
+                vUnComMoeda = (vUnComBRL > 0) ? (vUnComBRL / taxa) : (vProdMoeda / qCom);
+                vUnTribMoeda = (vUnTribBRL > 0) ? (vUnTribBRL / taxa) : vUnComMoeda;
+            } else if (parseNum(it.vProd_moeda_origem) > 0) {
+                vProdMoeda = parseNum(it.vProd_moeda_origem);
+                vUnComMoeda = parseNum(it.vUnCom_moeda_origem) || (vProdMoeda / qCom);
+                vUnTribMoeda = parseNum(it.vUnTrib_moeda_origem) || vUnComMoeda;
+                it.vProd = (vProdMoeda * taxa).toFixed(2);
+                it.vUnCom = (vUnComMoeda * taxa).toFixed(4);
+                it.vUnTrib = (vUnTribMoeda * taxa).toFixed(4);
+            }
+
+            it.moeda_conversao = moeda;
+            it.taxa_conversao = taxa.toFixed(4);
+            it.vProd_moeda_origem = vProdMoeda.toFixed(2);
+            it.vUnCom_moeda_origem = vUnComMoeda.toFixed(4);
+            it.vUnTrib_moeda_origem = vUnTribMoeda.toFixed(4);
+            afetados++;
+        });
+
+        itensCache = itens.map(it => ({ ...it }));
+        if (itensTable) {
+            itensTable.replaceData(itensCache).then(() => {
+                itensTable.redraw(true);
+            }).catch(() => {
+                itensTable.setData(itensCache);
+                itensTable.redraw(true);
+            });
+        }
+        if (typeof recalcularTotaisDosItens === 'function') {
+            recalcularTotaisDosItens(true);
+        }
+        if (typeof atualizarBadgesRateioEItens === 'function') {
+            atualizarBadgesRateioEItens();
+        }
+        if (document.getElementById('chk_ptax_infcpl')?.checked && typeof aplicarCotacaoNasObservacoes === 'function') {
+            aplicarCotacaoNasObservacoes(false);
+        }
+        if (typeof window.triggerAutoSave === 'function') {
+            window.triggerAutoSave();
+        }
+
+        const msgSucesso = `Moeda ${moeda} e Câmbio PTAX R$ ${taxaFmt} incluídos com sucesso em todos os ${afetados} item(ns)!\n\nOs valores da moeda de origem foram calculados e registrados como base de recálculo cambial.`;
+        if (window.nftAlert) {
+            await window.nftAlert(msgSucesso, {
+                title: 'Itens Atualizados com Sucesso',
+                type: 'success',
+                icon: 'check-circle-2'
+            });
+        } else {
+            alert(msgSucesso);
+        }
+    }
+
+    async function converterItensComTaxaPtax() {
+        return executarConversaoCambialItens('converter');
+    }
+
+    async function recalcularConversaoItens() {
+        return executarConversaoCambialItens('recalcular');
     }
 
     // === ALGORITMO DE RATEIO PROPORCIONAL CENTAVO-EXATO (HARE-NIEMEYER) ===
@@ -2344,6 +2836,10 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         if (!itens || itens.length === 0) {
             alert("Nenhum item carregado para executar o rateio. Importe um XML de modelo primeiro.");
             return;
+        }
+
+        if (window.nftRegistrarSnapshot) {
+            window.nftRegistrarSnapshot('Rateio de Despesas');
         }
 
         const vAFRMM = parseNum(getVal('rateio_vAFRMM'));
@@ -2502,6 +2998,158 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         executarRateioGlobal(false);
     }
 
+    async function converterValorItensEmFOB() {
+        const itens = (itensTable) ? itensTable.getData() : (itensCache || []);
+        if (!itens || itens.length === 0) {
+            const msgSemItens = "Nenhum item carregado na grade para converter em FOB.";
+            if (window.nftAlert) await window.nftAlert(msgSemItens, { title: "Sem Itens", type: "warning" });
+            else alert(msgSemItens);
+            return;
+        }
+
+        // Verifica se os itens possuem frete rateado ou se há frete no cabeçalho
+        const freteTotalItens = itens.reduce((acc, it) => acc + (parseNum(it.vFrete) || 0), 0);
+        const freteCabecalho = parseNum(getVal('rateio_vFrete'));
+
+        if (freteTotalItens <= 0 && freteCabecalho <= 0) {
+            const msgSemFrete = "Não há valor de frete nos itens nem no campo 'Frete Total (vFrete)' da aba '1. Operação' para abater e converter em FOB.";
+            if (window.nftAlert) await window.nftAlert(msgSemFrete, { title: "Frete Não Encontrado", type: "warning" });
+            else alert(msgSemFrete);
+            return;
+        }
+
+        const valorFreteFmt = formatarNumeroVisualBR(freteTotalItens > 0 ? freteTotalItens : freteCabecalho, 2, 2);
+        const qtdItensComFrete = itens.filter(it => parseNum(it.vFrete) > 0).length || itens.length;
+
+        const msgConfirmacao = 
+            `⚠️ <strong>Converter Valor dos Itens em FOB</strong>\n\n` +
+            `Esta ação irá converter os valores dos itens para <strong>FOB (Free On Board)</strong> abatendo o frete:\n\n` +
+            `• <strong>Subtrair o frete rateado</strong> de cada item do seu <strong>Valor Unitário (V. Unit. Com.)</strong> e <strong>Valor Total (vProd)</strong>;\n` +
+            `• <strong>Zerar o valor de Frete (vFrete)</strong> de todos os ${itens.length} item(ns);\n` +
+            `• <strong>Excluir o 'Frete Total (vFrete)'</strong> da aba <em>1. Operação</em>;\n` +
+            `• <strong>Recalcular automaticamente os totais</strong> da NF-e (vProd, tot_vFrete e vNF).\n\n` +
+            `📋 <strong>Resumo:</strong>\n` +
+            `• Total de Frete a ser abatido: <strong>R$ ${valorFreteFmt}</strong>\n` +
+            `• Itens impactados: <strong>${qtdItensComFrete}</strong> item(ns)\n\n` +
+            `Deseja prosseguir com a conversão para FOB?`;
+
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(msgConfirmacao, {
+                title: "Converter Itens em FOB",
+                type: "warning",
+                icon: "package-minus",
+                confirmText: "Sim, Converter em FOB",
+                cancelText: "Cancelar"
+            });
+        } else {
+            confirmado = confirm(msgConfirmacao.replace(/<[^>]+>/g, ''));
+        }
+
+        if (!confirmado) return;
+
+        if (window.nftRegistrarSnapshot) {
+            window.nftRegistrarSnapshot('Antes de Converter Itens em FOB');
+        }
+
+        // Se os itens ainda não tinham frete rateado individualmente, mas o cabeçalho tinha frete:
+        let distFrete = null;
+        if (freteTotalItens <= 0 && freteCabecalho > 0) {
+            const criterio = (document.getElementById('rateio_criterio')?.value) || 'vProd';
+            distFrete = calcularRateioProporcional(itens, freteCabecalho, criterio, 2);
+        }
+
+        let totalAbatido = 0;
+        let itensAlterados = 0;
+
+        itens.forEach((it, idx) => {
+            const qCom = parseNum(it.qCom) || 1;
+            const qTrib = parseNum(it.qTrib) || qCom;
+            const vUnComAtual = parseNum(it.vUnCom);
+            const vProdAtual = parseNum(it.vProd);
+
+            // Determina o frete deste item (já rateado ou proporcional)
+            const vFreteItem = (distFrete) ? parseNum(distFrete[idx]) : (parseNum(it.vFrete) || 0);
+
+            if (vFreteItem > 0) {
+                totalAbatido += vFreteItem;
+                itensAlterados++;
+
+                // Subtrai o frete do valor total e unitário
+                const novoVProd = Math.max(0, vProdAtual - vFreteItem);
+                const novoVUnCom = novoVProd / qCom;
+
+                it.vProd = novoVProd.toFixed(2);
+                it.vUnCom = novoVUnCom.toFixed(4);
+                it.vUnTrib = (novoVProd / qTrib).toFixed(4);
+
+                // Se o item possuir base em moeda estrangeira gravada, atualiza também
+                const taxa = parseNum(it.taxa_conversao) || parseNum(getVal('ptax_taxa_utilizada')) || parseNum(getVal('ptax_cotacao_venda'));
+                if (taxa > 0) {
+                    it.vProd_moeda_origem = (novoVProd / taxa).toFixed(2);
+                    it.vUnCom_moeda_origem = (novoVUnCom / taxa).toFixed(4);
+                    it.vUnTrib_moeda_origem = it.vUnCom_moeda_origem;
+                }
+
+                // Zera o frete do item
+                it.vFrete = '0.00';
+
+                // Recalcula Base de Cálculo do II (vBC_II = novoVProd + vFrete (0) + vSeg)
+                const vSeg = parseNum(it.vSeg);
+                it.vBC_II = (novoVProd + vSeg).toFixed(2);
+            } else {
+                it.vFrete = '0.00';
+                const vSeg = parseNum(it.vSeg);
+                it.vBC_II = (vProdAtual + vSeg).toFixed(2);
+            }
+        });
+
+        // Exclui o Frete Total da aba 1. Operação
+        setVal('rateio_vFrete', '0,00');
+        const fbFrete = document.getElementById('fb-rateio_vFrete');
+        if (fbFrete) fbFrete.innerHTML = '';
+
+        // Atualiza a grade Tabulator
+        itensCache = itens.map(it => ({ ...it }));
+        if (itensTable) {
+            itensTable.replaceData(itensCache).then(() => {
+                itensTable.redraw(true);
+            }).catch(() => {
+                itensTable.setData(itensCache);
+                itensTable.redraw(true);
+            });
+        }
+
+        // Recalcula totais dos itens (tot_vProd, tot_vFrete = 0, vNF, etc.)
+        if (typeof recalcularTotaisDosItens === 'function') {
+            recalcularTotaisDosItens(true);
+        }
+        if (typeof atualizarBadgesRateioEItens === 'function') {
+            atualizarBadgesRateioEItens();
+        }
+        if (typeof window.nftRegistrarSnapshot === 'function') {
+            window.nftRegistrarSnapshot('Itens Convertidos em FOB');
+        }
+        if (typeof window.triggerAutoSave === 'function') {
+            window.triggerAutoSave();
+        }
+
+        const msgSucesso = `Conversão para FOB concluída com sucesso!\n\n` +
+            `• ${itensAlterados} item(ns) tiveram o frete subtraído de seus valores;\n` +
+            `• Total de frete abatido: R$ ${formatarNumeroVisualBR(totalAbatido, 2, 2)};\n` +
+            `• Frete dos itens e 'Frete Total (vFrete)' da aba 1 zerados com sucesso.`;
+
+        if (window.nftAlert) {
+            await window.nftAlert(msgSucesso, {
+                title: "Conversão em FOB Concluída",
+                type: "success",
+                icon: "check-circle-2"
+            });
+        } else {
+            alert(msgSucesso);
+        }
+    }
+
     function abrirPainelRateio() {
         const tabEl = document.getElementById('cabecalho-tab');
         if (tabEl) {
@@ -2554,6 +3202,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
     // CSTs Oficiais e Estruturas de Seleção
     let cstMapDescricao = {};
+    let cstMapICMS = {};
+    let cstMapIPI = {};
+    let cstMapPIS = {};
     let cstOptionsICMS = [];
     let cstOptionsIPI = [];
     let cstOptionsPIS = [];
@@ -2562,7 +3213,17 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         const val = cell.getValue();
         if (!val) return '';
         const clean = String(val).split(' - ')[0].trim();
-        const desc = cstMapDescricao[clean] || val;
+        const field = cell.getField ? cell.getField() : '';
+        let desc = '';
+        if (field === 'CST_IPI') {
+            desc = cstMapIPI[clean] || cstMapDescricao[clean] || val;
+        } else if (field === 'CSOSN') {
+            desc = cstMapICMS[clean] || cstMapDescricao[clean] || val;
+        } else if (field === 'CST_PIS' || field === 'CST_COFINS') {
+            desc = cstMapPIS[clean] || cstMapDescricao[clean] || val;
+        } else {
+            desc = cstMapDescricao[clean] || val;
+        }
         return `<span title="${desc}" class="fw-semibold text-truncate d-inline-block" style="max-width: 100%; cursor: pointer;">${desc}</span>`;
     }
 
@@ -2642,6 +3303,14 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             const data = await resp.json();
             if (data.status === 'success' && data.csts) {
                 cstMapDescricao = {};
+                cstMapICMS = {};
+                cstMapIPI = {};
+                cstMapPIS = {};
+
+                (data.csts.icms_csosn || []).forEach(c => { cstMapICMS[c.codigo] = c.codigo_descricao; });
+                (data.csts.ipi || []).forEach(c => { cstMapIPI[c.codigo] = c.codigo_descricao; });
+                (data.csts.pis_cofins || []).forEach(c => { cstMapPIS[c.codigo] = c.codigo_descricao; });
+
                 data.csts.all.forEach(c => {
                     cstMapDescricao[c.codigo] = c.codigo_descricao;
                 });
@@ -2777,6 +3446,10 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         }
 
         if (!confirmado) return;
+
+        if (window.nftRegistrarSnapshot) {
+            window.nftRegistrarSnapshot(qtd === 1 ? 'Exclusão de 1 Item' : `Exclusão de ${qtd} Itens`);
+        }
 
         const selectedData = selectedRows.map(r => r.getData());
         itensCache = itensCache.filter(it => !selectedData.includes(it));
@@ -3044,10 +3717,12 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         {title:"Qtd. Com.", field:"qCom", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Com.", field:"vUnCom", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Total Prod.", field:"vProd", width:125, hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, cssClass:"fw-bold text-primary"},
+        {title:"V. Unit. (Moeda)", field:"vUnCom_moeda_origem", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero, cssClass:"font-monospace text-info"},
+        {title:"V. Total (Moeda)", field:"vProd_moeda_origem", width:125, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero, cssClass:"font-monospace text-info fw-semibold"},
         {title:"Moeda Conv.", field:"moeda_conversao", width:85, hozAlign:"center", headerHozAlign:"center", cssClass:"font-monospace fw-semibold text-secondary"},
         {title:"Câmbio Utilizado", field:"taxa_conversao", width:125, hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, cssClass:"font-monospace text-secondary"},
         {title:"Un. Trib.", field:"uTrib", width:85, editor:"input"},
-        {title:"Qtd. Trib.", field:"qTrib", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQtdVisualBR, mutatorEdit:mutatorLimparNumero},
+        {title:"Qtd. Trib.", field:"qTrib", width:115, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarQTribVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"V. Unit. Trib.", field:"vUnTrib", width:120, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarUnitarioVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"Frete", field:"vFrete", width:95, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
         {title:"Outras Desp.", field:"vOutro", width:105, editor:"input", hozAlign:"right", headerHozAlign:"right", formatter:formatarMoedaVisualBR, mutatorEdit:mutatorLimparNumero},
@@ -3085,6 +3760,12 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
     document.addEventListener('DOMContentLoaded', function() {
         // 1. Carregar Operações cadastradas do banco e CSTs oficiais
+        if (!getVal('dhEmi')) {
+            definirDataHoraAgora('dhEmi');
+        }
+        if (!getVal('dhSaiEnt')) {
+            copiarDataEmissaoParaSaida();
+        }
         carregarCSTsOficiais();
         carregarTiposOperacao();
         carregarFeirasParaInfCpl();
@@ -3099,7 +3780,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         atualizarBadgesRateioEItens();
 
         // Listeners para atualizar badges quando valores forem alterados
-        ['rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vOutro', 'rateio_vFrete', 'ptax_cotacao_venda'].forEach(id => {
+        ['rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vOutro', 'rateio_vFrete', 'ptax_cotacao_venda', 'ptax_taxa_utilizada'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener('input', atualizarBadgesRateioEItens);
@@ -3139,12 +3820,15 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             if (campo === 'qTrib') {
                 const qTribVal = parseNum(cell.getValue());
                 const vProdVal = parseNum(d.vProd);
+                const isManual = (qTribVal > 0);
+                const updates = { qTrib_manual: isManual };
                 if (qTribVal > 0 && vProdVal > 0) {
-                    const novoVUnTrib = (vProdVal / qTribVal).toFixed(4);
-                    row.update({ vUnTrib: novoVUnTrib });
+                    updates.vUnTrib = (vProdVal / qTribVal).toFixed(4);
                 } else if (!cell.getValue() || cell.getValue() === '' || qTribVal <= 0) {
-                    row.update({ vUnTrib: '' });
+                    updates.vUnTrib = '';
                 }
+                row.update(updates);
+                cell.checkHeight();
             } else if (campo === 'vProd') {
                 const qTribVal = parseNum(d.qTrib);
                 const vProdVal = parseNum(cell.getValue());
@@ -3179,7 +3863,34 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     if (qTribVal > 0) {
                         updates.vUnTrib = (parseNum(novoVProd) / qTribVal).toFixed(4);
                     }
+                    const taxaAnterior = parseNum(d.taxa_conversao) || parseNum(getVal('ptax_taxa_utilizada')) || parseNum(getVal('ptax_cotacao_venda'));
+                    if (taxaAnterior > 0) {
+                        updates.vProd_moeda_origem = (parseNum(novoVProd) / taxaAnterior).toFixed(2);
+                        updates.vUnCom_moeda_origem = (vUnComNum / taxaAnterior).toFixed(4);
+                    }
                     row.update(updates);
+                }
+            } else if (campo === 'vUnCom_moeda_origem' || campo === 'vProd_moeda_origem') {
+                const taxa = parseNum(d.taxa_conversao) || parseNum(getVal('ptax_taxa_utilizada')) || parseNum(getVal('ptax_cotacao_venda'));
+                if (taxa > 0) {
+                    const qComNum = parseNum(d.qCom) || 1;
+                    const vFreteNum = parseNum(d.vFrete);
+                    const vSegNum = parseNum(d.vSeg);
+                    if (campo === 'vUnCom_moeda_origem') {
+                        const vUnMoeda = parseNum(cell.getValue());
+                        const novoVUnCom = (vUnMoeda * taxa).toFixed(4);
+                        const novoVProd = (parseNum(novoVUnCom) * qComNum).toFixed(2);
+                        const novoVProdMoeda = (vUnMoeda * qComNum).toFixed(2);
+                        const novoBCII = (parseNum(novoVProd) + vFreteNum + vSegNum).toFixed(2);
+                        row.update({ vUnCom: novoVUnCom, vProd: novoVProd, vProd_moeda_origem: novoVProdMoeda, vBC_II: novoBCII });
+                    } else {
+                        const vProdMoeda = parseNum(cell.getValue());
+                        const novoVProd = (vProdMoeda * taxa).toFixed(2);
+                        const novoVUnCom = (parseNum(novoVProd) / qComNum).toFixed(4);
+                        const novoVUnMoeda = (vProdMoeda / qComNum).toFixed(4);
+                        const novoBCII = (parseNum(novoVProd) + vFreteNum + vSegNum).toFixed(2);
+                        row.update({ vProd: novoVProd, vUnCom: novoVUnCom, vUnCom_moeda_origem: novoVUnMoeda, vBC_II: novoBCII });
+                    }
                 }
             } else if (campo === 'vFrete' || campo === 'vSeg') {
                 // Atualização automática de BC II ao alterar componentes aduaneiros do frete ou seguro
@@ -3190,7 +3901,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 row.update({ vBC_II: novoBCII });
             }
 
-            if (['vProd', 'vFrete', 'vOutro', 'vIPI', 'vII', 'vPIS', 'vCOFINS', 'vBC_IPI', 'vBC_II', 'vBC_PIS', 'vBC_COFINS', 'vAFRMM', 'vDespAdu', 'qCom', 'vUnCom'].includes(campo)) {
+            if (['vProd', 'vFrete', 'vOutro', 'vIPI', 'vII', 'vPIS', 'vCOFINS', 'vBC_IPI', 'vBC_II', 'vBC_PIS', 'vBC_COFINS', 'vAFRMM', 'vDespAdu', 'qCom', 'vUnCom', 'vProd_moeda_origem', 'vUnCom_moeda_origem'].includes(campo)) {
                 recalcularTotaisDosItens(true);
                 atualizarBadgesRateioEItens();
             }
@@ -3344,6 +4055,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         const ncms = itens.map(it => it.NCM).filter(Boolean);
         const ncmMap = await obterUnidadesTributaveisNCM(ncms);
         const pesoLTotal = parseNum(getVal('transp_pesoL'));
+        const ehReexportacao = (typeof isOperacaoReexportacao === 'function') ? isOperacaoReexportacao() : false;
 
         const itensKGIndices = [];
         const itensManuais = [];
@@ -3358,6 +4070,18 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
             const uComUpper = String(it.uCom || '').trim().toUpperCase();
             const vProdNum = parseNum(it.vProd);
+            const isManualTrib = (it.qTrib_manual === true || it.qTrib_manual === 'true' || it.qTrib_manual === 1);
+
+            // Se for reexportação ou se tiver quantidade tributável manual já inserida, preserva estritamente
+            if (isManualTrib || (ehReexportacao && parseNum(it.qTrib) > 0)) {
+                it.qTrib_manual = true;
+                const qTribNum = parseNum(it.qTrib);
+                if (vProdNum > 0 && qTribNum > 0) {
+                    it.vUnTrib = (vProdNum / qTribNum).toFixed(4);
+                }
+                itensProcessados++;
+                return;
+            }
 
             // Se a unidade comercial já for idêntica à tributável oficial
             if (uComUpper && uComUpper === uTribOficial) {
@@ -3494,8 +4218,15 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         if (!cfopStr.startsWith('7') || tpNfStr !== '1') return;
 
         const pesoLTotal = parseNum(getVal('transp_pesoL'));
+        const ehReexportacao = (typeof isOperacaoReexportacao === 'function') ? isOperacaoReexportacao() : false;
+
         const itensKGIndices = [];
         itens.forEach((it, idx) => {
+            const isManualTrib = (it.qTrib_manual === true || it.qTrib_manual === 'true' || it.qTrib_manual === 1);
+            if (isManualTrib || (ehReexportacao && parseNum(it.qTrib) > 0)) {
+                // Item manual ou reexportação com dado inserido: não sobrescreve
+                return;
+            }
             if ((it.uTrib || '').trim().toUpperCase() === 'KG') {
                 itensKGIndices.push(idx);
             }
@@ -3522,10 +4253,10 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         const op = operacoesCache.find(o => o.nome_operacao.toUpperCase() === (nomeOp || '').toUpperCase());
         if (op) {
             document.getElementById('lbl-operacao-ativa').innerText = `(${op.cfop_padrao}) ${op.nome_operacao}`;
-            const descIcms = cstMapDescricao[op.csosn_icms] || op.csosn_icms || '-';
-            const descIpi = cstMapDescricao[op.cst_ipi] || op.cst_ipi || '-';
-            const descPis = cstMapDescricao[op.cst_pis] || op.cst_pis || '-';
-            const descCofins = cstMapDescricao[op.cst_cofins] || op.cst_cofins || '-';
+            const descIcms = cstMapICMS[op.csosn_icms] || cstMapDescricao[op.csosn_icms] || op.csosn_icms || '-';
+            const descIpi = cstMapIPI[op.cst_ipi] || cstMapDescricao[op.cst_ipi] || op.cst_ipi || '-';
+            const descPis = cstMapPIS[op.cst_pis] || cstMapDescricao[op.cst_pis] || op.cst_pis || '-';
+            const descCofins = cstMapPIS[op.cst_cofins] || cstMapDescricao[op.cst_cofins] || op.cst_cofins || '-';
             document.getElementById('lbl-icms-ativo').innerText = op.csosn_icms || '-';
             document.getElementById('lbl-icms-ativo').title = descIcms;
             document.getElementById('lbl-ipi-ativo').innerText = op.cst_ipi || '-';
@@ -4087,6 +4818,156 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             });
     }
 
+    // === IMPORTAÇÃO DE DUIMP POR NÚMERO (API SISCOMEX) ===
+    function abrirModalImportarDuimp() {
+        const input = document.getElementById('inputNumeroDuimp');
+        if (input) {
+            input.value = '';
+            const refAtual = (getVal('referenciaInterna') || '').trim().toUpperCase();
+            if (refAtual && refAtual.includes('BR')) {
+                input.value = refAtual;
+            }
+        }
+        const modalEl = document.getElementById('modalImportarDuimp');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+            setTimeout(() => {
+                if (input) input.focus();
+                if (window.lucide) lucide.createIcons();
+            }, 200);
+        }
+    }
+
+    async function acionarConfirmacaoImportarDuimp() {
+        const input = document.getElementById('inputNumeroDuimp');
+        const num = (input ? input.value : '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+        if (!num) {
+            if (window.nftAlert) {
+                await window.nftAlert('Por favor, digite o número da DUIMP para continuar.', { title: 'Campo Obrigatório', type: 'warning' });
+            } else {
+                alert('Por favor, digite o número da DUIMP para continuar.');
+            }
+            if (input) input.focus();
+            return;
+        }
+
+        if (num.length < 5) {
+            if (window.nftAlert) {
+                await window.nftAlert('Número de DUIMP muito curto ou inválido. Por favor, verifique os dígitos informados.', { title: 'Número Inválido', type: 'warning' });
+            } else {
+                alert('Número de DUIMP muito curto ou inválido. Por favor, verifique os dígitos informados.');
+            }
+            if (input) input.focus();
+            return;
+        }
+
+        // Esconde temporariamente o primeiro modal para exibir o popup de confirmação
+        const modalEl = document.getElementById('modalImportarDuimp');
+        if (modalEl) {
+            const modalInst = bootstrap.Modal.getInstance(modalEl);
+            if (modalInst) modalInst.hide();
+        }
+
+        // POPUP 2: Confirmação da importação da DUIMP
+        const msgConfirmacao = 
+            `Deseja realmente confirmar a importação da DUIMP <strong>${num}</strong>?\n\n` +
+            `Ao confirmar, o sistema irá automaticamente:\n` +
+            `  1. Consultar e puxar os dados oficiais da declaração via integração;\n` +
+            `  2. Armazenar o arquivo original na pasta dedicada "DUIMP Importada";\n` +
+            `  3. Criar um novo rascunho com Origem "DUIMP Importada";\n` +
+            `  4. Pré-preencher a Referência como "${num}" e carregar todos os dados (Emitente, Destinatário/Exportador, Itens, NCMs, Tributos calculados e Valores).`;
+
+        let confirmado = false;
+        if (window.nftConfirm) {
+            confirmado = await window.nftConfirm(msgConfirmacao, {
+                title: 'Confirmar Importação de DUIMP',
+                type: 'info',
+                icon: 'cloud-download',
+                confirmText: 'Sim, Importar e Criar Rascunho',
+                cancelText: 'Cancelar'
+            });
+        } else {
+            confirmado = confirm(`Confirma a importação da DUIMP ${num} e a criação automática do rascunho?`);
+        }
+
+        if (!confirmado) {
+            return;
+        }
+
+        const badge = document.getElementById('status-badge');
+        if (badge) {
+            badge.className = "badge bg-warning py-2 px-3 w-100 text-dark";
+            badge.innerHTML = `<span class="spinner-border spinner-border-sm me-1" style="width: 12px; height: 12px;"></span> Puxando DUIMP ${num}...`;
+        }
+
+        try {
+            const resp = await fetch('/api/duimp/importar_por_numero', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ numero_duimp: num })
+            });
+            const data = await resp.json();
+
+            if (!resp.ok || data.error) {
+                throw new Error(data.error || 'Falha na resposta do servidor');
+            }
+
+            if (badge) {
+                badge.className = "badge bg-success py-2 px-3 w-100";
+                badge.innerText = `DUIMP ${num} Importada (Rascunho #${data.id})`;
+            }
+
+            if (typeof atualizarContadorRascunhos === 'function') {
+                atualizarContadorRascunhos();
+            }
+
+            // Confirmação de abertura imediata do rascunho recém-criado
+            const msgSucesso = 
+                `DUIMP <strong>${num}</strong> importada com sucesso!\n\n` +
+                `• Arquivo arquivado na pasta: "DUIMP Importada"\n` +
+                `• Novo rascunho <strong>#${data.id}</strong> criado com Origem <strong>"DUIMP Importada"</strong>\n` +
+                `• Referência pré-preenchida: <strong>${data.referencia_interna || num}</strong>\n` +
+                `• Moeda / Câmbio Registrado: <strong>${data.moeda_conversao || 'USD'} (R$ ${data.taxa_conversao || '-'})</strong>\n` +
+                `• Quantidade de Itens: ${data.qtd_itens || 0} item(ns)\n` +
+                `• Valor Total: R$ ${formatarNumeroVisualBR(data.valor_total || 0, 2, 2)}\n\n` +
+                `Deseja abrir esse rascunho agora para visualizar todos os dados e itens já preenchidos?`;
+
+            let abrirAgora = false;
+            if (window.nftConfirm) {
+                abrirAgora = await window.nftConfirm(msgSucesso, {
+                    title: 'Importação Concluída com Sucesso!',
+                    type: 'info',
+                    icon: 'check-circle-2',
+                    confirmText: 'Sim, Abrir Rascunho Agora',
+                    cancelText: 'Ver na Lista de Rascunhos'
+                });
+            } else {
+                abrirAgora = confirm(`DUIMP ${num} importada com sucesso! Deseja abrir o rascunho agora?`);
+            }
+
+            if (abrirAgora) {
+                await carregarRascunho(data.id, 'DUIMP Importada', true);
+            } else {
+                if (typeof abrirModalListaRascunhos === 'function') {
+                    abrirModalListaRascunhos();
+                }
+            }
+
+        } catch (err) {
+            console.error("Erro ao importar DUIMP:", err);
+            if (badge) {
+                badge.className = "badge bg-danger py-2 px-3 w-100";
+                badge.innerText = "Erro ao Importar DUIMP";
+            }
+            if (window.nftAlert) {
+                await window.nftAlert(`Não foi possível importar a DUIMP ${num}:\n\n${err.message}`, { title: 'Erro de Importação', type: 'danger' });
+            } else {
+                alert(`Erro ao importar DUIMP ${num}: ${err.message}`);
+            }
+        }
+    }
+
     // === UPLOAD XML ===
     function uploadXML() {
         const fileInput = document.getElementById('xmlFileInput');
@@ -4117,6 +4998,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             
             // 1. Preenchimento Seguro do Cabecalho
             const c = data.cabecalho || {};
+            if (c.referencia_interna || c.nDI || c.import_nDI) {
+                if (typeof definirReferenciaInterna === 'function') {
+                    definirReferenciaInterna(c.referencia_interna || c.nDI || c.import_nDI);
+                }
+            }
             setVal('nNF', c.nNF);
             setVal('indFinal', (c.indFinal !== undefined && c.indFinal !== null && c.indFinal !== '') ? c.indFinal : '1');
             setVal('serie', c.serie);
@@ -4128,7 +5014,14 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             setVal('chaveAcesso', c.chaveAcesso || '');
             setVal('cUF', c.cUF || '35');
             setVal('cNF', c.cNF || '');
-            setVal('dhEmi', c.dhEmi || '');
+            const dhEmiConvertido = converterParaInputDatetime(c.dhEmi);
+            const dhSaiEntConvertido = converterParaInputDatetime(c.dhSaiEnt || c.dhEmi);
+            if (dhEmiConvertido) {
+                setVal('dhEmi', dhEmiConvertido);
+            }
+            if (dhSaiEntConvertido) {
+                setVal('dhSaiEnt', dhSaiEntConvertido);
+            }
             setVal('mod', c.mod || '55');
             setVal('tpEmis', c.tpEmis || '1');
             setVal('cDV', c.cDV || '');
@@ -4183,6 +5076,9 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             setVal('emit_xMun', c.emit_xMun);
             setVal('emit_UF', c.emit_UF);
             setVal('emit_CEP', c.emit_CEP);
+            if (c.emit_cPais) setVal('emit_cPais', c.emit_cPais);
+            if (c.emit_xPais) setVal('emit_xPais', c.emit_xPais);
+            if (typeof aoMudarPaisEmitente === 'function') aoMudarPaisEmitente();
             
             // Destinatario
             setVal('dest_xNome', c.dest_xNome);
@@ -4297,6 +5193,13 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             if (rateio.data_di) {
                 setVal('ptax_data', rateio.data_di);
             }
+            if (rateio.ptax_moeda || c.ptax_moeda) {
+                definirMoedaSelecionada(rateio.ptax_moeda || c.ptax_moeda);
+            }
+            if (rateio.ptax_cotacao_venda || c.ptax_cotacao_venda) {
+                setVal('ptax_cotacao_venda', rateio.ptax_cotacao_venda || c.ptax_cotacao_venda);
+                setVal('ptax_taxa_utilizada', rateio.ptax_taxa_utilizada || rateio.ptax_cotacao_venda || c.ptax_cotacao_venda);
+            }
 
             atualizarBadgesRateioEItens();
 
@@ -4398,8 +5301,13 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
     // === GERAR NOVO XML ===
     window.obterXMLFinal = () => generateXML(true);
     async function generateXML(returnTextOnly = false) {
-        if(!xmlOriginalData) {
-            alert("Por favor, faça o upload de um XML de modelo antes de gerar!");
+        const itensAtuais = (itensTable ? itensTable.getData() : itensCache) || [];
+        if (!itensAtuais || itensAtuais.length === 0) {
+            if (typeof nftAlert === 'function') {
+                await nftAlert("A nota não possui nenhum item cadastrado ou importado. Importe uma DI ou DUIMP antes de gerar o XML!", { type: 'warning', title: 'Nenhum Item' });
+            } else {
+                alert("A nota não possui nenhum item importado. Importe uma DI ou DUIMP antes de gerar o XML!");
+            }
             return;
         }
 
@@ -4458,6 +5366,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 cNF: getVal('cNF'),
                 cUF: getVal('cUF'),
                 dhEmi: getVal('dhEmi'),
+                dhSaiEnt: getVal('dhSaiEnt') || getVal('dhEmi'),
                 mod: getVal('mod'),
                 tpEmis: getVal('tpEmis'),
                 cDV: getVal('cDV'),
@@ -4474,6 +5383,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 emit_CEP: getVal('emit_CEP'),
                 emit_IE: getVal('emit_IE') || (window.currentCabecalho && window.currentCabecalho.emit_IE) || '138843326117',
                 emit_CRT: getVal('emit_CRT') || (window.currentCabecalho && window.currentCabecalho.emit_CRT) || '1',
+                emit_cPais: getVal('emit_cPais') || (window.currentCabecalho && window.currentCabecalho.emit_cPais) || '1058',
+                emit_xPais: getVal('emit_xPais') || (window.currentCabecalho && window.currentCabecalho.emit_xPais) || 'Brasil',
                 
                 dest_xNome: getVal('dest_xNome'),
                 dest_tpDoc: getVal('dest_tpDoc') || 'CNPJ',
@@ -4779,13 +5690,13 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
         // Coleta todos os campos do formulário
         const idsCabecalho = [
-            'nNF', 'indFinal', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'mod', 'tpEmis', 'cDV',
-            'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xCpl', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP',
-            'dest_xNome', 'dest_tpDoc', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xCpl', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP',
+            'nNF', 'indFinal', 'serie', 'refNFe', 'natOp', 'cfop_padrao', 'tpNF', 'idDest', 'chaveAcesso', 'cNF', 'cUF', 'dhEmi', 'dhSaiEnt', 'mod', 'tpEmis', 'cDV',
+            'emit_xNome', 'emit_CNPJ', 'emit_IE', 'emit_CRT', 'emit_xLgr', 'emit_nro', 'emit_xCpl', 'emit_xBairro', 'emit_cMun', 'emit_xMun', 'emit_UF', 'emit_CEP', 'emit_cPais', 'emit_xPais',
+            'dest_xNome', 'dest_tpDoc', 'dest_CNPJ_CPF', 'dest_indIEDest', 'dest_IE', 'dest_xLgr', 'dest_nro', 'dest_xCpl', 'dest_xBairro', 'dest_cMun', 'dest_xMun', 'dest_UF', 'dest_CEP', 'dest_cPais', 'dest_xPais',
             'import_nDI', 'import_dDI', 'import_cExportador', 'import_tpViaTransp', 'import_tpIntermedio', 'import_UFDesemb', 'import_xLocDesemb', 'import_dDesemb',
             'modFrete', 'transp_CNPJ_CPF', 'transp_xNome', 'transp_IE', 'transp_xEnder', 'transp_xMun', 'transp_UF', 'transp_qVol', 'transp_esp', 'transp_pesoL', 'transp_pesoB',
             'tot_vProd', 'tot_vFrete', 'tot_vSeg', 'tot_vOutro', 'tot_vDesc', 'tot_vNF', 'vNF', 'tot_vBC', 'tot_vICMS', 'tot_vBCST', 'tot_vST', 'tot_vII', 'tot_vIPI', 'tot_vPIS', 'tot_vCOFINS',
-            'rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vFrete', 'rateio_vSeg', 'rateio_vOutro', 'ptax_data', 'ptax_moeda', 'ptax_moeda_custom', 'ptax_cotacao_venda', 'criterio_rateio',
+            'rateio_vAFRMM', 'rateio_vSiscomex', 'rateio_vFrete', 'rateio_vSeg', 'rateio_vOutro', 'ptax_data', 'ptax_moeda', 'ptax_moeda_custom', 'ptax_cotacao_venda', 'ptax_taxa_utilizada', 'criterio_rateio',
             'exporta_UFSaidaPais', 'exporta_xLocExporta', 'exporta_xLocDespacho',
             'infCpl', 'select_operacao', 'referencia_interna', 'referenciaInterna',
             'tPag', 'tot_tPag', 'tot_vPag', 'regime_tributario'
@@ -4928,7 +5839,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         const tbody = document.getElementById('tbody-lista-rascunhos');
         if (!tbody) return;
 
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Carregando rascunhos salvos...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Carregando rascunhos salvos...</td></tr>`;
 
         const cat = getVal('filtro_cat_rascunho') || '';
         const origem = getVal('filtro_origem_rascunho') || '';
@@ -4953,7 +5864,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             if (infoRodape) infoRodape.innerText = `Total de ${rascunhosCacheLista.length} rascunho(s) encontrado(s).`;
         } catch (err) {
             console.error("Erro ao carregar rascunhos:", err);
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-4">Erro ao carregar lista de rascunhos: ${err}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Erro ao carregar lista de rascunhos: ${err}</td></tr>`;
         }
     }
 
@@ -4962,7 +5873,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         if (!tbody) return;
 
         if (!lista || lista.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-5">
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-5">
                 <i data-lucide="inbox" style="width: 32px; height: 32px; display: block; margin: 0 auto 8px auto; opacity: 0.5;"></i>
                 Nenhum rascunho encontrado para os filtros selecionados.
             </td></tr>`;
@@ -4972,10 +5883,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
         let html = '';
         lista.forEach(r => {
+            const isOrigemDuimpImp = (r.origem || '') === 'DUIMP Importada';
             const isOrigemDI = (r.origem || '').includes('DI');
             const isOrigemNova = (r.origem || '') === 'Nova NF';
-            const badgeOrigemClass = isOrigemNova ? 'badge-origem-nova' : (isOrigemDI ? 'badge-origem-di' : 'badge-origem-rasc');
-            const iconeOrigem = isOrigemNova ? 'file-plus-2' : (isOrigemDI ? 'globe' : 'file-code');
+            const badgeOrigemClass = isOrigemDuimpImp ? 'badge-origem-duimp-imp' : (isOrigemNova ? 'badge-origem-nova' : (isOrigemDI ? 'badge-origem-di' : 'badge-origem-rasc'));
+            const iconeOrigem = isOrigemDuimpImp ? 'cloud-download' : (isOrigemNova ? 'file-plus-2' : (isOrigemDI ? 'globe' : 'file-code'));
             const dataFmt = r.data_atualizacao_formatada || (r.data_atualizacao ? r.data_atualizacao.slice(0, 16).replace('T', ' ') : (r.data_criacao_formatada || '-'));
             const valTotalFmt = formatarNumeroVisualBR(r.valor_total || 0, 2, 2);
 
@@ -4984,23 +5896,25 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 <td>
                     <div class="d-flex align-items-center gap-1">
                         <i data-lucide="tag" style="width: 13px; height: 13px; color: var(--text-muted); flex-shrink: 0;"></i>
-                        <strong class="text-truncate" style="max-width: 170px;" title="${r.referencia_interna || 'Sem referência'}">
+                        <strong class="text-truncate" style="max-width: 220px;" title="${r.referencia_interna || 'Sem referência'}">
                             ${r.referencia_interna || '<span class="text-muted fst-italic">Sem referência</span>'}
                         </strong>
                     </div>
-                    <small class="text-muted font-monospace d-block text-truncate" style="font-size: 10.5px; max-width: 180px;">#${r.id} ${r.nome_arquivo_original ? '• ' + r.nome_arquivo_original : ''}</small>
-                </td>
-                <td class="small text-muted font-monospace text-truncate" style="max-width: 95px;" title="${r.categoria || 'Geral'}">
-                    ${r.categoria || 'Geral'}
+                    <small class="text-muted font-monospace d-block text-truncate" style="font-size: 10.5px; max-width: 220px;">#${r.id} ${r.nome_arquivo_original ? '• ' + r.nome_arquivo_original : ''}</small>
                 </td>
                 <td>
-                    <span class="badge d-inline-flex align-items-center gap-1 bg-info-subtle text-info fw-bold" style="font-size: 11px; padding: 3px 6px;">
-                        <i data-lucide="${iconeOrigem}" style="width: 11px; height: 11px;"></i>
-                        <span>${r.origem || 'XML da DI ou DUIMP'}</span>
-                    </span>
+                    <div class="d-flex flex-column align-items-start gap-1">
+                        <span class="texto-categoria-rascunho text-truncate" style="max-width: 150px;" title="Categoria: ${r.categoria || 'Geral'}">
+                            ${r.categoria || 'Geral'}
+                        </span>
+                        <span class="badge badge-origem-base ${badgeOrigemClass}" title="Origem: ${r.origem || 'XML da DI ou DUIMP'}">
+                            <i data-lucide="${iconeOrigem}" style="width: 11px; height: 11px;"></i>
+                            <span>${r.origem || 'XML da DI ou DUIMP'}</span>
+                        </span>
+                    </div>
                 </td>
                 <td>
-                    <span class="text-truncate d-inline-block text-secondary" style="max-width: 165px; font-size: 11.5px; vertical-align: middle;" title="${r.tipo_operacao || '-'}">
+                    <span class="text-truncate d-inline-block text-secondary" style="max-width: 220px; font-size: 11.5px; vertical-align: middle;" title="${r.tipo_operacao || '-'}">
                         ${r.tipo_operacao || '<span class="text-muted">-</span>'}
                     </span>
                 </td>
@@ -5017,13 +5931,15 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     </span>
                 </td>
                 <td class="text-center">
-                    <div class="d-flex justify-content-center gap-1">
-                        <button type="button" class="btn-nft d-inline-flex align-items-center gap-1 px-2 py-0" style="font-size: 11.5px; height: 26px;" onclick="carregarRascunho(${r.id}, '${r.origem}')" title="Carregar e continuar edição deste rascunho">
-                            <i data-lucide="folder-open" style="width: 12px; height: 12px;"></i>
-                            <span>Abrir</span>
+                    <div class="d-flex justify-content-center align-items-center gap-1">
+                        <button type="button" class="btn-nft btn-nft-action-round" onclick="carregarRascunho(${r.id}, '${r.origem}')" title="Abrir e carregar este rascunho">
+                            <i data-lucide="folder-open" style="width: 13px; height: 13px;"></i>
                         </button>
-                        <button type="button" class="btn-nft d-inline-flex align-items-center px-1 py-0" style="height: 26px;" onclick="excluirRascunho(${r.id}, '${(r.referencia_interna || '').replace(/'/g, "\\'")}')" title="Excluir este rascunho">
-                            <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+                        <button type="button" class="btn-nft btn-nft-action-round" onclick="duplicarRascunho(${r.id}, '${(r.referencia_interna || '').replace(/'/g, "\\'")}')" title="Duplicar Rascunho">
+                            <i data-lucide="copy" style="width: 13px; height: 13px;"></i>
+                        </button>
+                        <button type="button" class="btn-nft btn-nft-danger btn-nft-action-round" onclick="excluirRascunho(${r.id}, '${(r.referencia_interna || '').replace(/'/g, "\\'")}')" title="Excluir este rascunho">
+                            <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
                         </button>
                     </div>
                 </td>
@@ -5052,9 +5968,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         renderizarTabelaRascunhos(filtrados);
     }
 
-    async function carregarRascunho(id, origemRascunho) {
+    async function carregarRascunho(id, origemRascunho, silencioso = false) {
         // Verifica se pertence ao outro módulo
-        if (origemRascunho && origemRascunho !== window.NOME_MODULO_ORIGEM) {
+        const isModuloDI = window.NOME_MODULO_ORIGEM.includes('DI');
+        const isRascunhoDI = (origemRascunho || '').includes('DI') || (origemRascunho || '').includes('DUIMP');
+        if (origemRascunho && origemRascunho !== window.NOME_MODULO_ORIGEM && !(isModuloDI && isRascunhoDI)) {
             const confirmaMudanca = await nftConfirm(
                 `Este rascunho (#${id}) foi salvo originalmente no módulo:\n"${origemRascunho}".\n\n` +
                 `Você está atualmente no módulo "${window.NOME_MODULO_ORIGEM}".\n\n` +
@@ -5066,7 +5984,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 }
             );
             if (confirmaMudanca) {
-                if (origemRascunho.includes('DI')) {
+                if (origemRascunho.includes('DI') || origemRascunho.includes('DUIMP')) {
                     window.location.href = `/di_duimp?carregar_rascunho=${id}`;
                 } else if (origemRascunho === 'Nova NF') {
                     window.location.href = `/nova_nf?carregar_rascunho=${id}`;
@@ -5095,6 +6013,12 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                     setVal('transp_modFrete', dados.cabecalho.transp_modFrete);
                 } else if (dados.cabecalho.modFrete !== undefined) {
                     setVal('transp_modFrete', dados.cabecalho.modFrete);
+                }
+                if (dados.cabecalho.ptax_moeda && typeof definirMoedaSelecionada === 'function') {
+                    definirMoedaSelecionada(dados.cabecalho.ptax_moeda);
+                }
+                if (!getVal('ptax_taxa_utilizada') && getVal('ptax_cotacao_venda')) {
+                    setVal('ptax_taxa_utilizada', getVal('ptax_cotacao_venda'));
                 }
             }
             if (dados.rodape && dados.rodape.transporte && dados.rodape.transporte.modFrete !== undefined) {
@@ -5158,6 +6082,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 
             // 5. Restaura status de identificação e chave de acesso
             window.idRascunhoAtual = rascunho.id;
+            window.origemRascunhoAtual = rascunho.origem || window.NOME_MODULO_ORIGEM;
             atualizarCamposIdentificacao(getVal('tpNF'), getVal('idDest'));
             atualizarEstadoInscricaoEstadual();
             atualizarTipoDocumentoDestinatario();
@@ -5216,21 +6141,32 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
                 }
             }
 
-            // 7. Atualiza badge da área de upload
+            // 7. Atualiza badge da área de upload e indicador de origem
             const badgeUpload = document.getElementById('status-badge');
             if (badgeUpload) {
-                badgeUpload.className = "badge bg-success py-2 px-3 w-100";
+                badgeUpload.className = "badge bg-success-subtle text-success fw-bold py-1 px-2";
                 badgeUpload.innerText = `Rascunho #${rascunho.id} ativo (${itensCache.length} itens)`;
             }
+            const infoOrigemEl = document.getElementById('rascunho-origem-indicator');
+            if (infoOrigemEl) {
+                const badgeOrigemClass = (rascunho.origem === 'DUIMP Importada') ? 'badge-origem-duimp-imp' : 'badge-origem-di';
+                infoOrigemEl.innerHTML = `Módulo Ativo: <span class="badge ${badgeOrigemClass} fw-bold">${rascunho.origem || window.NOME_MODULO_ORIGEM}</span>`;
+            }
 
-            // Fecha modal
+            // Fecha modal se estiver aberto
             const modalEl = document.getElementById('modalListaRascunhos');
             if (modalEl) {
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 if (modal) modal.hide();
             }
 
-            alert(`✅ Rascunho #${rascunho.id} carregado com sucesso!\n\nReferência: ${rascunho.referencia_interna || '(Sem referência)'}\nCategoria: ${rascunho.categoria}\nItens: ${rascunho.qtd_itens}`);
+            if (!silencioso) {
+                if (window.nftAlert) {
+                    await window.nftAlert(`Rascunho #${rascunho.id} carregado com sucesso!\n\nReferência: ${rascunho.referencia_interna || '(Sem referência)'}\nCategoria: ${rascunho.categoria}\nOrigem: ${rascunho.origem || window.NOME_MODULO_ORIGEM}\nItens: ${rascunho.qtd_itens}`, { title: 'Rascunho Carregado', type: 'success' });
+                } else {
+                    alert(`✅ Rascunho #${rascunho.id} carregado com sucesso!\n\nReferência: ${rascunho.referencia_interna || '(Sem referência)'}\nCategoria: ${rascunho.categoria}\nOrigem: ${rascunho.origem || window.NOME_MODULO_ORIGEM}\nItens: ${rascunho.qtd_itens}`);
+                }
+            }
         } catch (err) {
             console.error("Erro ao carregar rascunho:", err);
             alert("Erro ao carregar rascunho: " + err);
@@ -5238,10 +6174,12 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
     }
 
     async function excluirRascunho(id, ref) {
-        const conf = await nftConfirm(`Tem certeza que deseja excluir o rascunho #${id}${ref ? ' (' + ref + ')' : ''}?\n\nO arquivo isolado e o registro no banco de dados serão excluídos permanentemente.`, {
-            title: 'Excluir Rascunho',
+        const conf = await nftConfirm(`Deseja realmente excluir o rascunho #${id}${ref ? ' (' + ref + ')' : ''}?\n\nEsta ação não poderá ser desfeita e o rascunho será removido permanentemente.`, {
+            title: 'Confirmar Exclusão',
             type: 'danger',
-            confirmText: 'Sim, Excluir'
+            confirmText: 'Sim, Excluir',
+            cancelText: 'Cancelar',
+            icon: 'trash-2'
         });
         if (!conf) return;
 
@@ -5259,6 +6197,36 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
         } catch (err) {
             console.error("Erro ao excluir rascunho:", err);
             alert("Erro inesperado ao excluir rascunho: " + err);
+        }
+    }
+
+    async function duplicarRascunho(id, ref) {
+        const conf = await nftConfirm(`Deseja realmente duplicar o rascunho #${id}${ref ? ' (' + ref + ')' : ''}?\n\nUma cópia independente será criada mantendo os mesmos dados e itens.`, {
+            title: 'Confirmar Duplicação',
+            type: 'info',
+            confirmText: 'Sim, Duplicar',
+            cancelText: 'Cancelar',
+            icon: 'copy'
+        });
+        if (!conf) return;
+
+        try {
+            const resp = await fetch(`/api/rascunhos/${id}/duplicar`, { method: 'POST' });
+            const data = await resp.json();
+            if (!resp.ok || !data.success) {
+                alert(data.error || "Erro ao duplicar rascunho.");
+                return;
+            }
+            if (typeof nftToast === 'function') {
+                nftToast(data.message || 'Rascunho duplicado com sucesso!', 'success');
+            } else {
+                alert(data.message || 'Rascunho duplicado com sucesso!');
+            }
+            carregarListaRascunhos();
+            atualizarContadorRascunhos();
+        } catch (err) {
+            console.error("Erro ao duplicar rascunho:", err);
+            alert("Erro inesperado ao duplicar rascunho: " + err);
         }
     }
 
@@ -5295,15 +6263,64 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             .catch(err => console.warn("Erro ao carregar lista de países:", err));
     }
 
-    function aoDigitarPaisDestinatario() {
-        const val = (getVal('dest_xPais') || '').trim().toUpperCase();
-        if (!val) return;
-        const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
-        if (encontrado) {
-            setVal('dest_cPais', encontrado.codigo);
-            setVal('dest_xPais', encontrado.nome);
-            ajustarRegrasPaisDestinatario(encontrado.codigo);
+    function aoDigitarPaisAutocomplete(tipo) {
+        const input = document.getElementById(`${tipo}_xPais`);
+        const dropdown = document.getElementById(`dropdown_menu_${tipo}_xPais`);
+        if (!input || !dropdown) return;
+        
+        const termo = (input.value || '').trim().toUpperCase();
+        let filtrados = [];
+        if (!termo) {
+            filtrados = paisesBacenCache.slice(0, 40);
+        } else {
+            filtrados = paisesBacenCache.filter(p => 
+                p.nome.toUpperCase().includes(termo) || String(p.codigo).includes(termo)
+            ).slice(0, 40);
         }
+
+        if (filtrados.length === 0) {
+            dropdown.innerHTML = '<div class="dropdown-item small text-muted text-center py-2">Nenhum país encontrado</div>';
+            dropdown.style.display = 'block';
+            return;
+        }
+
+        dropdown.innerHTML = filtrados.map(p => {
+            const nomeEsc = (p.nome || '').replace(/'/g, "\\'");
+            return `<button type="button" class="dropdown-item small py-1 d-flex justify-content-between align-items-center" onmousedown="selecionarPais('${tipo}', '${p.codigo}', '${nomeEsc}')">
+                <span class="fw-semibold text-truncate me-2">${p.nome}</span>
+                <span class="badge bg-secondary-subtle text-secondary font-monospace">${p.codigo}</span>
+            </button>`;
+        }).join('');
+        dropdown.style.display = 'block';
+    }
+
+    function selecionarPais(tipo, codigo, nome) {
+        setVal(`${tipo}_xPais`, nome);
+        setVal(`${tipo}_cPais`, codigo);
+        const dropdown = document.getElementById(`dropdown_menu_${tipo}_xPais`);
+        if (dropdown) dropdown.style.display = 'none';
+
+        if (tipo === 'dest') {
+            ajustarRegrasPaisDestinatario(codigo);
+        } else if (tipo === 'emit') {
+            ajustarRegrasPaisEmitente(codigo);
+        }
+    }
+
+    function aoPerderFocoPais(tipo) {
+        setTimeout(() => {
+            const dropdown = document.getElementById(`dropdown_menu_${tipo}_xPais`);
+            if (dropdown) dropdown.style.display = 'none';
+            if (tipo === 'dest') {
+                aoMudarPaisDestinatario();
+            } else if (tipo === 'emit') {
+                aoMudarPaisEmitente();
+            }
+        }, 250);
+    }
+
+    function aoDigitarPaisDestinatario() {
+        aoDigitarPaisAutocomplete('dest');
     }
 
     function aoMudarPaisDestinatario() {
@@ -5319,6 +6336,24 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             }
         }
         ajustarRegrasPaisDestinatario(codigo);
+    }
+
+    function aoDigitarPaisEmitente() {
+        aoDigitarPaisAutocomplete('emit');
+    }
+
+    function aoMudarPaisEmitente() {
+        const val = (getVal('emit_xPais') || '').trim().toUpperCase();
+        let codigo = getVal('emit_cPais');
+        if (paisesBacenCache.length > 0) {
+            const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
+            if (encontrado) {
+                codigo = encontrado.codigo;
+                setVal('emit_cPais', codigo);
+                setVal('emit_xPais', encontrado.nome);
+            }
+        }
+        ajustarRegrasPaisEmitente(codigo);
     }
 
     function ajustarRegrasPaisDestinatario(codigo) {
@@ -5355,44 +6390,11 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             const elTpDoc = document.getElementById('dest_tpDoc');
             if (elTpDoc && elTpDoc.value !== 'Estrangeiro') {
                 elTpDoc.value = 'Estrangeiro';
-                atualizarTipoDocumentoDestinatario();
+                if (typeof atualizarTipoDocumentoDestinatario === 'function') {
+                    atualizarTipoDocumentoDestinatario();
+                }
             }
         }
-    }
-
-    function resetarPaisParaBrasil(tipo = 'dest') {
-        setVal(`${tipo}_xPais`, 'Brasil');
-        setVal(`${tipo}_cPais`, '1058');
-        if (tipo === 'dest') {
-            ajustarRegrasPaisDestinatario('1058');
-        } else if (tipo === 'emit') {
-            ajustarRegrasPaisEmitente('1058');
-        }
-    }
-
-    function aoDigitarPaisEmitente() {
-        const val = getVal('emit_xPais').trim().toUpperCase();
-        const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
-        if (encontrado) {
-            setVal('emit_cPais', encontrado.codigo);
-            ajustarRegrasPaisEmitente(encontrado.codigo);
-        } else {
-            setVal('emit_cPais', '');
-        }
-    }
-
-    function aoMudarPaisEmitente() {
-        const val = getVal('emit_xPais').trim().toUpperCase();
-        let codigo = getVal('emit_cPais');
-        if (!codigo) {
-            const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
-            if (encontrado) {
-                codigo = encontrado.codigo;
-                setVal('emit_cPais', codigo);
-                setVal('emit_xPais', encontrado.nome);
-            }
-        }
-        ajustarRegrasPaisEmitente(codigo);
     }
 
     function ajustarRegrasPaisEmitente(codigo) {
@@ -5568,9 +6570,159 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 </div>
 </div>
+<!-- MODAL: Importar DUIMP por Número (Portal Único Siscomex) -->
+<div aria-hidden="true" aria-labelledby="modalImportarDuimpLabel" class="modal fade" id="modalImportarDuimp" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal-content shadow-lg border-0">
+<div class="modal-header border-bottom">
+<div class="d-flex align-items-center gap-2">
+<div class="p-2 rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+<i data-lucide="cloud-download" style="width: 20px; height: 20px;"></i>
+</div>
+<div>
+<h5 class="modal-title fw-bold mb-0" id="modalImportarDuimpLabel">Importar DUIMP por Número</h5>
+<small class="text-muted">Integração Direta • Portal Único Siscomex / API Oficial</small>
+</div>
+</div>
+<button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body p-4">
+<!-- Card Informativo com Detalhes do Processo -->
+<div class="card border-0 bg-body-tertiary p-3 mb-3 rounded-3">
+<h6 class="fw-bold d-flex align-items-center gap-2 mb-2 text-primary" style="font-size: 13.5px;">
+<i data-lucide="info" style="width: 16px; height: 16px;"></i>
+<span>Informações Importantes sobre o Processo</span>
+</h6>
+<div class="small text-secondary d-flex flex-column gap-2" style="font-size: 12.5px; line-height: 1.55;">
+<div>
+<strong>• Consulta Oficial sem Arquivos:</strong> Não é necessário possuir arquivos XML, extratos prévios ou planilhas. A consulta puxa todos os dados cadastrais, itens e tributos diretamente pelo número da declaração.
+</div>
+<div>
+<strong>• Autenticação & Certificado Digital:</strong> O sistema utiliza o Certificado Digital ICP-Brasil da empresa para autenticação mTLS segura junto ao Portal Único Siscomex, assegurando conformidade aduaneira e sigilo fiscal.
+</div>
+<div>
+<strong>• Versão Vigente Automática:</strong> A integração identifica e recupera automaticamente a versão mais recente e vigente da DUIMP (incluindo retificações aprovadas).
+</div>
+<div>
+<strong>• Armazenamento e Rascunho Prévio:</strong> O arquivo oficial importado é arquivado na pasta dedicada <code>DUIMP Importada</code> e um novo rascunho com Origem <strong>"DUIMP Importada"</strong> é criado com a referência pré-preenchida com o número da DUIMP, pronto para abertura imediata com todos os campos preenchidos.
+</div>
+</div>
+</div>
+<!-- Campo para Digitar a DUIMP -->
+<div class="mb-2">
+<label class="form-label fw-bold text-muted small text-uppercase mb-1" for="inputNumeroDuimp">
+Número da DUIMP <span class="text-danger">*</span>
+</label>
+<div class="input-group">
+<span class="input-group-text bg-body-tertiary font-monospace text-muted" style="height: 36px; min-height: 36px;">
+<i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+</span>
+<input autocomplete="off" class="form-control font-monospace text-uppercase" id="inputNumeroDuimp" maxlength="30" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '')" onkeydown="if(event.key === 'Enter') { event.preventDefault(); acionarConfirmacaoImportarDuimp(); }" placeholder="Ex: 24BR00001001899" type="text" style="height: 36px; min-height: 36px; font-size: 0.875rem;"/>
+<button class="btn btn-primary fw-bold d-inline-flex align-items-center gap-2 px-3" id="btnImportarDuimpModal" onclick="acionarConfirmacaoImportarDuimp()" type="button" style="height: 36px; min-height: 36px; font-size: 0.875rem; line-height: 1.5; padding: 0.375rem 0.75rem;">
+<i data-lucide="cloud-download" style="width: 15px; height: 15px;"></i>
+<span>Importar</span>
+</button>
+</div>
+<div class="form-text small mt-1 text-muted">
+<i data-lucide="help-circle" style="width: 13px; height: 13px; vertical-align: -2px;"></i>
+Padrão Siscomex: 2 dígitos do ano + "BR" + sequência numérica (ex: <strong>24BR00001001899</strong>).
+</div>
+</div>
+</div>
+<div class="modal-footer border-top bg-body-tertiary d-flex justify-content-between">
+<button class="btn-nft" data-bs-dismiss="modal" type="button">Cancelar</button>
+<button class="btn-nft fw-bold d-inline-flex align-items-center gap-2" onclick="acionarConfirmacaoImportarDuimp()" type="button">
+<i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+<span>Avançar para Confirmação</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- MODAL: Importar Certificado Digital (A1) -->
+<div aria-hidden="true" aria-labelledby="modalImportarCertificadoLabel" class="modal fade" id="modalImportarCertificado" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal-content shadow-lg border-0">
+<div class="modal-header border-bottom">
+<div class="d-flex align-items-center gap-2">
+<div class="p-2 rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+<i data-lucide="file-key" style="width: 20px; height: 20px;"></i>
+</div>
+<div>
+<h5 class="modal-title fw-bold mb-0" id="modalImportarCertificadoLabel">Importar Certificado Digital (A1)</h5>
+<small class="text-muted">Instalação e ativação imediata de arquivo .pfx / .p12 para emissão fiscal</small>
+</div>
+</div>
+<button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body p-4">
+<!-- Instruções e Requisitos do Certificado -->
+<div class="card border-0 bg-body-tertiary p-3 mb-3 rounded-3">
+<h6 class="fw-bold d-flex align-items-center gap-2 mb-2 text-success" style="font-size: 13.5px;">
+<i data-lucide="info" style="width: 16px; height: 16px;"></i>
+<span>Instruções Importantes sobre o Certificado</span>
+</h6>
+<div class="small text-secondary d-flex flex-column gap-2" style="font-size: 12.5px; line-height: 1.55;">
+<div>
+<strong>• Formato Suportado:</strong> O arquivo deve ser um certificado padrão ICP-Brasil A1 com extensão <code>.pfx</code> ou <code>.p12</code> (contendo a chave privada e os certificados intermediários).
+</div>
+<div>
+<strong>• Senha de Instalação:</strong> Certificados A1 são protegidos por senha. Informe a senha fornecida pela Autoridade Certificadora para validação e desbloqueio imediato.
+</div>
+<div>
+<strong>• Ativação Automática:</strong> Ao instalar, o certificado é salvo de forma segura no servidor e ativado automaticamente para assinatura de NF-e, consultas na SEFAZ e integração aduaneira.
+</div>
+</div>
+</div>
+<!-- Campo Drag and Drop / Selecionar Arquivo PFX -->
+<div class="mb-3">
+<label class="form-label fw-bold text-muted small text-uppercase mb-1">
+Arquivo do Certificado Digital (.pfx / .p12) <span class="text-danger">*</span>
+</label>
+<div class="dropzone-pfx p-4 text-center" id="dropzone-certificado" onclick="document.getElementById('inputArquivoPfx').click()">
+<i data-lucide="upload-cloud" style="width: 40px; height: 40px; color: var(--primary); margin-bottom: 8px;"></i>
+<div class="fw-bold mb-1">Arraste seu arquivo .pfx aqui ou clique para selecionar</div>
+<div class="small text-muted">Formatos aceitos: <strong>.pfx</strong> ou <strong>.p12</strong></div>
+<div class="mt-2 text-success fw-bold font-monospace d-none" id="pfx-file-name-display">
+<i data-lucide="check-circle" style="width: 15px; height: 15px; vertical-align: -2px;"></i>
+<span id="pfx-file-name-text"></span>
+</div>
+</div>
+<input accept=".pfx,.p12" class="d-none" id="inputArquivoPfx" onchange="aoSelecionarArquivoPfx(this)" type="file"/>
+</div>
+<!-- Campo Senha do Certificado -->
+<div class="mb-2">
+<label class="form-label fw-bold text-muted small text-uppercase mb-1" for="inputSenhaCertificado">
+Senha do Certificado Digital <span class="text-danger">*</span>
+</label>
+<div class="input-group">
+<span class="input-group-text bg-body-tertiary text-muted" style="height: 36px; min-height: 36px;">
+<i data-lucide="lock" style="width: 16px; height: 16px;"></i>
+</span>
+<input autocomplete="current-password" class="form-control" id="inputSenhaCertificado" onkeydown="if(event.key === 'Enter') { event.preventDefault(); submeterImportarCertificado(); }" placeholder="Digite a senha do certificado..." type="password" value="nftecnpj" style="height: 36px; min-height: 36px; font-size: 0.875rem;"/>
+<button class="btn btn-outline-secondary" onclick="alternarVisibilidadeSenhaCertificado()" title="Visualizar / Ocultar Senha" type="button" style="height: 36px; min-height: 36px; padding: 0.375rem 0.75rem;">
+<i data-lucide="eye" id="icone-olho-senha-cert" style="width: 16px; height: 16px;"></i>
+</button>
+</div>
+<div class="form-text small mt-1 text-muted">
+<i data-lucide="shield" style="width: 13px; height: 13px; vertical-align: -2px;"></i>
+Utilizada para decodificar a chave privada na assinatura e transmissão de documentos fiscais.
+</div>
+</div>
+</div>
+<div class="modal-footer border-top bg-body-tertiary d-flex justify-content-between">
+<button class="btn-nft" data-bs-dismiss="modal" type="button">Cancelar</button>
+<button class="btn-nft btn-nft-success-solid fw-bold d-inline-flex align-items-center gap-2" id="btnInstalarCertificadoModal" onclick="submeterImportarCertificado()" type="button" style="height: 36px; min-height: 36px; font-size: 0.875rem;">
+<i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+<span>Instalar Certificado</span>
+</button>
+</div>
+</div>
+</div>
+</div>
 <!-- MODAL: Listagem de Rascunhos Salvos -->
 <div aria-hidden="true" aria-labelledby="modalListaRascunhosLabel" class="modal fade" id="modalListaRascunhos" tabindex="-1">
-<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 95vw; width: 1350px;">
 <div class="modal-content shadow-lg border-0">
 <div class="modal-header border-bottom">
 <div>
@@ -5598,6 +6750,7 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <select class="form-select form-select-sm" id="filtro_origem_rascunho" onchange="carregarListaRascunhos()">
 <option value="">Todas as Origens</option>
 <option value="XML da DI ou DUIMP">XML da DI ou DUIMP</option>
+<option value="DUIMP Importada">DUIMP Importada</option>
 <option value="XML Rascunho">XML Rascunho</option>
 <option value="Nova NF">Nova NF</option>
 </select>
@@ -5622,19 +6775,18 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 <table class="table table-sm table-hover align-middle mb-0 small">
 <thead class="table-light sticky-top">
 <tr>
-<th style="width: 20%;">Referência Interna</th>
-<th style="width: 10%;">Categoria</th>
-<th style="width: 12%;">Origem</th>
-<th style="width: 17%;">Tipo de Operação</th>
+<th style="width: 22%;">Referência Interna</th>
+<th style="width: 15%;">Categoria / Origem</th>
+<th style="width: 20%;">Tipo de Operação</th>
 <th class="text-center" style="width: 6%;" title="Quantidade de Itens">Qtd.</th>
 <th class="text-end" style="width: 12%;">Valor Total</th>
 <th style="width: 14%;">Última Atualização</th>
-<th class="text-center" style="width: 9%;">Ações</th>
+<th class="text-center" style="width: 11%;">Ações</th>
 </tr>
 </thead>
 <tbody id="tbody-lista-rascunhos">
 <tr>
-<td class="text-center text-muted py-4" colspan="8">Carregando rascunhos...</td>
+<td class="text-center text-muted py-4" colspan="7">Carregando rascunhos...</td>
 </tr>
 </tbody>
 </table>
@@ -5650,8 +6802,8 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
 </div>
 </div>
 </div><!-- /container-fluid -->
-<!-- /nft-main-wrapper -->
 <script src="/static/js/nft-autosave.js?v=2.9"></script>
+<script src="/static/js/nft-shortcuts.js?v=1.0"></script>
 <script src="/static/js/nft-sefaz.js?v=2.9"></script>
 <script src="/static/js/nft-operacoes-manager.js?v=3.0"></script>
 <script>
@@ -5722,8 +6874,96 @@ Insere o texto: <code>CARGA DESTINADA A {Feira} {Ano} A SER REALIZADA ENTRE {Dat
             });
         }
 
+        function aoDigitarEmpresaAutocomplete(tipo) {
+            const inputId = tipo === 'emit' ? 'input_busca_emitente' : 'input_busca_destinatario';
+            const dropdownId = tipo === 'emit' ? 'dropdown_menu_busca_emitente' : 'dropdown_menu_busca_destinatario';
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            if (!input || !dropdown) return;
+
+            const termo = (input.value || '').trim().toUpperCase();
+            const termoDigitos = (input.value || '').replace(/\D/g, '');
+
+            let candidatos = cadastrosDisponiveis.filter(emp => {
+                if (tipo === 'emit') {
+                    return emp.tipo === 'Emitente' || emp.tipo === 'Armazem' || emp.tipo === 'Local de Desembaraço';
+                } else if (tipo === 'dest') {
+                    return emp.tipo === 'Cliente' || emp.tipo === 'Exportador' || emp.tipo === 'Armazem' || emp.tipo === 'Local de Desembaraço' || !emp.tipo;
+                }
+                return true;
+            });
+
+            let filtrados = [];
+            if (!termo) {
+                filtrados = candidatos.slice(0, 40);
+            } else {
+                filtrados = candidatos.filter(emp => {
+                    const nome = (emp.nome || '').toUpperCase();
+                    const apelido = (emp.apelido || '').toUpperCase();
+                    const cnpjCpf = (emp.cnpj_cpf || '').replace(/\D/g, '');
+                    const cnpjCpfFormatado = (emp.cnpj_cpf || '').toUpperCase();
+                    return nome.includes(termo) ||
+                           apelido.includes(termo) ||
+                           cnpjCpfFormatado.includes(termo) ||
+                           (termoDigitos && cnpjCpf.includes(termoDigitos));
+                }).slice(0, 40);
+            }
+
+            if (filtrados.length === 0) {
+                dropdown.innerHTML = '<div class="dropdown-item small text-muted text-center py-2">Nenhum cadastro encontrado</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            dropdown.innerHTML = filtrados.map(emp => {
+                const apelidoStr = emp.apelido ? ` (${emp.apelido})` : '';
+                const docStr = emp.cnpj_cpf || 'Sem doc';
+                const tipoBadge = emp.tipo ? `<span class="badge bg-secondary-subtle text-secondary me-1" style="font-size: 10px;">${emp.tipo}</span>` : '';
+                return `<button type="button" class="dropdown-item small py-1 text-start" onmousedown="selecionarEmpresa('${tipo}', ${emp.id})">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold text-truncate me-2" style="max-width: 70%;">${emp.nome}${apelidoStr}</span>
+                        <div class="text-end text-nowrap">
+                            ${tipoBadge}
+                            <span class="badge bg-light text-dark font-monospace border" style="font-size: 11px;">${docStr}</span>
+                        </div>
+                    </div>
+                </button>`;
+            }).join('');
+            dropdown.style.display = 'block';
+        }
+
+        function selecionarEmpresa(tipo, id) {
+            const dropdownId = tipo === 'emit' ? 'dropdown_menu_busca_emitente' : 'dropdown_menu_busca_destinatario';
+            const inputId = tipo === 'emit' ? 'input_busca_emitente' : 'input_busca_destinatario';
+            const selectId = tipo === 'emit' ? 'select_emitente' : 'select_destinatario';
+
+            const dropdown = document.getElementById(dropdownId);
+            if (dropdown) dropdown.style.display = 'none';
+
+            const emp = cadastrosDisponiveis.find(e => e.id == id);
+            if (emp) {
+                const apelidoStr = emp.apelido ? ` (${emp.apelido})` : '';
+                const input = document.getElementById(inputId);
+                if (input) input.value = `${emp.nome}${apelidoStr} - ${emp.cnpj_cpf || ''}`;
+            }
+
+            const sel = document.getElementById(selectId);
+            if (sel) {
+                sel.value = String(id);
+                preencherDadosDeCadastro(sel, tipo);
+            }
+        }
+
+        function aoPerderFocoEmpresa(tipo) {
+            setTimeout(() => {
+                const dropdownId = tipo === 'emit' ? 'dropdown_menu_busca_emitente' : 'dropdown_menu_busca_destinatario';
+                const dropdown = document.getElementById(dropdownId);
+                if (dropdown) dropdown.style.display = 'none';
+            }, 250);
+        }
+
         function preencherDadosDeCadastro(selectElem, prefix) {
-            const id = selectElem.value;
+            const id = typeof selectElem === 'object' && selectElem !== null ? selectElem.value : selectElem;
             if(!id) return; // Não faz nada se voltar pro "Selecione..."
 
             const emp = cadastrosDisponiveis.find(e => e.id == id);

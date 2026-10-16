@@ -1,0 +1,2283 @@
+{
+  "numero": "25BR0000178557-7",
+  "versao": "1",
+  "versao_vigente": true,
+  "situacao": "DESEMBARACADA_CARGA_ENTREGUE",
+  "canal": "VERDE",
+  "data_registro": "2025-09-30",
+  "data_desembaraco": "2025-09-30",
+  "origem_consulta": "Portal Único Siscomex (PUCOMEX / duimp-api)",
+  "duimp_original": {
+    "identificacao": {
+      "numero": "25BR00001785577",
+      "versao": 1,
+      "importador": {
+        "tipoImportador": "CNPJ",
+        "ni": "47998441000198"
+      },
+      "dataRegistro": "2025-09-30T18:27:02-0300",
+      "responsavelRegistroNumero": "15163207865",
+      "informacaoComplementar": "********        MFM LOGISTICA INTERNACIONAL LTDA         ********\n********            CNPJ: 15.023.360/0001-86             ********\n********       TELEFONE: 11 2495-4859 / 2495-4889        ********\n=================================================================\nN/ REF:............................................................MFMDIM25090004\nREFERÊNCIA(S) CLIENTE Nº:.......................NFT2500193-I\nBL HOUSE.......................................................NGP2672355A\nFATURA COMERCIAL.....................................NFT2500193-I, \nROMANEIO DE CARGA..................................S/NR, \nDTA:.................................................................25/0431530-3\nDATA EMBARQUE.........................................14/08/2025\nDATA CHEGADA............................................20/09/2025\nPORTO EMBARQUE......................................NINGBO\nPORTO CHEGADA ........................................PORTO DE SANTOS\nCARGA REMOVIDA PARA O EADI................MULTILOG BARUERI\nCAIXA DE MADEIRA......................................3\nNAVIO.............................................................COSCO SHIPPING CHILE\nARMADOR.....................................................CMA-CGM\nARMAZEM......................................................MULTILOG BARUERI\nPRESENCA DE CARGA................................CEMERCANGTE31032008152505278577066\nFORMA PAGAMENTO (CAMBIAL)................ADMISSAO EM REGIME ADUANEIRO ESPECIAL OU ATIPICO\n\nMOEDA VMLE................................................USD 5,3229\nMOEDA FRETE..............................................USD 5,3229\nTAXA FISCAL.................................................US$ 5,3229\n=================================================================\nCREDENCIADOS:\nADERBAL MENDES DOS SANTOS..............8D.02.988, CPF: 129.700.448-54\nCARLOS HENRIQUE MANQUETE...............8D.06.377, CPF: 151.632.078-65\nLUIS CARLOS DA SILVA AGUIAR.................8D.01.454, CPF: 147.548.968-40\n===============================================================\nMERCADORIA REMOVIDA DO PORTO DE SANTOS PARA O  EADI BARUERI - SP ATRAVES DA D.T.A. NR. 25/0431530-3\n=================================================================\nVALOR FOB............................................: R$ 168.203,64\nFRETE.....................................................: R$    6.371,99\nCIF...........................................................: R$ 174.575,63\nII..............................................................: R$ 0,00\nIPI............................................................: R$ 0,00\nIPI SUSPENSO.......................................: R$ 0,00\nTAXA SISCOMEX...................................: R$ 192,79\nPIS..........................................................: R$ 0,00\nCOFINS..................................................: R$ 0,00\nICMS.......................................................: EXONERADO\n=================================================================\nSOLICITAMOS A ADMISSAO TEMPORARIA DE ACORDO COM A IN RFB 1.600/2015, ARTIGO 3º, INCISO I.\n \nMATERIAL DESTINADO A FEIRA \"FENASAN 2025 \", A SER REALIZADA ENTRE OS DIAS 21 A 23 DE OUTUBRO DE 2025 NO EXPO CENTER NORTE - SÃO PAULO - SP.\n\nA PRESENTE ADMISSAO TERA OS SEUS IMPOSTOS SUSPENSOS NA SUA TOTALIDADE DE ACORDO COM A I.N. 1.600/2015, ART.11 ONDE O MONTANTE DOS TRIBUTOS INCIDENTES NA IMPORTACAO, COM PAGAMENTO SUSPENSO EM DECORRENCIA DA APLICACAO DO REGIME DE ADMISSAO TEMPORARIA SER A CONSUBSTACIADO EM TERMO DE RESPONSABILIDADE(TR).\n\n--VALORES DOS TRIBUTOS E CONTRIBUIÇÕES SUSPENSOS: \n--II SUSPENSO...........................................................: R$  21.996,53\n--IPI SUSPENSO.........................................................: R$          0,00\n--PIS SUSPENSO.......................................................: R$    3.666,08\n--COFINS SUSPENSO...............................................: R$  18.243,16\n--VALOR TOTAL DOS IMPOSTOS SUSPENSOS......: R$  43.905,77\n=================================================================\n--VALOR DO ICMS SUSPENSO................................: R$  48.001,65\n=================================================================\nSÃO PAULO,  30 DE SETEMBRO DE  2025.",
+      "chaveAcesso": "25USH000675029"
+    },
+    "situacao": {
+      "situacaoDuimp": "DESEMBARACADA_CARGA_ENTREGUE",
+      "situacaoAnaliseRetificacao": "NA",
+      "situacaoLicenciamento": "DISPENSADO",
+      "controleCarga": "ENTREGUE",
+      "situacaoConferenciaAduaneira": [
+        {
+          "siglaOrgao": "RFB",
+          "situacao": "CONCLUIDA_AUTOMATICAMENTE",
+          "indicadorAutorizacaoEntrega": "NAO",
+          "indicadorDesembaracoDecisaoJudicial": "NAO"
+        }
+      ],
+      "situacaoConferenciaAnuente": []
+    },
+    "equipesTrabalho": [
+      {
+        "siglaOrgao": "RFB",
+        "codigo": "ALFSPO001",
+        "descricao": "RF08-ALFSPO-Despacho de Importação"
+      }
+    ],
+    "resultadoAnaliseRisco": {
+      "canalConsolidado": "VERDE",
+      "resultadoRFB": [
+        {
+          "orgao": "RFB",
+          "resultado": "DESEMBARACO_AUTORIZADO"
+        }
+      ],
+      "resultadoAnuente": []
+    },
+    "carga": {
+      "unidadeDeclarada": {
+        "codigo": "0817900"
+      },
+      "tipoIdentificacaoCarga": "CE",
+      "identificacao": "152505278577066",
+      "seguro": {
+        "codigoMoedaNegociada": null,
+        "valorMoedaNegociada": null
+      },
+      "frete": {
+        "codigoMoedaNegociada": "USD",
+        "valorMoedaNegociada": 1197.09
+      },
+      "paisProcedencia": {
+        "codigo": "CN"
+      },
+      "motivoSituacaoEspecial": {
+        "codigo": null
+      },
+      "multiplosConhecimentosCarga": {
+        "indicadorUsoMultiplosConhecimentosCarga": "NAO",
+        "cargasReferenciadas": null
+      },
+      "consolidada": {
+        "freteCargaMoeda": "220",
+        "freteCargaValor": "1.197,09",
+        "freteCargaValorReal": "6.371,99"
+      },
+      "indicadores": {
+        "entregaFracionada": "NAO",
+        "descargaDireta": "NAO"
+      },
+      "recintoEntrega": null,
+      "tipoRecintoEntrega": null
+    },
+    "documentos": {
+      "documentosInstrucao": [
+        {
+          "tipo": {
+            "codigo": "30"
+          },
+          "palavrasChave": [
+            {
+              "codigo": "1",
+              "valor": "NGP2672355A"
+            }
+          ]
+        },
+        {
+          "tipo": {
+            "codigo": "49"
+          },
+          "palavrasChave": [
+            {
+              "codigo": "1",
+              "valor": "NFT2500193-I"
+            }
+          ]
+        },
+        {
+          "tipo": {
+            "codigo": "73"
+          },
+          "palavrasChave": [
+            {
+              "codigo": "2",
+              "valor": "PACKING LIST"
+            },
+            {
+              "codigo": "1",
+              "valor": "S/NR."
+            }
+          ]
+        }
+      ],
+      "processos": [],
+      "declaracoesExportacaoEstrangeira": [],
+      "dossies": [
+        {
+          "numero": "202500301546363"
+        },
+        {
+          "numero": "202500301560633"
+        }
+      ]
+    },
+    "adicoes": [
+      {
+        "numero": 1,
+        "itens": [
+          1,
+          3,
+          4
+        ]
+      },
+      {
+        "numero": 2,
+        "itens": [
+          2
+        ]
+      }
+    ],
+    "tributos": {
+      "mercadoria": {
+        "valorTotalLocalEmbarqueBRL": 168203.64,
+        "valorTotalLocalEmbarqueUSD": 31600.0
+      },
+      "tributosCalculados": [
+        {
+          "tipo": "II",
+          "valoresBRL": {
+            "calculado": 21996.53,
+            "aReduzir": null,
+            "devido": 21996.53,
+            "suspenso": 21996.53,
+            "aRecolher": 0.0,
+            "recolhido": null
+          }
+        },
+        {
+          "tipo": "IPI",
+          "valoresBRL": {
+            "calculado": 0.0,
+            "aReduzir": null,
+            "devido": 0.0,
+            "suspenso": 0.0,
+            "aRecolher": 0.0,
+            "recolhido": null
+          }
+        },
+        {
+          "tipo": "PIS",
+          "valoresBRL": {
+            "calculado": 3666.08,
+            "aReduzir": null,
+            "devido": 3666.08,
+            "suspenso": 3666.08,
+            "aRecolher": 0.0,
+            "recolhido": null
+          }
+        },
+        {
+          "tipo": "COFINS",
+          "valoresBRL": {
+            "calculado": 18243.16,
+            "aReduzir": null,
+            "devido": 18243.16,
+            "suspenso": 18243.16,
+            "aRecolher": 0.0,
+            "recolhido": null
+          }
+        },
+        {
+          "tipo": "TAXA_UTILIZACAO",
+          "valoresBRL": {
+            "calculado": null,
+            "aReduzir": null,
+            "devido": null,
+            "suspenso": null,
+            "aRecolher": 192.79,
+            "recolhido": 192.79
+          }
+        }
+      ]
+    },
+    "pagamentos": [
+      {
+        "versaoOrigem": 1,
+        "principal": {
+          "dataPagamento": "2025-09-30T18:27:09-0300",
+          "codigoReceita": "7811",
+          "banco": "001",
+          "agencia": "1812",
+          "conta": "38125",
+          "tributo": {
+            "tipo": "TAXA_UTILIZACAO"
+          },
+          "valor": 192.79,
+          "juros": {
+            "codigoReceita": null,
+            "valor": null,
+            "dataPagamentoJuros": null,
+            "bancoJuros": null,
+            "agenciaJuros": null,
+            "contaJuros": null
+          }
+        }
+      }
+    ],
+    "tratamentoAdministrativo": {
+      "resultadoProcessamentoTA": {
+        "dataProcessamento": "2025-09-30T18:27:02-0300",
+        "resultadoConsolidadoTA": "ALERTA"
+      },
+      "itensTratamentoAdministrativo": [
+        {
+          "numeroItemDuimp": 1,
+          "tipoTratamento": "ALERTA",
+          "descricao": "Alerta",
+          "orgao": "ANVISA",
+          "lpco": null,
+          "observacoes": " Operação sujeita a monitoramento da Agência Nacional de Vigilância sanitária - Anvisa, RDC 977/2025."
+        },
+        {
+          "numeroItemDuimp": 2,
+          "tipoTratamento": "ALERTA",
+          "descricao": "Alerta",
+          "orgao": "ANVISA",
+          "lpco": null,
+          "observacoes": " Operação sujeita a monitoramento da Agência Nacional de Vigilância sanitária - Anvisa, RDC 977/2025."
+        },
+        {
+          "numeroItemDuimp": 3,
+          "tipoTratamento": "ALERTA",
+          "descricao": "Alerta",
+          "orgao": "ANVISA",
+          "lpco": null,
+          "observacoes": " Operação sujeita a monitoramento da Agência Nacional de Vigilância sanitária - Anvisa, RDC 977/2025."
+        },
+        {
+          "numeroItemDuimp": 4,
+          "tipoTratamento": "ALERTA",
+          "descricao": "Alerta",
+          "orgao": "ANVISA",
+          "lpco": null,
+          "observacoes": " Operação sujeita a monitoramento da Agência Nacional de Vigilância sanitária - Anvisa, RDC 977/2025."
+        }
+      ]
+    },
+    "quantidadeItens": 4,
+    "itens": [
+      {
+        "status": "ATIVO",
+        "identificacao": {
+          "numero": "25BR00001785577",
+          "versao": 1,
+          "numeroItem": 1
+        },
+        "produto": {
+          "codigo": "3",
+          "versao": "2",
+          "niResponsavel": "47998441",
+          "ncm": "84212100"
+        },
+        "caracterizacaoImportacao": {
+          "indicador": "IMPORTACAO_DIRETA",
+          "ni": null
+        },
+        "indicadorExportadorFabricante": {
+          "codigo": "EXPORTADOR_IGUAL_FABRICANTE"
+        },
+        "fabricante": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "exportador": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "indicadorCompradorVendedor": {
+          "codigo": "NAO_HA_VINCULACAO"
+        },
+        "mercadoria": {
+          "tipoAplicacao": {
+            "codigo": "CONSUMO"
+          },
+          "condicao": "NOVA",
+          "unidadeComercial": "KIT",
+          "quantidadeComercial": "1.00000",
+          "quantidadeMedidaEstatistica": "1.00000",
+          "pesoLiquido": "400.00000",
+          "moedaNegociada": {
+            "codigo": "USD"
+          },
+          "valorUnitarioMoedaNegociada": "13000.0000000",
+          "descricao": null
+        },
+        "condicaoVenda": {
+          "metodoValoracao": {
+            "codigo": "6"
+          },
+          "incoterm": null,
+          "valorBRL": "69197.70",
+          "valorMoedaNegociada": "13000.00",
+          "frete": {
+            "valorBRL": "1930.91"
+          },
+          "seguro": {
+            "valorBRL": "0.00"
+          },
+          "acrescimosDeducoes": []
+        },
+        "lpcos": [],
+        "certificadoMercosul": [],
+        "declaracoesVinculadas": [],
+        "dadosCambiais": {
+          "coberturaCambial": {
+            "codigo": "SEM_COBERTURA"
+          },
+          "numeroROF": null,
+          "instituicaoFinanciadora": null,
+          "valorCoberturaCambial": null,
+          "motivoSemCobertura": {
+            "codigo": "52"
+          }
+        },
+        "atributosDuimp": [
+          {
+            "codigo": "ATT_10888",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_9332",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14786",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14785",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14783",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14782",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14781",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14780",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14520",
+            "valor": null
+          }
+        ],
+        "atributosFundamentoLegalDuimp": [
+          {
+            "codigo": "ATT_8120",
+            "valor": "1"
+          },
+          {
+            "codigo": "ATT_7820",
+            "valor": "180"
+          }
+        ],
+        "dadosInsumoDrawbackIsencao": {
+          "numeroAtoDuimpInsumo": null,
+          "itemAtoDuimpInsumo": null
+        },
+        "utilizacaoProcesso": {
+          "lpco": {
+            "indicadorUsoProcesso": "NAO",
+            "indicadorDispensaLPCO": "NAO"
+          },
+          "drawback": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null
+          },
+          "valores": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null,
+            "valorAduaneiroInformado": null,
+            "tributosInformados": []
+          }
+        },
+        "localConsumo": {
+          "uf": null,
+          "municipio": null
+        },
+        "tributos": {
+          "mercadoria": {
+            "valorLocalEmbarqueBRL": 69197.7,
+            "valorAduaneiroBRL": 71128.61,
+            "taxaUtilizacao": 78.5498223,
+            "afrmm": 166.7575758,
+            "tum": 8.1487445
+          },
+          "tributosAplicados": [
+            {
+              "tributo": {
+                "codigo": "II"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "IPI"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "CIDE"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "PIS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "COFINS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            }
+          ],
+          "tributosCalculados": [
+            {
+              "tipo": "II",
+              "valoresBRL": {
+                "calculado": 8962.2,
+                "aReduzir": null,
+                "devido": 8962.2,
+                "suspenso": 8962.2,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 3,
+                "baseCalculoBRL": 71128.61,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 12.6,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 8962.2,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "IPI",
+              "valoresBRL": {
+                "calculado": 0.0,
+                "aReduzir": null,
+                "devido": 0.0,
+                "suspenso": 0.0,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 6999,
+                "baseCalculoBRL": 80090.81486,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 0.0,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 0.0,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "PIS",
+              "valoresBRL": {
+                "calculado": 1493.7,
+                "aReduzir": null,
+                "devido": 1493.7,
+                "suspenso": 1493.7,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 71128.61,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 2.1,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 1493.7,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "COFINS",
+              "valoresBRL": {
+                "calculado": 7432.94,
+                "aReduzir": null,
+                "devido": 7432.94,
+                "suspenso": 7432.94,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 71128.61,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 10.45,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 7432.94,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            }
+          ]
+        },
+        "catp_detalhes": {
+          "descricao": "ROTARY DRUM SCREEN - PENEIRA ROTATIVA DE TAMBOR, MODELO: TNW-ZGL-600 - FAB. 07/2025",
+          "denominacao": "ROTARY DRUM SCREEN",
+          "modalidade": "IMPORTACAO",
+          "ncm": "84212100",
+          "atributos": [
+            {
+              "atributo": "ATT_2344",
+              "valor": "999"
+            },
+            {
+              "atributo": "ATT_13200",
+              "valor": "04"
+            },
+            {
+              "atributo": "ATT_14545",
+              "valor": "99"
+            }
+          ],
+          "atributosMultivalorados": [],
+          "atributosCompostos": [],
+          "atributosCompostosMultivalorados": [],
+          "codigosInterno": [
+            "TNW-ZGL-600"
+          ],
+          "inicioVigencia": "2025-09-30T11:42:59",
+          "cpfCnpjRaiz": "47998441",
+          "codigo": 3,
+          "versao": "2",
+          "situacao": "Ativado"
+        }
+      },
+      {
+        "status": "ATIVO",
+        "identificacao": {
+          "numero": "25BR00001785577",
+          "versao": 1,
+          "numeroItem": 2
+        },
+        "produto": {
+          "codigo": "5",
+          "versao": "2",
+          "niResponsavel": "47998441",
+          "ncm": "84798999"
+        },
+        "caracterizacaoImportacao": {
+          "indicador": "IMPORTACAO_DIRETA",
+          "ni": null
+        },
+        "indicadorExportadorFabricante": {
+          "codigo": "EXPORTADOR_IGUAL_FABRICANTE"
+        },
+        "fabricante": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "exportador": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "indicadorCompradorVendedor": {
+          "codigo": "NAO_HA_VINCULACAO"
+        },
+        "mercadoria": {
+          "tipoAplicacao": {
+            "codigo": "CONSUMO"
+          },
+          "condicao": "NOVA",
+          "unidadeComercial": "KIT",
+          "quantidadeComercial": "1.00000",
+          "quantidadeMedidaEstatistica": "1.00000",
+          "pesoLiquido": "450.00000",
+          "moedaNegociada": {
+            "codigo": "USD"
+          },
+          "valorUnitarioMoedaNegociada": "7500.0000000",
+          "descricao": null
+        },
+        "condicaoVenda": {
+          "metodoValoracao": {
+            "codigo": "6"
+          },
+          "incoterm": null,
+          "valorBRL": "39921.75",
+          "valorMoedaNegociada": "7500.00",
+          "frete": {
+            "valorBRL": "2172.27"
+          },
+          "seguro": {
+            "valorBRL": "0.00"
+          },
+          "acrescimosDeducoes": []
+        },
+        "lpcos": [],
+        "certificadoMercosul": [],
+        "declaracoesVinculadas": [],
+        "dadosCambiais": {
+          "coberturaCambial": {
+            "codigo": "SEM_COBERTURA"
+          },
+          "numeroROF": null,
+          "instituicaoFinanciadora": null,
+          "valorCoberturaCambial": null,
+          "motivoSemCobertura": {
+            "codigo": "52"
+          }
+        },
+        "atributosDuimp": [
+          {
+            "codigo": "ATT_10888",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_9332",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14786",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14785",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14783",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14782",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14781",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14780",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14520",
+            "valor": null
+          }
+        ],
+        "atributosFundamentoLegalDuimp": [
+          {
+            "codigo": "ATT_8120",
+            "valor": "1"
+          },
+          {
+            "codigo": "ATT_7820",
+            "valor": "180"
+          }
+        ],
+        "dadosInsumoDrawbackIsencao": {
+          "numeroAtoDuimpInsumo": null,
+          "itemAtoDuimpInsumo": null
+        },
+        "utilizacaoProcesso": {
+          "lpco": {
+            "indicadorUsoProcesso": "NAO",
+            "indicadorDispensaLPCO": "NAO"
+          },
+          "drawback": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null
+          },
+          "valores": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null,
+            "valorAduaneiroInformado": null,
+            "tributosInformados": []
+          }
+        },
+        "localConsumo": {
+          "uf": null,
+          "municipio": null
+        },
+        "tributos": {
+          "mercadoria": {
+            "valorLocalEmbarqueBRL": 39921.75,
+            "valorAduaneiroBRL": 42094.02,
+            "taxaUtilizacao": 46.4859048,
+            "afrmm": 187.6022727,
+            "tum": 4.8224394
+          },
+          "tributosAplicados": [
+            {
+              "tributo": {
+                "codigo": "II"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "IPI"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "CIDE"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "PIS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "COFINS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            }
+          ],
+          "tributosCalculados": [
+            {
+              "tipo": "II",
+              "valoresBRL": {
+                "calculado": 5303.85,
+                "aReduzir": null,
+                "devido": 5303.85,
+                "suspenso": 5303.85,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 3,
+                "baseCalculoBRL": 42094.02,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 12.6,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 5303.85,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "IPI",
+              "valoresBRL": {
+                "calculado": 0.0,
+                "aReduzir": null,
+                "devido": 0.0,
+                "suspenso": 0.0,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 6999,
+                "baseCalculoBRL": 47397.86652,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 0.0,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 0.0,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "PIS",
+              "valoresBRL": {
+                "calculado": 883.97,
+                "aReduzir": null,
+                "devido": 883.97,
+                "suspenso": 883.97,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 42094.02,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 2.1,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 883.97,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "COFINS",
+              "valoresBRL": {
+                "calculado": 4398.83,
+                "aReduzir": null,
+                "devido": 4398.83,
+                "suspenso": 4398.83,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 42094.02,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 10.45,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 4398.83,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            }
+          ]
+        },
+        "catp_detalhes": {
+          "descricao": "SCREW PRESS - PRENSA DE PARAFUSO; MOD.: TNW-201 - FAB. 07/2025",
+          "denominacao": "SCREW PRESS",
+          "modalidade": "IMPORTACAO",
+          "ncm": "84798999",
+          "atributos": [
+            {
+              "atributo": "ATT_13305",
+              "valor": "PRENSA DE PARAFUSO"
+            },
+            {
+              "atributo": "ATT_2692",
+              "valor": "999"
+            },
+            {
+              "atributo": "ATT_9764",
+              "valor": "false"
+            },
+            {
+              "atributo": "ATT_13240",
+              "valor": "04"
+            },
+            {
+              "atributo": "ATT_13820",
+              "valor": "99"
+            },
+            {
+              "atributo": "ATT_14545",
+              "valor": "99"
+            }
+          ],
+          "atributosMultivalorados": [],
+          "atributosCompostos": [],
+          "atributosCompostosMultivalorados": [],
+          "codigosInterno": [
+            "TNW-201"
+          ],
+          "inicioVigencia": "2025-09-30T11:44:21",
+          "fimVigencia": "2026-04-10T23:59:59",
+          "cpfCnpjRaiz": "47998441",
+          "codigo": 5,
+          "versao": "2",
+          "situacao": "Desativado"
+        }
+      },
+      {
+        "status": "ATIVO",
+        "identificacao": {
+          "numero": "25BR00001785577",
+          "versao": 1,
+          "numeroItem": 3
+        },
+        "produto": {
+          "codigo": "6",
+          "versao": "2",
+          "niResponsavel": "47998441",
+          "ncm": "84212100"
+        },
+        "caracterizacaoImportacao": {
+          "indicador": "IMPORTACAO_DIRETA",
+          "ni": null
+        },
+        "indicadorExportadorFabricante": {
+          "codigo": "EXPORTADOR_IGUAL_FABRICANTE"
+        },
+        "fabricante": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "exportador": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "indicadorCompradorVendedor": {
+          "codigo": "NAO_HA_VINCULACAO"
+        },
+        "mercadoria": {
+          "tipoAplicacao": {
+            "codigo": "CONSUMO"
+          },
+          "condicao": "NOVA",
+          "unidadeComercial": "KIT",
+          "quantidadeComercial": "1.00000",
+          "quantidadeMedidaEstatistica": "1.00000",
+          "pesoLiquido": "270.00000",
+          "moedaNegociada": {
+            "codigo": "USD"
+          },
+          "valorUnitarioMoedaNegociada": "7200.0000000",
+          "descricao": null
+        },
+        "condicaoVenda": {
+          "metodoValoracao": {
+            "codigo": "6"
+          },
+          "incoterm": null,
+          "valorBRL": "38324.88",
+          "valorMoedaNegociada": "7200.00",
+          "frete": {
+            "valorBRL": "1303.36"
+          },
+          "seguro": {
+            "valorBRL": "0.00"
+          },
+          "acrescimosDeducoes": []
+        },
+        "lpcos": [],
+        "certificadoMercosul": [],
+        "declaracoesVinculadas": [],
+        "dadosCambiais": {
+          "coberturaCambial": {
+            "codigo": "SEM_COBERTURA"
+          },
+          "numeroROF": null,
+          "instituicaoFinanciadora": null,
+          "valorCoberturaCambial": null,
+          "motivoSemCobertura": {
+            "codigo": "52"
+          }
+        },
+        "atributosDuimp": [
+          {
+            "codigo": "ATT_10888",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_9332",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14786",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14785",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14783",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14782",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14781",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14780",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14520",
+            "valor": null
+          }
+        ],
+        "atributosFundamentoLegalDuimp": [
+          {
+            "codigo": "ATT_8120",
+            "valor": "1"
+          },
+          {
+            "codigo": "ATT_7820",
+            "valor": "180"
+          }
+        ],
+        "dadosInsumoDrawbackIsencao": {
+          "numeroAtoDuimpInsumo": null,
+          "itemAtoDuimpInsumo": null
+        },
+        "utilizacaoProcesso": {
+          "lpco": {
+            "indicadorUsoProcesso": "NAO",
+            "indicadorDispensaLPCO": "NAO"
+          },
+          "drawback": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null
+          },
+          "valores": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null,
+            "valorAduaneiroInformado": null,
+            "tributosInformados": []
+          }
+        },
+        "localConsumo": {
+          "uf": null,
+          "municipio": null
+        },
+        "tributos": {
+          "mercadoria": {
+            "valorLocalEmbarqueBRL": 38324.88,
+            "valorAduaneiroBRL": 39628.24,
+            "taxaUtilizacao": 43.7628573,
+            "afrmm": 112.5613636,
+            "tum": 4.539951
+          },
+          "tributosAplicados": [
+            {
+              "tributo": {
+                "codigo": "II"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "IPI"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "CIDE"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "PIS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "COFINS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            }
+          ],
+          "tributosCalculados": [
+            {
+              "tipo": "II",
+              "valoresBRL": {
+                "calculado": 4993.16,
+                "aReduzir": null,
+                "devido": 4993.16,
+                "suspenso": 4993.16,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 3,
+                "baseCalculoBRL": 39628.24,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 12.6,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 4993.16,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "IPI",
+              "valoresBRL": {
+                "calculado": 0.0,
+                "aReduzir": null,
+                "devido": 0.0,
+                "suspenso": 0.0,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 6999,
+                "baseCalculoBRL": 44621.39824,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 0.0,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 0.0,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "PIS",
+              "valoresBRL": {
+                "calculado": 832.19,
+                "aReduzir": null,
+                "devido": 832.19,
+                "suspenso": 832.19,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 39628.24,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 2.1,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 832.19,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "COFINS",
+              "valoresBRL": {
+                "calculado": 4141.15,
+                "aReduzir": null,
+                "devido": 4141.15,
+                "suspenso": 4141.15,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 39628.24,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 10.45,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 4141.15,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            }
+          ]
+        },
+        "catp_detalhes": {
+          "descricao": "INTERNALLY FED ROTARY DRUM SCREEN - PENEIRA DE TAMBOR ROTATIVO ALIMENTADA INTERNAMENTE PARA TRATAMENTO DE RESIDUOS NA AGUA; MDO.: TNW-IRDS-2436 - FAB. 07/2025",
+          "denominacao": "INTERNALLY FED ROTARY DRUM SCREEN",
+          "modalidade": "IMPORTACAO",
+          "ncm": "84212100",
+          "atributos": [
+            {
+              "atributo": "ATT_2344",
+              "valor": "999"
+            },
+            {
+              "atributo": "ATT_13200",
+              "valor": "04"
+            },
+            {
+              "atributo": "ATT_14545",
+              "valor": "99"
+            }
+          ],
+          "atributosMultivalorados": [],
+          "atributosCompostos": [],
+          "atributosCompostosMultivalorados": [],
+          "codigosInterno": [
+            "TNW-IRDS-2436"
+          ],
+          "inicioVigencia": "2025-09-30T11:44:47",
+          "cpfCnpjRaiz": "47998441",
+          "codigo": 6,
+          "versao": "2",
+          "situacao": "Ativado"
+        }
+      },
+      {
+        "status": "ATIVO",
+        "identificacao": {
+          "numero": "25BR00001785577",
+          "versao": 1,
+          "numeroItem": 4
+        },
+        "produto": {
+          "codigo": "4",
+          "versao": "2",
+          "niResponsavel": "47998441",
+          "ncm": "84212100"
+        },
+        "caracterizacaoImportacao": {
+          "indicador": "IMPORTACAO_DIRETA",
+          "ni": null
+        },
+        "indicadorExportadorFabricante": {
+          "codigo": "EXPORTADOR_IGUAL_FABRICANTE"
+        },
+        "fabricante": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "exportador": {
+          "codigo": "OPE_3",
+          "versao": "1",
+          "niOperador": "47998441",
+          "pais": {
+            "codigo": "CN"
+          }
+        },
+        "indicadorCompradorVendedor": {
+          "codigo": "NAO_HA_VINCULACAO"
+        },
+        "mercadoria": {
+          "tipoAplicacao": {
+            "codigo": "CONSUMO"
+          },
+          "condicao": "NOVA",
+          "unidadeComercial": "KIT",
+          "quantidadeComercial": "1.00000",
+          "quantidadeMedidaEstatistica": "1.00000",
+          "pesoLiquido": "200.00000",
+          "moedaNegociada": {
+            "codigo": "USD"
+          },
+          "valorUnitarioMoedaNegociada": "3900.0000000",
+          "descricao": null
+        },
+        "condicaoVenda": {
+          "metodoValoracao": {
+            "codigo": "6"
+          },
+          "incoterm": null,
+          "valorBRL": "20759.31",
+          "valorMoedaNegociada": "3900.00",
+          "frete": {
+            "valorBRL": "965.45"
+          },
+          "seguro": {
+            "valorBRL": "0.00"
+          },
+          "acrescimosDeducoes": []
+        },
+        "lpcos": [],
+        "certificadoMercosul": [],
+        "declaracoesVinculadas": [],
+        "dadosCambiais": {
+          "coberturaCambial": {
+            "codigo": "SEM_COBERTURA"
+          },
+          "numeroROF": null,
+          "instituicaoFinanciadora": null,
+          "valorCoberturaCambial": null,
+          "motivoSemCobertura": {
+            "codigo": "52"
+          }
+        },
+        "atributosDuimp": [
+          {
+            "codigo": "ATT_10888",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_9332",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14786",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14785",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14783",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14782",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14781",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14780",
+            "valor": null
+          },
+          {
+            "codigo": "ATT_14520",
+            "valor": null
+          }
+        ],
+        "atributosFundamentoLegalDuimp": [
+          {
+            "codigo": "ATT_8120",
+            "valor": "1"
+          },
+          {
+            "codigo": "ATT_7820",
+            "valor": "180"
+          }
+        ],
+        "dadosInsumoDrawbackIsencao": {
+          "numeroAtoDuimpInsumo": null,
+          "itemAtoDuimpInsumo": null
+        },
+        "utilizacaoProcesso": {
+          "lpco": {
+            "indicadorUsoProcesso": "NAO",
+            "indicadorDispensaLPCO": "NAO"
+          },
+          "drawback": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null
+          },
+          "valores": {
+            "indicadorUsoProcesso": "NAO",
+            "justificativaUsoProcesso": null,
+            "valorAduaneiroInformado": null,
+            "tributosInformados": []
+          }
+        },
+        "localConsumo": {
+          "uf": null,
+          "municipio": null
+        },
+        "tributos": {
+          "mercadoria": {
+            "valorLocalEmbarqueBRL": 20759.31,
+            "valorAduaneiroBRL": 21724.76,
+            "taxaUtilizacao": 23.9914155,
+            "afrmm": 83.3787879,
+            "tum": 2.4888651
+          },
+          "tributosAplicados": [
+            {
+              "tributo": {
+                "codigo": "II"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "IPI"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "CIDE"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "PIS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            },
+            {
+              "tributo": {
+                "codigo": "COFINS"
+              },
+              "regime": {
+                "codigo": "5"
+              },
+              "fundamento": {
+                "codigo": "1031"
+              },
+              "atributos": []
+            }
+          ],
+          "tributosCalculados": [
+            {
+              "tipo": "II",
+              "valoresBRL": {
+                "calculado": 2737.32,
+                "aReduzir": null,
+                "devido": 2737.32,
+                "suspenso": 2737.32,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 3,
+                "baseCalculoBRL": 21724.76,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 12.6,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 2737.32,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "IPI",
+              "valoresBRL": {
+                "calculado": 0.0,
+                "aReduzir": null,
+                "devido": 0.0,
+                "suspenso": 0.0,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 6999,
+                "baseCalculoBRL": 24462.07976,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 0.0,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 0.0,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "PIS",
+              "valoresBRL": {
+                "calculado": 456.22,
+                "aReduzir": null,
+                "devido": 456.22,
+                "suspenso": 456.22,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 21724.76,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 2.1,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 456.22,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            },
+            {
+              "tipo": "COFINS",
+              "valoresBRL": {
+                "calculado": 2270.24,
+                "aReduzir": null,
+                "devido": 2270.24,
+                "suspenso": 2270.24,
+                "aRecolher": 0.0,
+                "originalDevido": null,
+                "calculadoPagProporcional": null
+              },
+              "memoriaCalculo": {
+                "codigoFundamentoLegalNormal": 1100,
+                "baseCalculoBRL": 21724.76,
+                "baseCalculoEspecificaBRL": null,
+                "baseCalculoReduzidaBRL": null,
+                "percentualReducaoBaseCalculo": null,
+                "tipoAliquota": "AD_VALOREM",
+                "percentualReducaoAliquotaReduzida": null,
+                "valorAliquota": 10.45,
+                "valorAliquotaEspecifica": null,
+                "valorAliquotaReduzida": null,
+                "normal": 2270.24,
+                "tributado": true,
+                "percentualPagamento": null,
+                "valorTributoGasolinaA": null,
+                "valorBaseCalculoEspecificaEAC": null,
+                "valorAliquotaEspecificaEAC": null,
+                "valorTributoRetidoEAC": null,
+                "percentualBiocombustivel": null,
+                "fundamentosAplicados": []
+              }
+            }
+          ]
+        },
+        "catp_detalhes": {
+          "descricao": "EXTERNALLY FED ROTARY DRUM SCREEN - PENEIRA ROTATIVA ALIMENTADA EXTERNAMENTE; MOD.: TNW-RDS-03/300 - FAB. 07/2025",
+          "denominacao": "EXTERNALLY FED ROTARY DRUM SCREEN",
+          "modalidade": "IMPORTACAO",
+          "ncm": "84212100",
+          "atributos": [
+            {
+              "atributo": "ATT_2344",
+              "valor": "999"
+            },
+            {
+              "atributo": "ATT_13200",
+              "valor": "04"
+            },
+            {
+              "atributo": "ATT_14545",
+              "valor": "99"
+            }
+          ],
+          "atributosMultivalorados": [],
+          "atributosCompostos": [],
+          "atributosCompostosMultivalorados": [],
+          "codigosInterno": [
+            "TNW-RDS-03/300"
+          ],
+          "inicioVigencia": "2025-09-30T11:43:49",
+          "cpfCnpjRaiz": "47998441",
+          "codigo": 4,
+          "versao": "2",
+          "situacao": "Ativado"
+        }
+      }
+    ],
+    "utilizacaoProcesso": {
+      "valores": {
+        "indicadorUsoProcesso": "NAO",
+        "tributosProcesso": []
+      }
+    }
+  },
+  "dados_processados_nfe": {
+    "numero": "25BR0000178557-7",
+    "versao": "1",
+    "data_registro": "2025-09-30",
+    "referencia_interna": "NFT2500193-I",
+    "itens": [
+      {
+        "nItem": "1",
+        "cProd": "25BR0000178557-7-1",
+        "cEAN": "SEM GTIN",
+        "xProd": "ROTARY DRUM SCREEN - PENEIRA ROTATIVA DE TAMBOR, MODELO: TNW-ZGL-600 - FAB. 07/2025",
+        "NCM": "84212100",
+        "CEST": "",
+        "CFOP": "3101",
+        "uCom": "KIT",
+        "qCom": "1.0000",
+        "vUnCom": "69197.7000",
+        "uTrib": "KIT",
+        "qTrib": "1.0000",
+        "vUnTrib": "69197.7000",
+        "vProd": "69197.70",
+        "moeda_conversao": "USD",
+        "taxa_conversao": "5.3229",
+        "vProd_moeda_origem": "13000.00",
+        "vUnCom_moeda_origem": "13000.0000",
+        "vUnTrib_moeda_origem": "13000.0000",
+        "orig": "1",
+        "cEnq": "999",
+        "CST_IPI": "49",
+        "CST_PIS": "98",
+        "CST_COFINS": "98",
+        "vFrete": "1930.91",
+        "vSeg": "0.00",
+        "vDesc": "0.00",
+        "vOutro": "78.55",
+        "vDespAdu": "0.00",
+        "vAFRMM": "0.00",
+        "pII": "12.60",
+        "vBC_II": "71128.61",
+        "vII": "8962.20",
+        "pIPI": "0.00",
+        "vBC_IPI": "80090.81",
+        "vIPI": "0.00",
+        "pPIS": "2.10",
+        "vBC_PIS": "71128.61",
+        "vPIS": "1493.70",
+        "pCOFINS": "10.45",
+        "vBC_COFINS": "71128.61",
+        "vCOFINS": "7432.94",
+        "nDI": "25BR0000178557-7",
+        "dDI": "2025-09-30",
+        "xLocDesemb": "MULTILOG",
+        "UFDesemb": "SP",
+        "dDesemb": "2025-09-30",
+        "tpViaTransp": "1",
+        "vAFRMM_import": "0.00",
+        "tpIntermedio": "1",
+        "CNPJ_adquirente": "",
+        "UFTerceiro": "",
+        "cExportador": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "cFabricante": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "nAdicao": "1",
+        "nSeqAdic": "1"
+      },
+      {
+        "nItem": "2",
+        "cProd": "25BR0000178557-7-2",
+        "cEAN": "SEM GTIN",
+        "xProd": "SCREW PRESS - PRENSA DE PARAFUSO; MOD.: TNW-201 - FAB. 07/2025",
+        "NCM": "84798999",
+        "CEST": "",
+        "CFOP": "3101",
+        "uCom": "KIT",
+        "qCom": "1.0000",
+        "vUnCom": "39921.7500",
+        "uTrib": "KIT",
+        "qTrib": "1.0000",
+        "vUnTrib": "39921.7500",
+        "vProd": "39921.75",
+        "moeda_conversao": "USD",
+        "taxa_conversao": "5.3229",
+        "vProd_moeda_origem": "7500.00",
+        "vUnCom_moeda_origem": "7500.0000",
+        "vUnTrib_moeda_origem": "7500.0000",
+        "orig": "1",
+        "cEnq": "999",
+        "CST_IPI": "49",
+        "CST_PIS": "98",
+        "CST_COFINS": "98",
+        "vFrete": "2172.27",
+        "vSeg": "0.00",
+        "vDesc": "0.00",
+        "vOutro": "46.49",
+        "vDespAdu": "0.00",
+        "vAFRMM": "0.00",
+        "pII": "12.60",
+        "vBC_II": "42094.02",
+        "vII": "5303.85",
+        "pIPI": "0.00",
+        "vBC_IPI": "47397.87",
+        "vIPI": "0.00",
+        "pPIS": "2.10",
+        "vBC_PIS": "42094.02",
+        "vPIS": "883.97",
+        "pCOFINS": "10.45",
+        "vBC_COFINS": "42094.02",
+        "vCOFINS": "4398.83",
+        "nDI": "25BR0000178557-7",
+        "dDI": "2025-09-30",
+        "xLocDesemb": "MULTILOG",
+        "UFDesemb": "SP",
+        "dDesemb": "2025-09-30",
+        "tpViaTransp": "1",
+        "vAFRMM_import": "0.00",
+        "tpIntermedio": "1",
+        "CNPJ_adquirente": "",
+        "UFTerceiro": "",
+        "cExportador": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "cFabricante": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "nAdicao": "2",
+        "nSeqAdic": "1"
+      },
+      {
+        "nItem": "3",
+        "cProd": "25BR0000178557-7-3",
+        "cEAN": "SEM GTIN",
+        "xProd": "INTERNALLY FED ROTARY DRUM SCREEN - PENEIRA DE TAMBOR ROTATIVO ALIMENTADA INTERNAMENTE PARA TRATAMENTO DE RESIDUOS NA AGUA; MDO.: TNW-IRDS-2436 - FAB. 07/2025",
+        "NCM": "84212100",
+        "CEST": "",
+        "CFOP": "3101",
+        "uCom": "KIT",
+        "qCom": "1.0000",
+        "vUnCom": "38324.8800",
+        "uTrib": "KIT",
+        "qTrib": "1.0000",
+        "vUnTrib": "38324.8800",
+        "vProd": "38324.88",
+        "moeda_conversao": "USD",
+        "taxa_conversao": "5.3229",
+        "vProd_moeda_origem": "7200.00",
+        "vUnCom_moeda_origem": "7200.0000",
+        "vUnTrib_moeda_origem": "7200.0000",
+        "orig": "1",
+        "cEnq": "999",
+        "CST_IPI": "49",
+        "CST_PIS": "98",
+        "CST_COFINS": "98",
+        "vFrete": "1303.36",
+        "vSeg": "0.00",
+        "vDesc": "0.00",
+        "vOutro": "43.76",
+        "vDespAdu": "0.00",
+        "vAFRMM": "0.00",
+        "pII": "12.60",
+        "vBC_II": "39628.24",
+        "vII": "4993.16",
+        "pIPI": "0.00",
+        "vBC_IPI": "44621.40",
+        "vIPI": "0.00",
+        "pPIS": "2.10",
+        "vBC_PIS": "39628.24",
+        "vPIS": "832.19",
+        "pCOFINS": "10.45",
+        "vBC_COFINS": "39628.24",
+        "vCOFINS": "4141.15",
+        "nDI": "25BR0000178557-7",
+        "dDI": "2025-09-30",
+        "xLocDesemb": "MULTILOG",
+        "UFDesemb": "SP",
+        "dDesemb": "2025-09-30",
+        "tpViaTransp": "1",
+        "vAFRMM_import": "0.00",
+        "tpIntermedio": "1",
+        "CNPJ_adquirente": "",
+        "UFTerceiro": "",
+        "cExportador": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "cFabricante": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "nAdicao": "1",
+        "nSeqAdic": "2"
+      },
+      {
+        "nItem": "4",
+        "cProd": "25BR0000178557-7-4",
+        "cEAN": "SEM GTIN",
+        "xProd": "EXTERNALLY FED ROTARY DRUM SCREEN - PENEIRA ROTATIVA ALIMENTADA EXTERNAMENTE; MOD.: TNW-RDS-03/300 - FAB. 07/2025",
+        "NCM": "84212100",
+        "CEST": "",
+        "CFOP": "3101",
+        "uCom": "KIT",
+        "qCom": "1.0000",
+        "vUnCom": "20759.3100",
+        "uTrib": "KIT",
+        "qTrib": "1.0000",
+        "vUnTrib": "20759.3100",
+        "vProd": "20759.31",
+        "moeda_conversao": "USD",
+        "taxa_conversao": "5.3229",
+        "vProd_moeda_origem": "3900.00",
+        "vUnCom_moeda_origem": "3900.0000",
+        "vUnTrib_moeda_origem": "3900.0000",
+        "orig": "1",
+        "cEnq": "999",
+        "CST_IPI": "49",
+        "CST_PIS": "98",
+        "CST_COFINS": "98",
+        "vFrete": "965.45",
+        "vSeg": "0.00",
+        "vDesc": "0.00",
+        "vOutro": "23.99",
+        "vDespAdu": "0.00",
+        "vAFRMM": "0.00",
+        "pII": "12.60",
+        "vBC_II": "21724.76",
+        "vII": "2737.32",
+        "pIPI": "0.00",
+        "vBC_IPI": "24462.08",
+        "vIPI": "0.00",
+        "pPIS": "2.10",
+        "vBC_PIS": "21724.76",
+        "vPIS": "456.22",
+        "pCOFINS": "10.45",
+        "vBC_COFINS": "21724.76",
+        "vCOFINS": "2270.24",
+        "nDI": "25BR0000178557-7",
+        "dDI": "2025-09-30",
+        "xLocDesemb": "MULTILOG",
+        "UFDesemb": "SP",
+        "dDesemb": "2025-09-30",
+        "tpViaTransp": "1",
+        "vAFRMM_import": "0.00",
+        "tpIntermedio": "1",
+        "CNPJ_adquirente": "",
+        "UFTerceiro": "",
+        "cExportador": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "cFabricante": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+        "nAdicao": "1",
+        "nSeqAdic": "3"
+      }
+    ],
+    "cabecalho": {
+      "referencia_interna": "NFT2500193-I",
+      "nNF": "",
+      "serie": "1",
+      "indFinal": "1",
+      "natOp": "COMPRA PARA INDUSTRIALIZAÇÃO (IMPORTAÇÃO)",
+      "cfop_padrao": "3101",
+      "select_operacao": "COMPRA PARA INDUSTRIALIZAÇÃO (IMPORTAÇÃO)",
+      "tpNF": "0",
+      "idDest": "3",
+      "chaveAcesso": "",
+      "cUF": "35",
+      "cNF": "",
+      "dhEmi": "2025-09-30T12:00:00-03:00",
+      "mod": "55",
+      "tpEmis": "1",
+      "cDV": "",
+      "emit_xNome": "NFT Logistics LTDA",
+      "emit_CNPJ": "47998441000198",
+      "emit_IE": "138843326117",
+      "emit_CRT": "1",
+      "emit_xLgr": "Avenida Doutor Gastao Vidigal",
+      "emit_nro": "1132",
+      "emit_xCpl": "SALA 910 TORRE B",
+      "emit_xBairro": "Vila Leopoldina",
+      "emit_cMun": "3550308",
+      "emit_xMun": "Sao Paulo",
+      "emit_UF": "SP",
+      "emit_CEP": "05314000",
+      "dest_xNome": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+      "dest_tpDoc": "Estrangeiro",
+      "dest_CNPJ_CPF": "",
+      "dest_indIEDest": "9",
+      "dest_IE": "",
+      "dest_xLgr": "NORTH SICHUAN RD.",
+      "dest_nro": "1666",
+      "dest_xCpl": "",
+      "dest_xBairro": "LUOHU DISTRICT",
+      "dest_cMun": "9999999",
+      "dest_xMun": "EXTERIOR",
+      "dest_UF": "EX",
+      "dest_CEP": "99999-999",
+      "dest_cPais": "1600",
+      "dest_xPais": "CHINA REPUBLICA POPULAR",
+      "import_nDI": "25BR0000178557-7",
+      "import_dDI": "2025-09-30",
+      "import_cExportador": "SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+      "import_tpViaTransp": "1",
+      "import_tpIntermedio": "1",
+      "import_UFDesemb": "SP",
+      "import_xLocDesemb": "MULTILOG",
+      "import_dDesemb": "2025-09-30",
+      "modFrete": "1",
+      "transp_modFrete": "1",
+      "transp_xNome": "TRANSFERRARI TRANSPORTE E LOGISTICA LTDA",
+      "transp_CNPJ_CPF": "04.601.873/0001-00",
+      "transp_IE": "298263390116",
+      "transp_xEnder": "Rua Doutor Paulo de Oliveira, 245",
+      "transp_xMun": "Embu das Artes",
+      "transp_UF": "SP",
+      "transp_qVol": "4",
+      "transp_esp": "VOLUMES",
+      "transp_pesoL": "1320,000",
+      "transp_pesoB": "1386,000",
+      "tot_vProd": "168203,64",
+      "tot_vFrete": "6371,99",
+      "tot_vSeg": "0,00",
+      "tot_vOutro": "192,79",
+      "tot_vDesc": "0,00",
+      "tot_vNF": "174768,42",
+      "vNF": "174768,42",
+      "tot_vBC": "0,00",
+      "tot_vICMS": "0,00",
+      "tot_vBCST": "0,00",
+      "tot_vST": "0,00",
+      "tot_vII": "21996,53",
+      "tot_vIPI": "0,00",
+      "tot_vPIS": "3666,08",
+      "tot_vCOFINS": "18243,16",
+      "rateio_vAFRMM": "0,00",
+      "rateio_vSiscomex": "192,79",
+      "rateio_vFrete": "6371,99",
+      "rateio_vSeg": "0,00",
+      "rateio_vOutro": "0,00",
+      "ptax_data": "2025-09-30",
+      "ptax_moeda": "USD",
+      "ptax_cotacao_venda": "5,3229",
+      "ptax_cotacao_compra": "5,3229",
+      "infCpl": "DECLARACAO UNICA DE IMPORTACAO - DUIMP: 25BR0000178557-7  DATA: 30/09/2025  LOCAL DESEMBARACO: MULTILOG - SP  CANAL: VERDE  IMPORTADOR: NFT Logistics LTDA (47998441000198)  EXPORTADOR: SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD"
+    },
+    "rodape": {
+      "vNF": "174768.42",
+      "infCpl": "DECLARACAO UNICA DE IMPORTACAO - DUIMP: 25BR0000178557-7  DATA: 30/09/2025  LOCAL DESEMBARACO: MULTILOG - SP  CANAL: VERDE  IMPORTADOR: NFT Logistics LTDA (47998441000198)  EXPORTADOR: SHANGHAI HI-EXPO INTERN.LOGISTICS CO.LTD",
+      "transporte": {
+        "modFrete": "1",
+        "CNPJ_CPF": "04.601.873/0001-00",
+        "xNome": "TRANSFERRARI TRANSPORTE E LOGISTICA LTDA",
+        "IE": "298263390116",
+        "xEnder": "Rua Doutor Paulo de Oliveira, 245",
+        "xMun": "Embu das Artes",
+        "UF": "SP",
+        "qVol": "4",
+        "esp": "VOLUMES",
+        "marca": "",
+        "nVol": "",
+        "pesoL": "1320.000",
+        "pesoB": "1386.000"
+      },
+      "totais": {
+        "vBC": "0.00",
+        "vICMS": "0.00",
+        "vICMSDeson": "0.00",
+        "vFCP": "0.00",
+        "vBCST": "0.00",
+        "vST": "0.00",
+        "vFCPST": "0.00",
+        "vFCPSTRet": "0.00",
+        "vProd": "168203.64",
+        "vFrete": "6371.99",
+        "vSeg": "0.00",
+        "vDesc": "0.00",
+        "vII": "21996.53",
+        "vIPI": "0.00",
+        "vIPIDevol": "0.00",
+        "vPIS": "3666.08",
+        "vCOFINS": "18243.16",
+        "vOutro": "192.79",
+        "vNF": "174768.42"
+      }
+    },
+    "imposto_modelo": {
+      "cfop_padrao": "3101",
+      "tp_nf": "0",
+      "id_dest": "3",
+      "orig_padrao": "1",
+      "csosn_icms": "102",
+      "c_enq_ipi": "999",
+      "cst_ipi": "49",
+      "p_ipi": 0,
+      "aliquota_ii": 0,
+      "cst_pis": "98",
+      "p_pis": 0,
+      "cst_cofins": "98",
+      "p_cofins": 0
+    },
+    "resumo_rateio": {
+      "vAFRMM": "0.00",
+      "vDespAdu": "192.79",
+      "vOutro": "192.79",
+      "vFrete": "6371.99",
+      "vSeg": "0.00",
+      "data_di": "2025-09-30",
+      "ptax_moeda": "USD",
+      "ptax_cotacao_venda": "5,3229"
+    },
+    "totais": {
+      "total_produtos": 168203.63999999998,
+      "total_frete": 6371.99,
+      "total_seguro": 0.0,
+      "total_outro": 192.79,
+      "total_ii": 21996.530000000002,
+      "total_ipi": 0.0,
+      "total_pis": 3666.08,
+      "total_cofins": 18243.16,
+      "valor_total_nf": 174768.41999999998
+    }
+  },
+  "data_importacao": "13/10/2026 17:16:53"
+}

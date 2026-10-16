@@ -526,6 +526,35 @@ select option {
   border-color: var(--success) !important;
 }
 
+.btn-nft-success-solid {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25);
+}
+
+.btn-nft-success-solid:hover,
+.btn-nft-success-solid:focus {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+  border-color: #047857 !important;
+}
+
+/* Dropzone de upload PFX */
+.dropzone-pfx {
+  border: 2px dashed var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  background-color: var(--surface-secondary) !important;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.dropzone-pfx:hover,
+.dropzone-pfx.dragover {
+  border-color: var(--primary) !important;
+  background-color: var(--primary-subtle) !important;
+}
+
 .btn-nft-danger {
   background-color: var(--danger-subtle) !important;
   color: var(--danger) !important;
@@ -754,6 +783,16 @@ select option {
   border: 1px solid var(--success) !important;
 }
 
+/* Badges de Erro / Cancelamento (Vermelho com texto em branco) */
+.badge.bg-danger,
+.badge-danger,
+.badge[style*="background-color: #dc2626"],
+.badge[style*="background-color:#dc2626"] {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+  border: 1px solid #dc2626 !important;
+}
+
 /* Badges sutis e variantes unificados com estilo --success */
 .badge.bg-info-subtle,
 .badge.bg-success-subtle,
@@ -764,20 +803,89 @@ select option {
   border: 1px solid rgba(16, 185, 129, 0.32) !important;
 }
 
-/* Badges específicos de rascunhos e contadores */
-.badge-origem-rascunho,
-.badge-origem-di,
-.badge-origem-nova,
-.badge-origem-rasc,
-.badge-categoria-rascunho {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+/* Estilo de Categoria em Rascunhos (Somente texto) */
+.texto-categoria-rascunho {
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
   font-weight: 600;
-  padding: 0.25rem 0.55rem;
+  color: var(--foreground) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Badges específicos de origem de rascunhos com cores diferenciadas */
+.badge-origem-base {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
-  background-color: var(--success-subtle) !important;
-  border: 1px solid rgba(16, 185, 129, 0.32) !important;
-  color: var(--success) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  line-height: 1.2;
+}
+
+/* Nova NF: Azul / Ciano Moderno */
+.badge-origem-nova {
+  background-color: rgba(6, 182, 212, 0.14) !important;
+  border: 1px solid rgba(6, 182, 212, 0.35) !important;
+  color: #0891b2 !important;
+}
+[data-bs-theme="dark"] .badge-origem-nova {
+  color: #22d3ee !important;
+  background-color: rgba(6, 182, 212, 0.18) !important;
+}
+
+/* XML Rascunho: Âmbar / Laranja Suave */
+.badge-origem-rasc,
+.badge-origem-rascunho {
+  background-color: rgba(245, 158, 11, 0.14) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  color: #d97706 !important;
+}
+[data-bs-theme="dark"] .badge-origem-rasc,
+[data-bs-theme="dark"] .badge-origem-rascunho {
+  color: #fbbf24 !important;
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+/* XML DI: Roxo / Violeta Elegante */
+.badge-origem-di {
+  background-color: rgba(139, 92, 246, 0.14) !important;
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+  color: #7c3aed !important;
+}
+[data-bs-theme="dark"] .badge-origem-di {
+  color: #a78bfa !important;
+  background-color: rgba(139, 92, 246, 0.18) !important;
+}
+
+/* DUIMP Importada: Azul Royal / Indigo */
+.badge-origem-duimp-imp {
+  background-color: rgba(59, 130, 246, 0.14) !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  color: #2563eb !important;
+}
+[data-bs-theme="dark"] .badge-origem-duimp-imp {
+  color: #60a5fa !important;
+  background-color: rgba(59, 130, 246, 0.18) !important;
+}
+
+/* Botões de Ação Redondos para Modais de Tabela */
+.btn-nft-action-round {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease-in-out !important;
 }
 
 /* ==========================================================================
@@ -1622,6 +1730,46 @@ label.has-regex-tag,
 .grip-handle:active {
   cursor: grabbing;
 }
+
+/* ==========================================================================
+   15. CÉLULA QUANTIDADE TRIBUTÁVEL MANUAL (DESTAQUE AMARELO)
+   ========================================================================== */
+.cell-qtrib-manual,
+.tabulator-cell.cell-qtrib-manual {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  color: #b45309 !important;
+  font-weight: 700 !important;
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.45) !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+[data-bs-theme="dark"] .cell-qtrib-manual,
+[data-bs-theme="dark"] .tabulator-cell.cell-qtrib-manual {
+  background-color: rgba(245, 158, 11, 0.25) !important;
+  color: #fbbf24 !important;
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.55) !important;
+}
+
+.cell-qtrib-manual .badge-manual-qtrib {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.25);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+[data-bs-theme="dark"] .cell-qtrib-manual .badge-manual-qtrib {
+  background: rgba(245, 158, 11, 0.35);
+  color: #fef3c7;
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
 
 
 

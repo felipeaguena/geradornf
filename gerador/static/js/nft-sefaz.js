@@ -6,12 +6,15 @@ async function verificarStatusCertificado() {
         const response = await fetch('/api/certificado/status');
         const data = await response.json();
         const container = document.getElementById('cert-info-container');
+        if (!container) return;
         
         if (data.status === 'success') {
+            const arquivoNome = data.arquivo ? `<div class="small text-muted font-monospace mt-1"><i data-lucide="file-key" style="width: 12px; height: 12px;"></i> Arquivo: ${data.arquivo}</div>` : '';
             container.innerHTML = `
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Titular / Assunto</div>
                     <div class="fw-bold font-monospace" style="font-size: 11px;">${data.assunto}</div>
+                    ${arquivoNome}
                 </div>
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Emissor</div>
@@ -43,10 +46,224 @@ async function verificarStatusCertificado() {
                 </div>
             `;
         }
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
     } catch (e) {
         console.error('Erro na verificação do certificado:', e);
-        await window.nftAlert('Ocorreu um erro ao verificar o certificado digital.', { type: 'danger', title: 'Erro de Certificado' });
+        if (window.nftAlert) {
+            await window.nftAlert('Ocorreu um erro ao verificar o certificado digital.', { type: 'danger', title: 'Erro de Certificado' });
+        }
+    }
+}
+
+// === IMPORTAÇÃO E INSTALAÇÃO DE CERTIFICADO DIGITAL A1 (PFX / P12) ===
+let arquivoPfxSelecionado = null;
+
+function abrirModalImportarCertificado() {
+    arquivoPfxSelecionado = null;
+    const inputPfx = document.getElementById('inputArquivoPfx');
+    if (inputPfx) inputPfx.value = '';
+    
+    const displayEl = document.getElementById('pfx-file-name-display');
+    if (displayEl) displayEl.classList.add('d-none');
+    
+    const textEl = document.getElementById('pfx-file-name-text');
+    if (textEl) textEl.innerText = '';
+    
+    const dropzone = document.getElementById('dropzone-certificado');
+    if (dropzone) dropzone.classList.remove('dragover');
+    
+    const senhaInput = document.getElementById('inputSenhaCertificado');
+    if (senhaInput && !senhaInput.value) {
+        senhaInput.value = 'nftecnpj';
+    }
+    
+    const modalEl = document.getElementById('modalImportarCertificado');
+    if (modalEl) {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+        configurarDropzonePfx();
+        setTimeout(() => {
+            if (window.lucide) lucide.createIcons();
+        }, 150);
+    }
+}
+
+function configurarDropzonePfx() {
+    const dropzone = document.getElementById('dropzone-certificado');
+    if (!dropzone || dropzone.dataset.configured === 'true') return;
+    dropzone.dataset.configured = 'true';
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('dragover');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('dragover');
+        }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length > 0) {
+            definirArquivoPfx(files[0]);
+        }
+    }, false);
+}
+
+function aoSelecionarArquivoPfx(input) {
+    if (input.files && input.files[0]) {
+        definirArquivoPfx(input.files[0]);
+    }
+}
+
+function definirArquivoPfx(file) {
+    const nome = file.name.toLowerCase();
+    if (!nome.endsWith('.pfx') && !nome.endsWith('.p12')) {
+        if (window.nftAlert) {
+            window.nftAlert('Por favor, selecione um arquivo de certificado digital válido (.pfx ou .p12).', {
+                title: 'Formato Não Suportado',
+                type: 'warning'
+            });
+        } else {
+            alert('Por favor, selecione um arquivo de certificado digital válido (.pfx ou .p12).');
+        }
+        return;
+    }
+
+    arquivoPfxSelecionado = file;
+    const displayEl = document.getElementById('pfx-file-name-display');
+    const textEl = document.getElementById('pfx-file-name-text');
+    const sizeKB = (file.size / 1024).toFixed(1);
+    
+    if (textEl) {
+        textEl.innerText = `${file.name} (${sizeKB} KB)`;
+    }
+    if (displayEl) {
+        displayEl.classList.remove('d-none');
+    }
+    if (window.lucide) lucide.createIcons();
+}
+
+function alternarVisibilidadeSenhaCertificado() {
+    const input = document.getElementById('inputSenhaCertificado');
+    const icone = document.getElementById('icone-olho-senha-cert');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icone) icone.setAttribute('data-lucide', 'eye-off');
+    } else {
+        input.type = 'password';
+        if (icone) icone.setAttribute('data-lucide', 'eye');
+    }
+    if (window.lucide) lucide.createIcons();
+}
+
+async function submeterImportarCertificado() {
+    if (!arquivoPfxSelecionado) {
+        const input = document.getElementById('inputArquivoPfx');
+        if (input && input.files && input.files[0]) {
+            definirArquivoPfx(input.files[0]);
+        }
+    }
+
+    if (!arquivoPfxSelecionado) {
+        if (window.nftAlert) {
+            await window.nftAlert('Por favor, selecione ou arraste um arquivo de certificado (.pfx ou .p12) antes de continuar.', {
+                title: 'Arquivo Necessário',
+                type: 'warning'
+            });
+        } else {
+            alert('Por favor, selecione ou arraste um arquivo de certificado (.pfx ou .p12) antes de continuar.');
+        }
+        return;
+    }
+
+    const senha = (document.getElementById('inputSenhaCertificado')?.value || '').trim();
+    if (!senha) {
+        if (window.nftAlert) {
+            await window.nftAlert('Por favor, informe a senha do certificado digital.', {
+                title: 'Senha Obrigatória',
+                type: 'warning'
+            });
+        } else {
+            alert('Por favor, informe a senha do certificado digital.');
+        }
+        document.getElementById('inputSenhaCertificado')?.focus();
+        return;
+    }
+
+    const btnInstalar = document.getElementById('btnInstalarCertificadoModal');
+    const originalHtml = btnInstalar ? btnInstalar.innerHTML : '';
+    if (btnInstalar) {
+        btnInstalar.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span> Validando e Instalando...`;
+        btnInstalar.disabled = true;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('file', arquivoPfxSelecionado);
+        formData.append('senha', senha);
+
+        const resp = await fetch('/api/certificado/importar', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || data.status === 'error') {
+            throw new Error(data.message || 'Falha ao importar certificado digital.');
+        }
+
+        // Fecha modal
+        const modalEl = document.getElementById('modalImportarCertificado');
+        if (modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        }
+
+        // Atualiza painel do certificado na tela
+        await verificarStatusCertificado();
+
+        const msgSucesso = 
+            `Certificado digital instalado e pronto para uso no sistema!\n\n` +
+            `• Arquivo: ${data.arquivo}\n` +
+            `• Titular: ${data.assunto}\n` +
+            `• CNPJ: ${data.cnpj || 'Identificado'}\n` +
+            `• Validade: até ${data.fim}`;
+
+        if (window.nftAlert) {
+            await window.nftAlert(msgSucesso, {
+                title: 'Certificado Ativado!',
+                type: 'success',
+                icon: 'shield-check'
+            });
+        } else {
+            alert('✅ ' + msgSucesso);
+        }
+
+    } catch (err) {
+        console.error('Erro ao importar certificado:', err);
+        if (window.nftAlert) {
+            await window.nftAlert(err.message, {
+                title: 'Falha na Instalação do Certificado',
+                type: 'danger'
+            });
+        } else {
+            alert('❌ Erro: ' + err.message);
+        }
+    } finally {
+        if (btnInstalar) {
+            btnInstalar.innerHTML = originalHtml;
+            btnInstalar.disabled = false;
+        }
     }
 }
 
@@ -78,7 +295,14 @@ async function enviarNfeSefaz(ambiente = 2) {
             // Força a tag <tpAmb> no XML para o ambiente clicado
             xmlString = xmlString.replace(/<tpAmb>\d+<\/tpAmb>/g, `<tpAmb>${ambiente}</tpAmb>`);
 
-            const chave = document.getElementById('chaveAcessoDisplay')?.value || 'N/A';
+            const chave = (document.getElementById('chaveAcesso')?.value || 
+                           document.getElementById('chaveAcessoDisplay')?.value || 
+                           'N/A').replace(/\s+/g, '');
+            const refInterna = document.getElementById('referenciaInterna')?.value || 
+                               document.getElementById('inputReferenciaInterna')?.value || 
+                               document.getElementById('referencia_interna')?.value || 
+                               document.getElementById('input_referencia_interna')?.value || 
+                               (typeof obterReferenciaInterna === 'function' ? obterReferenciaInterna() : '') || '';
 
             const response = await fetch('/api/sefaz/enviar', {
                 method: 'POST',
@@ -86,7 +310,8 @@ async function enviarNfeSefaz(ambiente = 2) {
                 body: JSON.stringify({
                     xml: xmlString,
                     chave: chave,
-                    tpAmb: ambiente
+                    tpAmb: ambiente,
+                    referencia_interna: refInterna
                 })
             });
 
@@ -184,13 +409,13 @@ function renderArquivosIcons(chave, isAutorizado) {
     if (isAutorizado) {
         return `
             <div class="d-inline-flex align-items-center justify-content-center gap-1">
-                <a href="/api/sefaz/download/pdf/${chaveLimpa}" target="_blank" download="${chaveLimpa}-danfe.pdf" class="btn btn-sm btn-outline-danger p-1 d-inline-flex align-items-center justify-content-center" title="Baixar DANFE (PDF)" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
+                <a href="/api/sefaz/download/pdf/${chaveLimpa}" target="_blank" class="btn btn-sm btn-outline-danger p-1 d-inline-flex align-items-center justify-content-center" title="Baixar DANFE (PDF)" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
                     <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
                 </a>
-                <a href="/api/sefaz/download/xml/${chaveLimpa}" target="_blank" download="${chaveLimpa}-nfe.xml" class="btn btn-sm btn-outline-primary p-1 d-inline-flex align-items-center justify-content-center" title="Baixar XML Autorizado" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
+                <a href="/api/sefaz/download/xml/${chaveLimpa}" target="_blank" class="btn btn-sm btn-outline-primary p-1 d-inline-flex align-items-center justify-content-center" title="Baixar XML Autorizado" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
                     <i data-lucide="file-code" style="width: 14px; height: 14px;"></i>
                 </a>
-                <a href="/api/sefaz/download/zip/${chaveLimpa}" target="_blank" download="${chaveLimpa}-arquivos.zip" class="btn btn-sm btn-outline-warning p-1 d-inline-flex align-items-center justify-content-center" title="Baixar Pacote Completo (ZIP)" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
+                <a href="/api/sefaz/download/zip/${chaveLimpa}" target="_blank" class="btn btn-sm btn-outline-warning p-1 d-inline-flex align-items-center justify-content-center" title="Baixar Pacote Completo (ZIP)" style="width: 26px; height: 26px; border-radius: 4px;" onclick="event.stopPropagation();">
                     <i data-lucide="archive" style="width: 14px; height: 14px;"></i>
                 </a>
             </div>
@@ -236,8 +461,13 @@ function limparAmbiente(valor) {
 window.limparAmbiente = limparAmbiente;
 
 function obterTagCStat(cstat, retorno = {}) {
-    const cs = limparCodigoCStat(cstat);
+    let cs = limparCodigoCStat(cstat);
     const xmotivo = String(retorno.xmotivo || retorno.message || retorno.error || '').toLowerCase();
+    
+    // Normalização: se constar 801 ou se o retorno/motivo indicar autorização, corrige para o código oficial 100
+    if (cs === '801' || retorno.autorizado === true || xmotivo.includes('autoriz')) {
+        cs = '100';
+    }
     const num = Number(cs);
 
     // 1. Erro de comunicação ou técnico (Vermelho)
@@ -327,12 +557,20 @@ function normalizarItemHistoricoSefaz(item) {
     chave = String(chave || '').replace(/<[^>]*>?/gm, '').trim();
 
     // Limpa status (cStat) de tags HTML ou badge antigos
-    const cstatLimpo = limparCodigoCStat(status);
+    let cstatLimpo = limparCodigoCStat(status);
     const ambLimpo = limparAmbiente(ambiente);
+    const motivoLower = String(motivo || '').toLowerCase();
+
+    // Normalização: se for evento (135/136/101 ou motivo de evento), preserva 135
+    if (cstatLimpo === '135' || cstatLimpo === '136' || cstatLimpo === '101' || motivoLower.includes('vinculado') || motivoLower.includes('cancelamento')) {
+        if (!cstatLimpo || cstatLimpo === '100' || cstatLimpo === 'EVENTO') cstatLimpo = '135';
+    } else if (cstatLimpo === '801' || motivoLower.includes('autoriz') || item.status === 'Autorizada' || item.autorizado === true) {
+        cstatLimpo = '100';
+    }
 
     // Renderiza tags padronizadas com as novas classes (sem badge)
     const tagAmbiente = obterTagAmbiente(ambLimpo);
-    const tagCStat = obterTagCStat(cstatLimpo, { xmotivo: motivo });
+    const tagCStat = obterTagCStat(cstatLimpo, { xmotivo: motivo, autorizado: (cstatLimpo === '100') });
 
     const isAut = (cstatLimpo === '100' || cstatLimpo === '104' || cstatLimpo === '135' || cstatLimpo === '136');
     if ((!arquivos || arquivos === '-') && typeof window.renderArquivosIcons === 'function' && chave) {
@@ -361,8 +599,17 @@ function atualizarTabelaHistorico(retorno, chave, ambiente = 2) {
 
     const tr = document.createElement('tr');
     
-    const cs = String(retorno.cstat || '').trim();
-    const isRejeicao = (cs && Number(cs) >= 200) || String(retorno.xmotivo || '').toLowerCase().includes('rejei');
+    let cs = String(retorno.cstat || '').trim();
+    const xmotivo = String(retorno.xmotivo || '').toLowerCase();
+    if (cs === '135' || cs === '136' || cs === '101' || (retorno.is_evento && retorno.autorizado)) {
+        // Mantém 135/136 para eventos (Cancelamento / CC-e)
+        if (!cs || cs === '100' || cs === 'EVENTO') cs = '135';
+        retorno.cstat = cs;
+    } else if (cs === '801' || retorno.autorizado === true || xmotivo.includes('autoriz')) {
+        cs = '100';
+        retorno.cstat = '100';
+    }
+    const isRejeicao = (cs && Number(cs) >= 200 && cs !== '801') || xmotivo.includes('rejei');
     const isAutorizado = ((cs === '100' || cs === '135' || cs === '136' || cs === '101' || retorno.autorizado === true) && !isRejeicao);
 
     const now = new Date().toLocaleString('pt-BR');
@@ -402,7 +649,28 @@ async function solicitarCartaCorrecao(ambiente = 2) {
     const ambNome = isHomolog ? 'Homologação' : 'Produção';
     const btnId = isHomolog ? 'btn-cce-sefaz-homolog' : 'btn-cce-sefaz-prod';
 
-    let chave = (document.getElementById('chaveAcessoDisplay')?.value || getVal('chaveAcesso') || '').replace(/\D/g, '').trim();
+    // 1. Tenta obter a chave autorizada do histórico da SEFAZ na tela
+    let chave = '';
+    const linhasHist = document.querySelectorAll('#tbody-historico-sefaz tr');
+    for (const l of linhasHist) {
+        const txtStatus = (l.querySelector('td:nth-child(5)')?.innerText || l.innerText || '');
+        if (txtStatus.includes('100') || txtStatus.toLowerCase().includes('autoriz')) {
+            const tdChave = l.querySelector('td:nth-child(4)');
+            if (tdChave) {
+                const cand = tdChave.innerText.replace(/\D/g, '').trim();
+                if (cand.length === 44) {
+                    chave = cand;
+                    break;
+                }
+            }
+        }
+    }
+
+    // 2. Se não encontrou no histórico autorizado, pega do campo da tela
+    if (!chave || chave.length !== 44) {
+        chave = (document.getElementById('chaveAcessoDisplay')?.value || getVal('chaveAcesso') || '').replace(/\D/g, '').trim();
+    }
+
     if (!chave || chave.length !== 44) {
         chave = await window.nftPrompt(
             `Informe a Chave de Acesso (44 dígitos) da NF-e para emitir a Carta de Correção (${ambNome}):`,
@@ -542,7 +810,28 @@ async function solicitarCancelarNfe(ambiente = 2) {
     const ambNome = isHomolog ? 'Homologação' : 'Produção';
     const btnId = isHomolog ? 'btn-cancelar-sefaz-homolog' : 'btn-cancelar-sefaz-prod';
 
-    let chave = (document.getElementById('chaveAcessoDisplay')?.value || getVal('chaveAcesso') || '').replace(/\D/g, '').trim();
+    // 1. Tenta obter a chave autorizada do histórico da SEFAZ na tela
+    let chave = '';
+    const linhasHist = document.querySelectorAll('#tbody-historico-sefaz tr');
+    for (const l of linhasHist) {
+        const txtStatus = (l.querySelector('td:nth-child(5)')?.innerText || l.innerText || '');
+        if (txtStatus.includes('100') || txtStatus.toLowerCase().includes('autoriz')) {
+            const tdChave = l.querySelector('td:nth-child(4)');
+            if (tdChave) {
+                const cand = tdChave.innerText.replace(/\D/g, '').trim();
+                if (cand.length === 44) {
+                    chave = cand;
+                    break;
+                }
+            }
+        }
+    }
+
+    // 2. Se não encontrou no histórico autorizado, pega do campo da tela
+    if (!chave || chave.length !== 44) {
+        chave = (document.getElementById('chaveAcessoDisplay')?.value || getVal('chaveAcesso') || '').replace(/\D/g, '').trim();
+    }
+
     if (!chave || chave.length !== 44) {
         chave = await window.nftPrompt(
             `Informe a Chave de Acesso (44 dígitos) da NF-e que deseja cancelar (${ambNome}):`,
@@ -709,6 +998,293 @@ function solicitarCancelarNfeProd() {
 window.solicitarCancelarNfe = solicitarCancelarNfe;
 window.solicitarCancelarNfeHomolog = solicitarCancelarNfeHomolog;
 window.solicitarCancelarNfeProd = solicitarCancelarNfeProd;
+
+// ==============================================================================
+// === CONSULTA DE SITUAÇÃO DA NF-E NA SEFAZ (POPUP COMPLETO COM DETALHES) ===
+// ==============================================================================
+
+async function consultarSituacaoNfeSefaz(ambiente = 1) {
+    const isHomolog = (Number(ambiente) === 2);
+    const ambNome = isHomolog ? 'Homologação' : 'Produção';
+
+    // 1. Tenta obter a chave autorizada do histórico ou do campo de tela
+    let chave = '';
+    const linhasHist = document.querySelectorAll('#tbody-historico-sefaz tr');
+    for (const l of linhasHist) {
+        const txtStatus = (l.querySelector('td:nth-child(5)')?.innerText || l.innerText || '');
+        if (txtStatus.includes('100') || txtStatus.includes('135') || txtStatus.toLowerCase().includes('autoriz') || txtStatus.toLowerCase().includes('cancel')) {
+            const tdChave = l.querySelector('td:nth-child(4)');
+            if (tdChave) {
+                const cand = tdChave.innerText.replace(/\D/g, '').trim();
+                if (cand.length === 44) {
+                    chave = cand;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!chave || chave.length !== 44) {
+        chave = (document.getElementById('chaveAcessoDisplay')?.value || getVal('chaveAcesso') || '').replace(/\D/g, '').trim();
+    }
+
+    if (!chave || chave.length !== 44) {
+        chave = await window.nftPrompt(
+            `Informe a Chave de Acesso (44 dígitos) da NF-e que deseja consultar na SEFAZ (${ambNome}):`,
+            chave,
+            {
+                title: `Consultar Situação na SEFAZ (${ambNome})`,
+                icon: 'search',
+                type: 'primary',
+                maxlength: 44,
+                minlength: 44,
+                placeholder: 'Digite os 44 dígitos da chave de acesso',
+                hint: 'A chave deve conter exatamente 44 dígitos numéricos.',
+                confirmText: 'Consultar SEFAZ'
+            }
+        );
+        if (chave) chave = chave.replace(/\D/g, '').trim();
+    }
+
+    if (!chave || chave.length !== 44) {
+        await window.nftAlert('Informe uma Chave de Acesso válida (44 dígitos) para consultar a SEFAZ.', {
+            type: 'warning',
+            title: 'Chave Obrigatória'
+        });
+        return;
+    }
+
+    // Modal ou Swal de Loading
+    const btnConsultar = document.getElementById(isHomolog ? 'btn-consultar-sefaz-homolog' : 'btn-consultar-sefaz-prod');
+    const originalHtml = btnConsultar ? btnConsultar.innerHTML : '';
+    if (btnConsultar) {
+        btnConsultar.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> Consultando SEFAZ...`;
+        btnConsultar.disabled = true;
+    }
+
+    try {
+        const resp = await fetch('/api/sefaz/consultar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chave: chave, tpAmb: ambiente })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || data.status === 'error') {
+            throw new Error(data.xmotivo || data.error || data.message || 'Falha ao consultar WebService da SEFAZ.');
+        }
+
+        // Monta o Modal / Popup com todos os dados fiscais da nota
+        exibirModalDetalhesConsultaSefaz(data);
+
+        // Atualiza a tabela de histórico (Aba 5) caso a nota esteja autorizada ou cancelada
+        const cs = String(data.cstat || '').trim();
+        const isAut = (cs === '100' || Boolean(data.protocolo_autorizacao));
+        
+        if (data.is_cancelada || isAut) {
+            // Verifica se esta chave e status já constam no histórico da tela para não duplicar
+            const tbody = document.getElementById('tbody-historico-sefaz');
+            let jaExisteNoHistorico = false;
+            if (tbody) {
+                const linhas = tbody.querySelectorAll('tr');
+                linhas.forEach(tr => {
+                    const txt = tr.innerText || '';
+                    if (txt.includes(chave)) {
+                        if (data.is_cancelada && (txt.includes('101') || txt.toLowerCase().includes('cancel'))) {
+                            jaExisteNoHistorico = true;
+                        } else if (isAut && !data.is_cancelada && (txt.includes('100') || txt.toLowerCase().includes('autoriz'))) {
+                            jaExisteNoHistorico = true;
+                        }
+                    }
+                });
+            }
+
+            if (!jaExisteNoHistorico) {
+                if (data.is_cancelada) {
+                    atualizarTabelaHistorico({
+                        cstat: '101',
+                        xmotivo: 'Cancelamento de NF-e homologado',
+                        protocolo: data.protocolo_cancelamento || data.protocolo_autorizacao,
+                        autorizado: false
+                    }, chave, ambiente);
+                } else if (isAut) {
+                    atualizarTabelaHistorico({
+                        cstat: data.cstat || '100',
+                        xmotivo: data.xmotivo || 'Autorizado o uso da NF-e',
+                        protocolo: data.protocolo_autorizacao,
+                        autorizado: true
+                    }, chave, ambiente);
+                }
+            }
+        }
+
+    } catch (e) {
+        console.error('Erro na consulta SEFAZ:', e);
+        await window.nftAlert(`Erro ao consultar SEFAZ (${ambNome}):\n\n${e.message}`, {
+            type: 'danger',
+            title: 'Falha na Consulta SEFAZ'
+        });
+    } finally {
+        if (btnConsultar) {
+            btnConsultar.innerHTML = originalHtml;
+            btnConsultar.disabled = false;
+        }
+        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    }
+}
+
+function exibirModalDetalhesConsultaSefaz(data) {
+    let modalEl = document.getElementById('modalDetalhesConsultaSefaz');
+    if (!modalEl) {
+        modalEl = document.createElement('div');
+        modalEl.id = 'modalDetalhesConsultaSefaz';
+        modalEl.className = 'modal fade';
+        modalEl.tabIndex = -1;
+        modalEl.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(modalEl);
+    }
+
+    const chaveFmt = data.chave ? data.chave.replace(/(\d{4})/g, '$1 ').trim() : '-';
+    const situacaoTexto = String(data.situacao || '').toUpperCase();
+    const isCancelada = Boolean(data.is_cancelada || situacaoTexto.includes('CANCELADA') || data.cstat === '101');
+    const isAutorizada = (data.cstat === '100' && !isCancelada);
+    
+    let statusBadgeHtml = '';
+    if (isCancelada) {
+        statusBadgeHtml = `<span class="badge bg-danger text-white fs-6 px-3 py-2 d-inline-flex align-items-center gap-1 shadow-sm" style="background-color: #dc2626 !important; color: #ffffff !important; border-color: #dc2626 !important;"><i data-lucide="x-circle" style="width: 16px; height: 16px; stroke: #ffffff;"></i> CANCELADA</span>`;
+    } else if (isAutorizada) {
+        statusBadgeHtml = `<span class="badge bg-success text-white fs-6 px-3 py-2 d-inline-flex align-items-center gap-1 shadow-sm" style="color: #ffffff !important;"><i data-lucide="check-circle" style="width: 16px; height: 16px; stroke: #ffffff;"></i> AUTORIZADA (EM USO)</span>`;
+    } else {
+        statusBadgeHtml = `<span class="badge bg-secondary text-white fs-6 px-3 py-2 d-inline-flex align-items-center gap-1 shadow-sm" style="color: #ffffff !important;">${data.cstat} - ${data.xmotivo}</span>`;
+    }
+
+    // Renderiza lista de eventos (se houver)
+    let eventosHtml = '';
+    if (data.eventos && data.eventos.length > 0) {
+        eventosHtml = `
+            <div class="mt-3">
+                <h6 class="fw-bold d-flex align-items-center gap-2 mb-2 text-secondary">
+                    <i data-lucide="calendar-check" style="width: 16px; height: 16px;"></i>
+                    Eventos Fiscais Vinculados (${data.eventos.length})
+                </h6>
+                <div class="table-responsive border rounded bg-white">
+                    <table class="table table-sm table-striped mb-0" style="font-size: 12px;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tipo / Evento</th>
+                                <th>Seq</th>
+                                <th>Data/Hora Registro</th>
+                                <th>Protocolo</th>
+                                <th>Status SEFAZ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.eventos.map(ev => `
+                                <tr>
+                                    <td><strong class="text-primary">${ev.descricao}</strong></td>
+                                    <td>${ev.sequencia || '1'}</td>
+                                    <td class="text-nowrap">${ev.data || '-'}</td>
+                                    <td class="font-monospace fw-bold">${ev.protocolo || '-'}</td>
+                                    <td><span class="badge bg-success-subtle text-success">${ev.cstat || '135'} - ${ev.motivo || 'Vinculado'}</span></td>
+                                </tr>
+                                ${ev.detalhe ? `
+                                <tr>
+                                    <td colspan="5" class="bg-light ps-4 small text-muted">
+                                        <em>Detalhe / Justificativa:</em> ${ev.detalhe}
+                                    </td>
+                                </tr>` : ''}
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    modalEl.innerHTML = `
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header ${isCancelada ? 'bg-danger text-white' : (isAutorizada ? 'bg-success-subtle text-success' : 'bg-body-secondary')} py-3 border-bottom" style="${isCancelada ? 'background-color: #dc2626 !important; color: #fff !important;' : ''}">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                        <i data-lucide="${isCancelada ? 'alert-triangle' : 'shield-check'}" style="width: 22px; height: 22px;"></i>
+                        Situação da NF-e na SEFAZ (${data.ambiente_nome})
+                    </h5>
+                    <button type="button" class="btn-close ${isCancelada ? 'btn-close-white' : ''}" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-4" style="background-color: var(--surface, #f8fafc);">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 p-3 bg-white border rounded shadow-sm mb-3">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-bold d-block mb-1">Status Oficial SEFAZ</span>
+                            <div class="d-flex align-items-center gap-2">
+                                ${statusBadgeHtml}
+                                <span class="badge bg-light text-dark border font-monospace">cStat: ${data.cstat}</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small text-uppercase fw-bold d-block mb-1">Data / Hora Consulta</span>
+                            <span class="small font-monospace text-secondary">${data.dh_recbto || new Date().toLocaleString('pt-BR')}</span>
+                        </div>
+                    </div>
+
+                    <!-- Dados da Nota -->
+                    <div class="p-3 bg-white border rounded shadow-sm mb-3">
+                        <div class="mb-2">
+                            <span class="text-muted small text-uppercase fw-bold d-block">Chave de Acesso (44 Dígitos)</span>
+                            <span class="font-monospace fw-bold text-dark text-break fs-6">${chaveFmt}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-muted small text-uppercase fw-bold d-block">Mensagem da SEFAZ</span>
+                            <span class="fw-semibold text-secondary">${data.xmotivo || 'Processamento concluído'}</span>
+                        </div>
+                        <hr class="my-2">
+                        <div class="row g-2 pt-1">
+                            <div class="col-sm-6">
+                                <span class="text-muted small text-uppercase fw-bold d-block">Protocolo de Autorização</span>
+                                <span class="font-monospace fw-bold text-success">${data.protocolo_autorizacao || '-'}</span>
+                                ${data.data_autorizacao ? `<small class="text-muted d-block font-monospace">${data.data_autorizacao}</small>` : ''}
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small text-uppercase fw-bold d-block">Protocolo do Evento de Cancelamento</span>
+                                <span class="font-monospace fw-bold text-danger">${data.protocolo_cancelamento || (isCancelada ? 'Homologado na SEFAZ' : 'Não se aplica')}</span>
+                                ${data.data_cancelamento ? `<small class="text-muted d-block font-monospace">${data.data_cancelamento}</small>` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${eventosHtml}
+
+                    <!-- Links Rápidos -->
+                    <div class="d-flex justify-content-center gap-2 pt-2 mt-3 border-top">
+                        <a href="/api/sefaz/download/pdf/${data.chave}" target="_blank" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i data-lucide="file-text" style="width: 14px; height: 14px;"></i> Baixar DANFE (PDF)
+                        </a>
+                        <a href="/api/sefaz/download/xml/${data.chave}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i data-lucide="file-code" style="width: 14px; height: 14px;"></i> Baixar XML
+                        </a>
+                        <a href="/api/sefaz/download/zip/${data.chave}" target="_blank" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i data-lucide="archive" style="width: 14px; height: 14px;"></i> Pacote ZIP
+                        </a>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const bsModal = new bootstrap.Modal(modalEl);
+    modalEl.addEventListener('hidden.bs.modal', () => {
+        modalEl.remove();
+    }, { once: true });
+    bsModal.show();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+}
+
+window.consultarSituacaoNfeSefaz = consultarSituacaoNfeSefaz;
+window.consultarSituacaoNfeSefazHomolog = () => consultarSituacaoNfeSefaz(2);
+window.consultarSituacaoNfeSefazProd = () => consultarSituacaoNfeSefaz(1);
+
 
 function sanitizarTabelaHistoricoSefaz() {
     const tbody = document.getElementById('tbody-historico-sefaz');

@@ -17,7 +17,92 @@
 <script src="/static/js/lucide.min.js"></script>
 <script src="/static/js/nft-dialogs.js"></script>
 <script defer src="/static/js/nft-sidebar.js?v=2.7"></script>
+<script defer src="/static/js/nft-shortcuts.js?v=1.0"></script>
 <script defer src="/static/js/nft-regex-visual.js?v=1.0"></script>
+<style>
+    /* Forçar visualmente letras maiúsculas em todos os campos de texto da página e modais */
+    input[type="text"], input[type="search"], textarea, .form-control {
+        text-transform: uppercase;
+    }
+
+    /* Cores personalizadas e exclusivas para cada categoria na tabela de Empresas (removendo interferência de .badge global) */
+    .badge-cat {
+        display: inline-block;
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+        font-weight: 700 !important;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        line-height: 1;
+    }
+    .badge-cat-emitente {
+        background-color: rgba(37, 99, 235, 0.15) !important;
+        color: #2563eb !important;
+        border: 1px solid rgba(37, 99, 235, 0.35) !important;
+    }
+    .badge-cat-cliente {
+        background-color: rgba(16, 185, 129, 0.15) !important;
+        color: #059669 !important;
+        border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    }
+    .badge-cat-transportadora {
+        background-color: rgba(245, 158, 11, 0.18) !important;
+        color: #d97706 !important;
+        border: 1px solid rgba(245, 158, 11, 0.4) !important;
+    }
+    .badge-cat-armazem {
+        background-color: rgba(6, 182, 212, 0.15) !important;
+        color: #0891b2 !important;
+        border: 1px solid rgba(6, 182, 212, 0.35) !important;
+    }
+    .badge-cat-desembaraco {
+        background-color: rgba(239, 68, 68, 0.15) !important;
+        color: #dc2626 !important;
+        border: 1px solid rgba(239, 68, 68, 0.35) !important;
+    }
+    .badge-cat-exportador {
+        background-color: rgba(100, 116, 139, 0.18) !important;
+        color: #475569 !important;
+        border: 1px solid rgba(100, 116, 139, 0.35) !important;
+    }
+    .badge-cat-default {
+        background-color: rgba(107, 114, 128, 0.15) !important;
+        color: #4b5563 !important;
+        border: 1px solid rgba(107, 114, 128, 0.35) !important;
+    }
+
+    [data-bs-theme="dark"] .badge-cat-emitente, [data-theme="dark"] .badge-cat-emitente {
+        background-color: rgba(59, 130, 246, 0.22) !important;
+        color: #60a5fa !important;
+        border-color: rgba(59, 130, 246, 0.45) !important;
+    }
+    [data-bs-theme="dark"] .badge-cat-cliente, [data-theme="dark"] .badge-cat-cliente {
+        background-color: rgba(16, 185, 129, 0.22) !important;
+        color: #34d399 !important;
+        border-color: rgba(16, 185, 129, 0.45) !important;
+    }
+    [data-bs-theme="dark"] .badge-cat-transportadora, [data-theme="dark"] .badge-cat-transportadora {
+        background-color: rgba(245, 158, 11, 0.25) !important;
+        color: #fbbf24 !important;
+        border-color: rgba(245, 158, 11, 0.45) !important;
+    }
+    [data-bs-theme="dark"] .badge-cat-armazem, [data-theme="dark"] .badge-cat-armazem {
+        background-color: rgba(6, 182, 212, 0.22) !important;
+        color: #38bdf8 !important;
+        border-color: rgba(6, 182, 212, 0.45) !important;
+    }
+    [data-bs-theme="dark"] .badge-cat-desembaraco, [data-theme="dark"] .badge-cat-desembaraco {
+        background-color: rgba(239, 68, 68, 0.22) !important;
+        color: #f87171 !important;
+        border-color: rgba(239, 68, 68, 0.45) !important;
+    }
+    [data-bs-theme="dark"] .badge-cat-exportador, [data-theme="dark"] .badge-cat-exportador {
+        background-color: rgba(148, 163, 184, 0.25) !important;
+        color: #cbd5e1 !important;
+        border-color: rgba(148, 163, 184, 0.45) !important;
+    }
+</style>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -65,6 +150,22 @@
 <a class="nft-sidebar-btn" href="/di_duimp?nova_nota=1" title="Módulo XML da DI ou DUIMP">
 <span class="sidebar-icon"><i data-lucide="globe"></i></span>
 <span class="sidebar-label">XML da DI ou DUIMP</span>
+</a>
+</li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?abrir_rascunhos=1" title="Ver e gerenciar Rascunhos Salvos">
+<span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+<span class="sidebar-label">Rascunhos Salvos</span>
+</a>
+</li>
+</ul>
+<!-- Grupo: Relatório -->
+<div class="sidebar-section-title">Relatório</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/relatorios" title="Relatório de Notas Fiscais Geradas">
+<span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
+<span class="sidebar-label">Relatório</span>
 </a>
 </li>
 </ul>
@@ -251,51 +352,58 @@
 </div>
 <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
 <div class="row g-3">
+<!-- Linha 1: CEP (4), Logradouro (6), Número (2) = 12 colunas -->
 <div class="col-md-4">
 <label class="form-label small fw-bold" for="cad_cep">CEP</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="cad_cep" onblur="buscarCepCad()" placeholder="00000-000 ou 99999-999" type="text"/>
-<button class="btn-nft" onclick="buscarCepCad()" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
+<button class="btn-nft" onclick="buscarCepCad()" title="Consultar CEP" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
 </div>
 </div>
-<div class="col-md-5">
-<label class="form-label small fw-bold">Logradouro</label>
-<input class="form-control form-control-sm" id="cad_logradouro" type="text"/>
-</div>
-<div class="col-md-2">
-<label class="form-label small fw-bold">Número</label>
-<input class="form-control form-control-sm" id="cad_numero" type="text"/>
-</div>
-<div class="col-md-5">
-<label class="form-label small fw-bold">Complemento</label>
-<input class="form-control form-control-sm" id="cad_complemento" placeholder="Sala, Bloco, Galpão..." type="text"/>
-</div>
-<div class="col-md-4">
-<label class="form-label small fw-bold">Bairro</label>
-<input class="form-control form-control-sm" id="cad_bairro" type="text"/>
-</div>
-<div class="col-md-4">
-<label class="form-label small fw-bold">Município</label>
-<input class="form-control form-control-sm" id="cad_municipio" type="text"/>
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="cad_logradouro">Logradouro</label>
+<input class="form-control form-control-sm" id="cad_logradouro" placeholder="Rua, Avenida, etc." type="text"/>
 </div>
 <div class="col-md-2">
-<label class="form-label small fw-bold">UF</label>
-<input class="form-control form-control-sm text-uppercase" id="cad_uf" maxlength="2" type="text"/>
+<label class="form-label small fw-bold" for="cad_numero">Número</label>
+<input class="form-control form-control-sm font-monospace" id="cad_numero" placeholder="Ex: 123" type="text"/>
+</div>
+
+<!-- Linha 2: Complemento (6), Bairro (6) = 12 colunas -->
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="cad_complemento">Complemento</label>
+<input class="form-control form-control-sm" id="cad_complemento" placeholder="Sala, Bloco, Galpão, Andar..." type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="cad_bairro">Bairro</label>
+<input class="form-control form-control-sm" id="cad_bairro" placeholder="Nome do Bairro" type="text"/>
+</div>
+
+<!-- Linha 3: Município (6), UF (2), Cód. Mun. IBGE (4) = 12 colunas -->
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="cad_municipio">Município</label>
+<input class="form-control form-control-sm" id="cad_municipio" placeholder="Nome do Município" type="text"/>
 </div>
 <div class="col-md-2">
-<label class="form-label small fw-bold">Cód. Mun (IBGE)</label>
-<input class="form-control form-control-sm font-monospace" id="cad_cmun" type="text"/>
+<label class="form-label small fw-bold" for="cad_uf">UF</label>
+<input class="form-control form-control-sm text-uppercase text-center font-monospace fw-bold" id="cad_uf" maxlength="2" placeholder="UF" type="text"/>
 </div>
 <div class="col-md-4">
-<label class="form-label small fw-bold">País</label>
-<div class="input-group input-group-sm">
-<input class="form-control form-control-sm fw-semibold" id="cad_xpais" list="datalist-paises" onchange="aoMudarPaisEmpresa('cad')" oninput="aoDigitarPaisEmpresa('cad')" placeholder="Selecione ou digite o País" type="text" value="Brasil"/>
-<button class="btn-nft" onclick="resetarPaisEmpresa('cad')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+<label class="form-label small fw-bold" for="cad_cmun">Cód. Mun. (IBGE)</label>
+<input class="form-control form-control-sm font-monospace" id="cad_cmun" placeholder="Ex: 3550308" type="text"/>
+</div>
+
+<!-- Linha 4: País (8), Cód. País BACEN (4) = 12 colunas -->
+<div class="col-md-8 position-relative">
+<label class="form-label small fw-bold" for="cad_xpais">País do Emitente (Nome)</label>
+<div class="position-relative">
+<input autocomplete="off" class="form-control form-control-sm fw-bold" id="cad_xpais" onblur="aoPerderFocoPaisEmpresa('cad')" onfocus="aoDigitarPaisAutocompleteEmpresa('cad')" oninput="aoDigitarPaisAutocompleteEmpresa('cad')" placeholder="Digite para filtrar e selecionar o País..." type="text" value="Brasil"/>
+<div class="dropdown-menu shadow w-100 overflow-auto p-1" id="dropdown_menu_cad_xpais" style="max-height: 250px; display: none; position: absolute; z-index: 1060; top: 100%; left: 0;"></div>
 </div>
 </div>
-<div class="col-md-3">
-<label class="form-label small fw-bold">Cód. País (BACEN)</label>
-<input class="form-control form-control-sm font-monospace bg-light fw-bold" id="cad_cpais" readonly="" type="text" value="1058"/>
+<div class="col-md-4">
+<label class="form-label small fw-bold" for="cad_cpais">Cód. BACEN (&lt;cPais&gt;)</label>
+<input class="form-control form-control-sm font-monospace fw-bold bg-light" id="cad_cpais" readonly="" type="text" value="1058"/>
 </div>
 </div>
 <div class="mt-4 text-end">
@@ -361,22 +469,37 @@
 
             let html = '';
             lista.forEach(e => {
-                let badgeClass = 'bg-secondary';
-                if (e.tipo === 'Emitente') badgeClass = 'bg-primary';
-                if (e.tipo === 'Cliente') badgeClass = 'bg-success';
-                if (e.tipo === 'Transportadora') badgeClass = 'bg-warning text-dark';
+                const tipoNormalizado = (e.tipo || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+                let badgeClass = 'badge-cat-default';
+
+                if (tipoNormalizado === 'emitente') {
+                    badgeClass = 'badge-cat-emitente';
+                } else if (tipoNormalizado === 'cliente') {
+                    badgeClass = 'badge-cat-cliente';
+                } else if (tipoNormalizado === 'transportadora') {
+                    badgeClass = 'badge-cat-transportadora';
+                } else if (tipoNormalizado.includes('armazem')) {
+                    badgeClass = 'badge-cat-armazem';
+                } else if (tipoNormalizado.includes('desembaraco')) {
+                    badgeClass = 'badge-cat-desembaraco';
+                } else if (tipoNormalizado === 'exportador') {
+                    badgeClass = 'badge-cat-exportador';
+                }
                 
                 const showNome = e.apelido ? `${e.nome} <br><small class="text-muted">(${e.apelido})</small>` : e.nome;
 
                 html += `
                     <tr>
-                        <td><span class="badge bg-info-subtle text-info fw-bold">${e.tipo}</span></td>
+                        <td><span class="badge-cat ${badgeClass}">${e.tipo || '-'}</span></td>
                         <td class="fw-bold">${showNome}</td>
                         <td class="font-monospace">${e.cnpj_cpf || '-'}</td>
                         <td>${e.municipio || '-'}/${e.uf || '-'}</td>
                         <td class="text-end">
                             <button class="btn-nft py-0 px-2 me-1" onclick="abrirModalEditar(${e.id})" title="Editar">
                                 <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                            </button>
+                            <button class="btn-nft py-0 px-2 me-1" onclick="duplicarEmpresa(${e.id})" title="Duplicar Cadastro">
+                                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
                             </button>
                             <button class="btn-nft py-0 px-2" onclick="deletarEmpresa(${e.id})" title="Excluir">
                                 <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
@@ -409,21 +532,21 @@
             
             document.getElementById('edit_id').value = emp.id;
             document.getElementById('edit_tipo').value = emp.tipo || 'Cliente';
-            document.getElementById('edit_nome').value = emp.nome || '';
-            document.getElementById('edit_apelido').value = emp.apelido || '';
+            document.getElementById('edit_nome').value = (emp.nome || '').toUpperCase();
+            document.getElementById('edit_apelido').value = (emp.apelido || '').toUpperCase();
             document.getElementById('edit_cnpj_cpf').value = emp.cnpj_cpf || '';
-            document.getElementById('edit_ie').value = emp.ie || '';
+            document.getElementById('edit_ie').value = (emp.ie || '').toUpperCase();
             document.getElementById('edit_ind_ie').value = emp.ind_ie || '1';
             document.getElementById('edit_fone').value = emp.fone || '';
             document.getElementById('edit_cep').value = emp.cep || '';
-            document.getElementById('edit_logradouro').value = emp.logradouro || '';
-            document.getElementById('edit_numero').value = emp.numero || '';
-            document.getElementById('edit_complemento').value = emp.complemento || '';
-            document.getElementById('edit_bairro').value = emp.bairro || '';
-            document.getElementById('edit_municipio').value = emp.municipio || '';
-            document.getElementById('edit_uf').value = emp.uf || '';
+            document.getElementById('edit_logradouro').value = (emp.logradouro || '').toUpperCase();
+            document.getElementById('edit_numero').value = (emp.numero || '').toUpperCase();
+            document.getElementById('edit_complemento').value = (emp.complemento || '').toUpperCase();
+            document.getElementById('edit_bairro').value = (emp.bairro || '').toUpperCase();
+            document.getElementById('edit_municipio').value = (emp.municipio || '').toUpperCase();
+            document.getElementById('edit_uf').value = (emp.uf || '').toUpperCase();
             document.getElementById('edit_cmun').value = emp.cmun || '';
-            document.getElementById('edit_xpais').value = emp.xpais || 'Brasil';
+            document.getElementById('edit_xpais').value = (emp.xpais || 'Brasil').toUpperCase();
             document.getElementById('edit_cpais').value = emp.cpais || '1058';
 
             const ehExterior = (emp.uf === 'EX') || (emp.cpais && String(emp.cpais) !== '1058') || (emp.xpais && emp.xpais.trim().toUpperCase() !== 'BRASIL');
@@ -434,26 +557,65 @@
             modal.show();
         }
 
+        function duplicarEmpresa(id) {
+            const emp = empresasCache.find(e => e.id === id);
+            if (!emp) return;
+
+            // Preenche o formulário da aba "Nova Empresa" com os dados do cadastro existente
+            document.getElementById('cad_tipo').value = emp.tipo || 'Cliente';
+            document.getElementById('cad_nome').value = (emp.nome ? `${emp.nome} (CÓPIA)` : '').toUpperCase();
+            document.getElementById('cad_apelido').value = (emp.apelido || '').toUpperCase();
+            document.getElementById('cad_cnpj_cpf').value = emp.cnpj_cpf || '';
+            document.getElementById('cad_ie').value = (emp.ie || '').toUpperCase();
+            document.getElementById('cad_ind_ie').value = emp.ind_ie || '1';
+            document.getElementById('cad_fone').value = emp.fone || '';
+            document.getElementById('cad_cep').value = emp.cep || '';
+            document.getElementById('cad_logradouro').value = (emp.logradouro || '').toUpperCase();
+            document.getElementById('cad_numero').value = (emp.numero || '').toUpperCase();
+            document.getElementById('cad_complemento').value = (emp.complemento || '').toUpperCase();
+            document.getElementById('cad_bairro').value = (emp.bairro || '').toUpperCase();
+            document.getElementById('cad_municipio').value = (emp.municipio || '').toUpperCase();
+            document.getElementById('cad_uf').value = (emp.uf || '').toUpperCase();
+            document.getElementById('cad_cmun').value = emp.cmun || '';
+            document.getElementById('cad_xpais').value = (emp.xpais || 'Brasil').toUpperCase();
+            document.getElementById('cad_cpais').value = emp.cpais || '1058';
+
+            const ehExterior = (emp.uf === 'EX') || (emp.cpais && String(emp.cpais) !== '1058') || (emp.xpais && emp.xpais.trim().toUpperCase() !== 'BRASIL');
+            document.getElementById('cad_localidade').value = ehExterior ? 'Exterior' : 'Brasil';
+            aplicarRegrasExterior('cad', ehExterior);
+
+            // Alterna para a aba Nova Empresa e foca no campo Nome
+            const tabNovaBtn = document.getElementById('tab-nova-btn');
+            if (tabNovaBtn) tabNovaBtn.click();
+            setTimeout(() => {
+                const elNome = document.getElementById('cad_nome');
+                if (elNome) {
+                    elNome.focus();
+                    elNome.select();
+                }
+            }, 200);
+        }
+
         async function salvarEdicaoEmpresa() {
             const id = document.getElementById('edit_id').value;
             const obj = {
                 tipo: document.getElementById('edit_tipo').value,
-                nome: document.getElementById('edit_nome').value,
-                apelido: document.getElementById('edit_apelido').value,
-                cnpj_cpf: document.getElementById('edit_cnpj_cpf').value,
-                ie: document.getElementById('edit_ie').value,
+                nome: (document.getElementById('edit_nome').value || '').trim().toUpperCase(),
+                apelido: (document.getElementById('edit_apelido').value || '').trim().toUpperCase(),
+                cnpj_cpf: (document.getElementById('edit_cnpj_cpf').value || '').trim(),
+                ie: (document.getElementById('edit_ie').value || '').trim().toUpperCase(),
                 ind_ie: document.getElementById('edit_ind_ie').value,
-                fone: document.getElementById('edit_fone').value,
-                cep: document.getElementById('edit_cep').value,
-                logradouro: document.getElementById('edit_logradouro').value,
-                numero: document.getElementById('edit_numero').value,
-                complemento: document.getElementById('edit_complemento').value,
-                bairro: document.getElementById('edit_bairro').value,
-                municipio: document.getElementById('edit_municipio').value,
-                cmun: document.getElementById('edit_cmun').value,
-                uf: document.getElementById('edit_uf').value,
-                xpais: document.getElementById('edit_xpais').value,
-                cpais: document.getElementById('edit_cpais').value
+                fone: (document.getElementById('edit_fone').value || '').trim(),
+                cep: (document.getElementById('edit_cep').value || '').trim(),
+                logradouro: (document.getElementById('edit_logradouro').value || '').trim().toUpperCase(),
+                numero: (document.getElementById('edit_numero').value || '').trim().toUpperCase(),
+                complemento: (document.getElementById('edit_complemento').value || '').trim().toUpperCase(),
+                bairro: (document.getElementById('edit_bairro').value || '').trim().toUpperCase(),
+                municipio: (document.getElementById('edit_municipio').value || '').trim().toUpperCase(),
+                cmun: (document.getElementById('edit_cmun').value || '').trim(),
+                uf: (document.getElementById('edit_uf').value || '').trim().toUpperCase(),
+                xpais: (document.getElementById('edit_xpais').value || '').trim().toUpperCase(),
+                cpais: (document.getElementById('edit_cpais').value || '').trim()
             };
             try {
                 const res = await fetch('/api/empresas/' + id, {
@@ -477,22 +639,22 @@
             e.preventDefault();
             const obj = {
                 tipo: document.getElementById('cad_tipo').value,
-                nome: document.getElementById('cad_nome').value,
-                apelido: document.getElementById('cad_apelido').value,
-                cnpj_cpf: document.getElementById('cad_cnpj_cpf').value,
-                ie: document.getElementById('cad_ie').value,
+                nome: (document.getElementById('cad_nome').value || '').trim().toUpperCase(),
+                apelido: (document.getElementById('cad_apelido').value || '').trim().toUpperCase(),
+                cnpj_cpf: (document.getElementById('cad_cnpj_cpf').value || '').trim(),
+                ie: (document.getElementById('cad_ie').value || '').trim().toUpperCase(),
                 ind_ie: document.getElementById('cad_ind_ie').value,
-                fone: document.getElementById('cad_fone').value,
-                cep: document.getElementById('cad_cep').value,
-                logradouro: document.getElementById('cad_logradouro').value,
-                numero: document.getElementById('cad_numero').value,
-                complemento: document.getElementById('cad_complemento').value,
-                bairro: document.getElementById('cad_bairro').value,
-                municipio: document.getElementById('cad_municipio').value,
-                cmun: document.getElementById('cad_cmun').value,
-                uf: document.getElementById('cad_uf').value,
-                xpais: document.getElementById('cad_xpais').value,
-                cpais: document.getElementById('cad_cpais').value
+                fone: (document.getElementById('cad_fone').value || '').trim(),
+                cep: (document.getElementById('cad_cep').value || '').trim(),
+                logradouro: (document.getElementById('cad_logradouro').value || '').trim().toUpperCase(),
+                numero: (document.getElementById('cad_numero').value || '').trim().toUpperCase(),
+                complemento: (document.getElementById('cad_complemento').value || '').trim().toUpperCase(),
+                bairro: (document.getElementById('cad_bairro').value || '').trim().toUpperCase(),
+                municipio: (document.getElementById('cad_municipio').value || '').trim().toUpperCase(),
+                cmun: (document.getElementById('cad_cmun').value || '').trim(),
+                uf: (document.getElementById('cad_uf').value || '').trim().toUpperCase(),
+                xpais: (document.getElementById('cad_xpais').value || '').trim().toUpperCase(),
+                cpais: (document.getElementById('cad_cpais').value || '').trim()
             };
             try {
                 const res = await fetch('/api/empresas', {
@@ -514,34 +676,51 @@
             }
         });
 
-        // MASKS (CNPJ/CPF and Fone)
+        // MASKS (CNPJ/CPF and Fone) e conversão automática para MAIÚSCULAS
         document.addEventListener('input', function (e) {
-            if (e.target.classList.contains('mask-cnpj-cpf')) {
-                let v = e.target.value.replace(/\D/g, '');
-                if (v.length <= 11) {
-                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-                    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-                    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                } else {
-                    v = v.replace(/^(\d{2})(\d)/, '$1.$2');
-                    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-                    v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
-                    v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-                    if (v.length > 18) v = v.substring(0, 18);
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                if (e.target.classList.contains('mask-cnpj-cpf')) {
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length <= 11) {
+                        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+                        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                    } else {
+                        v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+                        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+                        v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+                        v = v.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+                        if (v.length > 18) v = v.substring(0, 18);
+                    }
+                    e.target.value = v;
+                    return;
                 }
-                e.target.value = v;
-            }
-            if (e.target.classList.contains('mask-telefone')) {
-                let v = e.target.value.replace(/\D/g, '');
-                if (v.length > 11) v = v.substring(0, 11);
-                if (v.length > 10) {
-                    v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-                } else if (v.length > 5) {
-                    v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
-                } else if (v.length > 2) {
-                    v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                if (e.target.classList.contains('mask-telefone')) {
+                    let v = e.target.value.replace(/\D/g, '');
+                    if (v.length > 11) v = v.substring(0, 11);
+                    if (v.length > 10) {
+                        v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                    } else if (v.length > 5) {
+                        v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                    } else if (v.length > 2) {
+                        v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                    }
+                    e.target.value = v;
+                    return;
                 }
-                e.target.value = v;
+                // Converte em tempo real qualquer outro campo de texto para maiúsculas preservando posição do cursor
+                if (e.target.type === 'text' || e.target.type === 'search' || e.target.tagName === 'TEXTAREA') {
+                    const start = e.target.selectionStart;
+                    const end = e.target.selectionEnd;
+                    const valorOriginal = e.target.value;
+                    const valorMaiusculo = valorOriginal.toUpperCase();
+                    if (valorOriginal !== valorMaiusculo) {
+                        e.target.value = valorMaiusculo;
+                        if (start !== null && end !== null) {
+                            e.target.setSelectionRange(start, end);
+                        }
+                    }
+                }
             }
         });
 
@@ -640,26 +819,67 @@
             aplicarRegrasExterior(prefix, ehExterior);
         }
 
-        function aoDigitarPaisEmpresa(prefix) {
-            const xpaisElem = document.getElementById(prefix + '_xpais');
-            const cpaisElem = document.getElementById(prefix + '_cpais');
-            if (!xpaisElem) return;
+        function aoDigitarPaisAutocompleteEmpresa(prefix) {
+            const input = document.getElementById(`${prefix}_xpais`);
+            const dropdown = document.getElementById(`dropdown_menu_${prefix}_xpais`);
+            if (!input || !dropdown) return;
+            
+            const termo = (input.value || '').trim().toUpperCase();
+            let filtrados = [];
+            if (!termo) {
+                filtrados = paisesBacenCache.slice(0, 40);
+            } else {
+                filtrados = paisesBacenCache.filter(p => 
+                    p.nome.toUpperCase().includes(termo) || String(p.codigo).includes(termo)
+                ).slice(0, 40);
+            }
 
-            const val = (xpaisElem.value || '').trim().toUpperCase();
-            if (!val) return;
+            if (filtrados.length === 0) {
+                dropdown.innerHTML = '<div class="dropdown-item small text-muted text-center py-2">Nenhum país encontrado</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
 
-            const encontrado = paisesBacenCache.find(p => p.nome.toUpperCase() === val || p.codigo === val);
-            if (encontrado) {
-                if (cpaisElem) cpaisElem.value = encontrado.codigo;
-                xpaisElem.value = encontrado.nome;
-                if (encontrado.codigo !== '1058') {
-                    const locSelect = document.getElementById(prefix + '_localidade');
-                    if (locSelect && locSelect.value !== 'Exterior') {
-                        locSelect.value = 'Exterior';
-                        aplicarRegrasExterior(prefix, true);
-                    }
+            dropdown.innerHTML = filtrados.map(p => {
+                const nomeEsc = (p.nome || '').replace(/'/g, "\\'");
+                return `<button type="button" class="dropdown-item small py-1 d-flex justify-content-between align-items-center" onmousedown="selecionarPaisEmpresa('${prefix}', '${p.codigo}', '${nomeEsc}')">
+                    <span class="fw-semibold text-truncate me-2">${p.nome}</span>
+                    <span class="badge bg-secondary-subtle text-secondary font-monospace">${p.codigo}</span>
+                </button>`;
+            }).join('');
+            dropdown.style.display = 'block';
+        }
+
+        function selecionarPaisEmpresa(prefix, codigo, nome) {
+            const xpaisElem = document.getElementById(`${prefix}_xpais`);
+            const cpaisElem = document.getElementById(`${prefix}_cpais`);
+            if (xpaisElem) xpaisElem.value = nome;
+            if (cpaisElem) cpaisElem.value = codigo;
+
+            const dropdown = document.getElementById(`dropdown_menu_${prefix}_xpais`);
+            if (dropdown) dropdown.style.display = 'none';
+
+            if (codigo !== '1058') {
+                const locSelect = document.getElementById(`${prefix}_localidade`);
+                if (locSelect && locSelect.value !== 'Exterior') {
+                    locSelect.value = 'Exterior';
+                    aplicarRegrasExterior(prefix, true);
+                }
+            } else {
+                const locSelect = document.getElementById(`${prefix}_localidade`);
+                if (locSelect && locSelect.value !== 'Brasil') {
+                    locSelect.value = 'Brasil';
+                    aplicarRegrasExterior(prefix, false);
                 }
             }
+        }
+
+        function aoPerderFocoPaisEmpresa(prefix) {
+            setTimeout(() => {
+                const dropdown = document.getElementById(`dropdown_menu_${prefix}_xpais`);
+                if (dropdown) dropdown.style.display = 'none';
+                aoMudarPaisEmpresa(prefix);
+            }, 250);
         }
 
         function aoMudarPaisEmpresa(prefix) {
@@ -678,6 +898,12 @@
                         if (locSelect && locSelect.value !== 'Exterior') {
                             locSelect.value = 'Exterior';
                             aplicarRegrasExterior(prefix, true);
+                        }
+                    } else {
+                        const locSelect = document.getElementById(prefix + '_localidade');
+                        if (locSelect && locSelect.value !== 'Brasil') {
+                            locSelect.value = 'Brasil';
+                            aplicarRegrasExterior(prefix, false);
                         }
                     }
                     return;
@@ -814,51 +1040,58 @@
 </div>
 <h6 class="border-bottom pb-2 fw-bold text-primary mb-3">Endereço</h6>
 <div class="row g-3">
+<!-- Linha 1: CEP (4), Logradouro (6), Número (2) = 12 colunas -->
 <div class="col-md-4">
 <label class="form-label small fw-bold" for="edit_cep">CEP</label>
 <div class="input-group input-group-sm">
 <input class="form-control form-control-sm font-monospace" id="edit_cep" onblur="buscarCepEdit()" placeholder="00000-000" type="text"/>
-<button class="btn-nft" onclick="buscarCepEdit()" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
+<button class="btn-nft" onclick="buscarCepEdit()" title="Consultar CEP" type="button"><i data-lucide="search" style="width: 14px; height: 14px;"></i></button>
 </div>
 </div>
-<div class="col-md-5">
-<label class="form-label small fw-bold">Logradouro</label>
-<input class="form-control form-control-sm" id="edit_logradouro" type="text"/>
-</div>
-<div class="col-md-2">
-<label class="form-label small fw-bold">Número</label>
-<input class="form-control form-control-sm" id="edit_numero" type="text"/>
-</div>
-<div class="col-md-5">
-<label class="form-label small fw-bold">Complemento</label>
-<input class="form-control form-control-sm" id="edit_complemento" placeholder="Sala, Bloco, Galpão..." type="text"/>
-</div>
-<div class="col-md-4">
-<label class="form-label small fw-bold">Bairro</label>
-<input class="form-control form-control-sm" id="edit_bairro" type="text"/>
-</div>
-<div class="col-md-4">
-<label class="form-label small fw-bold">Município</label>
-<input class="form-control form-control-sm" id="edit_municipio" type="text"/>
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="edit_logradouro">Logradouro</label>
+<input class="form-control form-control-sm" id="edit_logradouro" placeholder="Rua, Avenida, etc." type="text"/>
 </div>
 <div class="col-md-2">
-<label class="form-label small fw-bold">UF</label>
-<input class="form-control form-control-sm text-uppercase" id="edit_uf" maxlength="2" type="text"/>
+<label class="form-label small fw-bold" for="edit_numero">Número</label>
+<input class="form-control form-control-sm font-monospace" id="edit_numero" placeholder="Ex: 123" type="text"/>
+</div>
+
+<!-- Linha 2: Complemento (6), Bairro (6) = 12 colunas -->
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="edit_complemento">Complemento</label>
+<input class="form-control form-control-sm" id="edit_complemento" placeholder="Sala, Bloco, Galpão, Andar..." type="text"/>
+</div>
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="edit_bairro">Bairro</label>
+<input class="form-control form-control-sm" id="edit_bairro" placeholder="Nome do Bairro" type="text"/>
+</div>
+
+<!-- Linha 3: Município (6), UF (2), Cód. Mun. IBGE (4) = 12 colunas -->
+<div class="col-md-6">
+<label class="form-label small fw-bold" for="edit_municipio">Município</label>
+<input class="form-control form-control-sm" id="edit_municipio" placeholder="Nome do Município" type="text"/>
 </div>
 <div class="col-md-2">
-<label class="form-label small fw-bold">Cód. Mun (IBGE)</label>
-<input class="form-control form-control-sm font-monospace" id="edit_cmun" type="text"/>
+<label class="form-label small fw-bold" for="edit_uf">UF</label>
+<input class="form-control form-control-sm text-uppercase text-center font-monospace fw-bold" id="edit_uf" maxlength="2" placeholder="UF" type="text"/>
 </div>
 <div class="col-md-4">
-<label class="form-label small fw-bold">País</label>
-<div class="input-group input-group-sm">
-<input class="form-control form-control-sm fw-semibold" id="edit_xpais" list="datalist-paises" onchange="aoMudarPaisEmpresa('edit')" oninput="aoDigitarPaisEmpresa('edit')" placeholder="Selecione ou digite o País" type="text"/>
-<button class="btn-nft" onclick="resetarPaisEmpresa('edit')" title="Redefinir para Brasil" type="button"><i data-lucide="rotate-ccw" style="width: 13px; height: 13px;"></i></button>
+<label class="form-label small fw-bold" for="edit_cmun">Cód. Mun. (IBGE)</label>
+<input class="form-control form-control-sm font-monospace" id="edit_cmun" placeholder="Ex: 3550308" type="text"/>
+</div>
+
+<!-- Linha 4: País (8), Cód. País BACEN (4) = 12 colunas -->
+<div class="col-md-8 position-relative">
+<label class="form-label small fw-bold" for="edit_xpais">País do Emitente (Nome)</label>
+<div class="position-relative">
+<input autocomplete="off" class="form-control form-control-sm fw-bold" id="edit_xpais" onblur="aoPerderFocoPaisEmpresa('edit')" onfocus="aoDigitarPaisAutocompleteEmpresa('edit')" oninput="aoDigitarPaisAutocompleteEmpresa('edit')" placeholder="Digite para filtrar e selecionar o País..." type="text"/>
+<div class="dropdown-menu shadow w-100 overflow-auto p-1" id="dropdown_menu_edit_xpais" style="max-height: 250px; display: none; position: absolute; z-index: 1060; top: 100%; left: 0;"></div>
 </div>
 </div>
-<div class="col-md-3">
-<label class="form-label small fw-bold">Cód. País (BACEN)</label>
-<input class="form-control form-control-sm font-monospace bg-light fw-bold" id="edit_cpais" readonly="" type="text"/>
+<div class="col-md-4">
+<label class="form-label small fw-bold" for="edit_cpais">Cód. BACEN (&lt;cPais&gt;)</label>
+<input class="form-control form-control-sm font-monospace fw-bold bg-light" id="edit_cpais" readonly="" type="text"/>
 </div>
 </div>
 </form>

@@ -14,38 +14,88 @@ import re
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-CERT_PATH = r'C:\Users\felipeaguena\Documents\XMLNFT\gerador\certificado\NFT_LOGISTICS_LTDA_47998441000198_1771873069312658700_nftcnpj.pfx'
-CERT_PASS = b'nftecnpj'
+CERT_DIR = os.path.join(os.path.dirname(__file__), 'certificado')
+os.makedirs(CERT_DIR, exist_ok=True)
+DEFAULT_CERT_PATH = os.path.join(CERT_DIR, 'NFT_LOGISTICS_LTDA_47998441000198_1771873069312658700_nftcnpj.pfx')
+DEFAULT_CERT_PASS = b'nftecnpj'
+
+CERT_PATH = DEFAULT_CERT_PATH
+CERT_PASS = DEFAULT_CERT_PASS
+
+def set_active_certificate(caminho, senha_bytes):
+    global CERT_PATH, CERT_PASS
+    CERT_PATH = caminho
+    CERT_PASS = senha_bytes
+
+def get_active_certificate_path():
+    return CERT_PATH
+
+def validar_e_extrair_info_pfx(pfx_data, senha_bytes):
+    private_key, certificate, additional_certificates = pkcs12.load_key_and_certificates(pfx_data, senha_bytes)
+    subject = certificate.subject.rfc4514_string()
+    issuer = certificate.issuer.rfc4514_string()
+    
+    cnpj = ""
+    m = re.search(r'([0-9]{14})', subject)
+    if m:
+        cnpj = m.group(1)
+    
+    return {
+        'status': 'success',
+        'assunto': subject,
+        'emissor': issuer,
+        'cnpj': cnpj,
+        'inicio': certificate.not_valid_before_utc.strftime('%d/%m/%Y %H:%M:%S'),
+        'fim': certificate.not_valid_after_utc.strftime('%d/%m/%Y %H:%M:%S')
+    }
+
+def carregar_certificado_salvo():
+    global CERT_PATH, CERT_PASS
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), 'database.db')
+        if os.path.exists(db_path):
+            import sqlite3
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+            c.execute("CREATE TABLE IF NOT EXISTS sistema_config (chave TEXT PRIMARY KEY, valor TEXT, data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
+            row_arq = c.execute("SELECT valor FROM sistema_config WHERE chave = 'certificado_ativo_arquivo'").fetchone()
+            row_pwd = c.execute("SELECT valor FROM sistema_config WHERE chave = 'certificado_ativo_senha'").fetchone()
+            conn.close()
+            if row_arq and row_arq[0]:
+                nome_arq = row_arq[0].strip()
+                caminho_cand = os.path.join(CERT_DIR, nome_arq)
+                if os.path.exists(caminho_cand):
+                    CERT_PATH = caminho_cand
+                    if row_pwd and row_pwd[0]:
+                        CERT_PASS = row_pwd[0].strip().encode('utf-8')
+                    return
+    except Exception as e:
+        print(f"Aviso ao carregar config de certificado: {e}")
+
+    # Fallback: se CERT_PATH não existir, procura o primeiro .pfx na pasta certificado
+    if not os.path.exists(CERT_PATH) and os.path.exists(CERT_DIR):
+        pfxs = [f for f in os.listdir(CERT_DIR) if f.lower().endswith(('.pfx', '.p12'))]
+        if pfxs:
+            CERT_PATH = os.path.join(CERT_DIR, pfxs[0])
+
+# Executa carga inicial
+carregar_certificado_salvo()
 
 def get_certificate_info():
     if not os.path.exists(CERT_PATH):
-        return {'status': 'error', 'message': 'Arquivo PFX não encontrado'}
+        carregar_certificado_salvo()
+        if not os.path.exists(CERT_PATH):
+            return {'status': 'error', 'message': 'Nenhum certificado PFX/P12 encontrado na pasta de certificados.'}
     
     try:
         with open(CERT_PATH, 'rb') as f:
             pfx_data = f.read()
             
-        private_key, certificate, additional_certificates = pkcs12.load_key_and_certificates(pfx_data, CERT_PASS)
-        
-        # Extrair CNPJ do Subject se possível
-        subject = certificate.subject.rfc4514_string()
-        issuer = certificate.issuer.rfc4514_string()
-        
-        cnpj = ""
-        m = re.search(r'([0-9]{14})', subject)
-        if m:
-            cnpj = m.group(1)
-        
-        return {
-            'status': 'success',
-            'assunto': subject,
-            'emissor': issuer,
-            'cnpj': cnpj,
-            'inicio': certificate.not_valid_before_utc.strftime('%d/%m/%Y %H:%M:%S'),
-            'fim': certificate.not_valid_after_utc.strftime('%d/%m/%Y %H:%M:%S')
-        }
+        info = validar_e_extrair_info_pfx(pfx_data, CERT_PASS)
+        info['arquivo'] = os.path.basename(CERT_PATH)
+        return info
     except Exception as e:
-        return {'status': 'error', 'message': str(e)}
+        return {'status': 'error', 'message': str(e), 'arquivo': os.path.basename(CERT_PATH) if os.path.exists(CERT_PATH) else ''}
 
 import xmlsec
 import time
@@ -617,7 +667,20 @@ def enviar_evento_nfe(tpEvento, chave, nSeqEvento=1, descEvento="", detalhe_xml=
         if os.path.exists(pem_path):
             os.unlink(pem_path)
             
-    ret_root = etree.fromstring(response.content)
+    try:
+        ret_root = etree.fromstring(response.content)
+    except Exception as e_xml_parse:
+        # Se a SEFAZ ou proxy retornou HTML de erro ou texto vazio
+        resp_preview = response.text[:300].strip() if response.text else ''
+        msg_erro = f"Resposta inválida da SEFAZ (HTTP {response.status_code}): {resp_preview or 'Sem conteúdo retornado'}"
+        return {
+            'status': 'error',
+            'status_code': response.status_code,
+            'message': msg_erro,
+            'xmotivo': msg_erro,
+            'cstat': str(response.status_code),
+            'response_xml': response.text
+        }
     
     inf_evento_ret = ret_root.find('.//{http://www.portalfiscal.inf.br/nfe}infEvento')
     cstat = ""
@@ -691,4 +754,161 @@ def carta_correcao_nfe(chave, texto_correcao, nSeqEvento=1, tpAmb=1, uf='SP'):
         tpAmb=tpAmb,
         uf=uf
     )
+
+def consultar_nfe(chave, tpAmb=1, uf='SP'):
+    """
+    Consulta a situação atual da NF-e perante a SEFAZ via WebService NFeConsultaProtocolo4.
+    Retorna o cStat geral, protocolo de autorização, eventos vinculados (cancelamento, CC-e) e dados fiscais.
+    """
+    chave = re.sub(r'\D', '', str(chave or '')).strip()
+    if len(chave) != 44:
+        raise ValueError("Chave de acesso inválida (deve conter exatamente 44 dígitos numéricos).")
+
+    url = 'https://nfe.fazenda.sp.gov.br/ws/nfeconsultaprotocolo4.asmx' if tpAmb == 1 else 'https://homologacao.nfe.fazenda.sp.gov.br/ws/nfeconsultaprotocolo4.asmx'
+
+    cons_xml = f'<consSitNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00"><tpAmb>{tpAmb}</tpAmb><xServ>CONSULTAR</xServ><chNFe>{chave}</chNFe></consSitNFe>'
+    soap_request = (
+        '<?xml version="1.0" encoding="utf-8"?>'
+        '<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">'
+        '<soap12:Header><nfeCabecMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4"><cUF>35</cUF><versaoDados>4.00</versaoDados></nfeCabecMsg></soap12:Header>'
+        f'<soap12:Body><nfeDadosMsg xmlns="http://www.portalfiscal.inf.br/nfe/wsdl/NFeConsultaProtocolo4">{cons_xml}</nfeDadosMsg></soap12:Body>'
+        '</soap12:Envelope>'
+    )
+
+    headers = {'Content-Type': 'application/soap+xml; charset=utf-8'}
+
+    with open(CERT_PATH, 'rb') as f:
+        pfx_data = f.read()
+    private_key, certificate, _ = pkcs12.load_key_and_certificates(pfx_data, CERT_PASS)
+
+    import tempfile
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.pem') as cert_file:
+        cert_file.write(private_key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        ))
+        cert_file.write(certificate.public_bytes(serialization.Encoding.PEM))
+        pem_path = cert_file.name
+
+    try:
+        response = requests.post(url, data=soap_request.encode('utf-8'), headers=headers, cert=pem_path, verify=False, timeout=15)
+        root = etree.fromstring(response.content)
+
+        ret_cons = root.find('.//{http://www.portalfiscal.inf.br/nfe}retConsSitNFe')
+        if ret_cons is None:
+            cstat_el = root.find('.//{http://www.portalfiscal.inf.br/nfe}cStat')
+            xmotivo_el = root.find('.//{http://www.portalfiscal.inf.br/nfe}xMotivo')
+            return {
+                'status': 'error',
+                'cstat': cstat_el.text if cstat_el is not None else 'ERRO',
+                'xmotivo': xmotivo_el.text if xmotivo_el is not None else 'Erro ao consultar a SEFAZ',
+                'chave': chave,
+                'tpAmb': tpAmb
+            }
+
+        cstat = ret_cons.findtext('{http://www.portalfiscal.inf.br/nfe}cStat') or ''
+        xmotivo = ret_cons.findtext('{http://www.portalfiscal.inf.br/nfe}xMotivo') or ''
+        dh_recbto = ret_cons.findtext('{http://www.portalfiscal.inf.br/nfe}dhRecbto') or ''
+
+        # InfProt (dados da autorização original)
+        inf_prot = ret_cons.find('.//{http://www.portalfiscal.inf.br/nfe}infProt')
+        prot_aut = ''
+        dh_aut = ''
+        cstat_aut = ''
+        xmotivo_aut = ''
+        dig_val = ''
+        if inf_prot is not None:
+            prot_aut = inf_prot.findtext('{http://www.portalfiscal.inf.br/nfe}nProt') or ''
+            dh_aut = inf_prot.findtext('{http://www.portalfiscal.inf.br/nfe}dhRecbto') or ''
+            cstat_aut = inf_prot.findtext('{http://www.portalfiscal.inf.br/nfe}cStat') or ''
+            xmotivo_aut = inf_prot.findtext('{http://www.portalfiscal.inf.br/nfe}xMotivo') or ''
+            dig_val = inf_prot.findtext('{http://www.portalfiscal.inf.br/nfe}digVal') or ''
+
+        # InfCanc legado (compatibilidade caso retorne)
+        inf_canc = ret_cons.find('.//{http://www.portalfiscal.inf.br/nfe}infCanc')
+        is_cancelada = (cstat == '101' or inf_canc is not None or 'cancelamento' in xmotivo.lower())
+        prot_canc = ''
+        dh_canc = ''
+        prot_canc_legado = ''
+        if inf_canc is not None:
+            prot_canc_legado = inf_canc.findtext('{http://www.portalfiscal.inf.br/nfe}nProt') or ''
+            dh_canc = inf_canc.findtext('{http://www.portalfiscal.inf.br/nfe}dhRecbto') or ''
+
+        # Eventos vinculados à NF-e (procEventoNFe)
+        eventos = []
+        for pe in ret_cons.findall('.//{http://www.portalfiscal.inf.br/nfe}procEventoNFe'):
+            inf_evt = pe.find('.//{http://www.portalfiscal.inf.br/nfe}infEvento')
+            ret_evt = pe.find('.//{http://www.portalfiscal.inf.br/nfe}retEvento/{http://www.portalfiscal.inf.br/nfe}infEvento')
+            
+            tipo_evt = inf_evt.findtext('{http://www.portalfiscal.inf.br/nfe}tpEvento') if inf_evt is not None else ''
+            desc_evt = inf_evt.findtext('.//{http://www.portalfiscal.inf.br/nfe}descEvento') if inf_evt is not None else ''
+            seq_evt = inf_evt.findtext('{http://www.portalfiscal.inf.br/nfe}nSeqEvento') if inf_evt is not None else ''
+            dh_evt = inf_evt.findtext('{http://www.portalfiscal.inf.br/nfe}dhEvento') if inf_evt is not None else ''
+            det_just = inf_evt.findtext('.//{http://www.portalfiscal.inf.br/nfe}xJust') if inf_evt is not None else ''
+            det_corr = inf_evt.findtext('.//{http://www.portalfiscal.inf.br/nfe}xCorrecao') if inf_evt is not None else ''
+            
+            nprot_evt = ret_evt.findtext('{http://www.portalfiscal.inf.br/nfe}nProt') if ret_evt is not None else ''
+            cstat_evt = ret_evt.findtext('{http://www.portalfiscal.inf.br/nfe}cStat') if ret_evt is not None else ''
+            xmotivo_evt = ret_evt.findtext('{http://www.portalfiscal.inf.br/nfe}xMotivo') if ret_evt is not None else ''
+            
+            if tipo_evt == '110111':
+                is_cancelada = True
+                if nprot_evt:
+                    prot_canc = nprot_evt
+                if not dh_canc and dh_evt:
+                    dh_canc = dh_evt
+
+            eventos.append({
+                'tipo': tipo_evt,
+                'descricao': desc_evt or ('Cancelamento' if tipo_evt == '110111' else ('Carta de Correção' if tipo_evt == '110110' else 'Evento')),
+                'sequencia': seq_evt,
+                'data': dh_evt,
+                'protocolo': nprot_evt,
+                'cstat': cstat_evt,
+                'motivo': xmotivo_evt,
+                'detalhe': det_just or det_corr or ''
+            })
+
+        # Se não encontrou nprot_evt do evento 110111 mas tem legado diferente do protocolo de autorização
+        if not prot_canc and prot_canc_legado and prot_canc_legado != prot_aut:
+            prot_canc = prot_canc_legado
+
+        # Situação simplificada amigável
+        if is_cancelada:
+            situacao_texto = "CANCELADA"
+            badge_classe = "danger"
+        elif cstat == '100' or cstat_aut == '100':
+            situacao_texto = "AUTORIZADA (EM USO)"
+            badge_classe = "success"
+        elif cstat in ('110', '205', '301', '302', '303'):
+            situacao_texto = "DENEGADA"
+            badge_classe = "warning"
+        else:
+            situacao_texto = xmotivo or "NÃO CONSTA / REJEITADA"
+            badge_classe = "secondary"
+
+        return {
+            'status': 'success',
+            'chave': chave,
+            'tpAmb': tpAmb,
+            'ambiente_nome': 'Produção' if tpAmb == 1 else 'Homologação',
+            'cstat': cstat,
+            'xmotivo': xmotivo,
+            'dh_recbto': dh_recbto,
+            'situacao': situacao_texto,
+            'badge_classe': badge_classe,
+            'is_cancelada': is_cancelada,
+            'protocolo_autorizacao': prot_aut,
+            'data_autorizacao': dh_aut,
+            'protocolo_cancelamento': prot_canc,
+            'data_cancelamento': dh_canc,
+            'digest_value': dig_val,
+            'eventos': eventos,
+            'raw_xml': response.text
+        }
+    finally:
+        if os.path.exists(pem_path):
+            os.unlink(pem_path)
+
 

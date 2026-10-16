@@ -537,7 +537,17 @@
             const selIpi = document.getElementById('m_item_CST_IPI');
             if (selIpi && selIpi.options.length <= 1) {
                 selIpi.innerHTML = '';
-                (cstOptionsCache.ipi || []).forEach(c => selIpi.appendChild(new Option(c.codigo_descricao, c.codigo)));
+                const grpEnt = document.createElement('optgroup');
+                grpEnt.label = 'Entradas';
+                const grpSai = document.createElement('optgroup');
+                grpSai.label = 'Saídas';
+                (cstOptionsCache.ipi || []).forEach(c => {
+                    const opt = new Option(c.codigo_descricao, c.codigo);
+                    if (c.aplicacao === 'ENTRADA' || c.aplicacao === 'IMPORTACAO') grpEnt.appendChild(opt);
+                    else grpSai.appendChild(opt);
+                });
+                selIpi.appendChild(grpEnt);
+                selIpi.appendChild(grpSai);
             }
 
             // 3. PIS & COFINS
@@ -1084,6 +1094,15 @@
             qTrib: formatNum(document.getElementById('m_item_qTrib').value || qCom, 4),
             vUnTrib: formatNum(document.getElementById('m_item_vUnTrib').value || vUnCom, 4),
             cEANTrib: document.getElementById('m_item_cEANTrib').value || "SEM GTIN",
+            qTrib_manual: (() => {
+                const qTribVal = parseNum(document.getElementById('m_item_qTrib').value);
+                const qComVal = parseNum(document.getElementById('m_item_qCom').value);
+                const origRow = (currentModalItemIndex >= 0 && getListaItensAtual()[currentModalItemIndex]) ? getListaItensAtual()[currentModalItemIndex] : null;
+                if (origRow && (origRow.qTrib_manual === true || origRow.qTrib_manual === 'true' || origRow.qTrib_manual === 1)) {
+                    return (qTribVal > 0);
+                }
+                return (qTribVal > 0 && Math.abs(qTribVal - qComVal) > 0.00001);
+            })(),
 
             // DI / Aduaneiro
             nDI: document.getElementById('m_item_nDI').value || "",

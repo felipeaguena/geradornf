@@ -571,12 +571,22 @@
                     if (selDest && novaEmpresa.id) {
                         selDest.value = String(novaEmpresa.id);
                     }
+                    const inputBuscaDest = document.getElementById('input_busca_destinatario');
+                    if (inputBuscaDest) {
+                        const apelidoStr = novaEmpresa.apelido ? ` (${novaEmpresa.apelido})` : '';
+                        inputBuscaDest.value = `${novaEmpresa.nome}${apelidoStr} - ${novaEmpresa.cnpj_cpf || ''}`;
+                    }
 
                     // Preenche diretamente todos os campos do Destinatário na tela
                     aplicarDadosEmpresaNoDestinatario(novaEmpresa);
                 } else if (_empresaAlvo === 'emit') {
                     const selEmit = document.getElementById('select_emitente');
                     if (selEmit && novaEmpresa.id) selEmit.value = String(novaEmpresa.id);
+                    const inputBuscaEmit = document.getElementById('input_busca_emitente');
+                    if (inputBuscaEmit) {
+                        const apelidoStr = novaEmpresa.apelido ? ` (${novaEmpresa.apelido})` : '';
+                        inputBuscaEmit.value = `${novaEmpresa.nome}${apelidoStr} - ${novaEmpresa.cnpj_cpf || ''}`;
+                    }
                     if (typeof window.preencherDadosDeCadastro === 'function') {
                         window.preencherDadosDeCadastro(selEmit, 'emit');
                     }

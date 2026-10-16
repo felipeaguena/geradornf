@@ -55,16 +55,18 @@ strLocalAppData = WshShell.ExpandEnvironmentStrings("%LOCALAPPDATA%")
 strProgramFiles = WshShell.ExpandEnvironmentStrings("%ProgramFiles%")
 strProgramFilesX86 = WshShell.ExpandEnvironmentStrings("%ProgramFiles(x86)%")
 
+strWindowSize = "--window-size=1440,900"
+
 If fso.FileExists(strProgramFiles & "\Google\Chrome\Application\chrome.exe") Then
-    strBrowserCmd = """" & strProgramFiles & "\Google\Chrome\Application\chrome.exe"" --app=""" & strInitialUrl & """"
+    strBrowserCmd = """" & strProgramFiles & "\Google\Chrome\Application\chrome.exe"" --app=""" & strInitialUrl & """ " & strWindowSize
 ElseIf fso.FileExists(strProgramFilesX86 & "\Google\Chrome\Application\chrome.exe") Then
-    strBrowserCmd = """" & strProgramFilesX86 & "\Google\Chrome\Application\chrome.exe"" --app=""" & strInitialUrl & """"
+    strBrowserCmd = """" & strProgramFilesX86 & "\Google\Chrome\Application\chrome.exe"" --app=""" & strInitialUrl & """ " & strWindowSize
 ElseIf fso.FileExists(strLocalAppData & "\Google\Chrome\Application\chrome.exe") Then
-    strBrowserCmd = """" & strLocalAppData & "\Google\Chrome\Application\chrome.exe"" --app=""" & strInitialUrl & """"
+    strBrowserCmd = """" & strLocalAppData & "\Google\Chrome\Application\chrome.exe"" --app=""" & strInitialUrl & """ " & strWindowSize
 ElseIf fso.FileExists(strProgramFiles & "\Microsoft\Edge\Application\msedge.exe") Then
-    strBrowserCmd = """" & strProgramFiles & "\Microsoft\Edge\Application\msedge.exe"" --app=""" & strInitialUrl & """"
+    strBrowserCmd = """" & strProgramFiles & "\Microsoft\Edge\Application\msedge.exe"" --app=""" & strInitialUrl & """ " & strWindowSize
 ElseIf fso.FileExists(strProgramFilesX86 & "\Microsoft\Edge\Application\msedge.exe") Then
-    strBrowserCmd = """" & strProgramFilesX86 & "\Microsoft\Edge\Application\msedge.exe"" --app=""" & strInitialUrl & """"
+    strBrowserCmd = """" & strProgramFilesX86 & "\Microsoft\Edge\Application\msedge.exe"" --app=""" & strInitialUrl & """ " & strWindowSize
 Else
     strBrowserCmd = """" & strInitialUrl & """"
 End If

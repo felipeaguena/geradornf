@@ -21,6 +21,7 @@
 <script src="/static/js/lucide.min.js"></script>
 <script src="/static/js/nft-dialogs.js"></script>
 <script defer src="/static/js/nft-sidebar.js?v=2.7"></script>
+<script defer src="/static/js/nft-shortcuts.js?v=1.0"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -70,6 +71,22 @@
 <span class="sidebar-label">XML da DI ou DUIMP</span>
 </a>
 </li>
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/rascunho?abrir_rascunhos=1" title="Ver e gerenciar Rascunhos Salvos">
+<span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+<span class="sidebar-label">Rascunhos Salvos</span>
+</a>
+</li>
+</ul>
+<!-- Grupo: Relatório -->
+<div class="sidebar-section-title">Relatório</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/relatorios" title="Relatório de Notas Fiscais Geradas">
+<span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
+<span class="sidebar-label">Relatório</span>
+</a>
+</li>
 </ul>
 <!-- Grupo: Configurações -->
 <div class="sidebar-section-title">Configurações</div>
@@ -102,26 +119,19 @@
 </div>
 <!-- 3. Rodapé da Sidebar -->
 <div class="nft-sidebar-footer">
-<button class="sidebar-footer-btn sidebar-footer-btn-analisar" onclick="analisarRascunho()" title="Analisar e Verificar Rascunho do XML" type="button">
-<span class="sidebar-icon"><i data-lucide="shield-check"></i></span>
-<span class="sidebar-footer-text">Analisar Rascunho</span>
-</button>
-<button class="sidebar-footer-btn sidebar-footer-btn-warning" onclick="generateXML()" title="Gerar e Baixar Novo XML" type="button">
-<span class="sidebar-icon"><i data-lucide="download"></i></span>
-<span class="sidebar-footer-text">Gerar Novo XML</span>
-</button>
-<div class="sidebar-footer-actions d-flex gap-2">
-<button class="sidebar-footer-btn justify-content-center p-0 flex-fill" onclick="encerrarServidor()" title="Desligar Servidor Local" type="button" style="color: #ef4444 !important; height: 38px;">
-<i data-lucide="power"></i>
-</button>
-<button class="sidebar-footer-btn justify-content-center p-0 flex-fill" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button" style="height: 38px;">
-<i data-lucide="moon"></i>
-</button>
-</div>
-<div class="sidebar-footer-info">
-<span>NFT Logistics</span>
-<span>v2.2</span>
-</div>
+    <div class="sidebar-footer-actions">
+        <button class="sidebar-footer-btn sidebar-footer-btn-power" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
+            <span class="sidebar-icon" style="color: #ef4444 !important;"><i data-lucide="power"></i></span>
+            <span class="sidebar-footer-text" style="color: #ef4444 !important; font-weight: 700;">Desligar</span>
+        </button>
+        <button class="sidebar-footer-btn theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+            <i data-lucide="moon"></i>
+        </button>
+    </div>
+    <div class="sidebar-footer-info">
+        <span>NFT Logistics</span>
+        <span>v2.2</span>
+    </div>
 </div>
 </aside>
 <!-- ÁREA PRINCIPAL DO PORTAL (DESLOCADA PELA SIDEBAR) -->

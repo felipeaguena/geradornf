@@ -40,7 +40,7 @@
                             <button type="button" class="btn-nft px-3" data-bs-dismiss="modal">Fechar e Revisar</button>
                             <button type="button" class="btn-nft px-3 fw-bold d-flex align-items-center gap-1 shadow-sm" id="btnGerarXMLModal" onclick="fecharModalEGerarXML()">
                                 <i data-lucide="download" style="width: 15px; height: 15px;"></i>
-                                <span>Gerar Novo XML</span>
+                                <span>Download do XML</span>
                             </button>
                         </div>
                     </div>
@@ -111,6 +111,7 @@
                 cNF: getVal('cNF'),
                 cUF: getVal('cUF'),
                 dhEmi: getVal('dhEmi'),
+                dhSaiEnt: getVal('dhSaiEnt') || getVal('dhEmi'),
                 mod: getVal('mod'),
                 tpEmis: getVal('tpEmis'),
                 cDV: getVal('cDV'),
@@ -125,6 +126,8 @@
                 emit_CEP: getVal('emit_CEP'),
                 emit_IE: getVal('emit_IE') || (window.currentCabecalho && window.currentCabecalho.emit_IE) || '',
                 emit_CRT: getVal('emit_CRT') || (window.currentCabecalho && window.currentCabecalho.emit_CRT) || '1',
+                emit_cPais: getVal('emit_cPais') || (window.currentCabecalho && window.currentCabecalho.emit_cPais) || '1058',
+                emit_xPais: getVal('emit_xPais') || (window.currentCabecalho && window.currentCabecalho.emit_xPais) || 'Brasil',
                 dest_xNome: getVal('dest_xNome'),
                 dest_CNPJ_CPF: getVal('dest_CNPJ_CPF'),
                 dest_idEstrangeiro: getVal('dest_idEstrangeiro') || (window.currentCabecalho && window.currentCabecalho.dest_idEstrangeiro) || '',
@@ -398,7 +401,7 @@
     // Função Principal Exposta Globalmente
     window.analisarRascunho = async function () {
         // Feedback visual no botão
-        const btn = document.querySelector('.sidebar-footer-btn-analisar');
+        const btn = document.querySelector('.btn-analisar-rascunho, .sidebar-footer-btn-analisar');
         let oldHtml = '';
         if (btn) {
             oldHtml = btn.innerHTML;

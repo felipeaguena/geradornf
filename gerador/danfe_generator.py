@@ -7,12 +7,30 @@ import pymupdf as fitz
 import barcode
 from barcode.writer import ImageWriter
 
+try:
+    from brazilfiscalreport.danfe import Danfe as BFRDanfe, DanfeConfig
+    HAS_BFR = True
+except Exception as e_bfr_import:
+    HAS_BFR = False
+    print(f"Aviso: BrazilFiscalReport não pôde ser importado ({e_bfr_import}). Usando renderizador legado.")
+
 class DanfeGenerator:
-    def __init__(self, template_path=None):
+    def __init__(self, template_path=None, logo_path=None):
+        base_dir = os.path.dirname(os.path.abspath(__file__))
         if template_path is None:
-            base_dir = os.path.dirname(os.path.abspath(__file__))
             template_path = os.path.join(base_dir, "modelo", "danfe_template_clean.pdf")
         self.template_path = template_path
+
+        if logo_path is None:
+            # Imagem oficial definida pelo usuário: NFTLogoBlackCompact.webp
+            default_logo = os.path.join(base_dir, "static", "img", "brand", "NFTLogoBlackCompact.webp")
+            if not os.path.exists(default_logo):
+                default_logo = os.path.join(base_dir, "static", "img", "brand", "NFTLogoBlackCompact.png")
+            if not os.path.exists(default_logo):
+                default_logo = os.path.join(base_dir, "static", "img", "brand", "nft_logo_completo-black.png")
+            if os.path.exists(default_logo):
+                logo_path = default_logo
+        self.logo_path = logo_path
 
     @staticmethod
     def format_currency(val):
@@ -349,6 +367,31 @@ class DanfeGenerator:
         return fp.getvalue()
 
     def render(self, xml_path_or_content, output_pdf_path):
+        if HAS_BFR:
+            try:
+                if os.path.exists(xml_path_or_content):
+                    with open(xml_path_or_content, "rb") as f:
+                        xml_bytes = f.read()
+                elif isinstance(xml_path_or_content, str):
+                    xml_bytes = xml_path_or_content.encode("utf-8")
+                else:
+                    xml_bytes = bytes(xml_path_or_content)
+
+                config = DanfeConfig(
+                    logo=self.logo_path if (self.logo_path and os.path.exists(self.logo_path)) else None
+                )
+                danfe = BFRDanfe(xml_bytes, config=config)
+                pdf_bytes = danfe.output()
+                with open(output_pdf_path, "wb") as f_out:
+                    f_out.write(pdf_bytes)
+                print(f"DANFE PDF gerado via BrazilFiscalReport em: {output_pdf_path}")
+                return
+            except Exception as e_bfr:
+                print(f"Aviso: Falha ao gerar DANFE via BrazilFiscalReport ({e_bfr}). Recorrendo ao layout legado.")
+
+        self._render_legacy(xml_path_or_content, output_pdf_path)
+
+    def _render_legacy(self, xml_path_or_content, output_pdf_path):
         data = self.parse_xml(xml_path_or_content)
         doc = fitz.open(self.template_path)
         page = doc[0]

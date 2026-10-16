@@ -17,6 +17,7 @@
 <script src="/static/js/lucide.min.js"></script>
 <script src="/static/js/nft-dialogs.js"></script>
 <script defer src="/static/js/nft-sidebar.js?v=2.7"></script>
+<script defer src="/static/js/nft-shortcuts.js?v=1.0"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -73,6 +74,16 @@
 </a>
 </li>
 </ul>
+<!-- Grupo: Relatório -->
+<div class="sidebar-section-title">Relatório</div>
+<ul class="nft-sidebar-nav">
+<li class="nft-sidebar-item">
+<a class="nft-sidebar-btn" href="/relatorios" title="Relatório de Notas Fiscais Geradas">
+<span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
+<span class="sidebar-label">Relatório</span>
+</a>
+</li>
+</ul>
 <!-- Grupo: Configurações -->
 <div class="sidebar-section-title">Configurações</div>
 <ul class="nft-sidebar-nav">
@@ -101,22 +112,6 @@
 </a>
 </li>
 </ul>
-<!-- Grupo: Exportações da Tabela -->
-<div class="sidebar-section-title">Exportações</div>
-<ul class="nft-sidebar-nav">
-<li class="nft-sidebar-item">
-<a class="nft-sidebar-btn" href="/download_ncm_excel" title="Baixar Planilha Excel Oficial">
-<span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
-<span class="sidebar-label">Baixar Excel (.xlsx)</span>
-</a>
-</li>
-<li class="nft-sidebar-item">
-<a class="nft-sidebar-btn" href="/download_ncm_json" title="Baixar Dados em JSON">
-<span class="sidebar-icon"><i data-lucide="file-code"></i></span>
-<span class="sidebar-label">Baixar JSON</span>
-</a>
-</li>
-</ul>
 </div>
 <!-- 3. Rodapé da Sidebar -->
 <div class="nft-sidebar-footer">
@@ -138,8 +133,8 @@
 <!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
 <div class="nft-main-wrapper">
 <div class="container-fluid px-4 py-3">
-<!-- Top Header Limpo -->
-<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border">
+<!-- Top Header Limpo com Botões de Exportação -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 bg-white p-3 rounded shadow-sm border">
 <div class="d-flex align-items-center gap-3">
 <button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
 <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
@@ -148,6 +143,17 @@
 <h4 class="mb-0 fw-bold">Grande Tabela NCM &amp; Impostos</h4>
 <small class="text-muted">15.156 registros unificados com Unidades Tributáveis (uTrib) e Alíquotas Oficiais de Importação (II, IPI, PIS, COFINS)</small>
 </div>
+</div>
+<!-- Botões de Ação à Direita -->
+<div class="d-flex align-items-center gap-2">
+<a class="btn-nft d-inline-flex align-items-center gap-2 shadow-sm text-decoration-none px-3 py-2 fw-semibold" href="/download_ncm_excel" title="Baixar Planilha Excel Oficial">
+<i data-lucide="file-spreadsheet" style="width: 16px; height: 16px;"></i>
+<span>Baixar Excel (.xlsx)</span>
+</a>
+<a class="btn-nft d-inline-flex align-items-center gap-2 shadow-sm text-decoration-none px-3 py-2 fw-semibold" href="/download_ncm_json" title="Baixar Dados em JSON">
+<i data-lucide="file-code" style="width: 16px; height: 16px;"></i>
+<span>Baixar JSON</span>
+</a>
 </div>
 </div>
 <!-- Cards de Estatisticas -->

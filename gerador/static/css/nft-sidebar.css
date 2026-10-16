@@ -312,6 +312,22 @@ body.sidebar-collapsed .nft-sidebar:hover {
   width: 100%;
 }
 
+.sidebar-footer-btn-power {
+  flex: 1;
+  color: #ef4444 !important;
+  font-weight: 700;
+}
+
+.sidebar-footer-btn-power .sidebar-icon {
+  color: #ef4444 !important;
+}
+
+.sidebar-footer-btn-power:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  color: #ef4444 !important;
+}
+
 .sidebar-footer-btn.theme-toggle-btn {
   width: 38px;
   min-width: 38px;
@@ -345,6 +361,25 @@ body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-text,
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-info,
 body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-toggle-btn {
   display: none !important;
+}
+
+/* No modo recolhido, cada botão do rodapé fica em sua própria linha (empilhados verticalmente) */
+body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-actions {
+  flex-direction: column !important;
+  gap: 0.4rem !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+body.sidebar-collapsed .nft-sidebar:not(:hover) .sidebar-footer-actions .sidebar-footer-btn {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  justify-content: center !important;
+  flex: none !important;
 }
 
 body.sidebar-collapsed .nft-sidebar:not(:hover) .nft-sidebar-header {

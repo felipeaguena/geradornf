@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- Favicon -->
+    <link href="/static/img/brand/nftlogo.webp" rel="icon" type="image/webp"/>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Relatório de Notas Fiscais - NFT Logistics</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- NFT Logistics Theme (Light & Dark) -->
+    <link href="/static/css/nft-theme.css?v=3.1" rel="stylesheet"/>
+    <link href="/static/css/nft-sidebar.css" rel="stylesheet"/>
+    <script src="/static/js/theme.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="/static/js/lucide.min.js"></script>
+    <script src="/static/js/nft-dialogs.js"></script>
+    <script defer src="/static/js/nft-sidebar.js?v=2.7"></script>
+    <script defer src="/static/js/nft-shortcuts.js?v=1.0"></script>
+
+    <!-- SheetJS para Exportação Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <style>
+        .metric-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .metric-value {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: var(--heading);
+            line-height: 1.2;
+        }
+        .metric-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .metric-icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-panel {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .filter-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--heading);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-report-wrap {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-report {
+            margin-bottom: 0;
+            font-size: 0.76rem;
+            width: 100%;
+        }
+
+        .table-report th {
+            background-color: var(--bg-alt);
+            color: var(--heading);
+            font-weight: 700;
+            font-size: 0.70rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 7px 6px;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .table-report td {
+            padding: 5px 6px;
+            font-size: 0.74rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chave-display {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0px;
+            color: var(--text);
+            background-color: var(--bg-alt);
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            max-width: 160px;
+        }
+
+        .chave-text-ellipsis {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 132px;
+            display: inline-block;
+        }
+
+        .chave-copy-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .chave-copy-btn:hover {
+            color: var(--primary);
+        }
+
+        .btn-file-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 2px 5px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-file-pdf {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+        .btn-file-pdf:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+
+        .btn-file-xml {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+        .btn-file-xml:hover {
+            background-color: #10b981;
+            color: #ffffff;
+        }
+
+        .btn-file-zip {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+            border-color: rgba(99, 102, 241, 0.25);
+        }
+        .btn-file-zip:hover {
+            background-color: #6366f1;
+            color: #ffffff;
+        }
+
+        .ref-tag {
+            font-weight: 700;
+            font-size: 0.74rem;
+            color: var(--primary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .ref-tag:hover {
+            text-decoration: underline;
+        }
+
+        .edit-ref-icon {
+            opacity: 0.4;
+            transition: opacity 0.15s ease;
+        }
+        .ref-tag:hover .edit-ref-icon {
+            opacity: 1;
+        }
+
+        .badge-op {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Tags de Status da Coluna Recibo/Protocolo */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1.2;
+            padding: 3px 7px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        /* Destaque em Vermelho Forte para Cancelada, Rejeitada e Denegada */
+        .status-pill-danger {
+            background-color: #fee2e2 !important;
+            color: #dc2626 !important;
+            border-color: #fca5a5 !important;
+        }
+        [data-theme="dark"] .status-pill-danger,
+        [data-bs-theme="dark"] .status-pill-danger,
+        .dark .status-pill-danger {
+            background-color: rgba(239, 68, 68, 0.2) !important;
+            color: #f87171 !important;
+            border-color: rgba(239, 68, 68, 0.45) !important;
+        }
+
+        /* Status Autorizada */
+        .status-pill-success {
+            background-color: #dcfce7 !important;
+            color: #16a34a !important;
+            border-color: #86efac !important;
+        }
+        [data-theme="dark"] .status-pill-success,
+        [data-bs-theme="dark"] .status-pill-success,
+        .dark .status-pill-success {
+            background-color: rgba(34, 197, 94, 0.18) !important;
+            color: #4ade80 !important;
+            border-color: rgba(34, 197, 94, 0.4) !important;
+        }
+
+        /* Outros Status Informativos */
+        .status-pill-info {
+            background-color: #e0f2fe !important;
+            color: #0284c7 !important;
+            border-color: #7dd3fc !important;
+        }
+        [data-theme="dark"] .status-pill-info,
+        [data-bs-theme="dark"] .status-pill-info,
+        .dark .status-pill-info {
+            background-color: rgba(14, 165, 233, 0.18) !important;
+            color: #38bdf8 !important;
+            border-color: rgba(14, 165, 233, 0.4) !important;
+        }
+
+        /* Tags de Ambiente (Sem conflito de badge): Homologação em Cinza e Produção em Azul */
+        .ambiente-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            font-size: 0.70rem;
+            font-weight: 700;
+            line-height: 1.2;
+            padding: 2px 7px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        /* Produção: Azul */
+        .ambiente-pill-prod {
+            background-color: #dbeafe !important;
+            color: #1d4ed8 !important;
+            border-color: #93c5fd !important;
+        }
+        [data-theme="dark"] .ambiente-pill-prod,
+        [data-bs-theme="dark"] .ambiente-pill-prod,
+        .dark .ambiente-pill-prod {
+            background-color: rgba(37, 99, 235, 0.22) !important;
+            color: #60a5fa !important;
+            border-color: rgba(96, 165, 250, 0.45) !important;
+        }
+
+        /* Homologação: Cinza */
+        .ambiente-pill-homolog {
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            border-color: #cbd5e1 !important;
+        }
+        [data-theme="dark"] .ambiente-pill-homolog,
+        [data-bs-theme="dark"] .ambiente-pill-homolog,
+        .dark .ambiente-pill-homolog {
+            background-color: rgba(148, 163, 184, 0.18) !important;
+            color: #94a3b8 !important;
+            border-color: rgba(148, 163, 184, 0.35) !important;
+        }
+
+        @media print {
+            .nft-sidebar, .filter-panel, .header-actions, .pagination-wrap, .chave-copy-btn, .btn-file-action {
+                display: none !important;
+            }
+            .nft-main-wrapper {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .table-report-wrap {
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="has-sidebar">
+
+<!-- MENU LATERAL FIXO (SIDEBAR) -->
+<aside class="nft-sidebar" id="nftSidebar">
+    <!-- 1. Cabeçalho da Sidebar -->
+    <div class="nft-sidebar-header">
+        <a class="sidebar-brand-link" href="/" title="NFT Logistics - Retornar ao Início">
+            <div class="sidebar-brand-logo-wrap">
+                <img alt="NFT" class="logo-theme-black" src="/static/img/brand/NFT%20Logo%20(3).webp"/>
+                <img alt="NFT" class="logo-theme-white" src="/static/img/brand/NFT%20Logo%20(11).webp"/>
+            </div>
+            <div class="sidebar-brand-info">
+                <span class="sidebar-brand-title">NFT Logistics</span>
+                <span class="badge sidebar-brand-badge bg-primary-subtle text-primary fw-bold">Relatório</span>
+            </div>
+        </a>
+        <button aria-label="Recolher / Fixar Menu" class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Recolher / Fixar Menu Lateral" type="button">
+            <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+        </button>
+    </div>
+
+    <!-- 2. Corpo com Menus e Itens -->
+    <div class="nft-sidebar-body">
+        <!-- Grupo: Módulos -->
+        <div class="sidebar-section-title">Módulos</div>
+        <ul class="nft-sidebar-nav">
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/" title="Portal Inicial">
+                    <span class="sidebar-icon"><i data-lucide="home"></i></span>
+                    <span class="sidebar-label">Início / Módulos</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/nova_nf?nova_nota=1" title="Módulo Nova NF (Sem XML)">
+                    <span class="sidebar-icon"><i data-lucide="file-plus-2"></i></span>
+                    <span class="sidebar-label">Nova NF</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/rascunho?nova_nota=1" title="Módulo XML Rascunho">
+                    <span class="sidebar-icon"><i data-lucide="file-code"></i></span>
+                    <span class="sidebar-label">XML Rascunho</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/di_duimp?nova_nota=1" title="Módulo XML da DI ou DUIMP">
+                    <span class="sidebar-icon"><i data-lucide="globe"></i></span>
+                    <span class="sidebar-label">XML da DI ou DUIMP</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/rascunho?abrir_rascunhos=1" title="Ver e gerenciar Rascunhos Salvos">
+                    <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+                    <span class="sidebar-label">Rascunhos Salvos</span>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Grupo: Relatório (SEPARADO DE MÓDULOS E CONFIGURAÇÕES) -->
+        <div class="sidebar-section-title">Relatório</div>
+        <ul class="nft-sidebar-nav">
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn active" href="/relatorios" title="Relatório de Notas Fiscais Geradas">
+                    <span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
+                    <span class="sidebar-label">Relatório</span>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Grupo: Configurações -->
+        <div class="sidebar-section-title">Configurações</div>
+        <ul class="nft-sidebar-nav">
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/empresas" title="Gestão de Empresas e Cadastros">
+                    <span class="sidebar-icon"><i data-lucide="building-2"></i></span>
+                    <span class="sidebar-label">Empresas</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/banco_ncm" title="Grande Tabela NCM &amp; Impostos">
+                    <span class="sidebar-icon"><i data-lucide="book-open"></i></span>
+                    <span class="sidebar-label">Tabela NCM</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/localidades" title="Localidades Oficiais (BACEN, IBGE, CEPs)">
+                    <span class="sidebar-icon"><i data-lucide="map-pin"></i></span>
+                    <span class="sidebar-label">Localidades</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/feiras" title="Descrição da Feira (Feiras do Ano)">
+                    <span class="sidebar-icon"><i data-lucide="calendar-days"></i></span>
+                    <span class="sidebar-label">Descrição da Feira</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 3. Rodapé da Sidebar -->
+    <div class="nft-sidebar-footer">
+        <div class="sidebar-footer-actions">
+            <button class="sidebar-footer-btn sidebar-footer-btn-power" onclick="encerrarServidor()" title="Desligar Servidor Local (Porta 1652)" type="button" style="color: #ef4444 !important;">
+                <span class="sidebar-icon" style="color: #ef4444 !important;"><i data-lucide="power"></i></span>
+                <span class="sidebar-footer-text" style="color: #ef4444 !important; font-weight: 700;">Desligar</span>
+            </button>
+            <button class="sidebar-footer-btn theme-toggle-btn" onclick="toggleTheme()" title="Alternar Modo Claro / Escuro" type="button">
+                <i data-lucide="moon"></i>
+            </button>
+        </div>
+        <div class="sidebar-footer-info">
+            <span>NFT Logistics</span>
+            <span>v2.2</span>
+        </div>
+    </div>
+</aside>
+
+<!-- ÁREA PRINCIPAL DE CONTEÚDO (DESLOCADA PELA SIDEBAR) -->
+<div class="nft-main-wrapper">
+    <div class="container-fluid px-4 py-3">
+
+        <!-- Top Header Card -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border" style="background-color: var(--surface) !important; border-color: var(--border) !important;">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-nft d-lg-none" onclick="document.body.classList.toggle('sidebar-mobile-open')" title="Abrir Menu" type="button">
+                    <i data-lucide="menu" style="width: 16px; height: 16px;"></i>
+                </button>
+                <div>
+                    <h4 class="mb-0 fw-bold d-flex align-items-center gap-2 text-heading">
+                        <i class="text-primary" data-lucide="file-spreadsheet"></i>
+                        <span>Relatório de Notas Fiscais Geradas</span>
+                    </h4>
+                    <small class="text-muted">Acompanhe todas as notas fiscais emitidas, dados de faturamento, protocolos e baixe os arquivos XML e DANFE</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 mt-2 mt-md-0 header-actions">
+                <button class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1" onclick="carregarNotas()" title="Atualizar listagem de notas" type="button">
+                    <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                    <span>Atualizar</span>
+                </button>
+                <button class="btn btn-sm btn-success d-flex align-items-center gap-1" onclick="exportarExcel()" title="Exportar dados filtrados para Excel (.xlsx)" type="button">
+                    <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                    <span>Exportar Excel</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" onclick="exportarCSV()" title="Exportar dados filtrados para CSV" type="button">
+                    <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+                    <span>CSV</span>
+                </button>
+                <button class="btn btn-sm btn-outline-info text-info-emphasis d-flex align-items-center gap-1 shadow-sm fw-semibold" onclick="abrirModalConsultaSefazModal()" title="Consultar Situação da NF-e no SEFAZ" type="button">
+                    <i data-lucide="search" style="width: 14px; height: 14px;"></i>
+                    <span>Consulta SEFAZ</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3 Metric Summary Cards (Sem vProd) -->
+        <div class="row g-3 mb-3">
+            <div class="col-xl-4 col-md-4">
+                <div class="metric-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="metric-label">Total de Notas</div>
+                        <div class="metric-value" id="card-total-notas">0</div>
+                        <div class="small text-muted mt-1" id="card-sub-notas">0 encontradas</div>
+                    </div>
+                    <div class="metric-icon-wrap" style="background-color: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                        <i data-lucide="files" style="width: 22px; height: 22px;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-4">
+                <div class="metric-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="metric-label">Valor Total (vNF)</div>
+                        <div class="metric-value text-success" id="card-total-valor">R$ 0,00</div>
+                        <div class="small text-muted mt-1">Soma do valor total das notas</div>
+                    </div>
+                    <div class="metric-icon-wrap" style="background-color: rgba(16, 185, 129, 0.12); color: #10b981;">
+                        <i data-lucide="dollar-sign" style="width: 22px; height: 22px;"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-4">
+                <div class="metric-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="metric-label">Status das Notas</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" id="card-badge-autorizadas">0 Autorizadas</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" id="card-badge-canceladas">0 Canceladas</span>
+                        </div>
+                        <div class="small text-muted mt-1" id="card-badge-rejeitadas">0 Rejeitadas</div>
+                    </div>
+                    <div class="metric-icon-wrap" style="background-color: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                        <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTROS AVANÇADOS -->
+        <div class="filter-panel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="filter-title">
+                    <i class="text-primary" data-lucide="sliders-horizontal" style="width: 18px; height: 18px;"></i>
+                    <span>Filtros Avançados de Pesquisa</span>
+                    <span class="badge bg-primary-subtle text-primary ms-2" id="lbl-filtros-ativos">Todos os registros</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="limparFiltros()" type="button">
+                        <i data-lucide="x" style="width: 13px; height: 13px;"></i> Limpar Filtros
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="aplicarFiltros()" type="button">
+                        <i data-lucide="filter" style="width: 13px; height: 13px;"></i> Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Linha 1 de Filtros: Busca Livre, Período e Tipo de Operação -->
+            <div class="row g-2 mb-2">
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label small text-muted fw-bold mb-1" for="filtro-search">Busca Geral (Pesquisa Rápida)</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i data-lucide="search" style="width: 14px; height: 14px;"></i></span>
+                        <input class="form-control" id="filtro-search" oninput="debounceAplicarFiltros()" placeholder="Ref. Interna, Chave, Número, Protocolo..." type="text"/>
+                        <button class="btn btn-outline-secondary" onclick="document.getElementById('filtro-search').value=''; aplicarFiltros();" title="Limpar busca" type="button">
+                            <i data-lucide="x" style="width: 12px; height: 12px;"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <label class="form-label small text-muted fw-bold mb-1" for="filtro-data-ini">Data Inicial</label>
+                    <input class="form-control form-control-sm" id="filtro-data-ini" onchange="aplicarFiltros()" type="date"/>
+                </div>
+                <div class="col-lg-2 col-md-3 col-6">
+                    <label class="form-label small text-muted fw-bold mb-1" for="filtro-data-fim">Data Final</label>
+                    <input class="form-control form-control-sm" id="filtro-data-fim" onchange="aplicarFiltros()" type="date"/>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <label class="form-label small text-muted fw-bold mb-1" for="filtro-operacao">Tipo de Operação</label>
+                    <select class="form-select form-select-sm" id="filtro-operacao" onchange="aplicarFiltros()">
+                        <option value="">Todas as Operações</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Linha 2 de Filtros: Status, Movimento, Ambiente e Faixas de Valor -->
+            <div class="row g-2">
+                <div class="col-lg-2 col-md-4 col-6">
+                    <label class="form-label small text-muted fw-bold mb-1" for="filtro-status">Status da Nota</label>
+                    <select class="form-select form-select-sm" id="filtro-status" onchange="aplicarFiltros()">
+                        <option value="">Todos os Status</option>
+                        <option value="Autorizada">Autorizada</option>
+                        <option value="Cancelada">Cancelada</option>
+                        <option value="Rejeitada">Rejeitada</option>
+                        <option value="Gerada">Gerada (Sem Envio)</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <label class="form-label small text-muted fw-bold mb-1" for="filtro-movimento">Tipo de Movimento</label>
+                    <select class="form-select form-select-sm" id="filtro-movimento" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="1">Saída (1)</option>
+                        <option value="0">Entrada (0)</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-4 col-6">
+                    <label class="form-label small text-muted fw-bold mb-1" for="filtro-ambiente">Ambiente SEFAZ</label>
+                    <select class="form-select form-select-sm" id="filtro-ambiente" onchange="aplicarFiltros()">
+                        <option value="">Todos</option>
+                        <option value="1">Produção (1)</option>
+                        <option value="2">Homologação (2)</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-6 col-6">
+                    <label class="form-label small text-muted fw-bold mb-1">Faixa Valor Total (vNF)</label>
+                    <div class="input-group input-group-sm">
+                        <input class="form-control" id="filtro-vmin" onchange="aplicarFiltros()" placeholder="Min R$" type="number" step="0.01"/>
+                        <span class="input-group-text px-1">a</span>
+                        <input class="form-control" id="filtro-vmax" onchange="aplicarFiltros()" placeholder="Max R$" type="number" step="0.01"/>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-12">
+                    <label class="form-label small text-muted fw-bold mb-1">Faixa Total Produtos (vProd)</label>
+                    <div class="input-group input-group-sm">
+                        <input class="form-control" id="filtro-pmin" onchange="aplicarFiltros()" placeholder="Min R$" type="number" step="0.01"/>
+                        <span class="input-group-text px-1">a</span>
+                        <input class="form-control" id="filtro-pmax" onchange="aplicarFiltros()" placeholder="Max R$" type="number" step="0.01"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA DE NOTAS FISCAIS GERADAS -->
+        <div class="table-report-wrap">
+            <div class="p-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2" style="background-color: var(--surface);">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold text-heading">Listagem de Notas Fiscais</span>
+                    <span class="badge bg-secondary-subtle text-secondary" id="badge-contador-linhas">0 notas</span>
+                </div>
+                <div class="d-flex align-items-center gap-3 pagination-wrap">
+                    <div class="d-flex align-items-center gap-1 small text-muted">
+                        <span>Exibir:</span>
+                        <select class="form-select form-select-sm py-0 ps-2 pe-4" id="select-page-size" onchange="mudarPageSize(this.value)" style="width: auto;">
+                            <option value="10">10</option>
+                            <option value="25" selected>25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="all">Todas</option>
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center gap-1" id="paginacao-controles">
+                        <!-- Botões de paginação inseridos dinamicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive" style="max-height: 650px; overflow-y: auto;">
+                <table class="table table-hover table-report align-middle" id="tabela-notas">
+                    <thead class="sticky-top">
+                        <tr>
+                            <th style="min-width: 115px;">Referencia Interna</th>
+                            <th style="min-width: 95px;">Data/Hora</th>
+                            <th style="min-width: 55px;" class="text-center">Nº NF-e</th>
+                            <th style="min-width: 135px;">Tipo de Operação</th>
+                            <th style="min-width: 80px;" class="text-center">Ambiente</th>
+                            <th style="min-width: 155px;">Chave de Acesso</th>
+                            <th style="min-width: 85px;" class="text-end text-nowrap">Valor Total</th>
+                            <th style="min-width: 100px;" class="text-center">Arquivos</th>
+                            <th style="min-width: 115px;">Recibo/Protocolo</th>
+                            <th style="min-width: 65px;" class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-notas">
+                        <tr>
+                            <td class="text-center py-5 text-muted" colspan="10">
+                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                Carregando notas fiscais geradas...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-2 px-3 border-top d-flex justify-content-between align-items-center small text-muted" style="background-color: var(--bg-alt);">
+                <div id="lbl-rodape-paginacao">Mostrando 0 de 0 notas fiscais</div>
+                <div>NFT Logistics &copy; Sistema Emissor de NF-e</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL: EDITAR REFERÊNCIA INTERNA -->
+<div class="modal fade" id="modalEditarReferencia" tabindex="-1" aria-labelledby="modalEditarReferenciaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom py-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="modalEditarReferenciaLabel">
+                    <i class="text-primary" data-lucide="edit-3"></i>
+                    <span>Editar Referência Interna</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body py-3">
+                <p class="small text-muted mb-3">
+                    Ajuste o código da referência interna vinculado a esta nota fiscal emitida. Essa informação ficará gravada para futuras consultas e relatórios.
+                </p>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted mb-1">Chave de Acesso:</label>
+                    <input type="text" class="form-control form-control-sm font-monospace bg-light" id="modal-ref-chave" readonly/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted mb-1" for="modal-ref-input">Referência Interna:</label>
+                    <input type="text" class="form-control" id="modal-ref-input" placeholder="Ex: NFT2600218-I REMESSA ou DI 2608502015" autofocus/>
+                </div>
+            </div>
+            <div class="modal-footer border-top py-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-1" onclick="salvarReferenciaInterna()">
+                    <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+                    <span>Salvar Alteração</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: RESUMO DA NOTA FISCAL E EXCLUSÃO DO RELATÓRIO -->
+<div class="modal fade" id="modalResumoNota" tabindex="-1" aria-labelledby="modalResumoNotaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-bottom py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary px-2 py-1"><i data-lucide="file-text" style="width: 14px; height: 14px;"></i> NF-e</span>
+                    <h5 class="modal-title fw-bold mb-0 text-heading" id="modalResumoNotaLabel">
+                        Resumo da Nota Fiscal
+                    </h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-4" id="modal-resumo-body">
+                <!-- Conteúdo preenchido dinamicamente por abrirModalResumoNota(chave) -->
+            </div>
+            <div class="modal-footer bg-light py-2 d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 shadow-sm" id="btn-excluir-nota-modal" onclick="confirmarExclusaoNota()">
+                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    <span>Excluir Nota Fiscal do Relatório</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: CONSULTA DE NOTA FISCAL NA SEFAZ -->
+<div class="modal fade" id="modalConsultaSefaz" tabindex="-1" aria-labelledby="modalConsultaSefazLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light border-bottom py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary px-2 py-1"><i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> SEFAZ</span>
+                    <h5 class="modal-title fw-bold mb-0 text-heading" id="modalConsultaSefazLabel">
+                        Consulta de NF-e na SEFAZ
+                    </h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="alert alert-info py-2 px-3 small d-flex align-items-center gap-2 mb-3">
+                    <i data-lucide="info" class="flex-shrink-0" style="width: 18px; height: 18px;"></i>
+                    <div>
+                        Digite a <strong>Chave de Acesso</strong> de 44 dígitos para consultar diretamente o webservice da SEFAZ, ou utilize o gerador de chave rápida preenchendo os campos fiscais.
+                    </div>
+                </div>
+
+                <!-- Formulário de Consulta -->
+                <div class="card border p-3 mb-3 bg-light shadow-sm">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="fw-bold mb-0 d-flex align-items-center gap-2 text-primary" style="font-size: 0.9rem;">
+                            <i data-lucide="key" style="width: 17px; height: 17px;"></i>
+                            <span>1. Consulta por Chave de Acesso (Principal)</span>
+                        </h6>
+                        <a href="https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ%20gAVw2g=" target="_blank" class="small text-decoration-none d-inline-flex align-items-center gap-1 text-primary">
+                            <i data-lucide="external-link" style="width: 13px; height: 13px;"></i>
+                            <span>Portal Nacional NF-e</span>
+                        </a>
+                    </div>
+                    
+                    <div class="row g-2 mb-2">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted mb-1" for="sefaz-chave-input">
+                                Chave de Acesso da NF-e:
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text font-monospace bg-white text-muted"><i data-lucide="hash" style="width: 15px; height: 15px;"></i></span>
+                                <input type="text" class="form-control font-monospace" id="sefaz-chave-input" placeholder="Cole ou digite a Chave de Acesso (ex: 35261047998441000198550010000009801005080383)" oninput="formatarChaveInput(this)" onkeypress="if(event.key==='Enter') executarConsultaSefazModal();">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="limparCamposConsultaSefaz()" title="Limpar chave">
+                                    <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted" style="font-size: 11px;">Insira a chave com ou sem espaços/pontuação.</small>
+                                <small class="text-muted font-monospace" id="sefaz-chave-contador" style="font-size: 11px;">0 dígitos</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 align-items-end pt-1">
+                        <div class="col-md-5 col-sm-6">
+                            <label class="form-label small fw-bold text-muted mb-1" for="sefaz-ambiente-select">
+                                Ambiente SEFAZ:
+                            </label>
+                            <select class="form-select form-select-sm" id="sefaz-ambiente-select">
+                                <option value="1" selected>1 - Produção (Oficial)</option>
+                                <option value="2">2 - Homologação (Testes)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <label class="form-label small fw-bold text-muted mb-1" for="sefaz-uf-select">
+                                UF SEFAZ:
+                            </label>
+                            <select class="form-select form-select-sm" id="sefaz-uf-select">
+                                <option value="SP" selected>SP (São Paulo)</option>
+                                <option value="RJ">RJ</option>
+                                <option value="MG">MG</option>
+                                <option value="PR">PR</option>
+                                <option value="SC">SC</option>
+                                <option value="RS">RS</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 col-sm-12 d-flex justify-content-md-end gap-2">
+                            <button type="button" class="btn btn-sm btn-primary fw-bold w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm py-2" id="btn-executar-consulta-sefaz" onclick="executarConsultaSefazModal()">
+                                <i data-lucide="search" style="width: 15px; height: 15px;"></i>
+                                <span>Consultar na SEFAZ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acordeão: Auxiliar de Composição da Chave (Caso o usuário só tenha os dados da nota) -->
+                <div class="accordion mb-3" id="accordionMontarChave">
+                    <div class="accordion-item border rounded">
+                        <h2 class="accordion-header" id="headingMontar">
+                            <button class="accordion-button collapsed py-2 px-3 small fw-semibold text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMontar" aria-expanded="false" aria-controls="collapseMontar">
+                                <i data-lucide="calculator" class="me-2" style="width: 15px; height: 15px;"></i>
+                                Não tem a chave completa? Preencher dados individuais da NF-e
+                            </button>
+                        </h2>
+                        <div id="collapseMontar" class="accordion-collapse collapse" aria-labelledby="headingMontar" data-bs-parent="#accordionMontarChave">
+                            <div class="accordion-body p-3 bg-light-subtle">
+                                <p class="small text-muted mb-2">
+                                    Os 44 dígitos da NF-e são formados por: <strong>UF (2) + AAMM (4) + CNPJ Emitente (14) + Modelo (2) + Série (3) + Número NF (9) + Tipo Emissão (1) + Código Numérico (8) + Dígito (1)</strong>.
+                                </p>
+                                <div class="row g-2 mb-2">
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label small fw-bold text-muted mb-1">CNPJ Emitente:</label>
+                                        <input type="text" class="form-control form-control-sm font-monospace" id="calc-cnpj" placeholder="47.998.441/0001-98" value="47998441000198">
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label small fw-bold text-muted mb-1">Ano/Mês Emissão:</label>
+                                        <input type="text" class="form-control form-control-sm font-monospace" id="calc-aamm" placeholder="AAMM (Ex: 2610)" maxlength="4" value="2610">
+                                    </div>
+                                    <div class="col-md-2 col-4">
+                                        <label class="form-label small fw-bold text-muted mb-1">Modelo:</label>
+                                        <input type="text" class="form-control form-control-sm font-monospace" id="calc-modelo" value="55" readonly>
+                                    </div>
+                                    <div class="col-md-2 col-4">
+                                        <label class="form-label small fw-bold text-muted mb-1">Série:</label>
+                                        <input type="text" class="form-control form-control-sm font-monospace" id="calc-serie" value="001" maxlength="3">
+                                    </div>
+                                    <div class="col-md-2 col-4">
+                                        <label class="form-label small fw-bold text-muted mb-1">Número NF-e:</label>
+                                        <input type="text" class="form-control form-control-sm font-monospace" id="calc-numero" placeholder="Ex: 980" maxlength="9">
+                                    </div>
+                                </div>
+                                <div class="small text-muted fst-italic">
+                                    Dica: Ao selecionar qualquer nota na listagem abaixo, a chave de 44 dígitos é preenchida automaticamente.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Container do Resultado da Consulta -->
+                <div id="sefaz-resultado-consulta" style="display: none;">
+                    <!-- Preenchido dinamicamente com o status, protocolos, eventos e links -->
+                </div>
+            </div>
+
+            <div class="modal-footer bg-light py-2">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Estado global da aplicação
+    let todasNotas = [];
+    let notasFiltradas = [];
+    let operacoesLista = [];
+    let paginaAtual = 1;
+    let itensPorPagina = 25;
+    let debounceTimer = null;
+    let modalRefBootstrap = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        modalRefBootstrap = new bootstrap.Modal(document.getElementById('modalEditarReferencia'));
+        carregarNotas();
+    });
+
+    // Carrega dados da API do backend
+    async function carregarNotas() {
+        const tbody = document.getElementById('tbody-notas');
+        tbody.innerHTML = `
+            <tr>
+                <td class="text-center py-5 text-muted" colspan="9">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Buscando e sincronizando notas fiscais geradas...
+                </td>
+            </tr>
+        `;
+
+        try {
+            const res = await fetch('/api/relatorios/notas');
+            const data = await res.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Erro ao carregar dados do relatório');
+            }
+
+            todasNotas = data.notas || [];
+            operacoesLista = data.operacoes || [];
+            
+            // Popula dropdown de operações
+            popularDropdownOperacoes();
+
+            // Aplica filtros e renderiza
+            aplicarFiltros();
+
+        } catch (err) {
+            console.error('Erro ao carregar notas:', err);
+            tbody.innerHTML = `
+                <tr>
+                    <td class="text-center py-5 text-danger" colspan="9">
+                        <i data-lucide="alert-triangle" class="mb-2" style="width: 28px; height: 28px;"></i><br/>
+                        <strong>Falha ao carregar relatório:</strong> ${err.message}<br/>
+                        <button class="btn btn-sm btn-outline-primary mt-2" onclick="carregarNotas()">Tentar Novamente</button>
+                    </td>
+                </tr>
+            `;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    // Popula o select de Tipo de Operação com opções distintas
+    function popularDropdownOperacoes() {
+        const sel = document.getElementById('filtro-operacao');
+        const valorAtual = sel.value;
+        sel.innerHTML = '<option value="">Todas as Operações</option>';
+        operacoesLista.forEach(op => {
+            if (op) {
+                const opt = document.createElement('option');
+                opt.value = op;
+                opt.textContent = op;
+                if (op === valorAtual) opt.selected = true;
+                sel.appendChild(opt);
+            }
+        });
+    }
+
+    // Debounce para digitação na busca rápida
+    function debounceAplicarFiltros() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            aplicarFiltros();
+        }, 250);
+    }
+
+    // Aplica todos os filtros localmente nos dados carregados
+    function aplicarFiltros() {
+        const search = (document.getElementById('filtro-search')?.value || '').trim().toLowerCase();
+        const dataIni = document.getElementById('filtro-data-ini')?.value || '';
+        const dataFim = document.getElementById('filtro-data-fim')?.value || '';
+        const operacao = document.getElementById('filtro-operacao')?.value || '';
+        const status = document.getElementById('filtro-status')?.value || '';
+        const movimento = document.getElementById('filtro-movimento')?.value || '';
+        const ambiente = document.getElementById('filtro-ambiente')?.value || '';
+        const vMin = parseFloat(document.getElementById('filtro-vmin')?.value || NaN);
+        const vMax = parseFloat(document.getElementById('filtro-vmax')?.value || NaN);
+        const pMin = parseFloat(document.getElementById('filtro-pmin')?.value || NaN);
+        const pMax = parseFloat(document.getElementById('filtro-pmax')?.value || NaN);
+
+        let ativosCount = 0;
+        if (search) ativosCount++;
+        if (dataIni || dataFim) ativosCount++;
+        if (operacao) ativosCount++;
+        if (status) ativosCount++;
+        if (movimento) ativosCount++;
+        if (ambiente) ativosCount++;
+        if (!isNaN(vMin) || !isNaN(vMax)) ativosCount++;
+        if (!isNaN(pMin) || !isNaN(pMax)) ativosCount++;
+
+        const lblFiltros = document.getElementById('lbl-filtros-ativos');
+        if (lblFiltros) {
+            lblFiltros.textContent = ativosCount > 0 ? `${ativosCount} filtro(s) ativo(s)` : 'Todos os registros';
+        }
+
+        notasFiltradas = todasNotas.filter(n => {
+            // Busca geral
+            if (search) {
+                const textoAlvo = `${n.referencia_interna || ''} ${n.chave_nfe || ''} ${n.numero_nfe || ''} ${n.tipo_operacao || ''} ${n.protocolo || ''} ${n.recibo || ''}`.toLowerCase();
+                if (!textoAlvo.includes(search)) return false;
+            }
+
+            // Período
+            const rawDt = (n.data_hora || '').substring(0, 10);
+            if (dataIni && rawDt && rawDt < dataIni) return false;
+            if (dataFim && rawDt && rawDt > dataFim) return false;
+
+            // Tipo de Operação
+            if (operacao && n.tipo_operacao !== operacao) return false;
+
+            // Status
+            if (status && n.status !== status) return false;
+
+            // Movimento (0=Entrada, 1=Saída)
+            if (movimento && String(n.tipo_movimento) !== movimento) return false;
+
+            // Ambiente (1=Produção, 2=Homologação)
+            if (ambiente && String(n.ambiente) !== ambiente) return false;
+
+            // Faixa vNF
+            const vTot = parseFloat(n.valor_total || 0.0);
+            if (!isNaN(vMin) && vTot < vMin) return false;
+            if (!isNaN(vMax) && vTot > vMax) return false;
+
+            // Faixa vProd
+            const vPr = parseFloat(n.total_produtos || 0.0);
+            if (!isNaN(pMin) && vPr < pMin) return false;
+            if (!isNaN(pMax) && vPr > pMax) return false;
+
+            return true;
+        });
+
+        paginaAtual = 1;
+        atualizarResumoCards();
+        renderizarTabela();
+    }
+
+    // Limpa todos os filtros de pesquisa
+    function limparFiltros() {
+        document.getElementById('filtro-search').value = '';
+        document.getElementById('filtro-data-ini').value = '';
+        document.getElementById('filtro-data-fim').value = '';
+        document.getElementById('filtro-operacao').value = '';
+        document.getElementById('filtro-status').value = '';
+        document.getElementById('filtro-movimento').value = '';
+        document.getElementById('filtro-ambiente').value = '';
+        document.getElementById('filtro-vmin').value = '';
+        document.getElementById('filtro-vmax').value = '';
+        document.getElementById('filtro-pmin').value = '';
+        document.getElementById('filtro-pmax').value = '';
+        aplicarFiltros();
+    }
+
+    // Atualiza os cartões de indicadores
+    function atualizarResumoCards() {
+        const totalNotas = notasFiltradas.length;
+        const totalValor = notasFiltradas.reduce((acc, n) => acc + (parseFloat(n.valor_total) || 0), 0);
+        const autorizadas = notasFiltradas.filter(n => n.status === 'Autorizada').length;
+        const canceladas = notasFiltradas.filter(n => n.status === 'Cancelada').length;
+        const rejeitadas = notasFiltradas.filter(n => n.status === 'Rejeitada').length;
+
+        document.getElementById('card-total-notas').textContent = totalNotas;
+        document.getElementById('card-sub-notas').textContent = `${totalNotas} de ${todasNotas.length} carregadas`;
+        document.getElementById('card-total-valor').textContent = formatarMoeda(totalValor);
+        const cardProd = document.getElementById('card-total-prod');
+        if (cardProd) cardProd.textContent = formatarMoeda(totalValor);
+        document.getElementById('card-badge-autorizadas').textContent = `${autorizadas} Autorizadas`;
+        document.getElementById('card-badge-canceladas').textContent = `${canceladas} Canceladas`;
+        document.getElementById('card-badge-rejeitadas').textContent = `${rejeitadas} Rejeitadas`;
+        document.getElementById('badge-contador-linhas').textContent = `${totalNotas} nota(s)`;
+    }
+
+    // Renderiza linhas da tabela com suporte a paginação
+    function renderizarTabela() {
+        const tbody = document.getElementById('tbody-notas');
+        if (notasFiltradas.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td class="text-center py-5 text-muted" colspan="9">
+                        <i data-lucide="inbox" class="mb-2" style="width: 32px; height: 32px;"></i><br/>
+                        Nenhuma nota fiscal encontrada com os filtros informados.
+                    </td>
+                </tr>
+            `;
+            document.getElementById('lbl-rodape-paginacao').textContent = 'Mostrando 0 de 0 notas fiscais';
+            renderizarPaginacao(0);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            return;
+        }
+
+        let inicio = 0;
+        let fim = notasFiltradas.length;
+
+        if (itensPorPagina !== 'all') {
+            const porPag = parseInt(itensPorPagina);
+            inicio = (paginaAtual - 1) * porPag;
+            fim = Math.min(inicio + porPag, notasFiltradas.length);
+        }
+
+        const notasExibidas = notasFiltradas.slice(inicio, fim);
+        let html = '';
+
+        notasExibidas.forEach(n => {
+            const chave = n.chave_nfe || '';
+            const chaveFmt = n.chave_formatada || chave;
+            const ref = n.referencia_interna || '-';
+            const dt = n.data_hora_formatada || n.data_hora || '-';
+            const numNfe = n.numero_nfe || '-';
+            const natOp = n.tipo_operacao || '-';
+            const vNF = n.valor_total_fmt || formatarMoeda(n.valor_total);
+            const vProd = n.total_produtos_fmt || formatarMoeda(n.total_produtos);
+            const status = n.status || 'Gerada';
+            const protocolo = n.protocolo || n.recibo || '-';
+
+            // Tag de Movimento (Entrada ou Saída)
+            const isEntrada = String(n.tipo_movimento) === '0';
+            const badgeMov = isEntrada 
+                ? `<span class="badge bg-warning-subtle text-warning border border-warning-subtle badge-op">Entrada</span>` 
+                : `<span class="badge bg-primary-subtle text-primary border border-primary-subtle badge-op">Saída</span>`;
+
+            // Tag de Status (Sem a classe 'badge' do Bootstrap para evitar conflitos de estilo)
+            let badgeStatus = '';
+            const statusUpper = (status || '').toUpperCase();
+            if (status === 'Autorizada') {
+                badgeStatus = `<span class="status-pill status-pill-success"><i data-lucide="check-circle" style="width:12px; height:12px;"></i> Autorizada</span>`;
+            } else if (statusUpper.includes('CANCELADA')) {
+                badgeStatus = `<span class="status-pill status-pill-danger"><i data-lucide="x-circle" style="width:12px; height:12px;"></i> Cancelada</span>`;
+            } else if (statusUpper.includes('REJEITADA') || statusUpper.includes('REJEIÇÃO')) {
+                badgeStatus = `<span class="status-pill status-pill-danger"><i data-lucide="alert-octagon" style="width:12px; height:12px;"></i> Rejeitada</span>`;
+            } else if (statusUpper.includes('DENEGADA')) {
+                badgeStatus = `<span class="status-pill status-pill-danger"><i data-lucide="shield-alert" style="width:12px; height:12px;"></i> Denegada</span>`;
+            } else {
+                badgeStatus = `<span class="status-pill status-pill-info">${escapeHtml(status)}</span>`;
+            }
+
+            // Botões de download de arquivos
+            const downloadPdfUrl = `/api/sefaz/download/pdf/${chave}`;
+            const downloadXmlUrl = `/api/sefaz/download/xml/${chave}`;
+            const downloadZipUrl = `/api/sefaz/download/zip/${chave}`;
+
+            // 5. Ambiente (1=Produção em Azul, 2=Homologação em Cinza - Sem classe badge conflitante)
+            const isProd = String(n.ambiente) === '1';
+            const badgeAmb = isProd
+                ? `<span class="ambiente-pill ambiente-pill-prod" title="Ambiente de Produção (SEFAZ)"><i data-lucide="shield-check" style="width: 11px; height: 11px;"></i> Produção</span>`
+                : `<span class="ambiente-pill ambiente-pill-homolog" title="Ambiente de Homologação / Testes"><i data-lucide="test-tube-2" style="width: 11px; height: 11px;"></i> Homologação</span>`;
+
+            html += `
+                <tr>
+                    <!-- 1. Referência Interna -->
+                    <td>
+                        <span class="ref-tag" onclick="abrirModalEditarRef('${chave}', '${escapeHtml(ref)}')" title="Clique para editar a referência: ${escapeHtml(ref)}">
+                            <span>${escapeHtml(ref)}</span>
+                            <i data-lucide="edit-3" class="edit-ref-icon" style="width: 11px; height: 11px;"></i>
+                        </span>
+                    </td>
+
+                    <!-- 2. Data/Hora -->
+                    <td class="text-nowrap" style="font-size: 0.73rem;">${dt}</td>
+
+                    <!-- 3. Número de NF-e -->
+                    <td class="text-center">
+                        <span class="badge bg-light text-dark border fw-bold px-1 py-1" style="font-size: 0.72rem;">${escapeHtml(numNfe)}</span>
+                    </td>
+
+                    <!-- 4. Tipo de Operação -->
+                    <td>
+                        <div class="d-flex align-items-center gap-1 mb-1">${badgeMov}</div>
+                        <div class="fw-semibold text-truncate" style="max-width: 155px; font-size: 0.73rem;" title="${escapeHtml(natOp)}">${escapeHtml(natOp)}</div>
+                    </td>
+
+                    <!-- 5. Ambiente -->
+                    <td class="text-center text-nowrap">
+                        ${badgeAmb}
+                    </td>
+
+                    <!-- 6. Chave de Acesso -->
+                    <td>
+                        <div class="chave-display" title="Chave de Acesso: ${chaveFmt}">
+                            <span class="chave-text-ellipsis">${chaveFmt}</span>
+                            <button class="chave-copy-btn" onclick="copiarChave('${chave}', this)" title="Copiar chave completa" type="button">
+                                <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
+                            </button>
+                        </div>
+                    </td>
+
+                    <!-- 7. Valor Total -->
+                    <td class="text-end fw-bold text-success text-nowrap" style="font-size: 0.75rem;">${vNF}</td>
+
+                    <!-- 8. Arquivos (Ícones de Download e Consulta) -->
+                    <td class="text-center text-nowrap">
+                        <div class="d-inline-flex gap-1 align-items-center">
+                            <button class="btn-file-action border-0" style="background-color: rgba(14, 165, 233, 0.12); color: #0284c7;" onclick="abrirModalConsultaSefazModal('${chave}')" title="Consultar esta NF-e na SEFAZ" type="button">
+                                <i data-lucide="search" style="width: 11px; height: 11px;"></i>
+                                <span>SEFAZ</span>
+                            </button>
+                            <a class="btn-file-action btn-file-pdf" href="${downloadPdfUrl}" target="_blank" title="Baixar DANFE em PDF" download>
+                                <i data-lucide="file-text" style="width: 11px; height: 11px;"></i>
+                                <span>PDF</span>
+                            </a>
+                            <a class="btn-file-action btn-file-xml" href="${downloadXmlUrl}" target="_blank" title="Baixar XML da NF-e" download>
+                                <i data-lucide="file-code" style="width: 11px; height: 11px;"></i>
+                                <span>XML</span>
+                            </a>
+                            <a class="btn-file-action btn-file-zip" href="${downloadZipUrl}" title="Baixar Pacote ZIP (PDF + XML)" download>
+                                <i data-lucide="archive" style="width: 11px; height: 11px;"></i>
+                            </a>
+                        </div>
+                    </td>
+
+                    <!-- 9. Recibo/Protocolo -->
+                    <td>
+                        <div class="mb-1">${badgeStatus}</div>
+                        <div class="font-monospace small text-muted text-truncate" style="max-width: 135px; font-size: 0.70rem;" title="${escapeHtml(protocolo)}">
+                            ${protocolo !== '-' ? `Prot: ${escapeHtml(protocolo)}` : '-'}
+                        </div>
+                    </td>
+
+                    <!-- 10. Ações: Resumo & Exclusão -->
+                    <td class="text-center text-nowrap">
+                        <button class="btn btn-sm btn-outline-primary py-0 px-2 d-inline-flex align-items-center gap-1 shadow-sm" style="font-size: 0.72rem; height: 24px;" onclick="abrirModalResumoNota('${chave}')" title="Visualizar Resumo da Nota Fiscal e Opções">
+                            <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
+                            <span>Resumo</span>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('lbl-rodape-paginacao').textContent = `Mostrando ${inicio + 1} a ${fim} de ${notasFiltradas.length} notas fiscais`;
+        renderizarPaginacao(notasFiltradas.length);
+
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    // Renderiza os botões numéricos e navegação de paginação
+    function renderizarPaginacao(totalItens) {
+        const wrap = document.getElementById('paginacao-controles');
+        if (itensPorPagina === 'all' || totalItens <= parseInt(itensPorPagina)) {
+            wrap.innerHTML = '';
+            return;
+        }
+
+        const porPag = parseInt(itensPorPagina);
+        const totalPaginas = Math.ceil(totalItens / porPag);
+
+        let html = `
+            <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''} title="Página Anterior">
+                <i data-lucide="chevron-left" style="width: 12px; height: 12px;"></i>
+            </button>
+            <span class="small px-2 fw-bold text-muted">${paginaAtual} / ${totalPaginas}</span>
+            <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''} title="Próxima Página">
+                <i data-lucide="chevron-right" style="width: 12px; height: 12px;"></i>
+            </button>
+        `;
+        wrap.innerHTML = html;
+    }
+
+    function mudarPagina(novaPag) {
+        const porPag = parseInt(itensPorPagina);
+        const totalPaginas = Math.ceil(notasFiltradas.length / porPag);
+        if (novaPag >= 1 && novaPag <= totalPaginas) {
+            paginaAtual = novaPag;
+            renderizarTabela();
+        }
+    }
+
+    function mudarPageSize(novoTam) {
+        itensPorPagina = novoTam;
+        paginaAtual = 1;
+        renderizarTabela();
+    }
+
+    // Copiar chave de acesso
+    function copiarChave(chave, btnEl) {
+        if (!chave) return;
+        navigator.clipboard.writeText(chave).then(() => {
+            const icon = btnEl.querySelector('i');
+            if (icon) {
+                btnEl.innerHTML = `<i data-lucide="check" style="width: 13px; height: 13px; color: #10b981;"></i>`;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                setTimeout(() => {
+                    btnEl.innerHTML = `<i data-lucide="copy" style="width: 13px; height: 13px;"></i>`;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }, 1800);
+            }
+        }).catch(err => {
+            console.error('Falha ao copiar:', err);
+        });
+    }
+
+    // Modal de edição de referência
+    function abrirModalEditarRef(chave, refAtual) {
+        document.getElementById('modal-ref-chave').value = chave;
+        document.getElementById('modal-ref-input').value = refAtual === '-' ? '' : refAtual;
+        modalRefBootstrap.show();
+    }
+
+    async function salvarReferenciaInterna() {
+        const chave = document.getElementById('modal-ref-chave').value;
+        const novaRef = document.getElementById('modal-ref-input').value.trim();
+
+        try {
+            const res = await fetch('/api/relatorios/notas/atualizar_referencia', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chave: chave, referencia_interna: novaRef })
+            });
+            const data = await res.json();
+            if (data.success) {
+                modalRefBootstrap.hide();
+                // Atualiza localmente
+                todasNotas.forEach(n => {
+                    if (n.chave_nfe.replace(/\s+/g, '') === chave.replace(/\s+/g, '')) {
+                        n.referencia_interna = novaRef || '-';
+                    }
+                });
+                aplicarFiltros();
+            } else {
+                alert('Erro ao salvar referência: ' + (data.error || 'Erro desconhecido'));
+            }
+        } catch (err) {
+            alert('Falha na comunicação com o servidor: ' + err.message);
+        }
+    }
+
+    // Exportação Excel via SheetJS
+    function exportarExcel() {
+        if (notasFiltradas.length === 0) {
+            alert('Nenhuma nota disponível para exportação.');
+            return;
+        }
+
+        const dadosExport = notasFiltradas.map(n => ({
+            'Referência Interna': n.referencia_interna || '-',
+            'Data/Hora': n.data_hora_formatada || n.data_hora || '-',
+            'Número NF-e': n.numero_nfe || '-',
+            'Tipo de Operação': n.tipo_operacao || '-',
+            'Ambiente': String(n.ambiente) === '1' ? 'Produção' : 'Homologação',
+            'Chave de Acesso': n.chave_nfe || '-',
+            'Valor Total': parseFloat(n.valor_total || 0),
+            'Status': n.status || '-',
+            'Recibo/Protocolo': n.protocolo || n.recibo || '-'
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(dadosExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Relatório NF-e");
+
+        const dataHoje = new Date().toISOString().substring(0, 10);
+        XLSX.writeFile(wb, `NFT_Relatorio_Notas_${dataHoje}.xlsx`);
+    }
+
+    // Exportação CSV
+    function exportarCSV() {
+        if (notasFiltradas.length === 0) {
+            alert('Nenhuma nota disponível para exportação.');
+            return;
+        }
+
+        const colunas = [
+            'Referencia Interna',
+            'Data/Hora',
+            'Numero NF-e',
+            'Tipo de Operacao',
+            'Ambiente',
+            'Chave de Acesso',
+            'Valor Total',
+            'Status',
+            'Protocolo'
+        ];
+
+        let csvContent = '\uFEFF' + colunas.join(';') + '\n';
+
+        notasFiltradas.forEach(n => {
+            const linha = [
+                `"${(n.referencia_interna || '').replace(/"/g, '""')}"`,
+                `"${(n.data_hora_formatada || n.data_hora || '').replace(/"/g, '""')}"`,
+                `"${(n.numero_nfe || '').replace(/"/g, '""')}"`,
+                `"${(n.tipo_operacao || '').replace(/"/g, '""')}"`,
+                `"${String(n.ambiente) === '1' ? 'Produção' : 'Homologação'}"`,
+                `"${(n.chave_nfe || '').replace(/"/g, '""')}"`,
+                `"${(parseFloat(n.valor_total || 0)).toFixed(2).replace('.', ',')}"`,
+                `"${(n.status || '').replace(/"/g, '""')}"`,
+                `"${(n.protocolo || n.recibo || '').replace(/"/g, '""')}"`
+            ];
+            csvContent += linha.join(';') + '\n';
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const dataHoje = new Date().toISOString().substring(0, 10);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `NFT_Relatorio_Notas_${dataHoje}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Helpers de formatação e sanitização
+    function formatarMoeda(val) {
+        const num = parseFloat(val) || 0;
+        return `R$ ${num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // ==========================================
+    // LÓGICA DO MODAL DE CONSULTA SEFAZ
+    // ==========================================
+    let modalConsultaSefazBootstrap = null;
+
+    function abrirModalConsultaSefazModal(chaveSugerida = '') {
+        const el = document.getElementById('modalConsultaSefaz');
+        if (!modalConsultaSefazBootstrap && el) {
+            modalConsultaSefazBootstrap = new bootstrap.Modal(el);
+            // Toda vez que o modal for fechado, limpa os resultados anteriores para pesquisar do zero na próxima abertura
+            el.addEventListener('hidden.bs.modal', () => {
+                limparCamposConsultaSefaz();
+            });
+        }
+
+        // Garante que o resultado esteja limpo ao abrir
+        limparResultadoConsultaSefazApenas();
+
+        const inputChave = document.getElementById('sefaz-chave-input');
+        if (chaveSugerida) {
+            inputChave.value = chaveSugerida;
+            formatarChaveInput(inputChave);
+        } else if (!inputChave.value && notasFiltradas.length > 0) {
+            // Sugere a primeira nota da lista se não houver preenchimento
+            const primeiraComChave = notasFiltradas.find(n => n.chave_nfe && n.chave_nfe.replace(/\D/g, '').length === 44);
+            if (primeiraComChave) {
+                inputChave.value = primeiraComChave.chave_nfe;
+                formatarChaveInput(inputChave);
+            }
+        }
+
+        if (modalConsultaSefazBootstrap) {
+            modalConsultaSefazBootstrap.show();
+            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        }
+    }
+
+    function limparResultadoConsultaSefazApenas() {
+        const resEl = document.getElementById('sefaz-resultado-consulta');
+        if (resEl) {
+            resEl.style.display = 'none';
+            resEl.innerHTML = '';
+        }
+    }
+
+    function formatarChaveInput(input) {
+        // Apenas conta os dígitos informados sem forçar regex ou truncar a digitação
+        const digitos = (input.value || '').replace(/\D/g, '');
+        const contador = document.getElementById('sefaz-chave-contador');
+        if (contador) {
+            contador.textContent = `${digitos.length} / 44 dígitos`;
+            contador.className = digitos.length === 44 ? 'text-success fw-bold font-monospace' : (digitos.length > 44 ? 'text-warning fw-bold font-monospace' : 'text-muted font-monospace');
+        }
+    }
+
+    function limparCamposConsultaSefaz() {
+        const input = document.getElementById('sefaz-chave-input');
+        if (input) {
+            input.value = '';
+            formatarChaveInput(input);
+        }
+        const resEl = document.getElementById('sefaz-resultado-consulta');
+        if (resEl) {
+            resEl.style.display = 'none';
+            resEl.innerHTML = '';
+        }
+    }
+
+    async function executarConsultaSefazModal() {
+        const inputChave = document.getElementById('sefaz-chave-input');
+        const chaveLimpa = (inputChave?.value || '').replace(/\D/g, '').trim();
+        const tpAmb = parseInt(document.getElementById('sefaz-ambiente-select')?.value || '1');
+        const uf = document.getElementById('sefaz-uf-select')?.value || 'SP';
+        const resEl = document.getElementById('sefaz-resultado-consulta');
+        const btnConsultar = document.getElementById('btn-executar-consulta-sefaz');
+
+        if (!chaveLimpa || chaveLimpa.length !== 44) {
+            alert('Por favor, informe uma Chave de Acesso válida contendo 44 dígitos.');
+            inputChave.focus();
+            return;
+        }
+
+        if (btnConsultar) {
+            btnConsultar.disabled = true;
+            btnConsultar.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Consultando SEFAZ...`;
+        }
+
+        resEl.style.display = 'block';
+        resEl.innerHTML = `
+            <div class="card border p-4 text-center my-3 bg-light">
+                <div class="spinner-border text-primary mx-auto mb-2" role="status"></div>
+                <div class="fw-bold text-dark">Consultando situação da NF-e no webservice da SEFAZ (${uf})...</div>
+                <small class="text-muted">Aguardando resposta oficial do servidor de autorização</small>
+            </div>
+        `;
+
+        try {
+            const resp = await fetch('/api/sefaz/consultar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chave: chaveLimpa,
+                    tpAmb: tpAmb,
+                    uf: uf
+                })
+            });
+
+            const data = await resp.json();
+
+            if (!data.status || data.status === 'error') {
+                throw new Error(data.message || data.error || 'Erro ao consultar SEFAZ');
+            }
+
+            renderizarResultadoSefaz(data);
+
+            // Atualiza status localmente se a nota estiver no relatório
+            todasNotas.forEach(n => {
+                if (n.chave_nfe && n.chave_nfe.replace(/\D/g, '') === chaveLimpa) {
+                    if (data.is_cancelada) {
+                        n.status = 'Cancelada';
+                    } else if (data.cstat === '100') {
+                        n.status = 'Autorizada';
+                    }
+                    if (data.protocolo_autorizacao && !n.protocolo) {
+                        n.protocolo = data.protocolo_autorizacao;
+                    }
+                }
+            });
+            atualizarResumoCards();
+            renderizarTabela();
+
+        } catch (err) {
+            console.error('Erro na consulta SEFAZ:', err);
+            resEl.innerHTML = `
+                <div class="alert alert-danger p-3 my-2 shadow-sm">
+                    <div class="d-flex align-items-center gap-2 mb-1 fw-bold">
+                        <i data-lucide="alert-octagon" style="width: 18px; height: 18px;"></i>
+                        <span>Falha na Comunicação com a SEFAZ</span>
+                    </div>
+                    <div class="small">${escapeHtml(err.message)}</div>
+                </div>
+            `;
+            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        } finally {
+            if (btnConsultar) {
+                btnConsultar.disabled = false;
+                btnConsultar.innerHTML = `<i data-lucide="search" style="width: 14px; height: 14px;"></i> <span>Consultar na SEFAZ</span>`;
+                if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+            }
+        }
+    }
+
+    function renderizarResultadoSefaz(data) {
+        const resEl = document.getElementById('sefaz-resultado-consulta');
+        if (!resEl) return;
+
+        const situacaoTexto = String(data.situacao || '').toUpperCase();
+        const isCancelada = Boolean(data.is_cancelada || situacaoTexto.includes('CANCELADA') || data.cstat === '101');
+        const chaveFmt = (data.chave || '').match(/.{1,4}/g)?.join(' ') || data.chave;
+        
+        // Define classe do badge: CANCELADA é sempre vermelho vivo (bg-danger)
+        let badgeClasse = data.badge_classe || 'primary';
+        if (isCancelada) {
+            badgeClasse = 'danger';
+        }
+        
+        // Monta tabela de eventos vinculados (Cancelamento, CC-e, etc.)
+        let eventosHtml = '';
+        if (data.eventos && data.eventos.length > 0) {
+            let trs = data.eventos.map(ev => `
+                <tr>
+                    <td class="text-nowrap"><span class="badge bg-secondary-subtle text-dark border">${escapeHtml(ev.tpEvento || '-')}</span></td>
+                    <td class="fw-semibold">${escapeHtml(ev.descEvento || 'Evento Fiscal')}</td>
+                    <td class="text-center">${ev.nSeqEvento || '1'}</td>
+                    <td class="text-nowrap small text-muted font-monospace">${escapeHtml(ev.dhRegEvento || '-')}</td>
+                    <td class="font-monospace text-primary fw-bold small">${escapeHtml(ev.nProt || '-')}</td>
+                    <td class="small text-muted">${escapeHtml(ev.xMotivo || '-')}</td>
+                </tr>
+            `).join('');
+
+            eventosHtml = `
+                <div class="mt-3">
+                    <h6 class="fw-bold text-dark d-flex align-items-center gap-2 mb-2" style="font-size: 0.85rem;">
+                        <i data-lucide="layers" style="width: 15px; height: 15px;"></i>
+                        <span>Eventos Vinculados à NF-e no Fisco (${data.eventos.length})</span>
+                    </h6>
+                    <div class="table-responsive border rounded bg-white shadow-sm">
+                        <table class="table table-sm table-hover mb-0" style="font-size: 0.75rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Descrição</th>
+                                    <th class="text-center">Seq</th>
+                                    <th>Data/Hora Registro</th>
+                                    <th>Protocolo do Evento</th>
+                                    <th>Status Retorno</th>
+                                </tr>
+                            </thead>
+                            <tbody>${trs}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        resEl.innerHTML = `
+            <div class="card border p-3 bg-white shadow-sm mt-3">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-2 border-bottom mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-${badgeClasse} text-white fs-6 px-3 py-2 fw-bold text-uppercase shadow-sm" style="${isCancelada ? 'background-color: #dc2626 !important; color: #ffffff !important; border-color: #dc2626 !important;' : 'color: #ffffff !important;'}">
+                            ${isCancelada ? 'CANCELADA' : (data.situacao || 'PROCESSADA')}
+                        </span>
+                        <span class="badge bg-light text-secondary border font-monospace">cStat: ${data.cstat || '-'}</span>
+                        <span class="badge ${data.tpAmb === 1 ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle'}">
+                            ${data.ambiente_nome || (data.tpAmb === 1 ? 'Produção' : 'Homologação')}
+                        </span>
+                    </div>
+                    <small class="text-muted font-monospace">${data.dh_recbto || ''}</small>
+                </div>
+
+                <div class="bg-light p-3 rounded border mb-3">
+                    <div class="mb-2">
+                        <span class="text-muted small text-uppercase fw-bold d-block">Chave de Acesso Consultada:</span>
+                        <span class="font-monospace fw-bold text-dark text-break" style="font-size: 0.85rem;">${chaveFmt}</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small text-uppercase fw-bold d-block">Retorno Oficial da SEFAZ:</span>
+                        <span class="fw-semibold text-secondary" style="font-size: 0.85rem;">${escapeHtml(data.xmotivo || 'Sem mensagem')}</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="row g-2 pt-1">
+                        <div class="col-sm-6">
+                            <span class="text-muted small text-uppercase fw-bold d-block">Protocolo de Autorização:</span>
+                            <span class="font-monospace fw-bold text-success">${escapeHtml(data.protocolo_autorizacao || '-')}</span>
+                            ${data.data_autorizacao ? `<small class="text-muted d-block font-monospace">${data.data_autorizacao}</small>` : ''}
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small text-uppercase fw-bold d-block">Protocolo do Evento de Cancelamento:</span>
+                            <span class="font-monospace fw-bold text-danger">${escapeHtml(data.protocolo_cancelamento || (isCancelada ? 'Homologado na SEFAZ' : 'Não consta cancelamento'))}</span>
+                            ${data.data_cancelamento ? `<small class="text-muted d-block font-monospace">${data.data_cancelamento}</small>` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                ${eventosHtml}
+
+                <div class="d-flex flex-wrap justify-content-center gap-2 pt-3 mt-2 border-top">
+                    <a href="/api/sefaz/download/pdf/${data.chave}" target="_blank" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 shadow-sm">
+                        <i data-lucide="file-text" style="width: 14px; height: 14px;"></i> <span>Baixar DANFE (PDF)</span>
+                    </a>
+                    <a href="/api/sefaz/download/xml/${data.chave}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 shadow-sm">
+                        <i data-lucide="file-code" style="width: 14px; height: 14px;"></i> <span>Baixar XML</span>
+                    </a>
+                    <a href="/api/sefaz/download/zip/${data.chave}" target="_blank" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1 shadow-sm">
+                        <i data-lucide="archive" style="width: 14px; height: 14px;"></i> <span>Pacote ZIP</span>
+                    </a>
+                </div>
+            </div>
+        `;
+
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
+    }
+
+    // ==========================================
+    // LÓGICA DO MODAL DE RESUMO E EXCLUSÃO DA NF-E
+    // ==========================================
+    let modalResumoNotaBootstrap = null;
+    let notaAtualParaExclusao = null;
+
+    function abrirModalResumoNota(chave) {
+        if (!modalResumoNotaBootstrap) {
+            const el = document.getElementById('modalResumoNota');
+            if (el) modalResumoNotaBootstrap = new bootstrap.Modal(el);
+        }
+
+        const nota = todasNotas.find(n => n.chave_nfe && n.chave_nfe.replace(/\D/g, '') === String(chave).replace(/\D/g, ''));
+        if (!nota) {
+            alert('Dados da nota fiscal não encontrados.');
+            return;
+        }
+
+        notaAtualParaExclusao = nota;
+        renderizarResumoNota(nota);
+
+        if (modalResumoNotaBootstrap) {
+            modalResumoNotaBootstrap.show();
+            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        }
+    }
+
+    function renderizarResumoNota(n) {
+        const bodyEl = document.getElementById('modal-resumo-body');
+        if (!bodyEl) return;
+
+        const chave = n.chave_nfe || '';
+        const chaveFmt = n.chave_formatada || chave;
+        const ref = n.referencia_interna || '-';
+        const dt = n.data_hora_formatada || n.data_hora || '-';
+        const numNfe = n.numero_nfe || '-';
+        const natOp = n.tipo_operacao || '-';
+        const vNF = n.valor_total_fmt || formatarMoeda(n.valor_total);
+        const vProd = n.total_produtos_fmt || formatarMoeda(n.total_produtos);
+        const status = n.status || 'Gerada';
+        const statusUpper = status.toUpperCase();
+        const protocolo = n.protocolo || n.recibo || '-';
+        const isProd = String(n.ambiente) === '1';
+
+        // Badge de Status (Sem a classe 'badge' do Bootstrap)
+        let badgeStatusHtml = '';
+        if (status === 'Autorizada') {
+            badgeStatusHtml = `<span class="status-pill status-pill-success px-2 py-1"><i data-lucide="check-circle" style="width:13px; height:13px;"></i> Autorizada</span>`;
+        } else if (statusUpper.includes('CANCELADA')) {
+            badgeStatusHtml = `<span class="status-pill status-pill-danger px-2 py-1 fw-bold"><i data-lucide="x-circle" style="width:13px; height:13px;"></i> Cancelada</span>`;
+        } else if (statusUpper.includes('REJEITADA') || statusUpper.includes('REJEIÇÃO')) {
+            badgeStatusHtml = `<span class="status-pill status-pill-danger px-2 py-1 fw-bold"><i data-lucide="alert-octagon" style="width:13px; height:13px;"></i> Rejeitada</span>`;
+        } else if (statusUpper.includes('DENEGADA')) {
+            badgeStatusHtml = `<span class="status-pill status-pill-danger px-2 py-1 fw-bold"><i data-lucide="shield-alert" style="width:13px; height:13px;"></i> Denegada</span>`;
+        } else {
+            badgeStatusHtml = `<span class="status-pill status-pill-info px-2 py-1">${escapeHtml(status)}</span>`;
+        }
+
+        // Tag de Ambiente (Produção em Azul, Homologação em Cinza)
+        const badgeAmbHtml = isProd
+            ? `<span class="ambiente-pill ambiente-pill-prod px-2 py-1"><i data-lucide="shield-check" style="width: 12px; height: 12px;"></i> Produção</span>`
+            : `<span class="ambiente-pill ambiente-pill-homolog px-2 py-1"><i data-lucide="test-tube-2" style="width: 12px; height: 12px;"></i> Homologação</span>`;
+
+        bodyEl.innerHTML = `
+            <div class="row g-3">
+                <!-- Cabeçalho do Resumo -->
+                <div class="col-12">
+                    <div class="p-3 bg-light rounded border d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <span class="small text-muted fw-bold text-uppercase d-block">Referência Interna:</span>
+                            <span class="fs-6 fw-bold text-primary">${escapeHtml(ref)}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            ${badgeStatusHtml}
+                            ${badgeAmbHtml}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalhes da Nota -->
+                <div class="col-md-6">
+                    <div class="p-3 border rounded h-100 bg-white">
+                        <h6 class="fw-bold mb-2 text-secondary d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+                            <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
+                            <span>Dados de Emissão</span>
+                        </h6>
+                        <ul class="list-unstyled small mb-0 lh-lg">
+                            <li><span class="text-muted fw-semibold">Número da NF-e:</span> <strong class="font-monospace">${escapeHtml(numNfe)}</strong></li>
+                            <li><span class="text-muted fw-semibold">Data/Hora:</span> ${escapeHtml(dt)}</li>
+                            <li><span class="text-muted fw-semibold">Natureza da Operação:</span> ${escapeHtml(natOp)}</li>
+                            <li><span class="text-muted fw-semibold">Tipo Movimento:</span> ${String(n.tipo_movimento) === '0' ? '0 - Entrada' : '1 - Saída'}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="p-3 border rounded h-100 bg-white">
+                        <h6 class="fw-bold mb-2 text-secondary d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+                            <i data-lucide="dollar-sign" style="width: 14px; height: 14px;"></i>
+                            <span>Valores & Protocolo</span>
+                        </h6>
+                        <ul class="list-unstyled small mb-0 lh-lg">
+                            <li><span class="text-muted fw-semibold">Valor Total (vNF):</span> <strong class="text-success">${escapeHtml(vNF)}</strong></li>
+                            <li><span class="text-muted fw-semibold">Total Produtos (vProd):</span> ${escapeHtml(vProd)}</li>
+                            <li><span class="text-muted fw-semibold">Protocolo / Recibo:</span> <span class="font-monospace">${escapeHtml(protocolo)}</span></li>
+                            <li><span class="text-muted fw-semibold">cStat SEFAZ:</span> <span class="badge bg-light text-dark border font-monospace">${escapeHtml(n.cstat || '-')}</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Chave de Acesso -->
+                <div class="col-12">
+                    <div class="p-3 border rounded bg-light">
+                        <span class="text-muted small fw-bold text-uppercase d-block mb-1">Chave de Acesso Oficial (44 Dígitos):</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="font-monospace fw-bold text-break text-dark" style="font-size: 0.85rem;">${chaveFmt}</span>
+                            <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="copiarChave('${chave}', this)" title="Copiar chave" type="button">
+                                <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
+                            </button>
+                        </div>
+                        ${n.xmotivo ? `<div class="mt-2 small text-muted"><strong>Mensagem do Fisco:</strong> ${escapeHtml(n.xmotivo)}</div>` : ''}
+                    </div>
+                </div>
+
+                <!-- Ações Rápidas de Download -->
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-2 justify-content-center pt-2">
+                        <a href="/api/sefaz/download/pdf/${chave}" target="_blank" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i data-lucide="file-text" style="width: 13px; height: 13px;"></i> Baixar DANFE (PDF)
+                        </a>
+                        <a href="/api/sefaz/download/xml/${chave}" target="_blank" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i data-lucide="file-code" style="width: 13px; height: 13px;"></i> Baixar XML
+                        </a>
+                        <a href="/api/sefaz/download/zip/${chave}" target="_blank" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1 shadow-sm">
+                            <i data-lucide="archive" style="width: 13px; height: 13px;"></i> Pacote ZIP
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1 shadow-sm" onclick="modalResumoNotaBootstrap.hide(); abrirModalConsultaSefazModal('${chave}');">
+                            <i data-lucide="search" style="width: 13px; height: 13px;"></i> Consultar na SEFAZ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
+    }
+
+    async function confirmarExclusaoNota() {
+        if (!notaAtualParaExclusao || !notaAtualParaExclusao.chave_nfe) {
+            if (typeof nftAlert === 'function') {
+                await nftAlert('Nenhuma nota fiscal selecionada.', { type: 'warning', title: 'Atenção' });
+            } else {
+                alert('Nenhuma nota fiscal selecionada.');
+            }
+            return;
+        }
+
+        const ref = notaAtualParaExclusao.referencia_interna && notaAtualParaExclusao.referencia_interna !== '-' 
+            ? notaAtualParaExclusao.referencia_interna 
+            : (notaAtualParaExclusao.numero_nfe ? `NF ${notaAtualParaExclusao.numero_nfe}` : notaAtualParaExclusao.chave_nfe);
+
+        let confirmou = false;
+        if (typeof nftConfirm === 'function') {
+            confirmou = await nftConfirm(
+                `Tem certeza que deseja excluir a nota fiscal "${ref}" do relatório?\n\nEla será removida da listagem e dos cálculos estatísticos do painel.`,
+                {
+                    title: 'Confirmar Exclusão',
+                    type: 'danger',
+                    confirmText: 'Sim, Excluir',
+                    cancelText: 'Cancelar',
+                    icon: 'trash-2'
+                }
+            );
+        } else {
+            confirmou = confirm(`Tem certeza que deseja excluir a nota fiscal "${ref}" do relatório?\n\nEla será removida da listagem e dos cálculos do painel.`);
+        }
+
+        if (!confirmou) return;
+
+        const chave = notaAtualParaExclusao.chave_nfe;
+        const btnExcluir = document.getElementById('btn-excluir-nota-modal');
+        if (btnExcluir) {
+            btnExcluir.disabled = true;
+            btnExcluir.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Excluindo...`;
+        }
+
+        try {
+            const resp = await fetch('/api/relatorios/notas/excluir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chave: chave })
+            });
+
+            const data = await resp.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Falha ao excluir nota fiscal do relatório.');
+            }
+
+            // Remove da lista local em memória
+            todasNotas = todasNotas.filter(n => n.chave_nfe && n.chave_nfe.replace(/\D/g, '') !== chave.replace(/\D/g, ''));
+            
+            if (modalResumoNotaBootstrap) {
+                modalResumoNotaBootstrap.hide();
+            }
+
+            // Reaplica filtros e atualiza contadores e tabela
+            aplicarFiltros();
+
+            if (typeof nftAlert === 'function') {
+                await nftAlert('Nota fiscal excluída do relatório com sucesso!', { 
+                    type: 'success', 
+                    title: 'Exclusão Concluída',
+                    icon: 'check-circle'
+                });
+            } else {
+                alert('Nota fiscal excluída do relatório com sucesso!');
+            }
+
+        } catch (err) {
+            console.error('Erro ao excluir nota:', err);
+            if (typeof nftAlert === 'function') {
+                await nftAlert('Erro ao excluir nota fiscal: ' + err.message, { 
+                    type: 'danger', 
+                    title: 'Falha na Exclusão',
+                    icon: 'alert-triangle'
+                });
+            } else {
+                alert('Erro ao excluir nota fiscal: ' + err.message);
+            }
+        } finally {
+            if (btnExcluir) {
+                btnExcluir.disabled = false;
+                btnExcluir.innerHTML = `<i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> <span>Excluir Nota Fiscal do Relatório</span>`;
+                if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

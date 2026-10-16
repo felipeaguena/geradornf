@@ -6,6 +6,16 @@
 (function() {
     let isShuttingDown = false;
 
+    // Ajusta a proporção da janela do sistema para 1440x900 ao carregar
+    try {
+        if (!sessionStorage.getItem('nft_window_resized')) {
+            if (window.resizeTo && (!window.outerWidth || window.outerWidth !== 1440 || window.outerHeight !== 900)) {
+                window.resizeTo(1440, 900);
+            }
+            sessionStorage.setItem('nft_window_resized', 'true');
+        }
+    } catch(e) {}
+
     window.fecharJanelaCompleta = function() {
         window._nftIsShuttingDown = true;
         window.onbeforeunload = null;

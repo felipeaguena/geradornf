@@ -16,6 +16,7 @@
     <script src="/static/js/lucide.min.js"></script>
     <script src="/static/js/nft-dialogs.js"></script>
     <script defer src="/static/js/nft-sidebar.js?v=2.7"></script>
+    <script defer src="/static/js/nft-shortcuts.js?v=1.0"></script>
 </head>
 <body class="has-sidebar">
 <!-- MENU LATERAL FIXO (SIDEBAR) -->
@@ -64,6 +65,23 @@
                 <a class="nft-sidebar-btn" href="/di_duimp?nova_nota=1" title="Módulo XML da DI ou DUIMP">
                     <span class="sidebar-icon"><i data-lucide="globe"></i></span>
                     <span class="sidebar-label">XML da DI ou DUIMP</span>
+                </a>
+            </li>
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/rascunho?abrir_rascunhos=1" title="Ver e gerenciar Rascunhos Salvos">
+                    <span class="sidebar-icon"><i data-lucide="folder-clock"></i></span>
+                    <span class="sidebar-label">Rascunhos Salvos</span>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Grupo: Relatório -->
+        <div class="sidebar-section-title">Relatório</div>
+        <ul class="nft-sidebar-nav">
+            <li class="nft-sidebar-item">
+                <a class="nft-sidebar-btn" href="/relatorios" title="Relatório de Notas Fiscais Geradas">
+                    <span class="sidebar-icon"><i data-lucide="file-spreadsheet"></i></span>
+                    <span class="sidebar-label">Relatório</span>
                 </a>
             </li>
         </ul>
@@ -139,8 +157,8 @@
                     <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
                     <span>Locais</span>
                 </button>
-                <button class="btn-nft d-flex align-items-center gap-1" onclick="sincronizarPlanilhaGoogle()" title="Sincronizar dados a partir da planilha oficial do Google Sheets">
-                    <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                <button class="btn-nft d-flex align-items-center gap-1" onclick="abrirModalPlanilhaGoogle()" title="Configurar link do Google Sheets e sincronizar feiras">
+                    <i data-lucide="sheet" style="width: 14px; height: 14px;"></i>
                     <span>Sincronizar Sheets</span>
                 </button>
                 <button class="btn-nft d-flex align-items-center gap-1" onclick="abrirModalNovaFeira()">
@@ -329,6 +347,56 @@
     </div>
 </div>
 
+<!-- MODAL 3: CONFIGURAR E SINCRONIZAR PLANILHA GOOGLE SHEETS -->
+<div class="modal fade" id="modalPlanilhaGoogle" tabindex="-1" aria-labelledby="modalPlanilhaGoogleTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow border-0">
+            <div class="modal-header bg-light py-2 px-3 border-bottom">
+                <h5 class="modal-title fw-bold fs-6 d-flex align-items-center gap-2" id="modalPlanilhaGoogleTitulo">
+                    <i data-lucide="sheet" class="text-success" style="width: 18px; height: 18px;"></i>
+                    <span>Sincronizar Feiras com Google Sheets</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-3">
+                    Cole abaixo o link da planilha do <strong>Google Sheets</strong> de onde o sistema deve puxar as feiras. O sistema salva esse link e atualiza automaticamente os dados.
+                </p>
+
+                <form id="formPlanilhaGoogle" onsubmit="confirmarSincronizarPlanilhaGoogle(event)">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold" for="input_sheets_url">Link da Planilha (Google Sheets)</label>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text"><i data-lucide="link" style="width: 14px; height: 14px;"></i></span>
+                            <input type="url" class="form-control form-control-sm font-monospace" id="input_sheets_url" required placeholder="https://docs.google.com/spreadsheets/d/.../edit#gid=..." style="height: 34px; font-size: 12px;"/>
+                        </div>
+                        <div class="form-text" style="font-size: 11px;">
+                            Pode ser o link normal de visualização do navegador (<code>/edit</code>) ou de exportação CSV.
+                        </div>
+                    </div>
+
+                    <div class="alert alert-light border small p-2 mb-3 d-flex align-items-start gap-2">
+                        <i data-lucide="info" class="text-primary mt-1 flex-shrink-0" style="width: 15px; height: 15px;"></i>
+                        <span class="text-muted" style="font-size: 11.5px;">
+                            <strong>Atenção:</strong> A planilha deve estar com acesso público de Leitor (no Google Sheets: <em>Compartilhar &rarr; Acesso Geral &rarr; Qualquer pessoa com o link &rarr; Leitor</em>).
+                        </span>
+                    </div>
+
+                    <div id="sheets_sync_status" class="mb-3" style="display: none;"></div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                        <button type="button" class="btn-nft px-3" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn-nft px-3 d-inline-flex align-items-center gap-1" id="btnSyncSheetsConfirm">
+                            <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                            <span id="txtBtnSyncSheets">Puxar Dados e Atualizar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -337,6 +405,7 @@
     let locaisCache = [];
     let modalFeiraInstancia = null;
     let modalGerenciarLocaisInstancia = null;
+    let modalPlanilhaGoogleInstancia = null;
 
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -349,6 +418,11 @@
         const modalLocaisEl = document.getElementById('modalGerenciarLocais');
         if (modalLocaisEl) {
             modalGerenciarLocaisInstancia = new bootstrap.Modal(modalLocaisEl);
+        }
+
+        const modalPlanilhaEl = document.getElementById('modalPlanilhaGoogle');
+        if (modalPlanilhaEl) {
+            modalPlanilhaGoogleInstancia = new bootstrap.Modal(modalPlanilhaEl);
         }
 
         carregarLocaisEntrega();
@@ -717,23 +791,100 @@
         }
     }
 
-    async function sincronizarPlanilhaGoogle() {
-        try {
-            const btn = event ? event.target.closest('button') : null;
-            if (btn) btn.disabled = true;
+    async function abrirModalPlanilhaGoogle() {
+        const inputUrl = document.getElementById('input_sheets_url');
+        const statusBox = document.getElementById('sheets_sync_status');
+        if (statusBox) statusBox.style.display = 'none';
 
-            const resp = await fetch('/api/feiras/sync_sheets', { method: 'POST' });
+        // Carrega o link atualmente configurado
+        try {
+            const resp = await fetch('/api/feiras/sync_sheets');
+            const data = await resp.json();
+            if (data.url && inputUrl) {
+                inputUrl.value = data.url;
+            }
+        } catch (e) {
+            console.warn('Erro ao carregar URL da planilha:', e);
+        }
+
+        if (modalPlanilhaGoogleInstancia) {
+            modalPlanilhaGoogleInstancia.show();
+            setTimeout(() => {
+                if (inputUrl) inputUrl.focus();
+            }, 300);
+        }
+    }
+
+    async function confirmarSincronizarPlanilhaGoogle(e) {
+        if (e) e.preventDefault();
+
+        const inputUrl = document.getElementById('input_sheets_url');
+        const url = (inputUrl ? inputUrl.value : '').trim();
+        const btn = document.getElementById('btnSyncSheetsConfirm');
+        const txtBtn = document.getElementById('txtBtnSyncSheets');
+        const statusBox = document.getElementById('sheets_sync_status');
+
+        if (!url) {
+            alert('Por favor, informe a URL da planilha do Google Sheets.');
+            if (inputUrl) inputUrl.focus();
+            return;
+        }
+
+        if (btn) btn.disabled = true;
+        if (txtBtn) txtBtn.innerText = 'Sincronizando dados...';
+        if (statusBox) {
+            statusBox.style.display = 'block';
+            statusBox.className = 'alert alert-info border small p-2 d-flex align-items-center gap-2';
+            statusBox.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span>Conectando ao Google Sheets e importando feiras...</span>`;
+        }
+
+        try {
+            const resp = await fetch('/api/feiras/sync_sheets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            });
             const data = await resp.json();
 
             if (data.status === 'success') {
-                alert(data.message);
+                if (statusBox) {
+                    statusBox.className = 'alert alert-success border small p-2';
+                    statusBox.innerHTML = `<strong>Sucesso:</strong> ${escapeHtml(data.message)}`;
+                }
                 await carregarFeiras();
+                if (window.nftAlert) {
+                    await window.nftAlert(data.message, { type: 'success', title: 'Sincronização Concluída' });
+                }
+                setTimeout(() => {
+                    if (modalPlanilhaGoogleInstancia) modalPlanilhaGoogleInstancia.hide();
+                }, 1200);
+            } else if (data.status === 'warning') {
+                if (statusBox) {
+                    statusBox.className = 'alert alert-warning border small p-2';
+                    statusBox.innerHTML = `<strong>Atenção:</strong> ${escapeHtml(data.message)}`;
+                }
+                if (window.nftAlert) {
+                    window.nftAlert(data.message, { type: 'warning', title: 'Atenção na Permissão da Planilha' });
+                } else {
+                    alert(data.message);
+                }
             } else {
-                alert(data.message || 'Aviso durante sincronização.');
+                if (statusBox) {
+                    statusBox.className = 'alert alert-danger border small p-2';
+                    statusBox.innerHTML = `<strong>Erro:</strong> ${escapeHtml(data.message || 'Falha ao sincronizar.')}`;
+                }
+                alert(data.message || 'Erro durante a sincronização.');
             }
-            if (btn) btn.disabled = false;
         } catch (err) {
-            alert('Erro ao tentar sincronizar com o Google Sheets: ' + err.message);
+            if (statusBox) {
+                statusBox.className = 'alert alert-danger border small p-2';
+                statusBox.innerHTML = `<strong>Falha de conexão:</strong> ${escapeHtml(err.message)}`;
+            }
+            alert('Erro de conexão ao tentar sincronizar com o Google Sheets: ' + err.message);
+        } finally {
+            if (btn) btn.disabled = false;
+            if (txtBtn) txtBtn.innerText = 'Puxar Dados e Atualizar';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
     }
 

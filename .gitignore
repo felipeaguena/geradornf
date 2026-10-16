@@ -1,0 +1,38 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.pyo
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# Certificados Digitais e Chaves Privadas (Segurança)
+gerador/certificado/*.pfx
+gerador/certificado/*.p12
+gerador/certificado/*.pem
+gerador/certificado/*.key
+gerador/certificado/*.crt
+
+# Arquivos Gerados de Downloads (XMLs, DANFEs, ZIPs)
+gerador/downloads/*-nfe.xml
+gerador/downloads/*-danfe.pdf
+gerador/downloads/*-arquivos.zip
+
+# Rascunhos e Arquivos de Trabalho Temporários
+gerador/rascunhos/rascunho_*.json
+
+# Logs e Temporários
+*.log
+*.tmp
+*.bak
+test_out.txt
+last_compact.txt
+last_290.xml
+
+# Arquivos e Modelos Legados
+arquivos_e_modelos_antigos/
