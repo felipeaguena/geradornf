@@ -355,16 +355,22 @@ class DanfeGenerator:
         chave_clean = re.sub(r"\D", "", chave)
         if len(chave_clean) != 44:
             return None
-        code128 = barcode.get("code128", chave_clean, writer=ImageWriter())
-        fp = io.BytesIO()
-        code128.write(fp, options={
-            "write_text": False,
-            "quiet_zone": 1.0,
-            "module_height": 10.0,
-            "font_size": 0
-        })
-        fp.seek(0)
-        return fp.getvalue()
+        if ImageWriter is None:
+            return None
+        try:
+            code128 = barcode.get("code128", chave_clean, writer=ImageWriter())
+            fp = io.BytesIO()
+            code128.write(fp, options={
+                "write_text": False,
+                "quiet_zone": 1.0,
+                "module_height": 10.0,
+                "font_size": 0
+            })
+            fp.seek(0)
+            return fp.getvalue()
+        except Exception as e_bc:
+            print(f"Aviso ao gerar barcode: {e_bc}")
+            return None
 
     def render(self, xml_path_or_content, output_pdf_path):
         if HAS_BFR:

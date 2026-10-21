@@ -3,3 +3,8 @@ Werkzeug==3.0.0
 openpyxl
 pymupdf
 python-barcode
+Pillow
+requests
+cryptography
+signxml
+xmlsec
